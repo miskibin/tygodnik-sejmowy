@@ -93,6 +93,17 @@ export type VoteEventPayload = {
   seats?: VoteSeatRaw[];
 };
 
+// Mirrors compute_act_kind() in supabase/migrations/0077_acts_act_kind.sql.
+// Used to split "Wchodzi w życie" into new-law vs republication sub-sections.
+export type ActKind =
+  | "ustawa_nowa"
+  | "nowelizacja"
+  | "tekst_jednolity"
+  | "obwieszczenie"
+  | "rozporzadzenie"
+  | "uchwala_sejmu"
+  | "inne";
+
 export type EliInforceEventPayload = {
   act_id: number;
   eli_id: string;
@@ -100,6 +111,7 @@ export type EliInforceEventPayload = {
   year: number;
   position: number;
   type: string;
+  act_kind: ActKind | null;
   title: string;
   short_title: string | null;
   in_force: string | null;
@@ -109,6 +121,20 @@ export type EliInforceEventPayload = {
   display_address: string | null;
   keywords: string[] | null;
 };
+
+// Citizen-facing categories: which act_kinds count as "new law" vs
+// "republications/updates". Filter in BriefList for citizen review #13.
+export const ACT_KIND_NEW_LAW: ReadonlySet<ActKind> = new Set([
+  "ustawa_nowa",
+  "nowelizacja",
+]);
+export const ACT_KIND_REPUBLICATION: ReadonlySet<ActKind> = new Set([
+  "tekst_jednolity",
+  "obwieszczenie",
+  "rozporzadzenie",
+  "uchwala_sejmu",
+  "inne",
+]);
 
 export type LateInterpellationAuthor = {
   mp_id: number;

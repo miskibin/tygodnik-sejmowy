@@ -959,6 +959,34 @@ def cmd_enrich_act_short_title(
         raise typer.Exit(3)
 
 
+@app.command("verify-act-kind")
+def cmd_verify_act_kind(
+    per_kind: int = typer.Option(50, "--per-kind", "-n",
+                                 help="Sample size per act_kind"),
+    counts_only: bool = typer.Option(False, "--counts",
+                                     help="Print kind counts only, skip sample dump"),
+):
+    """Eyeball act_kind classifications. Use BEFORE flipping the Tygodnik
+    `act_kind` filter on, to confirm compute_act_kind() (migration 0077)
+    didn't mis-bucket edge cases. Prints up to N rows per kind plus a
+    final tally.
+    """
+    from supagraf.enrich.acts import ACT_KINDS, kind_counts, print_sample
+
+    if not counts_only:
+        print_sample(per_kind=per_kind)
+
+    print("\n=== act_kind counts ===")
+    counts = kind_counts()
+    total = sum(counts.values())
+    for kind in (*ACT_KINDS, "_null_"):
+        n = counts.get(kind, 0)
+        if n:
+            pct = (n / total * 100.0) if total else 0.0
+            print(f"  {kind:18s}  {n:6d}  ({pct:5.1f}%)")
+    print(f"  {'TOTAL':18s}  {total:6d}")
+
+
 @app.command("enrich-voting-short-title")
 def cmd_enrich_voting_short_title(
     term: int = typer.Option(10, "--term", "-t"),

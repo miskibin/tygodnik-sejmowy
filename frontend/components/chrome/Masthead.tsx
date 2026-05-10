@@ -14,7 +14,7 @@ import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
 // mobile→desktop threshold to lg: gives us a clean burger on tablets, and we
 // only re-introduce supplementary chrome (issue label, postcode pill) at xl:.
 
-export function Masthead({ alertsCount = 0, issue = 47 }: { alertsCount?: number; issue?: number }) {
+export function Masthead({ alertsCount = 0 }: { alertsCount?: number }) {
   const pathname = usePathname();
   const { postcode, district } = useProfile();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -58,11 +58,14 @@ export function Masthead({ alertsCount = 0, issue = 47 }: { alertsCount?: number
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
           </Link>
-          <span className="hidden xl:inline w-px h-[18px] bg-border" />
-          <span className="hidden xl:inline font-mono text-[10px] text-muted-foreground tracking-[0.1em] uppercase">
-            <span className="text-destructive">●</span>&nbsp;Nr&nbsp;{issue}
-            {dateLabel && <> · {dateLabel.day}&nbsp;{dateLabel.full}</>}
-          </span>
+          {dateLabel && (
+            <>
+              <span className="hidden xl:inline w-px h-[18px] bg-border" />
+              <span className="hidden xl:inline font-mono text-[10px] text-muted-foreground tracking-[0.1em] uppercase">
+                <span className="text-destructive">●</span>&nbsp;{dateLabel.day}&nbsp;{dateLabel.full}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Primary nav (lg+ only — tablet falls back to burger) */}

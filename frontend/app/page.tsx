@@ -200,7 +200,11 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Three pillars */}
+      {/* Three pillars — citizen review 2026-05-10:
+          * filar II copy softened from "312 dopasowanych" to honest framing —
+            promise/vote matching is partial, hard counts misled (#6, #14)
+          * filar III moved off Patronite (autopromocja) onto Atlas — the
+            cross-club voting heatmap is the real second product (#14) */}
       <section className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 py-14 md:py-20 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
         {[
           {
@@ -213,16 +217,16 @@ export default function Landing() {
           {
             n: "II",
             h: "Obietnica vs głosowanie",
-            b: "312 deklaracji wyborczych z 2023 dopasowanych do realnych głosowań w X kadencji. Zaktualizowane w piątek po każdym posiedzeniu.",
+            b: "Rejestr deklaracji wyborczych z 2023 — co partia obiecała, jak głosowała w X kadencji. Dopasowywane do głosowań w trakcie kadencji, nie tylko w spotach.",
             cta: "Otwórz rejestr →",
             href: "/obietnice",
           },
           {
             n: "III",
-            h: "Finansowane przez Patronów",
-            b: "Projekt utrzymują regularne wpłaty przez Patronite. Brak reklam, brak grantów, brak partii. Transparentny budżet co miesiąc.",
-            cta: "Zostań patronem →",
-            href: "https://patronite.pl/tygodniksejmowy",
+            h: "Atlas głosowań",
+            b: "Z kim głosuje koło Twojego posła? Które kluby idą razem, a które naprawdę różnią się merytorycznie? Wykresy zbudowane na każdym imiennym głosowaniu kadencji.",
+            cta: "Otwórz Atlas →",
+            href: "/atlas",
           },
         ].map((c) => (
           <article key={c.n} className="border-t border-rule pt-5">

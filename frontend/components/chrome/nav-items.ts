@@ -1,13 +1,17 @@
+// Three-pillar primary nav matches the manifesto ("3 do 7 rzeczy" — keep
+// top-level lean). Sondaże/Atlas/Mowa are exploration tools, not core
+// product, so they live under "Więcej". /szukaj is hidden until the
+// PostgREST `polish_fts_search` RPC ships on prod (migration 0073) — no
+// dead "Wkrótce" link in the masthead.
 export const PRIMARY_NAV = [
   { href: "/tygodnik",  label: "Tygodnik" },
   { href: "/posel",     label: "Twój poseł" },
   { href: "/obietnice", label: "Obietnice" },
-  { href: "/sondaze",   label: "Sondaże" },
-  { href: "/atlas",     label: "Atlas" },
-  { href: "/szukaj",    label: "Szukaj" },
 ] as const;
 
 export const SECONDARY_NAV = [
+  { href: "/atlas",        label: "Atlas",       hint: "wykresy" },
+  { href: "/sondaze",      label: "Sondaże",     hint: "poparcie partii" },
   { href: "/watek",        label: "Wątek",       hint: "pełen cykl" },
   { href: "/mowa",         label: "Mowa",        hint: "transkrypcje" },
   { href: "/komisja",      label: "Komisja",     hint: "posiedzenia" },

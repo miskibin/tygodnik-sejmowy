@@ -79,6 +79,17 @@ export async function SiteFooter() {
               patronite.pl/tygodniksejmowy →
             </a>
           </p>
+          <p className="m-0 mb-3">
+            Kod źródłowy:{" "}
+            <a
+              href="https://github.com/miskibin/tygodnik-sejmowy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive hover:underline"
+            >
+              github.com/miskibin/tygodnik-sejmowy →
+            </a>
+          </p>
           <p className="m-0 text-border">
             © {year} Tygodnik Sejmowy · public-good infrastructure
           </p>

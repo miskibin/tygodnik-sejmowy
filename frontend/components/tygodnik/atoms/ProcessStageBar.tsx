@@ -1,6 +1,13 @@
 // 6-step pipeline visualization for a Sejm legislative process. Maps the
 // many stage_type enum values from process_stages onto 6 broad buckets so
 // the bar reads at a glance without needing to know parliamentary procedure.
+//
+// Termination: when `process_state.End` is reached without `processPassed`,
+// the project died mid-flow (rejected in I czytanie, withdrawn, etc.).
+// The full 6-step bar implies the project is moving toward Prezydent —
+// citizen review caught this contradiction (#4: "Zakończono" badge +
+// progressing 6-step bar on /druk/10/2197). Terminated processes now
+// render a compact "Proces zakończony" badge instead.
 
 const STEPS = [
   { key: "intake", label: "wpłynęło" },
@@ -18,6 +25,9 @@ type StepKey = (typeof STEPS)[number]["key"];
 const STAGE_TO_STEP: Record<string, StepKey> = {
   Start: "intake",
   Opinion: "intake",
+  GovermentPosition: "intake",
+  GovernmentPosition: "intake",
+  ExpertOpinion: "intake",
   Referral: "first_reading",
   ReadingReferral: "first_reading",
   Reading: "first_reading",
@@ -26,9 +36,12 @@ const STAGE_TO_STEP: Record<string, StepKey> = {
   SejmReading: "vote",
   Voting: "vote",
   SenatePosition: "senate",
+  SenateAmendments: "senate",
   ToPresident: "president",
   PresidentSignature: "president",
-  End: "president",
+  PresidentVeto: "president",
+  ConstitutionalTribunal: "president",
+  Promulgation: "president",
 };
 
 function stepIndexFor(stageType: string | null, processPassed: boolean | null): number {
@@ -47,6 +60,32 @@ export function ProcessStageBar({
   processPassed: boolean | null;
 }) {
   if (!currentStageType && !processPassed) return null;
+
+  // Terminated mid-flow — End/Withdrawn/Rejected with passed=false.
+  // Replace the misleading 6-step bar with a single terminal badge.
+  const terminated =
+    !processPassed &&
+    (currentStageType === "End" ||
+      currentStageType === "Withdrawn" ||
+      currentStageType === "Rejected");
+  if (terminated) {
+    const label =
+      currentStageType === "Withdrawn" ? "Projekt wycofany" :
+      currentStageType === "Rejected" ? "Projekt odrzucony" :
+      "Proces zakończony";
+    return (
+      <div className="mb-4">
+        <span
+          className="inline-flex items-center gap-1.5 font-mono text-[9.5px] tracking-[0.14em] uppercase rounded-full border px-2.5 py-1"
+          style={{ color: "var(--muted-foreground)", borderColor: "var(--border)" }}
+        >
+          <span aria-hidden style={{ color: "var(--destructive)" }}>●</span>
+          {label}
+        </span>
+      </div>
+    );
+  }
+
   const currentIdx = stepIndexFor(currentStageType, processPassed);
 
   return (

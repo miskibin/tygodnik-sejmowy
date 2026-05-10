@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPrint, type ProcessStage } from "@/lib/db/prints";
 import { documentCategoryLabel, opinionSourceLabel, opinionSourceShort, promiseStatusLabel, sponsorAuthorityLabel } from "@/lib/labels";
+import { STAGE_TYPE_LABEL } from "@/lib/stages";
 import { Reader } from "./_components/Reader";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { isUnaffiliated } from "@/lib/clubs/filter";
@@ -59,22 +60,6 @@ const ROLE_LABEL: Record<string, string> = {
   poprawka: "poprawka",
   joint: "łączne",
   other: "inne",
-};
-
-const STAGE_TYPE_LABEL: Record<string, string> = {
-  Start: "Wpłynięcie",
-  Opinion: "Opinia",
-  Referral: "Skierowanie",
-  ReadingReferral: "Skier. do czytania",
-  Reading: "I czytanie",
-  CommitteeWork: "Praca w komisji",
-  CommitteeReport: "Sprawozdanie",
-  SejmReading: "Czytanie w Sejmie",
-  Voting: "Głosowanie",
-  SenatePosition: "Stanowisko Senatu",
-  ToPresident: "Do Prezydenta",
-  PresidentSignature: "Podpis Prezydenta",
-  End: "Zakończono",
 };
 
 function StageRow({ s, isLast }: { s: ProcessStage; isLast: boolean }) {

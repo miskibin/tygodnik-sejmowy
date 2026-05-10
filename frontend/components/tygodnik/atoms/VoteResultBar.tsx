@@ -14,10 +14,17 @@ export type VoteResult = {
 };
 
 function verdict(r: VoteResult): { label: string; color: string } {
-  // Feed-level heuristic — sufficient for tygodnik scan; the druk page does
-  // the proper quorum/majority math when it matters.
-  if (r.yes > r.no) return { label: "przyjęta", color: "var(--success)" };
-  if (r.no > r.yes) return { label: "odrzucona", color: "var(--destructive)" };
+  // Tally-level verdict only — describes which side prevailed in this specific
+  // vote, NOT what happened to the project. Citizen review (#1) caught that
+  // labeling a first-reading "wniosek o odrzucenie" vote as "odrzucona" reads
+  // as "ustawa odrzucona" — exactly inverted (failed reject motion = project
+  // continues to committee). True project status needs a `motion_kind` field
+  // (final_passage / reject_in_first_reading / senate_amendments / etc.) on
+  // the vote enrichment, which is on the ETL roadmap. Until then, the chip
+  // describes the wniosek outcome only — agenda caption next to it (e.g.
+  // "Wniosek o odrzucenie projektu w I czytaniu") gives the reader the rest.
+  if (r.yes > r.no) return { label: "wniosek przyjęty", color: "var(--success)" };
+  if (r.no > r.yes) return { label: "wniosek odrzucony", color: "var(--destructive)" };
   return { label: "remis", color: "var(--muted-foreground)" };
 }
 

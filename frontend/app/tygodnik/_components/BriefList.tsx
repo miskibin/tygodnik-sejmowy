@@ -12,6 +12,7 @@ import type { BriefItem } from "@/lib/db/prints";
 import {
   partitionEvents,
   printEventToBriefItem,
+  ACT_KIND_NEW_LAW,
   type SittingInfo,
   type WeeklyEvent,
 } from "@/lib/events-types";
@@ -261,6 +262,62 @@ function EliCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "eli_infor
 
       <FooterLinks links={links} />
     </NumberedRow>
+  );
+}
+
+// ---------- ELI in-force section split (citizen review #13) ----------
+//
+// "Wchodzi w życie" used to dump every act with legal_status_date in the
+// sitting bucket — including teksty jednolite (consolidated republications)
+// and assorted Obwieszczenia / postanowienia, which read as AI slop to
+// citizens because they aren't new law.
+//
+// Behind NEXT_PUBLIC_FEATURE_ACT_KIND_FILTER we split the section in two:
+//   "Wchodzi w życie"  → ustawa_nowa + nowelizacja
+//   "Aktualizacje prawa" → tekst_jednolity + obwieszczenie + rozporzadzenie
+//                          + uchwala_sejmu + inne
+// Rows with act_kind=null (pre-backfill) keep the legacy behavior.
+
+function EliInforceSections({
+  events,
+}: {
+  events: Array<Extract<WeeklyEvent, { eventType: "eli_inforce" }>>;
+}) {
+  if (events.length === 0) return null;
+  const flagOn = process.env.NEXT_PUBLIC_FEATURE_ACT_KIND_FILTER === "1";
+
+  if (!flagOn) {
+    return (
+      <>
+        <SectionHeader icon="⏱" label="Wchodzi w życie" count={events.length} />
+        {events.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
+      </>
+    );
+  }
+
+  const newLaw: typeof events = [];
+  const updates: typeof events = [];
+  for (const ev of events) {
+    const k = ev.payload.act_kind;
+    if (k && ACT_KIND_NEW_LAW.has(k)) newLaw.push(ev);
+    else updates.push(ev);
+  }
+
+  return (
+    <>
+      {newLaw.length > 0 && (
+        <>
+          <SectionHeader icon="⏱" label="Wchodzi w życie" count={newLaw.length} />
+          {newLaw.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
+        </>
+      )}
+      {updates.length > 0 && (
+        <>
+          <SectionHeader icon="📎" label="Aktualizacje prawa" count={updates.length} />
+          {updates.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
+        </>
+      )}
+    </>
   );
 }
 
@@ -679,12 +736,7 @@ export function BriefList({
           </>
         )}
 
-        {partitioned.eliInforce.length > 0 && (
-          <>
-            <SectionHeader icon="⏱" label="Wchodzi w życie" count={partitioned.eliInforce.length} />
-            {partitioned.eliInforce.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
-          </>
-        )}
+        <EliInforceSections events={partitioned.eliInforce} />
 
         {partitioned.lateInterpellations.length > 0 && (
           <>
