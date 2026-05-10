@@ -10,7 +10,7 @@ import { PromiseFilterBar } from "./_components/PromiseFilterBar";
 import { PromiseFeed } from "./_components/PromiseFeed";
 import { ComparisonView } from "./_components/ComparisonView";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 function parseList(value: string | string[] | undefined): string[] {
   if (!value) return [];

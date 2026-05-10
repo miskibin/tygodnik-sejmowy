@@ -1,6 +1,15 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
+
+const PROMISES_REVALIDATE_SEC = 300;
+
+const getEnrichedPromisesCached = unstable_cache(
+  async () => fetchEnrichedPromises(),
+  ["promises-enriched-all", "v1"],
+  { revalidate: PROMISES_REVALIDATE_SEC },
+);
 
 // 5-status enum from migration 0027 CHECK constraint. Anything else stored is
 // a DB-violation and should be rendered as "—".
@@ -289,7 +298,7 @@ function defaultSort(rows: PromiseRow[]): PromiseRow[] {
 export async function getPromisesFiltered(
   filters: PromiseFilters = {},
 ): Promise<PromiseRow[]> {
-  const all = await fetchEnrichedPromises();
+  const all = await getEnrichedPromisesCached();
   const parties = filters.parties && filters.parties.length > 0 ? new Set(filters.parties) : null;
   const statuses = filters.statuses && filters.statuses.length > 0 ? new Set(filters.statuses) : null;
   const topics = filters.topics && filters.topics.length > 0 ? new Set(filters.topics) : null;
@@ -312,7 +321,7 @@ export async function getPromisesFiltered(
 }
 
 // Per-party rollup with the 5-status breakdown for the dashboard cards.
-export async function getPromiseDashboard(): Promise<PromiseDashboardRow[]> {
+async function loadPromiseDashboard(): Promise<PromiseDashboardRow[]> {
   const sb = supabase();
   const { data, error } = await sb.from("promises").select("party_code, status");
   if (error) throw error;
@@ -356,9 +365,17 @@ export async function getPromiseDashboard(): Promise<PromiseDashboardRow[]> {
   return [...byParty.values()].sort((a, b) => b.total - a.total);
 }
 
+export function getPromiseDashboard(): Promise<PromiseDashboardRow[]> {
+  return unstable_cache(
+    async () => loadPromiseDashboard(),
+    ["promise-dashboard", "v1"],
+    { revalidate: PROMISES_REVALIDATE_SEC },
+  )();
+}
+
 // Distinct party codes present in the table (legacy helper; preserved so any
 // external imports don't break — used to build filter chips).
-export async function getPartyCodesWithCounts(): Promise<Array<{ code: string; count: number }>> {
+async function loadPartyCodesWithCounts(): Promise<Array<{ code: string; count: number }>> {
   const sb = supabase();
   const { data, error } = await sb.from("promises").select("party_code");
   if (error) throw error;
@@ -370,6 +387,14 @@ export async function getPartyCodesWithCounts(): Promise<Array<{ code: string; c
   return [...counts.entries()]
     .map(([code, count]) => ({ code, count }))
     .sort((a, b) => b.count - a.count);
+}
+
+export function getPartyCodesWithCounts(): Promise<Array<{ code: string; count: number }>> {
+  return unstable_cache(
+    async () => loadPartyCodesWithCounts(),
+    ["promise-party-counts", "v1"],
+    { revalidate: PROMISES_REVALIDATE_SEC },
+  )();
 }
 
 // Detail page — full record + all confirmed candidates + voting timeline.
@@ -401,7 +426,7 @@ export type PromiseDetail = PromiseRow & {
   related: Array<Pick<PromiseRow, "id" | "partyCode" | "slug" | "title" | "status">>;
 };
 
-export async function getPromiseDetail(
+async function loadPromiseDetail(
   partyCode: string,
   slug: string,
 ): Promise<PromiseDetail | null> {
@@ -419,7 +444,18 @@ export async function getPromiseDetail(
   return buildDetail(data as Record<string, unknown>);
 }
 
-export async function getPromiseDetailById(id: number): Promise<PromiseDetail | null> {
+export function getPromiseDetail(
+  partyCode: string,
+  slug: string,
+): Promise<PromiseDetail | null> {
+  return unstable_cache(
+    async () => loadPromiseDetail(partyCode, slug),
+    ["promise-detail", partyCode, slug],
+    { revalidate: PROMISES_REVALIDATE_SEC },
+  )();
+}
+
+async function loadPromiseDetailById(id: number): Promise<PromiseDetail | null> {
   const sb = supabase();
   const { data, error } = await sb
     .from("promises")
@@ -431,6 +467,14 @@ export async function getPromiseDetailById(id: number): Promise<PromiseDetail | 
   if (error) throw error;
   if (!data) return null;
   return buildDetail(data as Record<string, unknown>);
+}
+
+export function getPromiseDetailById(id: number): Promise<PromiseDetail | null> {
+  return unstable_cache(
+    async () => loadPromiseDetailById(id),
+    ["promise-detail-id", String(id)],
+    { revalidate: PROMISES_REVALIDATE_SEC },
+  )();
 }
 
 async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
@@ -604,7 +648,7 @@ export type PromiseLedgerRow = {
 };
 
 export async function getPromiseLedger(): Promise<PromiseLedgerRow[]> {
-  const rows = await fetchEnrichedPromises();
+  const rows = await getEnrichedPromisesCached();
   const sorted = defaultSort(rows);
   return sorted.map((r) => ({
     id: r.id,

@@ -6,8 +6,8 @@ import {
 } from "@/lib/db/events";
 import { BriefList } from "./_components/BriefList";
 
-// Heavy Supabase aggregates exceed PostgREST 8s during prerender. Render on demand.
-export const dynamic = "force-dynamic";
+// ISR: `unstable_cache` in `lib/db/events` bounds cold PostgREST work; 300s matches that layer.
+export const revalidate = 300;
 
 export default async function TygodnikPage() {
   const [latest, sittings] = await Promise.all([
