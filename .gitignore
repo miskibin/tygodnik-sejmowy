@@ -1,0 +1,40 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+/temp/
+# Virtual environments
+.venv
+./env
+.env
+*tmp*
+/logs
+/logs/*
+sejm-stats-439117-39efc9d2f8b8.json
+
+# supagraf data fixtures: too large for git (~190MB JSON + PDFs).
+# Anchored to repo root so source modules under supagraf/fixtures/ stay tracked.
+/fixtures/
+*.log
+# Caches & build artifacts
+.pytest_cache/
+*.egg-info/
+
+# Local Claude Code state (worktrees, runtime skills)
+.claude/
+
+# Working dir for one-off ingest jobs (cached source CSVs, generated CSVs)
+.tmp_supagraf/
+
+# Raw HTML snapshots from polls fetcher (Wikipedia article ~700KB/run)
+/data/raw/
+
+.vercel
+
+# Third-party Claude Code skills (re-fetch with `npx skills add ...`)
+/skills/
+/skills-lock.json
+

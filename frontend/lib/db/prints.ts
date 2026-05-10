@@ -1,0 +1,705 @@
+import "server-only";
+
+import { supabase } from "@/lib/supabase";
+import { dbTagsToPersonas, type PersonaId } from "@/lib/personas";
+import { dbTagsToTopics, type TopicId } from "@/lib/topics";
+
+// Mirrors the CHECK constraint in supabase/migrations/0042_print_document_category.sql.
+// Bump in lockstep when extending.
+export type DocumentCategory =
+  | "projekt_ustawy"
+  | "opinia_organu"
+  | "sprawozdanie_komisji"
+  | "autopoprawka"
+  | "wniosek_personalny"
+  | "pismo_marszalka"
+  | "uchwala_upamietniajaca"
+  | "uchwala_senatu"
+  | "weto_prezydenta"
+  | "wotum_nieufnosci"
+  | "wniosek_organizacyjny"
+  | "informacja"
+  | "inne"
+  | null;
+
+// `prints.sponsor_authority` enum (free-text in DB). Coarse origin of the bill.
+export type SponsorAuthority =
+  | "rzad"
+  | "prezydent"
+  | "klub_poselski"
+  | "senat"
+  | "komisja"
+  | "prezydium"
+  | "obywatele"
+  | "inne"
+  | null;
+
+export type AffectedGroup = {
+  tag: string;
+  severity: "low" | "medium" | "high";
+  // Population enriched at read-time from `print_affected_with_population` view.
+  // Never read from `prints.affected_groups` jsonb — LLM forces null there now.
+  estPopulation: number | null;
+  sourceYear: number | null;
+  sourceNote: string | null;
+};
+
+export type BriefItem = {
+  id: number;
+  term: number;
+  number: string;
+  shortTitle: string;
+  title: string;
+  changeDate: string | null;
+  impactPunch: string;
+  summaryPlain: string | null;
+  citizenAction: string | null;
+  affectedGroups: AffectedGroup[];
+  personas: PersonaId[];
+  topics: TopicId[];
+  documentCategory: DocumentCategory;
+  isProcedural: boolean;
+  isMetaDocument: boolean;
+  homepageScore: number | null;
+  stance: string | null;
+  stanceConfidence: number | null;
+  sponsorAuthority: SponsorAuthority;
+  // Latest process_stages.stage_type for this print's process — feeds the
+  // 6-step ProcessStageBar in tygodnik feed. Null when no process linked.
+  currentStageType: string | null;
+  processPassed: boolean | null;
+  // Optional voting summary attached at runtime by BriefList when a vote
+  // event in the same sitting links to this print. Lets the print card
+  // absorb the vote (no separate "głosowania" duplicate). Null when the
+  // print hasn't been voted on yet in this sitting.
+  voting: {
+    votingId: number;
+    votingNumber: number;
+    yes: number;
+    no: number;
+    abstain: number;
+    notParticipating: number;
+  } | null;
+};
+
+export type PrintDetail = BriefItem & {
+  summary: string | null;
+  isoClass: number | null;
+  documentDate: string | null;
+  stance: string | null;
+  parentNumber: string | null;
+  sponsorAuthority: SponsorAuthority;
+  sponsorMps: string[];
+  // For sub-prints (opinia/OSR/etc): structured issuer code from migration 0047.
+  // NULL on primary projekt_ustawy rows.
+  opinionSource: string | null;
+};
+
+export type ProcessStage = {
+  ord: number;
+  depth: number;
+  stageName: string;
+  stageType: string;
+  stageDate: string | null;
+  decision: string | null;
+  sittingNum: number | null;
+  voting: {
+    yes?: number;
+    no?: number;
+    abstain?: number;
+    totalVoted?: number;
+    notParticipating?: number;
+    votingNumber?: number;
+    sitting?: number;
+    date?: string;
+    title?: string;
+    topic?: string;
+    description?: string;
+  } | null;
+};
+
+// Canonical voting linked to this print via voting_print_links (mig 0047).
+// Replaces the prior fragile "sort process_stages.voting JSON by votingNumber".
+export type LinkedVoting = {
+  votingId: number;
+  role: "main" | "autopoprawka" | "sprawozdanie" | "poprawka" | "joint" | "other";
+  votingNumber: number;
+  sitting: number;
+  sittingDay: number;
+  date: string;
+  title: string;
+  yes: number;
+  no: number;
+  abstain: number;
+  notParticipating: number;
+};
+
+export type ClubTally = {
+  clubShort: string;
+  clubName: string;
+  yes: number;
+  no: number;
+  abstain: number;
+  notVoting: number;
+  total: number;
+};
+
+// Forward-link to a child sub-print (opinion / autopoprawka / OSR / etc).
+export type SubPrint = {
+  number: string;
+  title: string;
+  shortTitle: string | null;
+  documentCategory: DocumentCategory;
+  opinionSource: string | null;
+  isProcedural: boolean;
+  attachments: string[];
+};
+
+// Filename list for a print's attachments (ordered). Empty list = no files.
+export type PrintAttachments = {
+  number: string;
+  filenames: string[];
+};
+
+export type MatchedPromise = {
+  promiseId: number;
+  partyCode: string | null;
+  title: string;
+  status: string | null;
+  matchStatus: "confirmed" | "candidate" | "rejected";
+  rationale: string | null;
+};
+
+// Final outcome of the legislative process — populated only when
+// processes.passed = true. `act` is non-null only after backfill linked
+// processes.eli_act_id → acts (i.e. ISAP has published the text).
+export type ProcessAct = {
+  eliId: string;          // 'DU/2026/305'
+  displayAddress: string; // 'Dz.U. 2026 poz. 305'
+  title: string | null;
+  status: string | null;     // 'obowiązujący' / 'uchylony' / 'wygaszony'
+  sourceUrl: string | null;  // direct ISAP link
+  publishedAt: string | null;
+};
+
+export type ProcessOutcome = {
+  passed: boolean;
+  closureDate: string | null;
+  act: ProcessAct | null;
+};
+
+export type MainVotingSeat = {
+  mp_id: number;
+  club_ref: string | null;
+  vote: string;
+};
+
+export type PrintWithStages = {
+  print: PrintDetail;
+  stages: ProcessStage[];
+  // Canonical "ostatnie głosowanie" — sourced from voting_print_links FK
+  // (migration 0047), not from process_stages.voting JSON sort.
+  mainVoting: LinkedVoting | null;
+  // Per-klub yes/no/abstain tally for mainVoting (from voting_by_club view).
+  votingByClub: ClubTally[];
+  // Per-MP votes for mainVoting — feeds the HemicycleChart on the druk
+  // detail page. Empty when no main voting is linked.
+  mainVotingSeats: MainVotingSeat[];
+  // All votings linked to this print (incl. mainVoting at index 0). Ranked by
+  // role priority then voting_number desc — same order as mainVoting picker.
+  relatedVotings: LinkedVoting[];
+  // Forward-links: opinia/autopoprawka/OSR sub-prints with structured authority.
+  subPrints: SubPrint[];
+  // LLM-confirmed promise→print pairs (promise_print_candidates.match_status).
+  matchedPromises: MatchedPromise[];
+  outcome: ProcessOutcome | null;
+  // Attachments for the main print (ordered by ordinal).
+  attachments: string[];
+};
+
+const SELECT_DETAIL =
+  "id, term, number, short_title, title, change_date, document_date, impact_punch, summary, summary_plain, iso24495_class, citizen_action, affected_groups, persona_tags, topic_tags, stance, document_category, parent_number, is_procedural, is_meta_document, sponsor_authority, sponsor_mps, opinion_source";
+
+async function fetchAffected(printIds: number[]): Promise<Map<number, AffectedGroup[]>> {
+  const out = new Map<number, AffectedGroup[]>();
+  if (printIds.length === 0) return out;
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("print_affected_with_population")
+    .select("print_id, tag, severity, est_population, source_year, source_note")
+    .in("print_id", printIds);
+  if (error) throw error;
+  for (const r of (data ?? []) as Record<string, unknown>[]) {
+    const id = r.print_id as number;
+    const list = out.get(id) ?? [];
+    list.push({
+      tag: (r.tag as string) ?? "",
+      severity: ((r.severity as string) ?? "low") as AffectedGroup["severity"],
+      estPopulation: (r.est_population as number | null) ?? null,
+      sourceYear: (r.source_year as number | null) ?? null,
+      sourceNote: (r.source_note as string | null) ?? null,
+    });
+    out.set(id, list);
+  }
+  return out;
+}
+
+export async function getPrint(term: number, number: string): Promise<PrintWithStages | null> {
+  const sb = supabase();
+  const { data: p, error: pe } = await sb
+    .from("prints")
+    .select(SELECT_DETAIL)
+    .eq("term", term)
+    .eq("number", number)
+    .limit(1)
+    .maybeSingle();
+  if (pe) throw pe;
+  if (!p) return null;
+
+  const printId = p.id as number;
+
+  // Fetch the process row once; we need both its id (for stages) and
+  // outcome columns (passed / eli / display_address / eli_act_id / closure_date).
+  const { data: proc } = await sb
+    .from("processes")
+    .select("id, passed, eli, display_address, eli_act_id, closure_date")
+    .eq("term", term)
+    .eq("number", number)
+    .limit(1)
+    .maybeSingle();
+  const processId = (proc?.id as number | undefined) ?? -1;
+
+  const { data: stagesRows, error: se } = await sb
+    .from("process_stages")
+    .select("ord, depth, stage_name, stage_type, stage_date, decision, sitting_num, voting, process_id")
+    .eq("process_id", processId)
+    .order("ord", { ascending: true });
+  if (se) throw se;
+
+  // Build outcome — link the act row only when the backfill connected it.
+  let outcome: ProcessOutcome | null = null;
+  if (proc) {
+    const eliActId = (proc.eli_act_id as number | null) ?? null;
+    let act: ProcessAct | null = null;
+    if (eliActId) {
+      // Real column name is promulgation_date (date of publication in
+      // Dz.U./M.P.). announcement_date is the dated upstream of that.
+      const { data: actRow } = await sb
+        .from("acts")
+        .select("eli_id, title, status, source_url, promulgation_date")
+        .eq("id", eliActId)
+        .limit(1)
+        .maybeSingle();
+      if (actRow) {
+        act = {
+          eliId: (actRow.eli_id as string) ?? "",
+          displayAddress: (proc.display_address as string) ?? "",
+          title: (actRow.title as string) ?? null,
+          status: (actRow.status as string) ?? null,
+          sourceUrl: (actRow.source_url as string) ?? null,
+          publishedAt: (actRow.promulgation_date as string) ?? null,
+        };
+      }
+    }
+    outcome = {
+      passed: !!proc.passed,
+      closureDate: (proc.closure_date as string) ?? null,
+      act,
+    };
+  }
+
+  const affectedMap = await fetchAffected([printId]);
+
+  const stages: ProcessStage[] = (stagesRows ?? []).map((r): ProcessStage => ({
+    ord: r.ord as number,
+    depth: r.depth as number,
+    stageName: (r.stage_name as string) ?? "",
+    stageType: (r.stage_type as string) ?? "",
+    stageDate: (r.stage_date as string) ?? null,
+    decision: (r.decision as string) ?? null,
+    sittingNum: (r.sitting_num as number | null) ?? null,
+    voting: (r.voting as ProcessStage["voting"]) ?? null,
+  }));
+
+  // Canonical voting from voting_print_links FK (mig 0047). Role priority:
+  // main > sprawozdanie > autopoprawka > poprawka > joint > other; tiebreak
+  // by voting_number desc. Replaces the prior "sort stage JSON by votingNumber"
+  // heuristic that broke on multi-print votings + autopoprawki.
+  const ROLE_RANK: Record<string, number> = {
+    main: 0, sprawozdanie: 1, autopoprawka: 2, poprawka: 3, joint: 4, other: 5,
+  };
+  const { data: linkedRows } = await sb
+    .from("voting_print_links")
+    .select("voting_id, role, votings:voting_id(id, term, sitting, sitting_day, voting_number, date, title, yes, no, abstain, not_participating)")
+    .eq("print_id", printId);
+  let mainVoting: LinkedVoting | null = null;
+  let relatedVotings: LinkedVoting[] = [];
+  if (linkedRows && linkedRows.length > 0) {
+    const ranked = (linkedRows as Array<{ role: string; votings: Record<string, unknown> | Record<string, unknown>[] | null }>)
+      .map((r) => {
+        const v = Array.isArray(r.votings) ? r.votings[0] : r.votings;
+        return v ? { role: r.role, v } : null;
+      })
+      .filter((x): x is { role: string; v: Record<string, unknown> } => !!x)
+      .sort((a, b) => {
+        const ra = ROLE_RANK[a.role] ?? 9;
+        const rb = ROLE_RANK[b.role] ?? 9;
+        if (ra !== rb) return ra - rb;
+        return ((b.v.voting_number as number) ?? 0) - ((a.v.voting_number as number) ?? 0);
+      });
+    relatedVotings = ranked.map(({ role, v }) => ({
+      votingId: v.id as number,
+      role: role as LinkedVoting["role"],
+      votingNumber: (v.voting_number as number) ?? 0,
+      sitting: (v.sitting as number) ?? 0,
+      sittingDay: (v.sitting_day as number) ?? 0,
+      date: (v.date as string) ?? "",
+      title: (v.title as string) ?? "",
+      yes: (v.yes as number) ?? 0,
+      no: (v.no as number) ?? 0,
+      abstain: (v.abstain as number) ?? 0,
+      notParticipating: (v.not_participating as number) ?? 0,
+    }));
+    if (relatedVotings.length > 0) mainVoting = relatedVotings[0];
+  }
+
+  // Per-club tally for the canonical voting (view voting_by_club from mig 0047).
+  let votingByClub: ClubTally[] = [];
+  let mainVotingSeats: MainVotingSeat[] = [];
+  if (mainVoting) {
+    const [clubsRes, seatsRes] = await Promise.all([
+      sb
+        .from("voting_by_club")
+        .select("club_short, club_name, yes, no, abstain, not_voting, total")
+        .eq("voting_id", mainVoting.votingId)
+        .order("yes", { ascending: false }),
+      // Per-MP votes for the HemicycleChart on the druk page. Same query
+      // shape used by the tygodnik feed enricher in lib/db/events.ts.
+      sb
+        .from("votes")
+        .select("mp_id, club_ref, vote")
+        .eq("voting_id", mainVoting.votingId),
+    ]);
+    votingByClub = (clubsRes.data ?? []).map((r) => ({
+      clubShort: (r.club_short as string) ?? "",
+      clubName: (r.club_name as string) ?? "",
+      yes: (r.yes as number) ?? 0,
+      no: (r.no as number) ?? 0,
+      abstain: (r.abstain as number) ?? 0,
+      notVoting: (r.not_voting as number) ?? 0,
+      total: (r.total as number) ?? 0,
+    }));
+    mainVotingSeats = ((seatsRes.data ?? []) as MainVotingSeat[]).map((r) => ({
+      mp_id: r.mp_id,
+      club_ref: r.club_ref,
+      vote: r.vote,
+    }));
+  }
+
+  // Forward-link sub-prints (opinia/OSR/autopoprawka) — by parent_number FK.
+  const { data: subRows } = await sb
+    .from("prints")
+    .select("id, number, title, short_title, document_category, opinion_source, is_procedural")
+    .eq("term", term)
+    .eq("parent_number", number)
+    .order("number", { ascending: true });
+
+  const subIds = (subRows ?? []).map((r) => r.id as number);
+  const printIdsForAtt = [printId, ...subIds];
+  const { data: attRows } = await sb
+    .from("print_attachments")
+    .select("print_id, ordinal, filename")
+    .in("print_id", printIdsForAtt)
+    .order("ordinal", { ascending: true });
+  const attByPrint = new Map<number, string[]>();
+  for (const r of (attRows ?? []) as Array<{ print_id: number; filename: string }>) {
+    const list = attByPrint.get(r.print_id) ?? [];
+    list.push(r.filename);
+    attByPrint.set(r.print_id, list);
+  }
+
+  const subPrints: SubPrint[] = (subRows ?? []).map((r) => ({
+    number: (r.number as string) ?? "",
+    title: (r.title as string) ?? "",
+    shortTitle: (r.short_title as string) ?? null,
+    documentCategory: ((r.document_category as string) ?? null) as DocumentCategory,
+    opinionSource: (r.opinion_source as string) ?? null,
+    isProcedural: !!r.is_procedural,
+    attachments: attByPrint.get(r.id as number) ?? [],
+  }));
+  const attachments = attByPrint.get(printId) ?? [];
+
+  // LLM-confirmed promise→print pairs (promise_print_candidates, mig 0046).
+  // Show only confirmed; "candidate" rank stays in the matcher pool but
+  // would polluate the print page with weak hits.
+  const { data: matchRows } = await sb
+    .from("promise_print_candidates")
+    .select("promise_id, match_status, match_rationale, promises:promise_id(id, party_code, title, status)")
+    .eq("print_term", term)
+    .eq("print_number", number)
+    .eq("match_status", "confirmed");
+  const matchedPromises: MatchedPromise[] = (matchRows ?? [])
+    .map((r): MatchedPromise | null => {
+      const raw = (r as { promises: Record<string, unknown> | Record<string, unknown>[] | null }).promises;
+      const pm = Array.isArray(raw) ? raw[0] : raw;
+      if (!pm) return null;
+      return {
+        promiseId: (pm.id as number) ?? (r.promise_id as number),
+        partyCode: (pm.party_code as string) ?? null,
+        title: (pm.title as string) ?? "",
+        status: (pm.status as string) ?? null,
+        matchStatus: "confirmed",
+        rationale: (r.match_rationale as string) ?? null,
+      };
+    })
+    .filter((x): x is MatchedPromise => !!x);
+
+  const sponsorMpsRaw = p.sponsor_mps as unknown;
+  const sponsorMps: string[] = Array.isArray(sponsorMpsRaw)
+    ? (sponsorMpsRaw.filter((x) => typeof x === "string") as string[])
+    : [];
+
+  const detail: PrintDetail = {
+    id: printId,
+    term: p.term as number,
+    number: p.number as string,
+    shortTitle: (p.short_title as string) ?? "",
+    title: (p.title as string) ?? "",
+    changeDate: (p.change_date as string) ?? null,
+    documentDate: (p.document_date as string) ?? null,
+    impactPunch: (p.impact_punch as string) ?? "",
+    summary: (p.summary as string) ?? null,
+    summaryPlain: (p.summary_plain as string) ?? null,
+    isoClass: (p.iso24495_class as number | null) ?? null,
+    citizenAction: (p.citizen_action as string) ?? null,
+    affectedGroups: affectedMap.get(printId) ?? [],
+    personas: dbTagsToPersonas(p.persona_tags as string[] | null),
+    topics: dbTagsToTopics(p.topic_tags as string[] | null),
+    stance: (p.stance as string) ?? null,
+    documentCategory: ((p.document_category as string) ?? null) as DocumentCategory,
+    parentNumber: (p.parent_number as string) ?? null,
+    isProcedural: !!p.is_procedural,
+    isMetaDocument: !!p.is_meta_document,
+    homepageScore: null,
+    sponsorAuthority: ((p.sponsor_authority as string) ?? null) as SponsorAuthority,
+    sponsorMps,
+    opinionSource: (p.opinion_source as string) ?? null,
+    stanceConfidence: null,
+    currentStageType: null,
+    processPassed: null,
+    voting: null,
+  };
+
+  return { print: detail, stages, mainVoting, votingByClub, mainVotingSeats, relatedVotings, subPrints, matchedPromises, outcome, attachments };
+}
+
+// Per-sitting (posiedzenie) metadata for the Tygodnik archive index + nav.
+// Sourced from `tygodnik_sittings` view (mig 0059) which joins proceedings
+// against `print_sitting_assignment` to give us eligible-print counts.
+export type SittingInfo = {
+  term: number;
+  sittingNum: number;          // proceedings.number — the issue number
+  title: string;               // e.g. "56. Posiedzenie Sejmu RP w dniach 28, 29 i 30 kwietnia 2026 r."
+  firstDate: string;           // YYYY-MM-DD
+  lastDate: string;
+  printCount: number;          // eligible Tygodnik prints
+};
+
+export async function getSittingsIndex(term = 10): Promise<SittingInfo[]> {
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("tygodnik_sittings")
+    .select("term, sitting_num, sitting_title, first_date, last_date, print_count")
+    .eq("term", term)
+    .order("sitting_num", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((r): SittingInfo => ({
+    term: r.term as number,
+    sittingNum: r.sitting_num as number,
+    title: (r.sitting_title as string) ?? "",
+    firstDate: (r.first_date as string) ?? "",
+    lastDate: (r.last_date as string) ?? "",
+    printCount: (r.print_count as number) ?? 0,
+  }));
+}
+
+// Latest sitting (highest sitting_num) that actually has eligible prints.
+// Used to default `/tygodnik` to the most recent non-empty issue — the
+// current sitting is often "in progress" with 0 enriched prints yet.
+export async function getLatestSittingWithPrints(term = 10): Promise<SittingInfo | null> {
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("tygodnik_sittings")
+    .select("term, sitting_num, sitting_title, first_date, last_date, print_count")
+    .eq("term", term)
+    .gt("print_count", 0)
+    .order("sitting_num", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    term: data.term as number,
+    sittingNum: data.sitting_num as number,
+    title: (data.sitting_title as string) ?? "",
+    firstDate: (data.first_date as string) ?? "",
+    lastDate: (data.last_date as string) ?? "",
+    printCount: (data.print_count as number) ?? 0,
+  };
+}
+
+// Per-sitting Tygodnik feed. Same filters as `getBriefItems` (projekt_ustawy
+// only, non-meta, non-procedural, has impact_punch); scoped to one sitting
+// via `print_sitting_assignment`. Ranked by homepage_score DESC.
+export async function getBriefItemsBySitting(term: number, sittingNum: number): Promise<BriefItem[]> {
+  const sb = supabase();
+
+  // 1. Print IDs assigned to this sitting.
+  const { data: assigned, error: ae } = await sb
+    .from("print_sitting_assignment")
+    .select("print_id")
+    .eq("term", term)
+    .eq("sitting_num", sittingNum);
+  if (ae) throw ae;
+  const ids = (assigned ?? []).map((r) => r.print_id as number);
+  if (ids.length === 0) return [];
+
+  // 2. Score lookup (filtered by view's eligibility).
+  const { data: scored, error: se } = await sb
+    .from("print_homepage_score")
+    .select("print_id, homepage_score, is_meta_document, is_procedural")
+    .in("print_id", ids)
+    .eq("is_meta_document", false)
+    .eq("is_procedural", false);
+  if (se) throw se;
+  const eligibleIds = (scored ?? []).map((r) => r.print_id as number);
+  if (eligibleIds.length === 0) return [];
+  const scoreById = new Map<number, number>();
+  for (const r of scored ?? []) scoreById.set(r.print_id as number, (r.homepage_score as number) ?? 0);
+
+  // 3. Hydrate prints metadata (only ones with impact_punch).
+  const { data, error } = await sb
+    .from("prints")
+    .select(
+      "id, term, number, short_title, title, change_date, impact_punch, summary_plain, citizen_action, persona_tags, topic_tags, document_category, is_procedural, is_meta_document",
+    )
+    .in("id", eligibleIds)
+    .not("impact_punch", "is", null);
+  if (error) throw error;
+
+  const printIds = (data ?? []).map((r) => r.id as number);
+  const affectedMap = await fetchAffected(printIds);
+
+  const items: BriefItem[] = (data ?? []).map((r): BriefItem => ({
+    id: r.id as number,
+    term: r.term as number,
+    number: r.number as string,
+    shortTitle: (r.short_title as string) ?? "",
+    title: (r.title as string) ?? "",
+    changeDate: (r.change_date as string) ?? null,
+    impactPunch: (r.impact_punch as string) ?? "",
+    summaryPlain: (r.summary_plain as string) ?? null,
+    citizenAction: (r.citizen_action as string) ?? null,
+    affectedGroups: affectedMap.get(r.id as number) ?? [],
+    personas: dbTagsToPersonas(r.persona_tags as string[] | null),
+    topics: dbTagsToTopics(r.topic_tags as string[] | null),
+    documentCategory: ((r.document_category as string) ?? null) as DocumentCategory,
+    isProcedural: !!r.is_procedural,
+    isMetaDocument: !!r.is_meta_document,
+    homepageScore: scoreById.get(r.id as number) ?? null,
+    stance: null,
+    stanceConfidence: null,
+    sponsorAuthority: null,
+    currentStageType: null,
+    processPassed: null,
+    voting: null,
+  }));
+
+  items.sort((a, b) => {
+    const sa = a.homepageScore ?? 0;
+    const sb2 = b.homepageScore ?? 0;
+    if (sb2 !== sa) return sb2 - sa;
+    const da = a.changeDate ? Date.parse(a.changeDate) : 0;
+    const db = b.changeDate ? Date.parse(b.changeDate) : 0;
+    return db - da;
+  });
+
+  return items;
+}
+
+// Tygodnik feed — real bills only, ranked by `print_homepage_score` view.
+// Filters mirror the user-supplied default sort:
+//   document_category = 'projekt_ustawy'
+//   AND is_meta_document = false
+//   AND COALESCE(is_procedural, false) = false
+//   AND impact_punch IS NOT NULL
+// Order: homepage_score DESC, change_date DESC.
+export async function getBriefItems(): Promise<BriefItem[]> {
+  const sb = supabase();
+
+  // 1. Pull eligible IDs + scores from the homepage_score view.
+  const { data: scored, error: se } = await sb
+    .from("print_homepage_score")
+    .select("print_id, homepage_score, is_meta_document, is_procedural")
+    .eq("is_meta_document", false)
+    .eq("is_procedural", false)
+    .order("homepage_score", { ascending: false })
+    .limit(60);
+  if (se) throw se;
+  const ids = (scored ?? []).map((r) => r.print_id as number);
+  if (ids.length === 0) return [];
+  const scoreById = new Map<number, number>();
+  for (const r of scored ?? []) scoreById.set(r.print_id as number, (r.homepage_score as number) ?? 0);
+
+  // 2. Hydrate prints metadata (only ones with impact_punch).
+  const { data, error } = await sb
+    .from("prints")
+    .select(
+      "id, term, number, short_title, title, change_date, impact_punch, summary_plain, citizen_action, persona_tags, topic_tags, document_category, is_procedural, is_meta_document",
+    )
+    .in("id", ids)
+    .not("impact_punch", "is", null)
+    .limit(60);
+  if (error) throw error;
+
+  // 3. Pull affected_groups + populations in one query for all eligible prints.
+  const printIds = (data ?? []).map((r) => r.id as number);
+  const affectedMap = await fetchAffected(printIds);
+
+  const items: BriefItem[] = (data ?? []).map((r): BriefItem => ({
+    id: r.id as number,
+    term: r.term as number,
+    number: r.number as string,
+    shortTitle: (r.short_title as string) ?? "",
+    title: (r.title as string) ?? "",
+    changeDate: (r.change_date as string) ?? null,
+    impactPunch: (r.impact_punch as string) ?? "",
+    summaryPlain: (r.summary_plain as string) ?? null,
+    citizenAction: (r.citizen_action as string) ?? null,
+    affectedGroups: affectedMap.get(r.id as number) ?? [],
+    personas: dbTagsToPersonas(r.persona_tags as string[] | null),
+    topics: dbTagsToTopics(r.topic_tags as string[] | null),
+    documentCategory: ((r.document_category as string) ?? null) as DocumentCategory,
+    isProcedural: !!r.is_procedural,
+    isMetaDocument: !!r.is_meta_document,
+    homepageScore: scoreById.get(r.id as number) ?? null,
+    stance: null,
+    stanceConfidence: null,
+    sponsorAuthority: null,
+    currentStageType: null,
+    processPassed: null,
+    voting: null,
+  }));
+
+  // 4. Final sort: homepage_score DESC, then change_date DESC.
+  items.sort((a, b) => {
+    const sa = a.homepageScore ?? 0;
+    const sb2 = b.homepageScore ?? 0;
+    if (sb2 !== sa) return sb2 - sa;
+    const da = a.changeDate ? Date.parse(a.changeDate) : 0;
+    const db = b.changeDate ? Date.parse(b.changeDate) : 0;
+    return db - da;
+  });
+
+  return items.slice(0, 30);
+}
