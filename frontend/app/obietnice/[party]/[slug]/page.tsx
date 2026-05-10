@@ -12,7 +12,7 @@ import {
   statusLabel,
 } from "@/lib/db/promises";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";

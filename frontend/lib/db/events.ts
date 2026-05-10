@@ -1,5 +1,6 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import {
   topicsFromDb,
@@ -14,7 +15,10 @@ import {
 // pull types without dragging in the server-only data layer).
 export type { SittingInfo, WeeklyEvent, EventType };
 
-export async function getSittingsIndex(term = 10): Promise<SittingInfo[]> {
+// Batches PostgREST work; keeps prerender + ISR under budget and cuts warm latency.
+const EVENTS_REVALIDATE_SEC = 300;
+
+async function loadSittingsIndex(term: number): Promise<SittingInfo[]> {
   const sb = supabase();
   const { data, error } = await sb
     .from("tygodnik_sittings")
@@ -34,7 +38,15 @@ export async function getSittingsIndex(term = 10): Promise<SittingInfo[]> {
   }));
 }
 
-export async function getLatestSittingWithEvents(term = 10): Promise<SittingInfo | null> {
+export function getSittingsIndex(term = 10): Promise<SittingInfo[]> {
+  return unstable_cache(
+    async () => loadSittingsIndex(term),
+    ["tygodnik-sittings-index", String(term)],
+    { revalidate: EVENTS_REVALIDATE_SEC },
+  )();
+}
+
+async function loadLatestSittingWithEvents(term: number): Promise<SittingInfo | null> {
   const sb = supabase();
   const { data, error } = await sb
     .from("tygodnik_sittings")
@@ -58,6 +70,14 @@ export async function getLatestSittingWithEvents(term = 10): Promise<SittingInfo
   };
 }
 
+export function getLatestSittingWithEvents(term = 10): Promise<SittingInfo | null> {
+  return unstable_cache(
+    async () => loadLatestSittingWithEvents(term),
+    ["tygodnik-latest-sitting", String(term)],
+    { revalidate: EVENTS_REVALIDATE_SEC },
+  )();
+}
+
 type RawEventRow = {
   event_type: EventType;
   term: number;
@@ -68,10 +88,7 @@ type RawEventRow = {
   source_url: string;
 };
 
-export async function getEventsBySitting(
-  term: number,
-  sittingNum: number,
-): Promise<WeeklyEvent[]> {
+async function loadEventsBySitting(term: number, sittingNum: number): Promise<WeeklyEvent[]> {
   const sb = supabase();
   const { data, error } = await sb
     .from("weekly_events_v")
@@ -261,4 +278,15 @@ export async function getEventsBySitting(
   }
 
   return out;
+}
+
+export function getEventsBySitting(
+  term: number,
+  sittingNum: number,
+): Promise<WeeklyEvent[]> {
+  return unstable_cache(
+    async () => loadEventsBySitting(term, sittingNum),
+    ["tygodnik-events-by-sitting", String(term), String(sittingNum)],
+    { revalidate: EVENTS_REVALIDATE_SEC },
+  )();
 }

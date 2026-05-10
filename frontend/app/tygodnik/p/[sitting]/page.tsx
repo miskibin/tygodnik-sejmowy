@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getEventsBySitting, getSittingsIndex } from "@/lib/db/events";
 import { BriefList } from "../../_components/BriefList";
 
+export const revalidate = 300;
 
 function fmtDateRange(first: string, last: string): string {
   if (!first) return "";
