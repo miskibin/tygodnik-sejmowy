@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    tags: ['*']
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      # Placeholders so Next.js build doesn't crash on missing env at module load.
+      SUPABASE_URL: https://placeholder.supabase.co
+      SUPABASE_ANON_KEY: placeholder
+      SUPABASE_KEY: placeholder
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  python:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync
+
+      - name: Smoke imports
+        run: uv run python -c "import supagraf; from supagraf import cli"
+
+      - name: CLI sanity
+        run: uv run python -m supagraf --help
+
+      # Test collection ensures the suite imports cleanly. Full execution requires
+      # live Supabase + Ollama so is left to local/manual runs until tests stabilise.
+      - name: Pytest collect
+        run: |
+          uv run pytest --collect-only -q \
+            tests/supagraf \
+            --ignore=tests/supagraf/e2e \
+            --ignore=tests/supagraf/unit/test_pdf_extract.py
