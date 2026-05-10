@@ -4,12 +4,12 @@ export function PollstersStrip({ rows }: { rows: PollsterSummary[] }) {
   const total = rows.reduce((acc, r) => acc + r.n_polls, 0);
   return (
     <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid items-baseline gap-5" style={{ gridTemplateColumns: "60px 1fr" }}>
-        <div className="font-serif italic font-normal text-destructive" style={{ fontSize: 56, lineHeight: 0.9 }}>E</div>
-        <div>
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Kto pyta i ile razy</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05]" style={{ fontSize: 36, letterSpacing: "-0.01em" }}>Pollsterzy</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px]" style={{ fontSize: 16 }}>
+      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
+        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">E</div>
+        <div className="min-w-0">
+          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Kto pyta i ile razy</div>
+          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Pollsterzy</h2>
+          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
             Wkład każdej pracowni do bazy. Łącznie {total.toLocaleString("pl-PL")} sondaży.
           </p>
         </div>
@@ -19,10 +19,10 @@ export function PollstersStrip({ rows }: { rows: PollsterSummary[] }) {
         {rows.map((r) => {
           const widthPct = (r.n_polls / Math.max(1, rows[0]?.n_polls ?? 1)) * 100;
           return (
-            <div key={r.code} className="p-4 bg-muted border border-border">
-              <div className="flex justify-between items-baseline mb-1.5">
-                <span className="font-serif text-[15px] font-medium text-foreground">{r.name_full}</span>
-                <span className="font-mono text-[14px] font-semibold text-foreground">{r.n_polls}</span>
+            <div key={r.code} className="p-3 sm:p-4 bg-muted border border-border min-w-0">
+              <div className="flex justify-between items-baseline gap-3 mb-1.5 min-w-0">
+                <span className="font-serif text-[15px] font-medium text-foreground min-w-0 break-words">{r.name_full}</span>
+                <span className="font-mono text-[14px] font-semibold text-foreground shrink-0 tabular-nums">{r.n_polls}</span>
               </div>
               <div className="h-1 relative border border-border bg-background mb-2">
                 <div className="absolute left-0 top-0 bottom-0 bg-destructive" style={{ width: `${widthPct}%`, opacity: 0.7 }} />

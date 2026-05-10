@@ -66,22 +66,22 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
 
   return (
     <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid items-baseline gap-5" style={{ gridTemplateColumns: "60px 1fr" }}>
-        <div className="font-serif italic font-normal text-destructive" style={{ fontSize: 56, lineHeight: 0.9 }}>C</div>
-        <div>
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
+        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">C</div>
+        <div className="min-w-0">
+          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
             Trzy lata, {byParty.size} {byParty.size === 1 ? "partia" : byParty.size < 5 ? "partie" : "partii"}
           </div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05]" style={{ fontSize: 36, letterSpacing: "-0.01em" }}>Trendy kwartalne</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px]" style={{ fontSize: 16 }}>
+          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Trendy kwartalne</h2>
+          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
             Średnia kwartalna z wszystkich sondaży w danym kwartale. Każdy punkt — jeden kwartał.
             Pokazujemy partie z bieżącą średnią ≥ 3% (w tym KKP Brauna i Razem — poza Sejmem, ale silnie sondażowane).
           </p>
         </div>
       </header>
 
-      <div className="bg-muted border border-border p-4">
-        <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="w-full h-auto" role="img" aria-label={`Wykres trendu kwartalnego ${byParty.size} partii`}>
+      <div className="bg-muted border border-border p-2 sm:p-4 min-w-0 overflow-x-auto">
+        <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="w-full min-w-[320px] h-auto block" role="img" aria-label={`Wykres trendu kwartalnego ${byParty.size} partii`}>
           {/* Y gridlines + labels */}
           {yTicks.map((t) => {
             const y = yFor(t);

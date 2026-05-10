@@ -88,8 +88,9 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
         sub="Macierz % zgodności w głosowaniach plenarnych. Bazujemy na większości w klubie — dwa kluby „zgodne” w danym głosowaniu, jeśli ich modalny głos się pokrywa."
       />
 
-      <div className="flex flex-wrap gap-3 mb-5 font-sans text-[12px] items-center">
-        <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px]">sortuj</span>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
+        <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0">sortuj</span>
+        <div className="overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
           value={sort}
@@ -100,6 +101,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
           <ToggleGroupItem value="alpha" aria-label="alfabetycznie">alfabetycznie</ToggleGroupItem>
           <ToggleGroupItem value="agreement" aria-label="po średniej zgodności">po zgodności</ToggleGroupItem>
         </ToggleGroup>
+        </div>
       </div>
 
       <div className="grid gap-8 lg:[grid-template-columns:1fr_320px] items-start">

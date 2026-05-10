@@ -190,7 +190,7 @@ export default function Landing() {
               onClick={() => router.push("/tygodnik")}
               className="mt-5 w-full text-center cursor-pointer bg-foreground text-background hover:bg-destructive transition-colors py-3 px-4 rounded-full font-sans text-[13.5px] tracking-wide"
             >
-              Pokaż mi mój Sejm w tym tygodniu &nbsp;→
+              Zobacz mój Tygodnik &nbsp;→
             </button>
 
             <div className="mt-3 font-sans text-[10.5px] text-muted-foreground tracking-wide text-center">

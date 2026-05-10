@@ -75,10 +75,10 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
         sub={`Top tematy projektów ustaw w czasie. Próba: ${totalPrints.toLocaleString("pl-PL")} druków z ${data.buckets.length} kwartałów (X kadencja).`}
       />
       <div
-        className="border border-border p-6 relative"
+        className="border border-border p-3 sm:p-6 relative min-w-0 overflow-x-auto"
         style={{ background: "var(--muted)" }}
       >
-        <svg viewBox={`0 0 ${W} ${H + 50}`} className="w-full block">
+        <svg viewBox={`0 0 ${W} ${H + 50}`} className="w-full min-w-[300px] block">
           {data.buckets.map((b, i) => {
             let acc = 0;
             return (data.topics as readonly TopicId[]).map((t, ti) => {
@@ -164,7 +164,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
           <div
             role="status"
             aria-live="polite"
-            className="absolute top-3 right-6 bg-background border border-rule p-3 font-sans text-[12px] min-w-[200px] shadow-md"
+            className="static mt-3 sm:absolute sm:mt-0 sm:top-3 sm:right-6 sm:left-auto bg-background border border-rule p-3 font-sans text-[12px] w-full sm:min-w-[200px] sm:max-w-[min(100%,280px)] shadow-md z-10"
           >
             <div className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase mb-1.5">
               {hover.bucket.replace("-", " ")}

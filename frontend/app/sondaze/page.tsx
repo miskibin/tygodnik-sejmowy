@@ -64,10 +64,10 @@ export default async function SondazePage() {
   const totalPolls = pollsters.reduce((acc, r) => acc + r.n_polls, 0);
 
   return (
-    <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
-      <div className="max-w-[1280px] mx-auto">
-        <header className="mb-12 pb-7 border-b-2 border-rule">
-          <div className="font-sans text-[11px] tracking-[0.22em] uppercase text-destructive mb-4">
+    <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-20 sm:pb-28 min-w-0">
+      <div className="max-w-[1280px] mx-auto min-w-0">
+        <header className="mb-8 sm:mb-12 pb-6 sm:pb-7 border-b-2 border-rule">
+          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.14em] sm:tracking-[0.22em] uppercase text-destructive mb-3 sm:mb-4 text-balance">
             ✶ &nbsp; Sondaże · co Polacy myślą o partiach &nbsp; ✶
           </div>
           <h1
@@ -79,14 +79,13 @@ export default async function SondazePage() {
             ważone.
           </h1>
           <p
-            className="font-serif text-secondary-foreground max-w-[720px] mt-6 mb-0"
-            style={{ fontSize: 19, lineHeight: 1.55, textWrap: "pretty" }}
+            className="font-serif text-secondary-foreground max-w-[720px] mt-5 sm:mt-6 mb-0 text-[17px] sm:text-[19px] leading-[1.5] sm:leading-[1.55] text-pretty"
           >
             Średnia ważona z ostatnich 30 dni — świeższy sondaż waży więcej. Plus historyczne trendy
             kwartalne, surowe odczyty i pracownie które pytały. Bez interpretacji, bez wyrwanych
             cytatów. Liczby same w sobie.
           </p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 mt-7 font-mono text-[11px] uppercase text-muted-foreground tracking-wider">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 sm:gap-x-6 mt-6 sm:mt-7 font-mono text-[10px] sm:text-[11px] uppercase text-muted-foreground tracking-wide sm:tracking-wider">
             <span>Aktualizacja: {formatToday()}</span>
             <span>·</span>
             <span>Źródło: Wikipedia (CC BY-SA)</span>
@@ -95,7 +94,7 @@ export default async function SondazePage() {
           </div>
         </header>
 
-        <div className="grid gap-20">
+        <div className="grid gap-12 sm:gap-16 md:gap-20">
           <Average30dGrid rows={averages} />
           <Ornament />
           <SeatProjection rows={averages} />
@@ -107,7 +106,7 @@ export default async function SondazePage() {
           <PollstersStrip rows={pollsters} />
         </div>
 
-        <footer className="mt-20 pt-6 border-t border-rule font-serif text-[14px] text-muted-foreground leading-[1.6]">
+        <footer className="mt-12 sm:mt-20 pt-6 border-t border-rule font-serif text-[13px] sm:text-[14px] text-muted-foreground leading-[1.6]">
           <p className="m-0 max-w-[760px]">
             Dane z Wikipedii (CC BY-SA), aktualizacja codziennie. Średnia ważona to wykładniczy zanik
             z półokresem 14 dni — sondaż sprzed tygodnia waży około 70% świeższego. Trend kwartalny

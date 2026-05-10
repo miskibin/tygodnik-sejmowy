@@ -23,12 +23,12 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
 
   return (
     <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid items-baseline gap-5" style={{ gridTemplateColumns: "60px 1fr" }}>
-        <div className="font-serif italic font-normal text-destructive" style={{ fontSize: 56, lineHeight: 0.9 }}>A</div>
-        <div>
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Średnia ważona — ostatnie 30 dni</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05]" style={{ fontSize: 36, letterSpacing: "-0.01em" }}>Aktualnie</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px]" style={{ fontSize: 16 }}>
+      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
+        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">A</div>
+        <div className="min-w-0">
+          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Średnia ważona — ostatnie 30 dni</div>
+          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Aktualnie</h2>
+          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
             Wykładniczy zanik z półokresem 14 dni — świeższy sondaż waży więcej. Posortowane od największego.
           </p>
         </div>
@@ -80,9 +80,9 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
               <div className="h-1.5 relative border border-border bg-background mb-3">
                 <div className="absolute left-0 top-0 bottom-0" style={{ width: `${widthPct}%`, background: color }} />
               </div>
-              <div className="flex justify-between font-mono text-[10px] text-muted-foreground tracking-wide">
-                <span>min {fmtPct(r.percentage_min_30d)} – max {fmtPct(r.percentage_max_30d)}%</span>
-                <span>n = {r.n_polls}</span>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:items-baseline font-mono text-[10px] text-muted-foreground tracking-wide">
+                <span className="min-w-0 break-words">min {fmtPct(r.percentage_min_30d)} – max {fmtPct(r.percentage_max_30d)}%</span>
+                <span className="shrink-0 sm:text-right">n = {r.n_polls}</span>
               </div>
               <div className="mt-1 font-mono text-[10px] text-muted-foreground italic">
                 ostatni: {daysAgo(r.last_conducted_at)}

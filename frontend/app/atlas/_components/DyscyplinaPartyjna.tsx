@@ -41,10 +41,10 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
                     aria-label={`${klubLabel}: ${pct.toFixed(1)}% lojalności`}
                     className="mb-5 cursor-pointer rounded-sm transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destructive p-1"
                   >
-                    <div className="flex justify-between items-baseline mb-1.5">
-                      <span className="font-serif text-[18px] font-medium text-foreground inline-flex items-center gap-2">
+                    <div className="flex justify-between items-baseline mb-1.5 gap-2 min-w-0">
+                      <span className="font-serif text-[18px] font-medium text-foreground inline-flex items-center gap-2 min-w-0">
                         <ClubLogo klub={d.klub} size={20} />
-                        {klubLabel}
+                        <span className="truncate">{klubLabel}</span>
                       </span>
                       <span className="font-mono text-[18px] font-semibold text-foreground">
                         {pct.toFixed(1)}
@@ -91,8 +91,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
           })}
         </div>
         <aside
-          className="font-serif text-[15px] leading-[1.7] text-secondary-foreground p-5"
-          style={{ borderLeft: "3px solid var(--destructive)" }}
+          className="font-serif text-[15px] leading-[1.7] text-secondary-foreground p-4 sm:p-5 border-t-[3px] sm:border-t-0 sm:border-l-[3px] border-destructive"
         >
           <p className="m-0 mb-3.5">
             <strong className="text-foreground">{KLUB_LABELS[top.klub] ?? top.klub} najbardziej zdyscyplinowany</strong>
@@ -106,7 +105,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
             )}
           </p>
           <p className="m-0 text-[13px] text-muted-foreground italic">
-            Liczymy „głos zgodny z klubem" jako głos w stronę większości klubu obecnej w danym głosowaniu (winner takes all spośród ZA/PRZECIW/WSTRZYM.). Próba: ≥ 5 członków klubu obecnych w głosowaniu.
+            Liczymy „głos zgodny z klubem” jako głos w stronę większości klubu obecnej w danym głosowaniu (winner takes all spośród ZA/PRZECIW/WSTRZYM.). Próba: ≥ 5 członków klubu obecnych w głosowaniu.
           </p>
         </aside>
       </div>

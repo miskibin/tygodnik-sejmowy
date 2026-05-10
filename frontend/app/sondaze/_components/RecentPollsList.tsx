@@ -46,12 +46,12 @@ export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; ave
     : FALLBACK_PRIMARY_PARTIES;
   return (
     <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid items-baseline gap-5" style={{ gridTemplateColumns: "60px 1fr" }}>
-        <div className="font-serif italic font-normal text-destructive" style={{ fontSize: 56, lineHeight: 0.9 }}>D</div>
-        <div>
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Surowe odczyty</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05]" style={{ fontSize: 36, letterSpacing: "-0.01em" }}>Ostatnie sondaże</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px]" style={{ fontSize: 16 }}>
+      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
+        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">D</div>
+        <div className="min-w-0">
+          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Surowe odczyty</div>
+          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Ostatnie sondaże</h2>
+          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
             Dwadzieścia najświeższych pomiarów. Główne partie w nagłówku — pełna rozpiska po kliknięciu źródła.
           </p>
         </div>
@@ -85,7 +85,53 @@ export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; ave
           const tail = p.results.filter((r) => !PRIMARY_PARTIES.includes(r.party_code) && !RESIDUAL_CODES.has(r.party_code));
           return (
             <div key={p.poll_id} className="border-b border-border py-3 px-3 hover:bg-muted">
-              <div className="grid items-baseline gap-y-1 font-sans text-[13px]"
+              {/* Mobile: stacked card — desktop: wide table row */}
+              <div className="md:hidden space-y-2.5 font-sans text-[13px]">
+                <div className="flex flex-wrap items-start justify-between gap-2 min-w-0">
+                  <span className="font-serif text-[15px] text-foreground font-medium min-w-0">{p.pollster}</span>
+                  <span className="font-mono text-[11px] text-secondary-foreground shrink-0">
+                    {fmtRange(p.conducted_at_start, p.conducted_at_end)}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-muted-foreground">
+                  <span>
+                    Próba:{" "}
+                    <span className="text-foreground">{p.sample_size ? p.sample_size.toLocaleString("pl-PL") : "—"}</span>
+                  </span>
+                  {p.source_url ? (
+                    <a
+                      href={p.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-destructive hover:underline break-all"
+                      title={p.source_url}
+                    >
+                      {sourceDomain(p.source_url)} ↗
+                    </a>
+                  ) : (
+                    <span className="italic">brak źródła</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 min-[400px]:grid-cols-3 gap-x-3 gap-y-2 sm:grid-cols-5">
+                  {PRIMARY_PARTIES.map((code) => {
+                    const v = lookup.get(code) ?? null;
+                    return (
+                      <div key={code} className="min-w-0">
+                        <div className="font-mono text-[9px] uppercase tracking-wide text-muted-foreground truncate" title={partyLabel(code)}>
+                          {code}
+                        </div>
+                        <div className="font-mono text-[13px] text-foreground tabular-nums">
+                          <span className="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle" style={{ background: partyColor(code) }} />
+                          {fmtPct(v)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div
+                className="hidden md:grid items-baseline gap-y-1 font-sans text-[13px]"
                 style={{ gridTemplateColumns: "1.5fr 0.95fr 0.6fr repeat(5, 0.65fr) 1fr", columnGap: 12 }}
               >
                 <span className="font-serif text-[15px] text-foreground">{p.pollster}</span>
@@ -119,7 +165,7 @@ export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; ave
                 </span>
               </div>
               {tail.length > 0 && (
-                <div className="mt-1.5 ml-1 font-mono text-[10px] text-muted-foreground tracking-wide">
+                <div className="mt-1.5 ml-0 md:ml-1 font-mono text-[10px] text-muted-foreground tracking-wide">
                   {tail.map((r, i) => (
                     <span key={r.party_code}>
                       {i > 0 ? " · " : ""}

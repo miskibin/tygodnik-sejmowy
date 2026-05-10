@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { useProfile } from "@/lib/profile";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
+import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
 
 // Tablet (768–1023) inherits the mobile burger nav. At iPad widths the 6 primary
@@ -53,7 +54,8 @@ export function Masthead({ alertsCount = 0 }: { alertsCount?: number }) {
         {/* Hamburger + wordmark (burger shown <lg) */}
         <div className="flex items-center gap-1.5 sm:gap-3.5">
           <MobileNav alertsCount={alertsCount} />
-          <Link href="/" className="flex items-baseline gap-2.5 cursor-pointer">
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 md:gap-3 cursor-pointer">
+            <TygodnikLogoMark className="h-7 w-7 sm:h-8 sm:h-8 shrink-0" />
             <span className="font-serif text-[20px] sm:text-[24px] md:text-[26px] font-medium tracking-tight text-foreground leading-none whitespace-nowrap">
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>

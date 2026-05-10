@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { useProfile } from "@/lib/profile";
 import { ThemeToggle } from "./ThemeToggle";
 import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
@@ -39,9 +40,12 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
           <Link
             href="/"
             onClick={close}
-            className="font-serif text-[22px] font-medium tracking-tight text-foreground leading-none"
+            className="flex items-center gap-2.5 font-serif text-[22px] font-medium tracking-tight text-foreground leading-none"
           >
-            Tygodnik<span className="italic text-destructive"> Sejmowy</span>
+            <TygodnikLogoMark className="h-8 w-8 shrink-0" />
+            <span>
+              Tygodnik<span className="italic text-destructive"> Sejmowy</span>
+            </span>
           </Link>
           {postcode && (
             <div className="mt-3 inline-flex items-center gap-2 px-2.5 py-1 border border-border rounded-full text-secondary-foreground text-[11px]">

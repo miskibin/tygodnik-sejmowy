@@ -48,10 +48,10 @@ export default async function AtlasPage() {
   ]);
 
   return (
-    <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
-      <div className="max-w-[1280px] mx-auto">
-        <header className="mb-12 pb-7 border-b-2 border-rule">
-          <div className="font-sans text-[11px] tracking-[0.22em] uppercase text-destructive mb-4">
+    <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-20 sm:pb-28 min-w-0">
+      <div className="max-w-[1280px] mx-auto min-w-0">
+        <header className="mb-8 sm:mb-12 pb-6 sm:pb-7 border-b-2 border-rule">
+          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.14em] sm:tracking-[0.22em] uppercase text-destructive mb-3 sm:mb-4 text-balance">
             ✶ &nbsp; Atlas · sześć wykresów które naprawdę coś mówią &nbsp; ✶
           </div>
           <h1
@@ -63,12 +63,11 @@ export default async function AtlasPage() {
             ujęciach.
           </h1>
           <p
-            className="font-serif text-secondary-foreground max-w-[720px] mt-6 mb-0"
-            style={{ fontSize: 19, lineHeight: 1.55, textWrap: "pretty" }}
+            className="font-serif text-secondary-foreground max-w-[720px] mt-5 sm:mt-6 mb-0 text-[17px] sm:text-[19px] leading-[1.5] sm:leading-[1.55] text-pretty"
           >
-            Geografia, koalicje, migracje, opóźnienia, dyscyplina, agenda. Bez wykresów-zombie typu „liczba głosowań na miesiąc". Tylko dane, które opowiadają historię — i pozwalają ją zweryfikować.
+            Geografia, koalicje, migracje, opóźnienia, dyscyplina, agenda. Bez wykresów-zombie typu „liczba głosowań na miesiąc”. Tylko dane, które opowiadają historię — i pozwalają ją zweryfikować.
           </p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 mt-7 font-mono text-[11px] uppercase text-muted-foreground tracking-wider">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 sm:gap-x-6 mt-6 sm:mt-7 font-mono text-[10px] sm:text-[11px] uppercase text-muted-foreground tracking-wide sm:tracking-wider">
             <span>Aktualizacja: {await formatToday()}</span>
             <span>·</span>
             <span>Źródło: ETL sejmograf + API Sejmu RP</span>
@@ -77,7 +76,7 @@ export default async function AtlasPage() {
           </div>
         </header>
 
-        <div className="grid gap-20">
+        <div className="grid gap-12 sm:gap-16 md:gap-20">
           <MapaOkregow data={mapData} />
           <Ornament />
           <HeatmapaKoalicji data={heatmap} />
@@ -91,7 +90,7 @@ export default async function AtlasPage() {
           <OCzymMowiSejm data={topics} />
         </div>
 
-        <footer className="mt-20 pt-6 border-t border-rule font-serif text-[14px] text-muted-foreground leading-[1.6]">
+        <footer className="mt-12 sm:mt-20 pt-6 border-t border-rule font-serif text-[13px] sm:text-[14px] text-muted-foreground leading-[1.6]">
           <p className="m-0 max-w-[760px]">
             Wszystkie wykresy odświeżane na żywo z bazy supagraf (district_klub_stats, klub_pair_agreement_mv, voting_by_club_mv, prints.topic, klub_flow_quarter, mp_minister_reply_lag).
           </p>

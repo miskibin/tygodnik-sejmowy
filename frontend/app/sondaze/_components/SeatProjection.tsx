@@ -127,20 +127,20 @@ export function SeatProjection({ rows }: { rows: PollAverageRow[] }) {
 
   return (
     <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid items-baseline gap-5" style={{ gridTemplateColumns: "60px 1fr" }}>
-        <div className="font-serif italic font-normal text-destructive" style={{ fontSize: 56, lineHeight: 0.9 }}>B</div>
-        <div>
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Gdyby wybory dziś · projekcja 460 mandatów</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05]" style={{ fontSize: 36, letterSpacing: "-0.01em" }}>Projekcja sali</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px]" style={{ fontSize: 16 }}>
+      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
+        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">B</div>
+        <div className="min-w-0">
+          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Gdyby wybory dziś · projekcja 460 mandatów</div>
+          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Projekcja sali</h2>
+          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
             Mandaty rozdzielone proporcjonalnie metodą największej reszty wśród partii powyżej {SEJM_THRESHOLD_PCT}% progu.
             Bez korekty geograficznej D&apos;Hondta — to przybliżenie, nie prognoza wyborów.
           </p>
         </div>
       </header>
 
-      <div className="bg-muted border border-border p-4">
-        <svg viewBox="-540 -540 1080 580" className="w-full h-auto block" role="img" aria-label="Projekcja składu Sejmu">
+      <div className="bg-muted border border-border p-2 sm:p-4 min-w-0 overflow-x-auto">
+        <svg viewBox="-540 -540 1080 580" className="w-full min-w-[280px] h-auto block" role="img" aria-label="Projekcja składu Sejmu">
           <style>{`circle.seat{transition:r 0.12s}circle.seat:hover{r:7}`}</style>
 
           <path d="M -445 0 A 445 445 0 0 1 445 0" fill="none" stroke="var(--rule)" strokeWidth={1} opacity={0.4} />
@@ -247,13 +247,13 @@ function Block({ label, seats, threshold, hint }: { label: string; seats: number
   const pct = Math.min(100, (seats / SEJM_SEATS) * 100);
   const overMajority = seats >= threshold;
   return (
-    <div className="p-4 bg-muted border border-border">
-      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">{label}</div>
-      <div className="flex items-baseline gap-1.5 mb-2">
-        <span className="font-serif text-[32px] font-medium text-foreground leading-none tabular-nums" style={{ letterSpacing: "-0.02em" }}>{seats}</span>
+    <div className="p-3 sm:p-4 bg-muted border border-border min-w-0">
+      <div className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5 leading-snug">{label}</div>
+      <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 mb-2">
+        <span className="font-serif text-[28px] sm:text-[32px] font-medium text-foreground leading-none tabular-nums" style={{ letterSpacing: "-0.02em" }}>{seats}</span>
         <span className="font-mono text-[12px] text-muted-foreground">/ {SEJM_SEATS}</span>
         {overMajority && (
-          <span className="ml-auto font-mono text-[10px] tracking-[0.14em] uppercase text-success">Większość</span>
+          <span className="sm:ml-auto font-mono text-[10px] tracking-[0.14em] uppercase text-success">Większość</span>
         )}
       </div>
       <div className="h-1 relative border border-border bg-background mb-2">

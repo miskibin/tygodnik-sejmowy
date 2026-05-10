@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { PersonaId } from "@/lib/personas";
 import type { TopicId } from "@/lib/topics";
 
@@ -52,29 +52,29 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
   }, []);
 
-  const setPostcode = (v: string) => {
+  const setPostcode = useCallback((v: string) => {
     setPostcodeState(v);
     try { localStorage.setItem(KEY_POSTCODE, v); } catch {}
-  };
-  const setPersonas = (v: PersonaId[]) => {
+  }, []);
+  const setPersonas = useCallback((v: PersonaId[]) => {
     setPersonasState(v);
     try { localStorage.setItem(KEY_PERSONAS, JSON.stringify(v)); } catch {}
-  };
-  const setTopics = (v: TopicId[]) => {
+  }, []);
+  const setTopics = useCallback((v: TopicId[]) => {
     setTopicsState(v);
     try { localStorage.setItem(KEY_TOPICS, JSON.stringify(v)); } catch {}
-  };
-  const setShowPersonas = (v: boolean) => {
+  }, []);
+  const setShowPersonas = useCallback((v: boolean) => {
     setShowPersonasState(v);
     try { localStorage.setItem(KEY_SHOW_PERSONAS, v ? "1" : "0"); } catch {}
-  };
-  const setDistrict = (v: Profile["district"]) => {
+  }, []);
+  const setDistrict = useCallback((v: Profile["district"]) => {
     setDistrictState(v);
     try {
       if (v) localStorage.setItem(KEY_DISTRICT, JSON.stringify(v));
       else localStorage.removeItem(KEY_DISTRICT);
     } catch {}
-  };
+  }, []);
 
   return (
     <Ctx.Provider
