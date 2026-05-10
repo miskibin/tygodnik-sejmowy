@@ -179,18 +179,10 @@ export default async function DrukPage({
             className="mb-7 border border-rule px-4 py-3 md:px-5 md:py-4"
             style={{ background: "var(--muted)" }}
           >
-            <div className="flex items-baseline justify-between gap-3 flex-wrap mb-2.5">
+            <div className="mb-2.5">
               <div className="font-sans text-[10px] tracking-[0.16em] uppercase text-destructive">
                 ✶ Pliki źródłowe
               </div>
-              {totalFiles > 1 && (
-                <a
-                  href={`/api/druk/${print.term}/${encodeURIComponent(print.number)}/all`}
-                  className="font-sans text-[11px] tracking-wide uppercase px-3 py-1.5 border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
-                >
-                  ⬇ Pobierz wszystkie ({totalFiles}) · ZIP
-                </a>
-              )}
             </div>
             <ul className="font-sans text-[12.5px] flex flex-wrap gap-x-4 gap-y-1.5">
               {attachments.map((fn) => (
