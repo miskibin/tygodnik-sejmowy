@@ -39,7 +39,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
 
   if (data.buckets.length === 0) {
     return (
-      <section>
+      <section className="min-w-0">
         <SectionHead num="06" kicker="Agenda" title="O czym mówi Sejm" sub="Brak druków z otagowanym tematem w bazie." />
       </section>
     );
@@ -67,7 +67,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
   const biggestFall = [...deltas].sort((a, b) => a.delta - b.delta)[0];
 
   return (
-    <section>
+    <section className="min-w-0">
       <SectionHead
         num="06"
         kicker="Agenda"
@@ -78,7 +78,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
         className="border border-border p-3 sm:p-6 relative min-w-0 overflow-x-auto"
         style={{ background: "var(--muted)" }}
       >
-        <svg viewBox={`0 0 ${W} ${H + 50}`} className="w-full min-w-[300px] block">
+        <svg viewBox={`0 0 ${W} ${H + 50}`} className="block h-auto w-full min-w-[300px] max-w-full">
           {data.buckets.map((b, i) => {
             let acc = 0;
             return (data.topics as readonly TopicId[]).map((t, ti) => {

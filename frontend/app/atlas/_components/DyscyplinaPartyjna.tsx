@@ -9,7 +9,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
   if (data.length === 0) {
     return (
-      <section>
+      <section className="min-w-0">
         <SectionHead num="05" kicker="Monolit czy fronda?" title="Dyscyplina klubowa" sub="Brak danych." />
       </section>
     );
@@ -18,15 +18,15 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
   const bottom = data[data.length - 1];
 
   return (
-    <section>
+    <section className="min-w-0">
       <SectionHead
         num="05"
         kicker="Monolit czy fronda?"
         title="Dyscyplina klubowa"
         sub={`Średni odsetek głosów zgodnych z linią klubu (czyli głosów „w stronę większości"). Próba: ${top.votings.toLocaleString("pl-PL")} głosowań w X kadencji.`}
       />
-      <div className="grid gap-9 lg:grid-cols-2 items-start">
-        <div>
+      <div className="grid min-w-0 gap-9 lg:grid-cols-2 items-start">
+        <div className="min-w-0">
           {data.map((d) => {
             const pct = d.loyalty * 100;
             const color = KLUB_COLORS[d.klub] ?? "var(--muted-foreground)";
@@ -91,7 +91,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
           })}
         </div>
         <aside
-          className="font-serif text-[15px] leading-[1.7] text-secondary-foreground p-4 sm:p-5 border-t-[3px] sm:border-t-0 sm:border-l-[3px] border-destructive"
+          className="min-w-0 font-serif text-[15px] leading-[1.7] text-secondary-foreground p-4 sm:p-5 border-t-[3px] sm:border-t-0 sm:border-l-[3px] border-destructive"
         >
           <p className="m-0 mb-3.5">
             <strong className="text-foreground">{KLUB_LABELS[top.klub] ?? top.klub} najbardziej zdyscyplinowany</strong>

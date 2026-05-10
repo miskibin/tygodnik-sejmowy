@@ -15,7 +15,7 @@ import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
 // mobile→desktop threshold to lg: gives us a clean burger on tablets, and we
 // only re-introduce supplementary chrome (issue label, postcode pill) at xl:.
 
-export function Masthead({ alertsCount = 0 }: { alertsCount?: number }) {
+export function Masthead() {
   const pathname = usePathname();
   const { postcode, district } = useProfile();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -53,10 +53,14 @@ export function Masthead({ alertsCount = 0 }: { alertsCount?: number }) {
       <div className="px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-2.5 lg:py-3 xl:py-3.5 grid items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-7 grid-cols-[auto_1fr_auto]">
         {/* Hamburger + wordmark (burger shown <lg) */}
         <div className="flex items-center gap-1.5 sm:gap-3.5">
-          <MobileNav alertsCount={alertsCount} />
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 md:gap-3 cursor-pointer">
+          <MobileNav />
+          <Link
+            href="/"
+            aria-label="Tygodnik Sejmowy"
+            className="flex items-center gap-2 sm:gap-2.5 md:gap-3 cursor-pointer"
+          >
             <TygodnikLogoMark className="h-7 w-7 sm:h-8 sm:h-8 shrink-0" />
-            <span className="font-serif text-[20px] sm:text-[24px] md:text-[26px] font-medium tracking-tight text-foreground leading-none whitespace-nowrap">
+            <span className="hidden sm:inline font-serif text-[20px] sm:text-[24px] md:text-[26px] font-medium tracking-tight text-foreground leading-none whitespace-nowrap">
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
           </Link>
@@ -160,26 +164,6 @@ export function Masthead({ alertsCount = 0 }: { alertsCount?: number }) {
             <span>Okręg&nbsp;{district?.num ?? "—"}</span>
           </Link>
 
-          <Link
-            href="/alerty"
-            title="Alerty"
-            aria-label="Alerty"
-            className="relative w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center border border-border rounded-full text-secondary-foreground bg-background"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg>
-            {alertsCount > 0 && (
-              <span
-                className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-destructive text-background font-mono text-[10px] font-semibold rounded-full flex items-center justify-center"
-                style={{ border: "1.5px solid var(--background)" }}
-              >
-                {alertsCount}
-              </span>
-            )}
-          </Link>
-
           <ThemeToggle />
 
           <a
@@ -201,7 +185,9 @@ export function Masthead({ alertsCount = 0 }: { alertsCount?: number }) {
             title="Wesprzyj"
             className="sm:hidden w-9 h-9 inline-flex items-center justify-center rounded-full bg-foreground text-background"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" /></svg>
+            <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" />
+            </svg>
           </a>
         </div>
       </div>
