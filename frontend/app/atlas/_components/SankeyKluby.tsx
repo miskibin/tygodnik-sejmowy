@@ -208,7 +208,7 @@ export function SankeyKluby({ data }: { data: SankeyData }) {
   const sortedMigrations = layout.migrations.slice().sort((a, b) => b.n - a.n);
 
   return (
-    <section>
+    <section className="min-w-0">
       <SectionHead
         num="03"
         kicker="Migracje"
@@ -216,14 +216,17 @@ export function SankeyKluby({ data }: { data: SankeyData }) {
         sub={quarterLabel ? `${quarterLabel}. Wstęgi pokazują tylko realne przejścia między klubami — posłowie którzy zostali, są oznaczeni liczbą wewnątrz słupka.` : "Wstęgi pokazują tylko realne przejścia między klubami."}
       />
       <div
-        className="border border-border px-3 py-5 sm:px-7 sm:py-8 relative min-w-0 overflow-x-auto"
+        className="hidden md:block border border-border px-3 py-5 sm:px-7 sm:py-8 relative min-w-0 overflow-x-auto"
         style={{ background: "var(--muted)" }}
       >
         <div className="flex flex-col gap-1 sm:flex-row sm:justify-between font-mono text-[9px] sm:text-[10px] uppercase text-muted-foreground tracking-[0.12em] sm:tracking-[0.16em] mb-3 sm:mb-4">
           <span>Stan początkowy {quarterLabel}</span>
           <span>Stan końcowy {quarterLabel}</span>
         </div>
-        <svg viewBox={`0 0 ${W} ${H + 40}`} className="w-full min-w-[320px] block">
+        <svg
+          viewBox={`0 0 ${W} ${H + 40}`}
+          className="block h-auto w-[880px] shrink-0 max-w-none md:w-full md:min-w-0 md:max-w-full"
+        >
           <defs>
             {layout.migrations.map((m) => (
               <linearGradient key={m.gradId} id={m.gradId} x1={X_LEFT + COL_W} x2={X_RIGHT} y1={0} y2={0} gradientUnits="userSpaceOnUse">

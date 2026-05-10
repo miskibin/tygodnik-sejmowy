@@ -48,12 +48,9 @@ export default async function AtlasPage() {
   ]);
 
   return (
-    <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-20 sm:pb-28 min-w-0">
-      <div className="max-w-[1280px] mx-auto min-w-0">
-        <header className="mb-8 sm:mb-12 pb-6 sm:pb-7 border-b-2 border-rule">
-          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.14em] sm:tracking-[0.22em] uppercase text-destructive mb-3 sm:mb-4 text-balance">
-            ✶ &nbsp; Atlas · sześć wykresów które naprawdę coś mówią &nbsp; ✶
-          </div>
+    <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-20 sm:pb-28 min-w-0 w-full">
+      <div className="max-w-[1280px] mx-auto min-w-0 w-full">
+        <header className="mb-8 sm:mb-12 pb-6 sm:pb-7 border-b-2 border-rule min-w-0">
           <h1
             className="font-serif font-medium m-0 leading-[0.94]"
             style={{ fontSize: "clamp(3rem, 8vw, 5.75rem)", letterSpacing: "-0.04em", textWrap: "balance" }}
@@ -76,7 +73,7 @@ export default async function AtlasPage() {
           </div>
         </header>
 
-        <div className="grid gap-12 sm:gap-16 md:gap-20">
+        <div className="grid gap-12 sm:gap-16 md:gap-20 min-w-0 [&>*]:min-w-0">
           <MapaOkregow data={mapData} />
           <Ornament />
           <HeatmapaKoalicji data={heatmap} />

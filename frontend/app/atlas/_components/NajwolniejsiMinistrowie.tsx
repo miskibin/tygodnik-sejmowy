@@ -45,7 +45,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
   const totalInterp = data.rows.reduce((s, m) => s + m.count, 0);
 
   return (
-    <section>
+    <section className="min-w-0">
       <SectionHead
         num="04"
         kicker="Odpowiedzialność"
@@ -56,7 +56,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
         <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0">sortuj</span>
-        <div className="overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
+        <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
           value={sort}
@@ -72,7 +72,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
         </ToggleGroup>
         </div>
         <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0 sm:ml-1">filtr</span>
-        <div className="overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
+        <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
           value={filter}

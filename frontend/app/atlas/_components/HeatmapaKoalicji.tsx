@@ -53,7 +53,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
 
   if (data.klubs.length === 0) {
     return (
-      <section>
+      <section className="min-w-0">
         <SectionHead num="02" kicker="Koalicje" title="Kto z kim głosuje" sub="Brak danych — zapytanie do bazy nie zwróciło wyników." />
       </section>
     );
@@ -80,7 +80,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
   ) ?? null;
 
   return (
-    <section>
+    <section className="min-w-0">
       <SectionHead
         num="02"
         kicker="Realne koalicje"
@@ -90,7 +90,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
         <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0">sortuj</span>
-        <div className="overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
+        <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
           value={sort}
@@ -104,37 +104,41 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
         </div>
       </div>
 
-      <div className="grid gap-8 lg:[grid-template-columns:1fr_320px] items-start">
+      <div className="grid min-w-0 gap-8 lg:[grid-template-columns:1fr_320px] items-start">
         {/* Matrix as a CSS grid — fills available width on desktop, scrolls on mobile. */}
-        <div className="relative">
-          <div className="overflow-x-auto">
+        <div className="relative min-w-0">
+          <div className="min-w-0 overflow-x-auto">
           <div
             role="grid"
             aria-label="macierz zgodności klubów"
             className="grid gap-px bg-border border border-rule min-w-[560px]"
             style={{
               gridTemplateColumns: `120px repeat(${N}, minmax(60px, 1fr))`,
-              gridTemplateRows: `64px repeat(${N}, minmax(60px, 1fr))`,
+              gridTemplateRows: `70px repeat(${N}, minmax(60px, 1fr))`,
             }}
           >
             <div className="bg-background" />
             {klubs.map((k) => (
               <div
                 key={`col-${k}`}
-                className="bg-background flex flex-col items-center justify-end pb-1.5 gap-1 font-sans text-[12px] font-medium text-foreground"
+                className="bg-background flex flex-col items-center justify-end gap-0 pb-1 md:gap-1 md:pb-1.5 font-sans text-[12px] font-medium text-foreground"
               >
-                <ClubLogo klub={k} size={26} />
-                <span>{KLUB_LABELS[k] ?? k}</span>
+                <span className="inline-flex origin-bottom scale-[1.85] md:scale-100">
+                  <ClubLogo klub={k} size={22} />
+                </span>
+                <span className="hidden md:inline">{KLUB_LABELS[k] ?? k}</span>
               </div>
             ))}
             {klubs.map((ka, i) => (
               <>
                 <div
                   key={`row-${ka}`}
-                  className="bg-background flex items-center justify-end pr-3 gap-2 font-sans text-[12px] font-medium text-foreground"
+                  className="bg-background flex items-center justify-center gap-0 pr-2 md:justify-end md:gap-2 md:pr-3 font-sans text-[12px] font-medium text-foreground"
                 >
-                  <ClubLogo klub={ka} size={22} />
-                  <span>{KLUB_LABELS[ka] ?? ka}</span>
+                  <span className="inline-flex origin-center scale-[1.85] md:scale-100">
+                    <ClubLogo klub={ka} size={22} />
+                  </span>
+                  <span className="hidden md:inline">{KLUB_LABELS[ka] ?? ka}</span>
                 </div>
                 {klubs.map((kb, j) => {
                   // Render lower triangle + diagonal only (matrix is symmetric).
@@ -195,7 +199,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
           />
         </div>
 
-        <aside className="font-serif text-[15px] leading-[1.6] text-secondary-foreground">
+        <aside className="min-w-0 font-serif text-[15px] leading-[1.6] text-secondary-foreground">
           {display ? (
             <div className="mb-4 p-4 border border-rule bg-background relative">
               {pinned && (
