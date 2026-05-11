@@ -226,7 +226,7 @@ export async function getRecentPolls(limit = 20): Promise<RecentPollRow[]> {
     const { data: pollsters, error: eNames } = await withSupabaseRetry(async () => await sb
       .from("pollsters")
       .select("code, name_full")
-      .in("code", pollsterCodes);
+      .in("code", pollsterCodes));
     if (eNames) throw eNames;
     for (const r of pollsters ?? []) {
       pollsterNames.set(
