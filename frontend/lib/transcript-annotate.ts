@@ -24,9 +24,14 @@ export type StageDirection = {
   label: string;
 };
 
+export type ParagraphSegment =
+  | { kind: "text"; text: string }
+  | { kind: "direction"; direction: StageDirection };
+
 export type ExtractedParagraph = {
   cleanedText: string;
   directions: StageDirection[];
+  segments: ParagraphSegment[];
 };
 
 // Map a parenthesized phrase (already lowercased, sans diacritics) to its
@@ -44,22 +49,58 @@ const STAGE_PATTERNS: Array<{ test: RegExp; kind: StageDirectionKind }> = [
 
 const PAREN_RE = /\(([^()]{2,80})\)/g;
 
+function cleanProseText(text: string): string {
+  return text.replace(/[ \t]{2,}/g, " ").replace(/\s+([,.;:!?])/g, "$1").trim();
+}
+
 export function extractStageDirections(paragraph: string): ExtractedParagraph {
   const directions: StageDirection[] = [];
-  const cleanedText = paragraph.replace(PAREN_RE, (full, inner: string) => {
+  const segments: ParagraphSegment[] = [];
+  let cursor = 0;
+  PAREN_RE.lastIndex = 0;
+
+  const pushText = (raw: string) => {
+    const text = cleanProseText(raw);
+    if (!text) return;
+    const prev = segments[segments.length - 1];
+    if (prev?.kind === "text") {
+      prev.text = cleanProseText(`${prev.text} ${text}`);
+      return;
+    }
+    segments.push({ kind: "text", text });
+  };
+
+  let match: RegExpExecArray | null;
+  while ((match = PAREN_RE.exec(paragraph)) !== null) {
+    const [full, inner] = match;
+    pushText(paragraph.slice(cursor, match.index));
     const trimmed = inner.trim();
+    let mapped: StageDirection | null = null;
     for (const { test, kind } of STAGE_PATTERNS) {
       if (test.test(trimmed)) {
-        directions.push({ kind, label: trimmed });
-        return ""; // strip from prose
+        mapped = { kind, label: trimmed };
+        break;
       }
     }
-    return full; // unknown parenthetical — leave alone
-  });
-  // Collapse double-spaces left behind by stripping a parenthetical mid-line.
+    if (mapped) {
+      directions.push(mapped);
+      segments.push({ kind: "direction", direction: mapped });
+    } else {
+      pushText(full);
+    }
+    cursor = match.index + full.length;
+  }
+  pushText(paragraph.slice(cursor));
+
   return {
-    cleanedText: cleanedText.replace(/[ \t]{2,}/g, " ").replace(/\s+([,.;:!?])/g, "$1").trim(),
+    cleanedText: cleanProseText(
+      segments
+        .filter((s): s is Extract<ParagraphSegment, { kind: "text" }> => s.kind === "text")
+        .map((s) => s.text)
+        .join(" "),
+    ),
     directions,
+    segments,
   };
 }
 
