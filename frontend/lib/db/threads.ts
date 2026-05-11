@@ -63,11 +63,13 @@ export type ThreadSummary = {
 };
 
 // Threads currently moving through Sejm — passed=false AND seen by ETL in the
-// last 90 days. Sorted by most-recent stage_date desc so freshly-active bills
-// surface above stale-but-still-open ones.
-export async function getThreadsInFlight(limit = 30): Promise<ThreadSummary[]> {
+// last `cutoffDays` days. Sorted by most-recent stage_date desc so freshly-active
+// bills surface above stale-but-still-open ones. Default 90d for the /watek
+// view; homepage tile passes a wider window so it still has something to show
+// after a quiet stretch.
+export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<ThreadSummary[]> {
   const sb = supabase();
-  const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+  const cutoff = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000).toISOString();
 
   // Pull candidate processes; we'll attach the latest stage in a second query
   // because process_stages → max(stage_date) is awkward in PostgREST.
@@ -160,6 +162,92 @@ export async function getThreadsInFlight(limit = 30): Promise<ThreadSummary[]> {
   });
 
   return summaries.slice(0, limit);
+}
+
+// Pick a recently-active mid-pipeline thread — one whose latest stage is past
+// "druk" but not yet published. Powers the homepage Wątek tile, where a bill
+// in II czyt. or commission tells a more compelling visual story than a brand-
+// new print sitting at stage 0. Falls back to any latest process if no mid-
+// pipeline match exists. Returns null only if `processes` is empty.
+export async function getLatestThread(): Promise<ThreadSummary | null> {
+  const sb = supabase();
+
+  // Bias toward stages that read as "in progress": committee work, II/III
+  // czytanie, and senate handoff. PostgREST `or` filter is `,`-joined.
+  const midPipelineMatch =
+    "stage_name.ilike.%czytanie%,stage_name.ilike.%komisj%,stage_type.ilike.%committee%,stage_type.ilike.%senate%";
+
+  const { data: midStages } = await sb
+    .from("process_stages")
+    .select("process_id, stage_type, stage_name, stage_date")
+    .eq("depth", 0)
+    .not("stage_date", "is", null)
+    .or(midPipelineMatch)
+    .order("stage_date", { ascending: false })
+    .limit(1);
+  const mid = (midStages ?? [])[0] as
+    | { process_id: number; stage_type: string | null; stage_name: string | null; stage_date: string | null }
+    | undefined;
+
+  let procId: number | null = mid?.process_id ?? null;
+  let latest: { stage_type: string | null; stage_name: string | null; stage_date: string | null } | null = mid
+    ? { stage_type: mid.stage_type, stage_name: mid.stage_name, stage_date: mid.stage_date }
+    : null;
+
+  if (procId == null) {
+    // Fallback: any most-recently-refreshed process.
+    const { data: procs } = await sb
+      .from("processes")
+      .select("id, term, number, title, last_refreshed_at")
+      .order("last_refreshed_at", { ascending: false })
+      .limit(1);
+    const p = (procs ?? [])[0] as
+      | { id: number; term: number; number: string; title: string | null; last_refreshed_at: string | null }
+      | undefined;
+    if (!p) return null;
+    procId = p.id;
+    const { data: stageRows } = await sb
+      .from("process_stages")
+      .select("stage_type, stage_name, stage_date")
+      .eq("process_id", p.id)
+      .eq("depth", 0)
+      .not("stage_date", "is", null)
+      .order("stage_date", { ascending: false })
+      .limit(1);
+    latest = ((stageRows ?? [])[0] as typeof latest) ?? null;
+  }
+
+  // Hydrate process header.
+  const { data: procRows, error: pe } = await sb
+    .from("processes")
+    .select("id, term, number, title, last_refreshed_at")
+    .eq("id", procId)
+    .limit(1);
+  if (pe) throw pe;
+  const proc = (procRows ?? [])[0] as
+    | { id: number; term: number; number: string; title: string | null; last_refreshed_at: string | null }
+    | undefined;
+  if (!proc) return null;
+
+  const { data: printRows } = await sb
+    .from("prints")
+    .select("short_title")
+    .eq("term", proc.term)
+    .eq("number", proc.number)
+    .limit(1);
+  const shortTitle = ((printRows ?? [])[0] as { short_title: string | null } | undefined)?.short_title ?? null;
+
+  return {
+    processId: proc.id,
+    term: proc.term,
+    number: proc.number,
+    title: proc.title ?? "",
+    shortTitle,
+    lastStageType: latest?.stage_type ?? null,
+    lastStageName: latest?.stage_name ?? null,
+    lastStageDate: latest?.stage_date ?? null,
+    lastRefreshedAt: proc.last_refreshed_at ?? null,
+  };
 }
 
 // Single thread detail. id == print number ("2180"); term defaults to 10.
