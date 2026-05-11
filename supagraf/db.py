@@ -42,5 +42,5 @@ def supabase() -> Client:
     return create_client(url, key)
 
 
-PROJECT_ID = "krtdwpbkzlyxzwpeqzww"
+PROJECT_ID = "mixvm-selfhost"
 DEFAULT_TERM = 10
