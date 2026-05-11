@@ -52,6 +52,17 @@ PARTY_HEADER_MAP: dict[str, str] = {
 # Non-party column headers (skipped from poll_results writes).
 NON_PARTY_HEADERS = {"Polling firm/Link", "Fieldworkdate", "Samplesize", "Lead"}
 
+# Some Wikipedia rows collapse pre-split alliances with colspan=2 instead of
+# repeating the value under each child-party column. If we read those rows
+# positionally, every value to the right shifts and corrupts the downstream
+# trend chart (e.g. Konfederacja's ~15% becomes Razem's ~15%). Map these
+# merged cells back to the canonical series we actually want to store.
+MERGED_PARTY_CODE_MAP: dict[tuple[str, ...], str] = {
+    ("Polska2050", "PSL"): "TD",
+    ("Lewica", "Razem"): "Lewica",
+    ("Konfederacja", "KKP"): "Konfederacja",
+}
+
 # Pollster name (split on ' / ', take first part) -> canonical code.
 POLLSTER_MAP: dict[str, str] = {
     "ibris": "IBRiS",
@@ -227,7 +238,7 @@ def _is_polling_table(table: Tag) -> bool:
 def _build_column_map(header_row: Tag) -> dict[int, str]:
     """Map table column index -> party_code (for party columns only)."""
     out: dict[int, str] = {}
-    for i, th in enumerate(header_row.find_all("th")):
+    for i, th in enumerate(_expand_cells(header_row.find_all("th"))):
         txt = th.get_text(strip=True)
         # The header text often contains nested links; take the leaf.
         for header_key, code in PARTY_HEADER_MAP.items():
@@ -235,6 +246,65 @@ def _build_column_map(header_row: Tag) -> dict[int, str]:
                 out[i] = code
                 break
     return out
+
+
+def _cell_span(cell: Tag) -> int:
+    raw = cell.get("colspan")
+    if raw in (None, "", "1"):
+        return 1
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return 1
+
+
+def _expand_cells(cells: list[Tag]) -> list[Tag]:
+    out: list[Tag] = []
+    for cell in cells:
+        out.extend([cell] * _cell_span(cell))
+    return out
+
+
+def _iter_cells_with_slots(cells: list[Tag]):
+    slot = 0
+    for cell in cells:
+        span = _cell_span(cell)
+        yield slot, span, cell
+        slot += span
+
+
+def _resolve_party_code(covered_codes: list[str]) -> Optional[str]:
+    uniq: list[str] = []
+    for code in covered_codes:
+        if code not in uniq:
+            uniq.append(code)
+    if not uniq:
+        return None
+    if len(uniq) == 1:
+        return uniq[0]
+    return MERGED_PARTY_CODE_MAP.get(tuple(uniq))
+
+
+def _extract_result_rows(cells: list[Tag], col_map: dict[int, str], poll_id: int) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    emitted_codes: set[str] = set()
+    for start_slot, span, cell in _iter_cells_with_slots(cells):
+        covered_codes = [col_map[i] for i in range(start_slot, start_slot + span) if i in col_map]
+        party_code = _resolve_party_code(covered_codes)
+        if not party_code or party_code in emitted_codes:
+            continue
+        pct = _parse_percent(cell.get_text(strip=True))
+        if pct is None:
+            continue
+        rows.append(
+            {
+                "poll_id": poll_id,
+                "party_code": party_code,
+                "percentage": pct,
+            }
+        )
+        emitted_codes.add(party_code)
+    return rows
 
 
 def stage_polls_from_wikipedia(html_path: Path) -> tuple[int, int]:
@@ -270,13 +340,14 @@ def stage_polls_from_wikipedia(html_path: Path) -> tuple[int, int]:
 
         for row in rows[1:]:
             cells = row.find_all(["td", "th"])
-            if len(cells) < 12:
+            expanded = _expand_cells(cells)
+            if len(expanded) < 12:
                 continue
-            fw_cell = cells[1]
+            fw_cell = expanded[1]
             end_iso = fw_cell.get("data-sort-value", "")
             if not re.match(r"^\d{4}-\d{2}-\d{2}$", end_iso):
                 continue
-            pollster_raw = cells[0].get_text(strip=True)
+            pollster_raw = expanded[0].get_text(strip=True)
             pollster_code = _normalize_pollster(pollster_raw)
             if not pollster_code:
                 logger.debug(
@@ -293,8 +364,8 @@ def stage_polls_from_wikipedia(html_path: Path) -> tuple[int, int]:
                 logger.warning("polls.stage: date parse fail {!r}: {!r}", pollster_raw, e)
                 n_skipped += 1
                 continue
-            sample = _parse_sample(cells[2].get_text(strip=True))
-            source_url = _row_pollster_url(cells[0]) or (
+            sample = _parse_sample(expanded[2].get_text(strip=True))
+            source_url = _row_pollster_url(expanded[0]) or (
                 f"https://en.wikipedia.org/wiki/"
                 f"Opinion_polling_for_the_next_Polish_parliamentary_election"
             )
@@ -361,20 +432,7 @@ def stage_polls_from_wikipedia(html_path: Path) -> tuple[int, int]:
                 continue
 
             # Build poll_results rows.
-            results_rows = []
-            for col_idx, party_code in col_map.items():
-                if col_idx >= len(cells):
-                    continue
-                pct = _parse_percent(cells[col_idx].get_text(strip=True))
-                if pct is None:
-                    continue
-                results_rows.append(
-                    {
-                        "poll_id": poll_id,
-                        "party_code": party_code,
-                        "percentage": pct,
-                    }
-                )
+            results_rows = _extract_result_rows(cells, col_map, poll_id)
             if results_rows:
                 try:
                     client.table("poll_results").upsert(

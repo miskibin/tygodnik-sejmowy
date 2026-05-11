@@ -5,7 +5,7 @@ import { partyColor, partyLabel } from "./partyMeta";
 const VB_W = 920;
 const VB_H = 320;
 const M_LEFT = 40;
-const M_RIGHT = 100;
+const M_RIGHT = 20;
 const M_TOP = 20;
 const M_BOTTOM = 30;
 const Y_MIN = 0;
@@ -135,60 +135,21 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
             );
           })}
 
-          {/* Endpoint labels with collision avoidance: cluster around 5–15%
-              would otherwise stack illegibly. Sort by raw y, then push each
-              label down to maintain MIN_GAP separation, with a leader line
-              from the actual endpoint to the dodged label. */}
-          {(() => {
-            const MIN_GAP = 12;
-            const labels = Array.from(byParty.entries()).map(([party, points]) => {
-              const last = points[points.length - 1];
-              return {
-                party,
-                color: partyColor(party),
-                anchorX: xFor(last.quarter_start),
-                anchorY: yFor(last.percentage_avg),
-              };
-            });
-            labels.sort((a, b) => a.anchorY - b.anchorY);
-            const placedY: number[] = [];
-            for (let i = 0; i < labels.length; i++) {
-              let y = labels[i].anchorY;
-              if (i > 0 && y < placedY[i - 1] + MIN_GAP) y = placedY[i - 1] + MIN_GAP;
-              placedY.push(y);
-            }
-            const labelX = VB_W - M_RIGHT + 8;
-            return labels.map((l, i) => {
-              const ly = placedY[i];
-              const dodged = Math.abs(ly - l.anchorY) > 1.5;
-              return (
-                <g key={l.party}>
-                  {dodged && (
-                    <line
-                      x1={l.anchorX + 3}
-                      y1={l.anchorY}
-                      x2={labelX - 2}
-                      y2={ly - 2}
-                      stroke={l.color}
-                      strokeWidth={0.75}
-                      opacity={0.5}
-                    />
-                  )}
-                  <text
-                    x={labelX}
-                    y={ly + 2}
-                    className="font-mono"
-                    fontSize={10}
-                    fill={l.color}
-                    fontWeight={600}
-                  >
-                    {l.party}
-                  </text>
-                </g>
-              );
-            });
-          })()}
         </svg>
+      </div>
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from(byParty.entries()).map(([party, points]) => {
+          const last = points[points.length - 1];
+          return (
+            <div key={party} className="flex items-center gap-2.5 min-w-0">
+              <span className="shrink-0 inline-block w-6 h-0.5 rounded-full" style={{ background: partyColor(party) }} />
+              <span className="font-serif text-[13px] text-foreground truncate">{partyLabel(party)}</span>
+              <span className="ml-auto font-mono text-[11px] text-muted-foreground tabular-nums shrink-0">
+                {last.percentage_avg.toFixed(1)}%
+              </span>
+            </div>
+          );
+        })}
       </div>
       <p className="mt-3 font-mono text-[10px] text-muted-foreground italic tracking-wide">
         Dystans pionowy 0–50%. Najechanie na punkt pokaże dokładną wartość i liczbę sondaży w kwartale.
