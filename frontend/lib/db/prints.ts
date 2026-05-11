@@ -187,6 +187,10 @@ export type ProcessOutcome = {
   passed: boolean;
   closureDate: string | null;
   act: ProcessAct | null;
+  // 'URGENT' = tryb pilny (Konst. art. 123). Compressed Senate/President
+  // deadlines (14 d / 7 d) and excludes tax, electoral law, kodeksy, etc.
+  // Populated from upstream Sejm API processes.urgencyStatus.
+  urgencyStatus: "NORMAL" | "URGENT" | null;
 };
 
 export type MainVotingSeat = {
@@ -263,7 +267,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
   // outcome columns (passed / eli / display_address / eli_act_id / closure_date).
   const { data: proc } = await sb
     .from("processes")
-    .select("id, passed, eli, display_address, eli_act_id, closure_date")
+    .select("id, passed, eli, display_address, eli_act_id, closure_date, urgency_status")
     .eq("term", term)
     .eq("number", number)
     .limit(1)
@@ -305,10 +309,12 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
         };
       }
     }
+    const us = (proc.urgency_status as string | null) ?? null;
     outcome = {
       passed: !!proc.passed,
       closureDate: (proc.closure_date as string) ?? null,
       act,
+      urgencyStatus: us === "URGENT" || us === "NORMAL" ? us : null,
     };
   }
 

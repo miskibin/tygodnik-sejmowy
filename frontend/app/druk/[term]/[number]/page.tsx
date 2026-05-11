@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPrint, type ProcessStage } from "@/lib/db/prints";
 import { documentCategoryLabel, opinionSourceLabel, opinionSourceShort, promiseStatusLabel, sponsorAuthorityLabel } from "@/lib/labels";
-import { STAGE_TYPE_LABEL } from "@/lib/stages";
+import { stageLabel } from "@/lib/stages";
 import { Reader } from "./_components/Reader";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { isUnaffiliated } from "@/lib/clubs/filter";
@@ -63,7 +63,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 function StageRow({ s, isLast }: { s: ProcessStage; isLast: boolean }) {
-  const label = STAGE_TYPE_LABEL[s.stageType] ?? s.stageType ?? s.stageName;
+  const label = stageLabel(s.stageType, s.stageName);
   const date = s.stageDate
     ? new Date(s.stageDate).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit" })
     : "—";
@@ -125,7 +125,7 @@ export default async function DrukPage({
 
   return (
     <div className="bg-background text-foreground font-serif pb-20">
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9 pb-8 md:pb-10">
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9 pb-8 md:pb-10">
         <div className="font-sans text-[11px] tracking-[0.16em] uppercase mb-3 flex items-center gap-3 flex-wrap">
           <a href="/tygodnik" className="text-muted-foreground hover:text-destructive">‹ Tygodnik</a>
           <span className="text-border">/</span>
@@ -314,6 +314,23 @@ export default async function DrukPage({
           </div>
 
           <aside className="font-sans text-[13px] text-secondary-foreground">
+            {outcome?.urgencyStatus === "URGENT" && (
+              <div
+                className="mb-5 px-3 py-2 border-l-2 font-sans text-[11px] leading-[1.5]"
+                style={{ borderColor: "var(--destructive)", background: "var(--muted)" }}
+                title="Konst. art. 123: tylko Rada Ministrów może nadać tryb pilny. Wyłączenia: podatki, prawo wyborcze, ustrój władz, kodeksy."
+              >
+                <div
+                  className="font-mono text-[10px] tracking-[0.16em] uppercase mb-1"
+                  style={{ color: "var(--destructive)", fontWeight: 600 }}
+                >
+                  ⚡ Tryb pilny
+                </div>
+                <div className="text-secondary-foreground">
+                  Skrócone terminy: Senat 14 dni · Prezydent 7 dni · skraca standardową ścieżkę vacatio legis.
+                </div>
+              </div>
+            )}
             {(print.sponsorAuthority || print.sponsorMps.length > 0 || print.opinionSource) && (
               <>
                 <div className="text-[10px] tracking-[0.16em] uppercase text-destructive mb-2.5">

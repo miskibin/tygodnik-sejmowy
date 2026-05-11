@@ -40,8 +40,12 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
 
 ## LLM
 
-- Default: `gemma4:e4b` (Ollama, 9.6 GB, ID c6eb396dbd59 — verified pullable). Set via `SUPAGRAF_LLM_MODEL` env.
-- **Default timeout 300 s** (long Polish prints + structured-JSON gemma inference can take 60-120 s; 60 s default was triggering `ReadTimeout` mid-batch). Override via `SUPAGRAF_LLM_TIMEOUT_S` env.
+- **Default backend: `deepseek`** (`SUPAGRAF_LLM_BACKEND=deepseek`). Needs `DEEPSEEK_API_KEY`. Code defaults live in `supagraf/enrich/__init__.py`.
+- **Per-print picker** (`supagraf/enrich/print_unified.py:pick_model`) routes each print to `pro` or `flash`:
+  - `deepseek-v4-pro` (`SUPAGRAF_LLM_MODEL_PRO`) — substantive bills (projekt_ustawy, sprawozdanie_komisji). 1M ctx.
+  - `deepseek-v4-flash` (`SUPAGRAF_LLM_MODEL_FLASH`) — procedural/meta docs (opinions, OSR, autopoprawka). 1M ctx.
+- Alternative backends behind `SUPAGRAF_LLM_BACKEND`: `gemini` (needs `GOOGLE_API_KEY`) and `ollama` (legacy local; historically `gemma4:e4b`, 9.6 GB, ID c6eb396dbd59). `SUPAGRAF_LLM_MODEL` overrides the per-print picker with a single model name.
+- **Default timeout 300 s** (long Polish prints + structured-JSON inference can take 60-120 s; 60 s default was triggering `ReadTimeout` mid-batch). Override via `SUPAGRAF_LLM_TIMEOUT_S` env.
 - Embedding: `nomic-embed-text-v2-moe` (Ollama, 957 MB). Native dim 768 → zero-padded to 1024 in `supagraf/enrich/embed.py` for `halfvec(1024)` DB column. Cosine-preserving (zeros contribute 0 to dot product + L2 norm).
 
 ## Migrations
