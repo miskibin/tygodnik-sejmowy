@@ -2,6 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
+import { normalizeActSourceUrl } from "@/lib/isap";
 import {
   topicsFromDb,
   SECTION_LIMITS,
@@ -118,7 +119,12 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
         sittingNum: r.sitting_num,
         eventDate: r.event_date,
         impactScore: r.impact_score ?? 0,
-        sourceUrl: r.source_url,
+        sourceUrl: r.event_type === "eli_inforce"
+          ? (normalizeActSourceUrl(
+              r.source_url,
+              (r.payload as { eli_id?: string | null })?.eli_id,
+            ) ?? r.source_url)
+          : r.source_url,
         payload: r.payload as never,
       } as WeeklyEvent);
     }
