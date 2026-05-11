@@ -1,6 +1,7 @@
 import "server-only";
 
 import { supabase } from "@/lib/supabase";
+import { isQuarterVisibleForParty } from "@/lib/polls/series";
 
 // E3: polls dashboard data layer. Reads matviews populated by E2 ETL
 // (poll_average_30d_mv, poll_trend_quarterly_mv) plus raw polls/poll_results
@@ -27,6 +28,7 @@ export type PollTrendRow = {
 export type RecentPollRow = {
   poll_id: number;
   pollster: string;
+  pollster_code: string;
   conducted_at_start: string;
   conducted_at_end: string;
   sample_size: number | null;
@@ -82,7 +84,7 @@ export async function getPollTrendQuarterly(parties: string[] = [...TREND_DEFAUL
     percentage_min: toNum(r.percentage_min),
     percentage_max: toNum(r.percentage_max),
     n_polls: r.n_polls as number,
-  }));
+  })).filter((r) => isQuarterVisibleForParty(r.party_code, r.quarter_start));
 }
 
 export async function getRecentPolls(limit = 20): Promise<RecentPollRow[]> {
@@ -96,6 +98,21 @@ export async function getRecentPolls(limit = 20): Promise<RecentPollRow[]> {
   if (error) throw error;
   const rows = polls ?? [];
   if (rows.length === 0) return [];
+  const pollsterCodes = Array.from(new Set(rows.map((p) => (p.pollster as string) ?? "").filter(Boolean)));
+  const pollsterNames = new Map<string, string>();
+  if (pollsterCodes.length > 0) {
+    const { data: pollsters, error: eNames } = await sb
+      .from("pollsters")
+      .select("code, name_full")
+      .in("code", pollsterCodes);
+    if (eNames) throw eNames;
+    for (const r of pollsters ?? []) {
+      pollsterNames.set(
+        r.code as string,
+        ((r.name_full as string) ?? (r.code as string) ?? "").trim(),
+      );
+    }
+  }
   const ids = rows.map((p) => p.id as number);
   const { data: results, error: e2 } = await sb
     .from("poll_results")
@@ -114,7 +131,8 @@ export async function getRecentPolls(limit = 20): Promise<RecentPollRow[]> {
   }
   return rows.map((p) => ({
     poll_id: p.id as number,
-    pollster: (p.pollster as string) ?? "",
+    pollster: pollsterNames.get((p.pollster as string) ?? "") ?? ((p.pollster as string) ?? ""),
+    pollster_code: (p.pollster as string) ?? "",
     conducted_at_start: p.conducted_at_start as string,
     conducted_at_end: p.conducted_at_end as string,
     sample_size: (p.sample_size as number | null) ?? null,

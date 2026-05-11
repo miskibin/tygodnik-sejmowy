@@ -1,4 +1,5 @@
 import type { PollAverageRow } from "@/lib/db/polls";
+import { NON_ADDITIVE_SERIES_NOTE } from "@/lib/polls/series";
 import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES } from "./partyMeta";
 
 function daysAgo(iso: string): string {
@@ -20,6 +21,7 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
   const main = rows.filter((r) => !RESIDUAL_CODES.has(r.party_code));
   const residual = rows.filter((r) => RESIDUAL_CODES.has(r.party_code));
   const max = Math.max(1, ...main.map((r) => r.percentage_avg));
+  const total = rows.reduce((sum, r) => sum + r.percentage_avg, 0);
 
   return (
     <section>
@@ -104,6 +106,10 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
           ))}
         </div>
       )}
+
+      <p className="mt-4 font-mono text-[10px] text-muted-foreground tracking-wide leading-relaxed">
+        Suma wszystkich pokazanych serii: {fmtPct(total)}%. {NON_ADDITIVE_SERIES_NOTE}
+      </p>
     </section>
   );
 }

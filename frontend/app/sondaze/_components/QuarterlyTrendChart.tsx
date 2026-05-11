@@ -1,4 +1,5 @@
 import type { PollTrendRow } from "@/lib/db/polls";
+import { NON_ADDITIVE_SERIES_NOTE } from "@/lib/polls/series";
 import { partyColor, partyLabel } from "./partyMeta";
 
 const VB_W = 920;
@@ -75,7 +76,8 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
           <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Trendy kwartalne</h2>
           <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
             Średnia kwartalna z wszystkich sondaży w danym kwartale. Każdy punkt — jeden kwartał.
-            Pokazujemy partie z bieżącą średnią ≥ 3% (w tym KKP Brauna i Razem — poza Sejmem, ale silnie sondażowane).
+            Pokazujemy partie z bieżącą średnią ≥ 3%; nowe szyldy (np. Razem, KKP) startują dopiero od kwartału,
+            w którym realnie pojawiły się jako osobne byty polityczne.
           </p>
         </div>
       </header>
@@ -190,6 +192,9 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
       </div>
       <p className="mt-3 font-mono text-[10px] text-muted-foreground italic tracking-wide">
         Dystans pionowy 0–50%. Najechanie na punkt pokaże dokładną wartość i liczbę sondaży w kwartale.
+      </p>
+      <p className="mt-2 font-mono text-[10px] text-muted-foreground tracking-wide leading-relaxed">
+        {NON_ADDITIVE_SERIES_NOTE}
       </p>
     </section>
   );

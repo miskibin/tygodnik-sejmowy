@@ -3,6 +3,7 @@ import { stripSpeechBoilerplate } from "@/lib/labels";
 import {
   applyHighlights,
   extractStageDirections,
+  type ParagraphSegment,
   type StageDirection,
   type StageDirectionKind,
 } from "@/lib/transcript-annotate";
@@ -21,24 +22,16 @@ function readingTime(text: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
-function MarginDirections({ directions }: { directions: StageDirection[] }) {
-  if (directions.length === 0) return null;
+function MarginDirection({ direction }: { direction: StageDirection }) {
+  const Icon = DIRECTION_ICON[direction.kind];
   return (
-    <ul className="m-0 p-0 list-none space-y-1.5">
-      {directions.map((d, i) => {
-        const Icon = DIRECTION_ICON[d.kind];
-        return (
-          <li
-            key={i}
-            className="flex items-start gap-1.5 font-mono text-[10px] tracking-wide uppercase text-muted-foreground leading-snug"
-            title={d.label}
-          >
-            <Icon aria-hidden size={11} strokeWidth={1.75} className="text-destructive mt-[1px] shrink-0" />
-            <span className="italic normal-case font-serif text-[12px]">{d.label}</span>
-          </li>
-        );
-      })}
-    </ul>
+    <div
+      className="flex items-start gap-1.5 font-mono text-[10px] tracking-wide uppercase text-muted-foreground leading-snug"
+      title={direction.label}
+    >
+      <Icon aria-hidden size={11} strokeWidth={1.75} className="text-destructive mt-[1px] shrink-0" />
+      <span className="italic normal-case font-serif text-[12px]">{direction.label}</span>
+    </div>
   );
 }
 
@@ -46,9 +39,10 @@ function MarginDirections({ directions }: { directions: StageDirection[] }) {
 // two-column grid on desktop: prose left, stage-direction chips right.
 //
 // Stage directions ((Oklaski), (Wesołość na sali), etc.) render only on
-// desktop in the right margin column. On mobile they are dropped to keep
-// the reading column clean — per design decision 2026-05-10. If we want
-// them on mobile later, render them inline as italic muted text instead.
+// desktop in the right margin column. Unlike the first pass, we keep them
+// as ordered segment markers so each badge sits next to the exact moment in
+// the speech instead of collapsing into one stack at the paragraph start.
+// On mobile they are still dropped to keep the reading column clean.
 //
 // Highlights wrap viral_quote + key_claims substrings (>=12 chars,
 // whitespace-normalized, case-insensitive) so the reader sees what the
@@ -95,36 +89,53 @@ export function AnnotatedTranscript({
 
       <div className="pt-6">
         {paragraphs.map((p, i) => {
-          const spans = applyHighlights(p.cleanedText, needles);
           return (
-            <div
-              key={i}
-              className="md:grid md:grid-cols-[1fr_180px] md:gap-6 md:items-start mb-5"
-            >
-              <p
-                className="m-0 font-serif text-secondary-foreground"
-                style={{ fontSize: 17, lineHeight: 1.75, textWrap: "pretty" }}
-              >
-                {spans.map((s, j) =>
-                  s.kind === "mark" ? (
-                    <mark
+            <div key={i} className="mb-5 space-y-2.5">
+              {p.segments.map((segment: ParagraphSegment, j) => {
+                if (segment.kind === "direction") {
+                  return (
+                    <div
                       key={j}
-                      className="bg-muted text-foreground px-0.5 rounded-[2px]"
-                      style={{
-                        boxShadow: "inset 0 -0.42em 0 color-mix(in srgb, var(--destructive) 14%, transparent)",
-                      }}
+                      className="hidden md:grid md:grid-cols-[1fr_180px] md:gap-6 md:items-start"
                     >
-                      {s.content}
-                    </mark>
-                  ) : (
-                    <span key={j}>{s.content}</span>
-                  ),
-                )}
-              </p>
-              {/* margin column — desktop only */}
-              <div className="hidden md:block pt-1">
-                <MarginDirections directions={p.directions} />
-              </div>
+                      <div aria-hidden />
+                      <div className="pt-1">
+                        <MarginDirection direction={segment.direction} />
+                      </div>
+                    </div>
+                  );
+                }
+
+                const spans = applyHighlights(segment.text, needles);
+                return (
+                  <div
+                    key={j}
+                    className="md:grid md:grid-cols-[1fr_180px] md:gap-6 md:items-start"
+                  >
+                    <p
+                      className="m-0 font-serif text-secondary-foreground"
+                      style={{ fontSize: 17, lineHeight: 1.75, textWrap: "pretty" }}
+                    >
+                      {spans.map((s, k) =>
+                        s.kind === "mark" ? (
+                          <mark
+                            key={k}
+                            className="bg-muted text-foreground px-0.5 rounded-[2px]"
+                            style={{
+                              boxShadow: "inset 0 -0.42em 0 color-mix(in srgb, var(--destructive) 14%, transparent)",
+                            }}
+                          >
+                            {s.content}
+                          </mark>
+                        ) : (
+                          <span key={k}>{s.content}</span>
+                        ),
+                      )}
+                    </p>
+                    <div className="hidden md:block" aria-hidden />
+                  </div>
+                );
+              })}
             </div>
           );
         })}
