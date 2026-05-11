@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useProfile } from "@/lib/profile";
 import type { MpListItem } from "@/lib/db/mps";
+import { emitApiRouteError } from "@/lib/analytics";
 import { MPCardGrid } from "@/components/posel/MPCardGrid";
 
 function MpGrid({ mps }: { mps: MpListItem[] }) {
@@ -45,7 +46,18 @@ export function PoselIndexClient({
     setDistrictLoading(true);
     const ctrl = new AbortController();
     fetch(`/api/mps-by-district?num=${district.num}`, { signal: ctrl.signal })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) {
+          emitApiRouteError({
+            context: "mps_by_district",
+            route: "/api/mps-by-district",
+            status_code: r.status,
+            is_retryable: r.status >= 500 || r.status === 429,
+          });
+          throw new Error("non-ok response");
+        }
+        return r.json();
+      })
       .then((j) => setDistrictMps(j.mps ?? []))
       .catch(() => setDistrictMps([]))
       .finally(() => setDistrictLoading(false));

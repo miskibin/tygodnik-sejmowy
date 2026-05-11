@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, PERSONA_IDS, type PersonaId } from "@/lib/personas";
 import { TOPICS, TOPIC_IDS, type TopicId } from "@/lib/topics";
+import { emitApiRouteError, emitUiError } from "@/lib/analytics";
 
 export default function Landing() {
   const router = useRouter();
@@ -30,12 +31,29 @@ export default function Landing() {
     const id = setTimeout(async () => {
       try {
         const r = await fetch(`/api/postcode?p=${encodeURIComponent(postcode)}`, { signal: ctrl.signal });
-        if (!r.ok) { setDistrict(null); setLookupErr(null); return; }
+        if (!r.ok) {
+          emitApiRouteError({
+            context: "postcode_lookup",
+            route: "/api/postcode",
+            status_code: r.status,
+            is_retryable: r.status >= 500 || r.status === 429,
+          });
+          setDistrict(null);
+          setLookupErr(null);
+          return;
+        }
         const j = await r.json();
         if (j?.district) { setDistrict(j.district); setLookupErr(null); }
         else { setDistrict(null); }
       } catch (e) {
-        if ((e as Error).name !== "AbortError") setLookupErr("nie udało się sprawdzić kodu");
+        if ((e as Error).name !== "AbortError") {
+          emitUiError({
+            context: "postcode_lookup",
+            route: "/api/postcode",
+            is_retryable: true,
+          });
+          setLookupErr("nie udało się sprawdzić kodu");
+        }
       }
     }, 250);
     return () => { ctrl.abort(); clearTimeout(id); };

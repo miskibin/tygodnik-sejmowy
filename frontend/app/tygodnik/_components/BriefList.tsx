@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
 import { TOPICS, type TopicId } from "@/lib/topics";
@@ -36,6 +36,7 @@ import {
   type FooterLink,
 } from "@/components/tygodnik/atoms";
 import { FilterBar } from "./FilterBar";
+import { emitEmptyStateShown } from "@/lib/analytics";
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
@@ -585,6 +586,19 @@ export function BriefList({
   }, [printItems, topics, personas, showAll]);
 
   const filterActive = topics.length > 0 || personas.length > 0;
+
+  useEffect(() => {
+    if (!(filteredPrints.length === 0 && partitioned.prints.length > 0)) return;
+    emitEmptyStateShown({
+      context: "tygodnik_key_list",
+      active_filters: {
+        topics: topics.join(","),
+        personas: personas.join(","),
+        show_all: showAll,
+      },
+    });
+  }, [filteredPrints.length, partitioned.prints.length, topics, personas, showAll]);
+
 
   const sittingIdx = sittings.findIndex((s) => s.sittingNum === sitting.sittingNum);
   const newerSitting = sittingIdx > 0

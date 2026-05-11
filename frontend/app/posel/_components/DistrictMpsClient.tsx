@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useProfile } from "@/lib/profile";
 import type { MpListItem } from "@/lib/db/mps";
+import { emitApiRouteError } from "@/lib/analytics";
 
 export function DistrictMpsClient() {
   const { district, hydrated } = useProfile();
@@ -16,7 +17,18 @@ export function DistrictMpsClient() {
     setLoading(true);
     const ctrl = new AbortController();
     fetch(`/api/mps-by-district?num=${district.num}`, { signal: ctrl.signal })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) {
+          emitApiRouteError({
+            context: "mps_by_district",
+            route: "/api/mps-by-district",
+            status_code: r.status,
+            is_retryable: r.status >= 500 || r.status === 429,
+          });
+          throw new Error("non-ok response");
+        }
+        return r.json();
+      })
       .then((j) => setMps(j.mps ?? []))
       .catch(() => setMps([]))
       .finally(() => setLoading(false));

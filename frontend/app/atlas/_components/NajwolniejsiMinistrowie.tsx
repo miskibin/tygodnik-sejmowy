@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SectionHead } from "./SectionHead";
 import type { SlowMinisters, MinisterRow } from "@/lib/db/atlas";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { emitEmptyStateShown } from "@/lib/analytics";
 
 type SortKey = "avgDays" | "overdueRate" | "count";
 type FilterKey = "all" | "overdue" | "ontime";
@@ -42,6 +43,14 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
   }, [data.rows, sort, filter, limit]);
 
   const max = Math.max(1, ...filtered.map((m) => m.avgDays));
+
+  useEffect(() => {
+    if (filtered.length !== 0) return;
+    emitEmptyStateShown({
+      context: "atlas_key_list",
+      active_filters: { sort, filter, limit_days: limit },
+    });
+  }, [filtered.length, sort, filter, limit]);
   const totalInterp = data.rows.reduce((s, m) => s + m.count, 0);
 
   return (
