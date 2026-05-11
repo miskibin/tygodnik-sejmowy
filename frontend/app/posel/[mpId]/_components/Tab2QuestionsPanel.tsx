@@ -1,14 +1,5 @@
-import type { MpQuestionsData } from "@/lib/db/posel-tabs";
-
-function formatDate(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "2-digit" });
-}
-
-function shortenRecipient(name: string): string {
-  // "minister rodziny, pracy i polityki społecznej" → "MRPiPS"-ish — keep it readable instead.
-  return name.replace(/^minister\s+/i, "min. ");
-}
+import type { MpQuestionsStats, MpQuestionRow } from "@/lib/db/posel-tabs";
+import { PoselInterpellationsListClient } from "./PoselInterpellationsListClient";
 
 function KpiTile({
   label,
@@ -53,7 +44,7 @@ function RecipientBars({ items }: { items: Array<{ name: string; count: number }
             <li key={it.name} className="mb-3 last:mb-0">
               <div className="flex items-baseline justify-between mb-1 gap-3">
                 <span className="font-serif text-[14px] text-foreground leading-snug truncate">
-                  {shortenRecipient(it.name)}
+                  {it.name.replace(/^minister\s+/i, "min. ")}
                 </span>
                 <span className="font-mono text-[12px] text-foreground font-semibold">{it.count}</span>
               </div>
@@ -71,14 +62,16 @@ function RecipientBars({ items }: { items: Array<{ name: string; count: number }
   );
 }
 
-const KIND_LABELS: Record<string, string> = {
-  interpellation: "Interpelacja",
-  written: "Zapytanie",
-  oral: "Pytanie ustne",
-};
-
-export function Tab2QuestionsPanel({ data }: { data: MpQuestionsData }) {
-  if (data.total === 0) {
+export function Tab2QuestionsPanel({
+  stats,
+  initialRows,
+  mpId,
+}: {
+  stats: MpQuestionsStats;
+  initialRows: MpQuestionRow[];
+  mpId: number;
+}) {
+  if (stats.total === 0) {
     return (
       <p className="font-serif italic text-muted-foreground text-center py-12">
         Ten poseł nie złożył jeszcze interpelacji ani zapytań w tej kadencji.
@@ -86,30 +79,30 @@ export function Tab2QuestionsPanel({ data }: { data: MpQuestionsData }) {
     );
   }
 
-  const onTime = data.total - data.delayedCount;
-  const onTimePct = data.total > 0 ? (onTime / data.total) * 100 : 0;
+  const onTime = stats.total - stats.delayedCount;
+  const onTimePct = stats.total > 0 ? (onTime / stats.total) * 100 : 0;
 
   return (
     <div className="grid gap-7">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <KpiTile
           label="Złożone"
-          value={data.total.toLocaleString("pl-PL")}
+          value={stats.total.toLocaleString("pl-PL")}
           sub="interpelacji i zapytań"
           color="var(--destructive)"
         />
         <KpiTile
           label="Z odpowiedzią w terminie"
           value={`${onTimePct.toFixed(0)}%`}
-          sub={`${onTime} z ${data.total}`}
+          sub={`${onTime} z ${stats.total}`}
           color="var(--success)"
         />
         <KpiTile
           label="Spóźnionych odpowiedzi"
-          value={data.delayedCount.toString()}
+          value={stats.delayedCount.toString()}
           sub={
-            data.avgDelayDays != null
-              ? `średnio ${Math.round(data.avgDelayDays)} dni opóźnienia`
+            stats.avgDelayDays != null
+              ? `średnio ${Math.round(stats.avgDelayDays)} dni opóźnienia`
               : "termin >30 dni"
           }
           color="var(--warning)"
@@ -117,68 +110,13 @@ export function Tab2QuestionsPanel({ data }: { data: MpQuestionsData }) {
       </div>
 
       <div className="grid gap-5 md:grid-cols-[1fr_1.2fr] items-start">
-        <RecipientBars items={data.recipientsTop} />
+        <RecipientBars items={stats.recipientsTop} />
 
         <div>
           <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
-            Interpelacje chronologicznie
+            Interpelacje i zapytania (najnowsze wpisy)
           </div>
-          <ul className="border-t border-border">
-            {data.rows.map((r) => {
-              const delayed = r.answerDelayedDays != null && r.answerDelayedDays > 0;
-              const kindLabel = KIND_LABELS[r.kind] ?? r.kind;
-              return (
-                <li
-                  key={r.questionId}
-                  className="grid border-b border-border py-3 gap-2"
-                  style={{ gridTemplateColumns: "62px 1fr" }}
-                >
-                  <span className="font-mono text-[11px] text-muted-foreground tracking-wide pt-1">
-                    {formatDate(r.sentDate)}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-baseline gap-2 mb-1">
-                      <span
-                        className="font-sans text-[10px] uppercase tracking-[0.12em] text-destructive"
-                      >
-                        {kindLabel} #{r.num}
-                      </span>
-                      {delayed ? (
-                        <span
-                          className="font-sans text-[10px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-sm"
-                          style={{ color: "var(--warning)", border: "1px solid var(--warning)" }}
-                        >
-                          spóźnione {r.answerDelayedDays} dni
-                        </span>
-                      ) : (
-                        <span
-                          className="font-sans text-[10px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-sm"
-                          style={{ color: "var(--success)", border: "1px solid var(--success)" }}
-                        >
-                          w terminie
-                        </span>
-                      )}
-                    </div>
-                    <div className="font-serif text-[15.5px] leading-snug text-foreground mb-1">
-                      {r.title}
-                    </div>
-                    {r.recipients.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-1.5">
-                        {r.recipients.slice(0, 3).map((rc) => (
-                          <span
-                            key={rc}
-                            className="font-sans text-[10.5px] text-secondary-foreground px-1.5 py-0.5 border border-border rounded-sm"
-                          >
-                            {shortenRecipient(rc)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <PoselInterpellationsListClient mpId={mpId} initialRows={initialRows} total={stats.total} />
         </div>
       </div>
     </div>

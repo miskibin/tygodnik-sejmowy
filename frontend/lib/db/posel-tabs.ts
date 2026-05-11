@@ -1,8 +1,13 @@
 import "server-only";
 
+import { cleanStatementBody } from "@/lib/speechExcerpt";
 import { supabase } from "@/lib/supabase";
 
 const DEFAULT_TERM = 10;
+
+const STATS_FETCH_PAGE = 1000;
+
+export { MP_QUESTIONS_STATEMENTS_TAB_LIMIT } from "@/lib/posel-tab-page-size";
 
 export type VoteValue = "YES" | "NO" | "ABSTAIN" | "ABSENT" | "PRESENT";
 
@@ -174,40 +179,37 @@ export type MpQuestionRow = {
   recipients: string[];
 };
 
-export type MpQuestionsData = {
-  rows: MpQuestionRow[];
+/** Aggregates over all interpellations / written questions for an MP (full DB scan). */
+export type MpQuestionsStats = {
   total: number;
   delayedCount: number;
   avgDelayDays: number | null;
   recipientsTop: Array<{ name: string; count: number }>;
 };
 
-export async function getMpQuestions(mpId: number, term = DEFAULT_TERM): Promise<MpQuestionsData> {
-  const sb = supabase();
-  const { data, error } = await sb
-    .from("question_authors")
-    .select(
-      "question_id, questions:questions!inner(id, kind, num, title, sent_date, answer_delayed_days, recipient_titles)"
-    )
-    .eq("term", term)
-    .eq("mp_id", mpId)
-    .order("question_id", { ascending: false })
-    .limit(500);
-  if (error) throw error;
-
-  type QRow = {
-    question_id: number;
-    questions: {
-      id: number;
-      kind: string;
-      num: number;
-      title: string | null;
-      sent_date: string | null;
-      answer_delayed_days: number | null;
-      recipient_titles: string[] | null;
-    };
+type QRowFull = {
+  question_id: number;
+  questions: {
+    id: number;
+    kind: string;
+    num: number;
+    title: string | null;
+    sent_date: string | null;
+    answer_delayed_days: number | null;
+    recipient_titles: string[] | null;
   };
-  const rows: MpQuestionRow[] = ((data as unknown as QRow[]) ?? []).map((r) => ({
+};
+
+type QAggRow = {
+  question_id: number;
+  questions: {
+    answer_delayed_days: number | null;
+    recipient_titles: string[] | null;
+  };
+};
+
+function mapQRowFull(r: QRowFull): MpQuestionRow {
+  return {
     questionId: r.question_id,
     kind: r.questions.kind,
     num: r.questions.num,
@@ -215,25 +217,49 @@ export async function getMpQuestions(mpId: number, term = DEFAULT_TERM): Promise
     sentDate: r.questions.sent_date,
     answerDelayedDays: r.questions.answer_delayed_days,
     recipients: r.questions.recipient_titles ?? [],
-  }));
+  };
+}
 
-  rows.sort((a, b) => {
-    const da = a.sentDate ? Date.parse(a.sentDate) : 0;
-    const db = b.sentDate ? Date.parse(b.sentDate) : 0;
-    return db - da;
-  });
+export async function getMpQuestionsStats(mpId: number, term = DEFAULT_TERM): Promise<MpQuestionsStats> {
+  const sb = supabase();
+  const { count: totalN, error: cErr } = await sb
+    .from("question_authors")
+    .select("*", { count: "exact", head: true })
+    .eq("term", term)
+    .eq("mp_id", mpId);
+  if (cErr) throw cErr;
+  const total = totalN ?? 0;
+  if (total === 0) {
+    return { total: 0, delayedCount: 0, avgDelayDays: null, recipientsTop: [] };
+  }
 
-  const recipientCount = new Map<string, number>();
+  const all: QAggRow[] = [];
+  for (let offset = 0; ; offset += STATS_FETCH_PAGE) {
+    const { data, error } = await sb
+      .from("question_authors")
+      .select("question_id, questions:questions!inner(answer_delayed_days, recipient_titles)")
+      .eq("term", term)
+      .eq("mp_id", mpId)
+      .order("question_id", { ascending: true })
+      .range(offset, offset + STATS_FETCH_PAGE - 1);
+    if (error) throw error;
+    const chunk = (data ?? []) as unknown as QAggRow[];
+    all.push(...chunk);
+    if (chunk.length < STATS_FETCH_PAGE) break;
+  }
+
   let delayedCount = 0;
   let delaySum = 0;
   let delayN = 0;
-  for (const r of rows) {
-    for (const name of r.recipients) {
+  const recipientCount = new Map<string, number>();
+  for (const r of all) {
+    for (const name of r.questions.recipient_titles ?? []) {
       recipientCount.set(name, (recipientCount.get(name) ?? 0) + 1);
     }
-    if (r.answerDelayedDays != null && r.answerDelayedDays > 0) {
+    const d = r.questions.answer_delayed_days;
+    if (d != null && d > 0) {
       delayedCount++;
-      delaySum += r.answerDelayedDays;
+      delaySum += d;
       delayN++;
     }
   }
@@ -243,12 +269,34 @@ export async function getMpQuestions(mpId: number, term = DEFAULT_TERM): Promise
     .slice(0, 10);
 
   return {
-    rows,
-    total: rows.length,
+    total,
     delayedCount,
     avgDelayDays: delayN > 0 ? delaySum / delayN : null,
     recipientsTop,
   };
+}
+
+export async function getMpQuestionsRows(
+  mpId: number,
+  term = DEFAULT_TERM,
+  offset: number,
+  limit: number,
+): Promise<MpQuestionRow[]> {
+  if (limit <= 0) return [];
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("question_authors")
+    .select(
+      "question_id, questions:questions!inner(id, kind, num, title, sent_date, answer_delayed_days, recipient_titles)"
+    )
+    .eq("term", term)
+    .eq("mp_id", mpId)
+    .order("question_id", { ascending: false })
+    .range(offset, offset + limit - 1);
+  if (error) throw error;
+  // Keep one stable global order across paginated API calls.
+  // Re-sorting each page in memory can break cross-page ordering.
+  return ((data ?? []) as unknown as QRowFull[]).map(mapQRowFull);
 }
 
 export type MpStatementRow = {
@@ -263,34 +311,129 @@ export type MpStatementRow = {
   proceedingDay: string | null;
 };
 
-export type MpStatementsData = {
-  rows: MpStatementRow[];
+/** Aggregates over all plenary statements for an MP (full DB scan). */
+export type MpStatementsStats = {
   total: number;
   proceedingsTouched: number;
   longest: number;
   monthly: Array<{ ym: string; count: number }>;
 };
 
-export async function getMpStatementsTab(mpId: number, term = DEFAULT_TERM): Promise<MpStatementsData> {
+type StmtSlim = {
+  id: number;
+  start_datetime: string | null;
+  body_text: string | null;
+  proceeding_day_id: number | null;
+};
+
+type StmtRowFull = {
+  id: number;
+  start_datetime: string | null;
+  body_text: string | null;
+  summary_one_line: string | null;
+  function: string | null;
+  rapporteur: boolean | null;
+  secretary: boolean | null;
+  proceeding_day_id: number | null;
+};
+
+export async function getMpStatementsStats(mpId: number, term = DEFAULT_TERM): Promise<MpStatementsStats> {
+  const sb = supabase();
+  const { count: totalN, error: cErr } = await sb
+    .from("proceeding_statements")
+    .select("*", { count: "exact", head: true })
+    .eq("term", term)
+    .eq("mp_id", mpId);
+  if (cErr) throw cErr;
+  const total = totalN ?? 0;
+  if (total === 0) {
+    return { total: 0, proceedingsTouched: 0, longest: 0, monthly: [] };
+  }
+
+  const stmts: StmtSlim[] = [];
+  for (let offset = 0; ; offset += STATS_FETCH_PAGE) {
+    const { data, error } = await sb
+      .from("proceeding_statements")
+      .select("id, start_datetime, body_text, proceeding_day_id")
+      .eq("term", term)
+      .eq("mp_id", mpId)
+      .order("start_datetime", { ascending: false, nullsFirst: false })
+      .range(offset, offset + STATS_FETCH_PAGE - 1);
+    if (error) throw error;
+    const chunk = (data ?? []) as StmtSlim[];
+    stmts.push(...chunk);
+    if (chunk.length < STATS_FETCH_PAGE) break;
+  }
+
+  const dayIds = Array.from(new Set(stmts.map((s) => s.proceeding_day_id).filter((x): x is number => x != null)));
+  let dayInfo = new Map<number, { date: string | null; proceedingNumber: number | null }>();
+  if (dayIds.length) {
+    const dRes = await sb
+      .from("proceeding_days")
+      .select("id, date, proceeding_id")
+      .in("id", dayIds)
+      .limit(Math.max(dayIds.length, 1));
+    if (dRes.error) throw dRes.error;
+    type D = { id: number; date: string | null; proceeding_id: number | null };
+    const days = (dRes.data ?? []) as D[];
+    const procIds = Array.from(new Set(days.map((d) => d.proceeding_id).filter((x): x is number => x != null)));
+    let procNumByPid = new Map<number, number>();
+    if (procIds.length) {
+      const pRes = await sb.from("proceedings").select("id, number").in("id", procIds).limit(procIds.length);
+      if (pRes.error) throw pRes.error;
+      for (const p of (pRes.data ?? []) as Array<{ id: number; number: number }>) procNumByPid.set(p.id, p.number);
+    }
+    for (const d of days) {
+      dayInfo.set(d.id, {
+        date: d.date,
+        proceedingNumber: d.proceeding_id != null ? procNumByPid.get(d.proceeding_id) ?? null : null,
+      });
+    }
+  }
+
+  const proceedings = new Set<number>();
+  let longest = 0;
+  const monthAcc = new Map<string, number>();
+  for (const s of stmts) {
+    const body = s.body_text ?? "";
+    if (body.length > longest) longest = body.length;
+    const di = s.proceeding_day_id != null ? dayInfo.get(s.proceeding_day_id) : null;
+    if (di?.proceedingNumber != null) proceedings.add(di.proceedingNumber);
+    const dt = s.start_datetime ?? di?.date ?? null;
+    if (dt) {
+      const ym = dt.slice(0, 7);
+      monthAcc.set(ym, (monthAcc.get(ym) ?? 0) + 1);
+    }
+  }
+  const monthly = Array.from(monthAcc.entries())
+    .map(([ym, count]) => ({ ym, count }))
+    .sort((a, b) => a.ym.localeCompare(b.ym));
+
+  return {
+    total,
+    proceedingsTouched: proceedings.size,
+    longest,
+    monthly,
+  };
+}
+
+export async function getMpStatementsRows(
+  mpId: number,
+  term = DEFAULT_TERM,
+  offset: number,
+  limit: number,
+): Promise<MpStatementRow[]> {
+  if (limit <= 0) return [];
   const sb = supabase();
   const { data, error } = await sb
     .from("proceeding_statements")
-    .select("id, start_datetime, body_text, function, rapporteur, secretary, proceeding_day_id")
+    .select("id, start_datetime, body_text, summary_one_line, function, rapporteur, secretary, proceeding_day_id")
     .eq("term", term)
     .eq("mp_id", mpId)
     .order("start_datetime", { ascending: false, nullsFirst: false })
-    .limit(500);
+    .range(offset, offset + limit - 1);
   if (error) throw error;
-  type Row = {
-    id: number;
-    start_datetime: string | null;
-    body_text: string | null;
-    function: string | null;
-    rapporteur: boolean | null;
-    secretary: boolean | null;
-    proceeding_day_id: number | null;
-  };
-  const stmts = (data ?? []) as Row[];
+  const stmts = (data ?? []) as StmtRowFull[];
 
   const dayIds = Array.from(new Set(stmts.map((s) => s.proceeding_day_id).filter((x): x is number => x != null)));
   let dayInfo = new Map<number, { date: string | null; proceedingNumber: number | null }>();
@@ -318,37 +461,11 @@ export async function getMpStatementsTab(mpId: number, term = DEFAULT_TERM): Pro
     }
   }
 
-  const stripped = (s: string): string => {
-    // Mirror lib/labels.ts stripSpeechBoilerplate without importing (server-only avoidance).
-    let out = s.trim();
-    const patterns: RegExp[] = [
-      /^\d+\.\s*kadencja,\s*\d+\.\s*posiedzenie[^:]+:\s*[^.]+\.\s*/u,
-      /^\d+\.\s*kadencja,\s*\d+\.\s*posiedzenie[^:]+:\s*/u,
-      /^\d+\.\s*punkt\s+porządku\s+dziennego[^.]*\.\s*/u,
-      /^[\p{Lu}][\p{L}\s.-]{2,120}:\s+/u,
-      /^(Szanown[aey]?\s+)?(Pan(ie)?|Państwo)\s+(Marszał\w+|Minist\w+|Premier\w*|Prezydent\w*|Posł\w+|Senator\w*)[!,.\s]+/u,
-      /^(Szanown[aey]?\s+)?(Pan(ie)?|Państwo)\s+\w+[!,.\s]+/u,
-      /^Wysoka\s+Izbo[!,.\s]+/u,
-      /^Szanown\w+\s+Pa[nń]\w*\s+\w+[!,.\s]+/u,
-    ];
-    for (let i = 0; i < 8; i++) {
-      let changed = false;
-      for (const re of patterns) {
-        const next = out.replace(re, "").trim();
-        if (next !== out) {
-          out = next;
-          changed = true;
-        }
-      }
-      if (!changed) break;
-    }
-    return out;
-  };
-
-  const rows: MpStatementRow[] = stmts.map((s) => {
+  return stmts.map((s) => {
     const di = s.proceeding_day_id != null ? dayInfo.get(s.proceeding_day_id) : null;
     const body = s.body_text ?? "";
-    const cleaned = stripped(body);
+    const summ = s.summary_one_line?.trim();
+    const cleaned = summ ? summ : cleanStatementBody(body);
     const excerpt = cleaned.length > 320 ? cleaned.slice(0, 320).trimEnd() + "…" : cleaned;
     return {
       id: s.id,
@@ -362,29 +479,6 @@ export async function getMpStatementsTab(mpId: number, term = DEFAULT_TERM): Pro
       proceedingDay: di?.date ?? null,
     };
   });
-
-  const proceedings = new Set<number>();
-  let longest = 0;
-  const monthAcc = new Map<string, number>();
-  for (const r of rows) {
-    if (r.proceedingNumber != null) proceedings.add(r.proceedingNumber);
-    if (r.bodyLength > longest) longest = r.bodyLength;
-    if (r.date) {
-      const ym = r.date.slice(0, 7);
-      monthAcc.set(ym, (monthAcc.get(ym) ?? 0) + 1);
-    }
-  }
-  const monthly = Array.from(monthAcc.entries())
-    .map(([ym, count]) => ({ ym, count }))
-    .sort((a, b) => a.ym.localeCompare(b.ym));
-
-  return {
-    rows,
-    total: rows.length,
-    proceedingsTouched: proceedings.size,
-    longest,
-    monthly,
-  };
 }
 
 export type PromiseAlignmentVote = {
