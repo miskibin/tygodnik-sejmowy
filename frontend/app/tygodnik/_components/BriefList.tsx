@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
 import { TOPICS, type TopicId } from "@/lib/topics";
 import { personasImplyAnyTopic } from "@/lib/topic-persona-map";
 import { Ornament } from "@/components/chrome/Ornament";
 import { formatPopulation } from "@/lib/labels";
+import { trackEventOncePerSession } from "@/lib/analytics";
 import type { BriefItem } from "@/lib/db/prints";
 import {
   partitionEvents,
@@ -585,6 +586,13 @@ export function BriefList({
   }, [printItems, topics, personas, showAll]);
 
   const filterActive = topics.length > 0 || personas.length > 0;
+
+  useEffect(() => {
+    if (!hydrated) return;
+    trackEventOncePerSession("tsejm.analytics.tygodnik_first_view", "tygodnik_first_view", {
+      filters_active: filterActive,
+    });
+  }, [hydrated, filterActive]);
 
   const sittingIdx = sittings.findIndex((s) => s.sittingNum === sitting.sittingNum);
   const newerSitting = sittingIdx > 0

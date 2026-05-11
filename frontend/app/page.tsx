@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, PERSONA_IDS, type PersonaId } from "@/lib/personas";
 import { TOPICS, TOPIC_IDS, type TopicId } from "@/lib/topics";
+import { trackEvent } from "@/lib/analytics";
 
 export default function Landing() {
   const router = useRouter();
@@ -22,6 +23,15 @@ export default function Landing() {
     hydrated,
   } = useProfile();
   const [lookupErr, setLookupErr] = useState<string | null>(null);
+  const landingTrackedRef = useRef(false);
+  const postcodeInputStartedRef = useRef(false);
+
+  useEffect(() => {
+    if (landingTrackedRef.current) return;
+    landingTrackedRef.current = true;
+    trackEvent("landing_view");
+  }, []);
+
 
   useEffect(() => {
     if (!hydrated) return;
@@ -30,22 +40,38 @@ export default function Landing() {
     const id = setTimeout(async () => {
       try {
         const r = await fetch(`/api/postcode?p=${encodeURIComponent(postcode)}`, { signal: ctrl.signal });
-        if (!r.ok) { setDistrict(null); setLookupErr(null); return; }
+        if (!r.ok) { setDistrict(null); setLookupErr(null); trackEvent("postcode_lookup_result", { success: false, error_type: `http_${r.status}` }); return; }
         const j = await r.json();
-        if (j?.district) { setDistrict(j.district); setLookupErr(null); }
-        else { setDistrict(null); }
+        if (j?.district) { setDistrict(j.district); setLookupErr(null); trackEvent("postcode_lookup_result", { success: true, district_num: j.district.num }); }
+        else { setDistrict(null); trackEvent("postcode_lookup_result", { success: false, error_type: "no_match" }); }
       } catch (e) {
-        if ((e as Error).name !== "AbortError") setLookupErr("nie udało się sprawdzić kodu");
+        if ((e as Error).name !== "AbortError") { setLookupErr("nie udało się sprawdzić kodu"); trackEvent("postcode_lookup_result", { success: false, error_type: "network" }); }
       }
     }, 250);
     return () => { ctrl.abort(); clearTimeout(id); };
   }, [postcode, hydrated, setDistrict]);
 
   const togglePersona = (id: PersonaId) => {
-    setPersonas(personas.includes(id) ? personas.filter((x) => x !== id) : [...personas, id]);
+    const enabled = !personas.includes(id);
+    const nextPersonas = enabled ? [...personas, id] : personas.filter((x) => x !== id);
+    setPersonas(nextPersonas);
+    trackEvent("persona_toggled", {
+      id,
+      enabled,
+      persona_count: nextPersonas.length,
+      topic_count: topics.length,
+    });
   };
   const toggleTopic = (id: TopicId) => {
-    setTopics(topics.includes(id) ? topics.filter((x) => x !== id) : [...topics, id]);
+    const enabled = !topics.includes(id);
+    const nextTopics = enabled ? [...topics, id] : topics.filter((x) => x !== id);
+    setTopics(nextTopics);
+    trackEvent("topic_toggled", {
+      id,
+      enabled,
+      topic_count: nextTopics.length,
+      persona_count: personas.length,
+    });
   };
 
   return (
@@ -86,7 +112,13 @@ export default function Landing() {
               <div className="flex items-baseline gap-3 border-b border-rule pb-1.5 mb-1">
                 <input
                   value={postcode}
-                  onChange={(e) => setPostcode(e.target.value)}
+                  onChange={(e) => {
+                    if (!postcodeInputStartedRef.current) {
+                      postcodeInputStartedRef.current = true;
+                      trackEvent("postcode_input_started");
+                    }
+                    setPostcode(e.target.value);
+                  }}
                   placeholder="00–000"
                   className="font-serif text-[22px] font-medium border-0 outline-none flex-1 bg-transparent text-foreground min-w-0"
                 />
@@ -187,7 +219,15 @@ export default function Landing() {
             </div>
 
             <button
-              onClick={() => router.push("/tygodnik")}
+              onClick={() => {
+                trackEvent("cta_tygodnik_click", {
+                  has_postcode: postcode.trim().length > 0,
+                  has_district: Boolean(district),
+                  topic_count: topics.length,
+                  persona_count: personas.length,
+                });
+                router.push("/tygodnik");
+              }}
               className="mt-5 w-full text-center cursor-pointer bg-foreground text-background hover:bg-destructive transition-colors py-3 px-4 rounded-full font-sans text-[13.5px] tracking-wide"
             >
               Zobacz mój Tygodnik &nbsp;→
