@@ -4,7 +4,7 @@ import { partyColor, partyLabel } from "./partyMeta";
 const VB_W = 980;
 const VB_H = 382;
 const M_LEFT = 48;
-const M_RIGHT = 182;
+const M_RIGHT = 264;
 const M_TOP = 18;
 const M_BOTTOM = 46;
 const Y_MIN = 0;
@@ -25,7 +25,7 @@ function chartPartyLabel(code: string): string {
 }
 
 function labelWidth(label: string): number {
-  return Math.max(74, Math.min(156, 18 + label.length * 6.15));
+  return Math.max(110, Math.min(220, 38 + label.length * 6.8));
 }
 
 function niceTickStep(maxValue: number): number {
@@ -55,32 +55,6 @@ function pathFromSeries(
   return points
     .map((point, index) => `${index === 0 ? "M" : "L"} ${xFor(point.quarter_start)} ${yFor(valueFor(point))}`)
     .join(" ");
-}
-
-function placeLabels<T extends { y: number }>(
-  items: T[],
-  topBound: number,
-  bottomBound: number,
-  labelHeight: number,
-  minGap: number,
-): Array<T & { centerY: number }> {
-  let prevBottom = topBound - labelHeight - minGap;
-  return items
-    .map((item) => {
-      let centerY = Math.max(item.y, prevBottom + labelHeight + minGap);
-      centerY = Math.min(centerY, bottomBound);
-      prevBottom = centerY + labelHeight / 2;
-      return { ...item, centerY };
-    })
-    .reverse()
-    .map((item, index, arr) => {
-      const nextTop = index === 0
-        ? bottomBound + labelHeight / 2
-        : arr[index - 1].centerY - labelHeight - minGap;
-      const centerY = Math.min(item.centerY, nextTop);
-      return { ...item, centerY: Math.max(centerY, topBound) };
-    })
-    .reverse();
 }
 
 export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
@@ -148,16 +122,17 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
 
   const labelHeight = 22;
   const labelX = VB_W - M_RIGHT + 14;
-  const labelData = parties
-    .map((series) => ({
-      party: series.party,
-      label: `${chartPartyLabel(series.party)} ${series.last.percentage_avg.toFixed(1)}%`,
-      color: series.color,
-      x: xFor(series.last.quarter_start),
-      y: yFor(series.last.percentage_avg),
-    }))
-    .sort((a, b) => a.y - b.y);
-  const placedLabels = placeLabels(labelData, M_TOP + labelHeight / 2, VB_H - M_BOTTOM - labelHeight / 2, labelHeight, 8);
+  const legendGap = 10;
+  const legendStep = labelHeight + legendGap;
+  const legendTop = M_TOP + Math.max(16, (innerH - legendStep * (parties.length - 1)) / 2);
+  const legendItems = parties.map((series, index) => ({
+    party: series.party,
+    label: `${chartPartyLabel(series.party)} ${series.last.percentage_avg.toFixed(1)}%`,
+    color: series.color,
+    x: xFor(series.last.quarter_start),
+    y: yFor(series.last.percentage_avg),
+    centerY: legendTop + index * legendStep,
+  }));
   const lateStartSeries = parties
     .filter((series) => series.first.quarter_start !== firstQuarter)
     .map((series) => `${series.label} od ${quarterLabel(series.first.quarter_start)}`);
@@ -235,6 +210,10 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
             );
           })}
 
+          <text x={labelX} y={M_TOP + 8} fontSize={10} fill="var(--muted-foreground)" fontFamily="var(--font-jetbrains-mono)">
+            Ostatni kwartał
+          </text>
+
           {parties.map((series) => {
             const line = pathFromSeries(series.points, xFor, yFor, (point) => point.percentage_avg);
             return (
@@ -259,14 +238,14 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
             );
           })}
 
-          {placedLabels.map((item) => {
+          {legendItems.map((item) => {
             const width = labelWidth(item.label);
             const x = labelX;
             const y = item.centerY - labelHeight / 2;
             return (
               <g key={item.party}>
                 <line
-                  x1={item.x + 6}
+                  x1={Math.min(item.x + 8, VB_W - M_RIGHT + 2)}
                   y1={item.y}
                   x2={x - 8}
                   y2={item.centerY}
@@ -285,8 +264,9 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
                   stroke={item.color}
                   strokeWidth={1.2}
                 />
+                <circle cx={x + 10} cy={item.centerY} r={3.2} fill={item.color} />
                 <text
-                  x={x + 10}
+                  x={x + 20}
                   y={item.centerY + 4}
                   fontSize={11}
                   fill={item.color}
