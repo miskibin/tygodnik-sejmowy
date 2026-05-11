@@ -1,12 +1,16 @@
 import type { PollTrendRow } from "@/lib/db/polls";
 import { partyColor, partyLabel } from "./partyMeta";
 
-const SPARK_W = 520;
-const SPARK_H = 56;
-const SPARK_MX = 14;
-const SPARK_MY = 7;
+const VB_W = 980;
+const VB_H = 390;
+const M_LEFT = 42;
+const M_RIGHT = 168;
+const M_TOP = 18;
+const M_BOTTOM = 30;
 const Y_MIN = 0;
 const Y_MAX = 50;
+const BREAK_AT = 15;
+const BREAK_GAP = 18;
 
 function quarterLabel(iso: string): string {
   // 2025-04-01 -> '25 Q2
@@ -16,34 +20,45 @@ function quarterLabel(iso: string): string {
   return `'${y} Q${q}`;
 }
 
-function pctLabel(value: number): string {
-  return `${value.toFixed(1)}%`;
+function labelWidth(label: string): number {
+  return Math.max(74, Math.min(156, 18 + label.length * 6.15));
 }
 
-function deltaLabel(value: number): string {
-  const rounded = Math.round(value * 10) / 10;
-  if (Math.abs(rounded) < 0.05) return "bez zmiany";
-  return `${rounded > 0 ? "+" : ""}${rounded.toFixed(1)} pp`;
-}
-
-function rangeLabel(min: number, max: number): string {
-  return `${min.toFixed(1)}-${max.toFixed(1)}%`;
-}
-
-function pathFromSeries(points: PollTrendRow[], xFor: (q: string) => number, yFor: (value: number) => number, valueFor: (point: PollTrendRow) => number): string {
+function pathFromSeries(
+  points: PollTrendRow[],
+  xFor: (q: string) => number,
+  yFor: (value: number) => number,
+  valueFor: (point: PollTrendRow) => number,
+): string {
   return points
     .map((point, index) => `${index === 0 ? "M" : "L"} ${xFor(point.quarter_start)} ${yFor(valueFor(point))}`)
     .join(" ");
 }
 
-function bandPath(points: PollTrendRow[], xFor: (q: string) => number, yFor: (value: number) => number): string {
-  if (points.length === 0) return "";
-  const upper = points.map((point, index) => `${index === 0 ? "M" : "L"} ${xFor(point.quarter_start)} ${yFor(point.percentage_max)}`);
-  const lower = points
-    .slice()
+function placeLabels<T extends { y: number }>(
+  items: T[],
+  topBound: number,
+  bottomBound: number,
+  labelHeight: number,
+  minGap: number,
+): Array<T & { centerY: number }> {
+  let prevBottom = topBound - labelHeight - minGap;
+  return items
+    .map((item) => {
+      let centerY = Math.max(item.y, prevBottom + labelHeight + minGap);
+      centerY = Math.min(centerY, bottomBound);
+      prevBottom = centerY + labelHeight / 2;
+      return { ...item, centerY };
+    })
     .reverse()
-    .map((point) => `L ${xFor(point.quarter_start)} ${yFor(point.percentage_min)}`);
-  return [...upper, ...lower, "Z"].join(" ");
+    .map((item, index, arr) => {
+      const nextTop = index === 0
+        ? bottomBound + labelHeight / 2
+        : arr[index - 1].centerY - labelHeight - minGap;
+      const centerY = Math.min(item.centerY, nextTop);
+      return { ...item, centerY: Math.max(centerY, topBound) };
+    })
+    .reverse();
 }
 
 export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
@@ -58,17 +73,26 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
   const quarters = Array.from(new Set(rows.map((r) => r.quarter_start))).sort();
   const quarterCount = quarters.length;
   const xIndex = new Map(quarters.map((quarter, index) => [quarter, index]));
-  const innerW = SPARK_W - SPARK_MX * 2;
-  const innerH = SPARK_H - SPARK_MY * 2;
+  const innerW = VB_W - M_LEFT - M_RIGHT;
+  const innerH = VB_H - M_TOP - M_BOTTOM;
+  const lowerH = Math.round(innerH * 0.58);
+  const upperH = innerH - lowerH - BREAK_GAP;
+  const upperBottom = M_TOP + upperH;
+  const lowerTop = upperBottom + BREAK_GAP;
 
   const xFor = (quarter: string): number => {
     const index = xIndex.get(quarter) ?? 0;
-    if (quarterCount <= 1) return SPARK_MX + innerW / 2;
-    return SPARK_MX + (index / (quarterCount - 1)) * innerW;
+    if (quarterCount <= 1) return M_LEFT + innerW / 2;
+    return M_LEFT + (index / (quarterCount - 1)) * innerW;
   };
   const yFor = (pct: number): number => {
-    const t = (pct - Y_MIN) / (Y_MAX - Y_MIN);
-    return SPARK_MY + (1 - Math.max(0, Math.min(1, t))) * innerH;
+    const clamped = Math.max(Y_MIN, Math.min(Y_MAX, pct));
+    if (clamped <= BREAK_AT) {
+      const t = clamped / BREAK_AT;
+      return lowerTop + (1 - t) * lowerH;
+    }
+    const t = (clamped - BREAK_AT) / (Y_MAX - BREAK_AT);
+    return M_TOP + (1 - t) * upperH;
   };
 
   const byParty = new Map<string, PollTrendRow[]>();
@@ -85,8 +109,6 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
     .map(([party, points]) => {
       const first = points[0];
       const last = points[points.length - 1];
-      const min = Math.min(...points.map((point) => point.percentage_min));
-      const max = Math.max(...points.map((point) => point.percentage_max));
       return {
         party,
         label: partyLabel(party),
@@ -95,8 +117,6 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
         first,
         last,
         delta: last.percentage_avg - first.percentage_avg,
-        min,
-        max,
       };
     })
     .sort((a, b) => b.last.percentage_avg - a.last.percentage_avg);
@@ -104,8 +124,36 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
   const lastQuarter = quarters[quarters.length - 1];
   const firstQuarter = quarters[0];
   const lastQuarterX = xFor(lastQuarter);
-  const highlightX = Math.max(SPARK_MX, lastQuarterX - 18);
-  const highlightW = Math.min(36, SPARK_W - SPARK_MX - highlightX);
+  const highlightX = Math.max(M_LEFT, lastQuarterX - 24);
+  const highlightW = Math.min(48, VB_W - M_RIGHT - highlightX);
+
+  const labelHeight = 22;
+  const labelX = VB_W - M_RIGHT + 14;
+  const labelsUpper = parties
+    .filter((series) => series.last.percentage_avg > BREAK_AT)
+    .map((series) => ({
+      party: series.party,
+      label: `${series.label} ${series.last.percentage_avg.toFixed(1)}%`,
+      color: series.color,
+      x: xFor(series.last.quarter_start),
+      y: yFor(series.last.percentage_avg),
+    }))
+    .sort((a, b) => a.y - b.y);
+  const labelsLower = parties
+    .filter((series) => series.last.percentage_avg <= BREAK_AT)
+    .map((series) => ({
+      party: series.party,
+      label: `${series.label} ${series.last.percentage_avg.toFixed(1)}%`,
+      color: series.color,
+      x: xFor(series.last.quarter_start),
+      y: yFor(series.last.percentage_avg),
+    }))
+    .sort((a, b) => a.y - b.y);
+  const placedLabels = [
+    ...placeLabels(labelsUpper, M_TOP + labelHeight / 2, upperBottom - labelHeight / 2, labelHeight, 8),
+    ...placeLabels(labelsLower, lowerTop + labelHeight / 2, VB_H - M_BOTTOM - labelHeight / 2, labelHeight, 8),
+  ];
+  const xTickStride = quarterCount > 8 ? 2 : 1;
 
   return (
     <section>
@@ -117,139 +165,146 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
           </div>
           <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Trendy kwartalne</h2>
           <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[760px] text-[15px] sm:text-base">
-            Zamiast jednej zatłoczonej planszy: osobny rytm dla każdej partii. Pasmo pokazuje kwartalny min-max, linia średnią, a prawa kolumna ostatni odczyt i zmianę od początku szeregu.
+            Jedna wspólna plansza, ale ze złamaną skalą: przedział 0-15% dostał więcej pionowego miejsca, więc mniejsze partie przestają ginąć pod KO i PiS.
           </p>
         </div>
       </header>
 
-      <div className="border border-border bg-muted p-3 sm:p-4">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border pb-3 mb-3">
-          <div className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            Ostatni kwartał: {quarterLabel(lastQuarter)}
-          </div>
-          <div className="font-sans text-[13px] text-secondary-foreground">
-            Wspólna skala 0-50% we wszystkich wierszach.
-          </div>
-        </div>
+      <div className="border border-border bg-muted p-2 sm:p-4 min-w-0 overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${VB_W} ${VB_H}`}
+          className="w-full min-w-[320px] h-auto block"
+          role="img"
+          aria-label={`Wykres trendu kwartalnego ${parties.length} partii ze złamaną skalą osi Y`}
+        >
+          <rect x={M_LEFT} y={M_TOP} width={innerW} height={upperH} fill="var(--background)" opacity={0.42} rx={10} />
+          <rect x={M_LEFT} y={lowerTop} width={innerW} height={lowerH} fill="var(--background)" opacity={0.68} rx={10} />
+          <rect x={highlightX} y={M_TOP} width={highlightW} height={upperH} fill="var(--muted)" opacity={0.72} rx={10} />
+          <rect x={highlightX} y={lowerTop} width={highlightW} height={lowerH} fill="var(--muted)" opacity={0.86} rx={10} />
 
-        <div className="grid gap-3">
-          {parties.map((series) => {
-            const line = pathFromSeries(series.points, xFor, yFor, (point) => point.percentage_avg);
-            const band = bandPath(series.points, xFor, yFor);
-            const deltaTone = Math.abs(series.delta) < 0.05
-              ? "text-muted-foreground border-border"
-              : series.delta > 0
-                ? "text-foreground border-foreground"
-                : "text-secondary-foreground border-border";
-
+          {[20, 30, 40, 50].map((tick) => {
+            const y = yFor(tick);
             return (
-              <article key={series.party} className="grid gap-3 border border-border bg-background px-3 py-3 sm:px-4 md:grid-cols-[minmax(0,200px)_minmax(0,1fr)_auto] md:items-center">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="inline-block h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: series.color }} />
-                    <h3 className="m-0 font-serif text-[18px] sm:text-[20px] leading-[1.05] text-foreground truncate">{series.label}</h3>
-                  </div>
-                  <div className="mt-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-                    Zakres: {rangeLabel(series.min, series.max)} · {series.points.length} kw.
-                  </div>
-                </div>
-
-                <div className="min-w-0 overflow-x-auto">
-                  <svg
-                    viewBox={`0 0 ${SPARK_W} ${SPARK_H}`}
-                    className="block h-auto w-full min-w-[300px]"
-                    role="img"
-                    aria-label={`${series.label}: trend kwartalny od ${quarterLabel(firstQuarter)} do ${quarterLabel(lastQuarter)}`}
-                  >
-                    <rect x={highlightX} y={4} width={highlightW} height={SPARK_H - 8} fill="var(--muted)" opacity={0.8} rx={10} />
-
-                    {[0, 25, 50].map((tick) => {
-                      const y = yFor(tick);
-                      return (
-                        <line
-                          key={tick}
-                          x1={SPARK_MX}
-                          y1={y}
-                          x2={SPARK_W - SPARK_MX}
-                          y2={y}
-                          stroke="var(--border)"
-                          strokeWidth={tick === 0 ? 1 : 0.9}
-                          strokeDasharray={tick === 0 ? undefined : "3 5"}
-                          opacity={tick === 0 ? 0.8 : 0.5}
-                        />
-                      );
-                    })}
-
-                    {quarters.map((quarter) => (
-                      <line
-                        key={quarter}
-                        x1={xFor(quarter)}
-                        y1={SPARK_MY}
-                        x2={xFor(quarter)}
-                        y2={SPARK_H - SPARK_MY}
-                        stroke="var(--border)"
-                        strokeWidth={0.8}
-                        opacity={quarter === lastQuarter ? 0.5 : 0.28}
-                      />
-                    ))}
-
-                    <path d={band} fill={series.color} opacity={0.12} />
-                    <path d={line} fill="none" stroke={series.color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-
-                    {series.points.map((point, index) => {
-                      const isLast = index === series.points.length - 1;
-                      return (
-                        <circle
-                          key={`${series.party}-${point.quarter_start}`}
-                          cx={xFor(point.quarter_start)}
-                          cy={yFor(point.percentage_avg)}
-                          r={isLast ? 4.8 : 3}
-                          fill="var(--background)"
-                          stroke={series.color}
-                          strokeWidth={isLast ? 2.4 : 1.8}
-                        />
-                      );
-                    })}
-                  </svg>
-                </div>
-
-                <div className="flex items-center justify-between gap-3 md:block md:min-w-[108px] md:text-right">
-                  <div>
-                    <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Teraz</div>
-                    <div className="font-serif text-[28px] sm:text-[32px] leading-none tracking-[-0.02em]" style={{ color: series.color }}>
-                      {pctLabel(series.last.percentage_avg)}
-                    </div>
-                  </div>
-                  <div className={`inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[11px] ${deltaTone}`}>
-                    {deltaLabel(series.delta)}
-                  </div>
-                </div>
-              </article>
+              <g key={tick}>
+                <line x1={M_LEFT} y1={y} x2={VB_W - M_RIGHT} y2={y} stroke="var(--border)" strokeWidth={0.8} strokeDasharray="3 5" opacity={0.55} />
+                <text x={M_LEFT - 7} y={y + 3} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="end">
+                  {tick}%
+                </text>
+              </g>
             );
           })}
-        </div>
 
-        <div className="mt-3 border border-border bg-background px-3 py-2 sm:px-4">
-          <svg viewBox={`0 0 ${SPARK_W} 22`} className="block h-auto w-full min-w-[300px]" aria-hidden="true">
-            {quarters.map((quarter, index) => {
-              const stride = quarterCount > 8 ? 2 : 1;
-              if (index % stride !== 0 && index !== quarterCount - 1) return null;
-              return (
-                <text
-                  key={quarter}
-                  x={xFor(quarter)}
-                  y={14}
-                  textAnchor="middle"
-                  fontFamily="var(--font-jetbrains-mono)"
-                  fontSize={10}
-                  fill="var(--muted-foreground)"
-                >
-                  {quarterLabel(quarter)}
+          {[0, 5, 10, 15].map((tick) => {
+            const y = yFor(tick);
+            return (
+              <g key={tick}>
+                <line
+                  x1={M_LEFT}
+                  y1={y}
+                  x2={VB_W - M_RIGHT}
+                  y2={y}
+                  stroke="var(--border)"
+                  strokeWidth={tick === 0 ? 1 : 0.8}
+                  strokeDasharray={tick === 0 ? undefined : "3 5"}
+                  opacity={tick === 0 ? 0.75 : 0.55}
+                />
+                <text x={M_LEFT - 7} y={y + 3} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="end">
+                  {tick}%
                 </text>
-              );
-            })}
-          </svg>
-        </div>
+              </g>
+            );
+          })}
+
+          {quarters.map((quarter, index) => {
+            const x = xFor(quarter);
+            return (
+              <g key={quarter}>
+                <line x1={x} y1={M_TOP} x2={x} y2={upperBottom} stroke="var(--border)" strokeWidth={0.8} opacity={quarter === lastQuarter ? 0.5 : 0.28} />
+                <line x1={x} y1={lowerTop} x2={x} y2={VB_H - M_BOTTOM} stroke="var(--border)" strokeWidth={0.8} opacity={quarter === lastQuarter ? 0.5 : 0.28} />
+                {(index % xTickStride === 0 || index === quarterCount - 1) && (
+                  <text x={x} y={VB_H - 9} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="middle">
+                    {quarterLabel(quarter)}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+
+          <g opacity={0.85}>
+            <path d={`M ${M_LEFT - 2} ${upperBottom - 6} l 6 4 l -6 4 l 6 4`} stroke="var(--muted-foreground)" strokeWidth={1.1} fill="none" />
+            <path d={`M ${M_LEFT - 2} ${lowerTop - 12} l 6 4 l -6 4 l 6 4`} stroke="var(--muted-foreground)" strokeWidth={1.1} fill="none" />
+          </g>
+
+          <text x={VB_W - M_RIGHT - 8} y={M_TOP + 14} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="end">
+            15-50% (ściśnięte)
+          </text>
+          <text x={VB_W - M_RIGHT - 8} y={lowerTop + 14} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="end">
+            0-15% (powiększone)
+          </text>
+
+          {parties.map((series) => {
+            const line = pathFromSeries(series.points, xFor, yFor, (point) => point.percentage_avg);
+            return (
+              <g key={series.party}>
+                <path d={line} fill="none" stroke={series.color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                {series.points.map((point, index) => {
+                  const isLast = index === series.points.length - 1;
+                  return (
+                    <circle
+                      key={`${series.party}-${point.quarter_start}`}
+                      cx={xFor(point.quarter_start)}
+                      cy={yFor(point.percentage_avg)}
+                      r={isLast ? 4.3 : 2.3}
+                      fill="var(--background)"
+                      stroke={series.color}
+                      strokeWidth={isLast ? 2.2 : 1.6}
+                    />
+                  );
+                })}
+              </g>
+            );
+          })}
+
+          {placedLabels.map((item) => {
+            const width = labelWidth(item.label);
+            const x = labelX;
+            const y = item.centerY - labelHeight / 2;
+            return (
+              <g key={item.party}>
+                <line
+                  x1={item.x + 6}
+                  y1={item.y}
+                  x2={x - 8}
+                  y2={item.centerY}
+                  stroke={item.color}
+                  strokeWidth={1.2}
+                  opacity={0.72}
+                />
+                <rect
+                  x={x}
+                  y={y}
+                  rx={11}
+                  ry={11}
+                  width={width}
+                  height={labelHeight}
+                  fill="var(--background)"
+                  stroke={item.color}
+                  strokeWidth={1.2}
+                />
+                <text
+                  x={x + 10}
+                  y={item.centerY + 4}
+                  fontSize={11}
+                  fill={item.color}
+                  fontFamily="var(--font-jetbrains-mono)"
+                  fontWeight={600}
+                >
+                  {item.label}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
       </div>
     </section>
   );
