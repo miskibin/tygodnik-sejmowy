@@ -1,5 +1,6 @@
 import "server-only";
 
+import { normalizeActSourceUrl } from "@/lib/isap";
 import { supabase } from "@/lib/supabase";
 import { dbTagsToPersonas, type PersonaId } from "@/lib/personas";
 import { dbTagsToTopics, type TopicId } from "@/lib/topics";
@@ -296,7 +297,10 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
           displayAddress: (proc.display_address as string) ?? "",
           title: (actRow.title as string) ?? null,
           status: (actRow.status as string) ?? null,
-          sourceUrl: (actRow.source_url as string) ?? null,
+          sourceUrl: normalizeActSourceUrl(
+            (actRow.source_url as string) ?? null,
+            (actRow.eli_id as string) ?? null,
+          ),
           publishedAt: (actRow.promulgation_date as string) ?? null,
         };
       }
