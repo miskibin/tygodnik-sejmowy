@@ -2,15 +2,12 @@ import type { PollTrendRow } from "@/lib/db/polls";
 import { partyColor, partyLabel } from "./partyMeta";
 
 const VB_W = 980;
-const VB_H = 390;
-const M_LEFT = 42;
-const M_RIGHT = 168;
+const VB_H = 382;
+const M_LEFT = 48;
+const M_RIGHT = 182;
 const M_TOP = 18;
-const M_BOTTOM = 30;
+const M_BOTTOM = 46;
 const Y_MIN = 0;
-const Y_MAX = 50;
-const BREAK_AT = 15;
-const BREAK_GAP = 18;
 
 function quarterLabel(iso: string): string {
   // 2025-04-01 -> '25 Q2
@@ -20,8 +17,33 @@ function quarterLabel(iso: string): string {
   return `'${y} Q${q}`;
 }
 
+function chartPartyLabel(code: string): string {
+  if (code === "KO") return "KO";
+  if (code === "PiS") return "PiS";
+  if (code === "KKP") return "KKP (Braun)";
+  return partyLabel(code);
+}
+
 function labelWidth(label: string): number {
   return Math.max(74, Math.min(156, 18 + label.length * 6.15));
+}
+
+function niceTickStep(maxValue: number): number {
+  if (maxValue <= 12) return 2;
+  if (maxValue <= 30) return 5;
+  return 10;
+}
+
+function niceYMax(maxValue: number): number {
+  const step = niceTickStep(maxValue);
+  return Math.max(step * 2, Math.ceil((maxValue + step * 0.8) / step) * step);
+}
+
+function buildTicks(maxValue: number): number[] {
+  const step = niceTickStep(maxValue);
+  const ticks: number[] = [];
+  for (let tick = 0; tick <= maxValue; tick += step) ticks.push(tick);
+  return ticks;
 }
 
 function pathFromSeries(
@@ -75,24 +97,11 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
   const xIndex = new Map(quarters.map((quarter, index) => [quarter, index]));
   const innerW = VB_W - M_LEFT - M_RIGHT;
   const innerH = VB_H - M_TOP - M_BOTTOM;
-  const lowerH = Math.round(innerH * 0.58);
-  const upperH = innerH - lowerH - BREAK_GAP;
-  const upperBottom = M_TOP + upperH;
-  const lowerTop = upperBottom + BREAK_GAP;
 
   const xFor = (quarter: string): number => {
     const index = xIndex.get(quarter) ?? 0;
     if (quarterCount <= 1) return M_LEFT + innerW / 2;
     return M_LEFT + (index / (quarterCount - 1)) * innerW;
-  };
-  const yFor = (pct: number): number => {
-    const clamped = Math.max(Y_MIN, Math.min(Y_MAX, pct));
-    if (clamped <= BREAK_AT) {
-      const t = clamped / BREAK_AT;
-      return lowerTop + (1 - t) * lowerH;
-    }
-    const t = (clamped - BREAK_AT) / (Y_MAX - BREAK_AT);
-    return M_TOP + (1 - t) * upperH;
   };
 
   const byParty = new Map<string, PollTrendRow[]>();
@@ -121,6 +130,16 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
     })
     .sort((a, b) => b.last.percentage_avg - a.last.percentage_avg);
 
+  const maxValue = Math.max(
+    ...parties.flatMap((series) => series.points.map((point) => Math.max(point.percentage_avg, point.percentage_max))),
+  );
+  const yMax = niceYMax(maxValue);
+  const yTicks = buildTicks(yMax);
+  const yFor = (pct: number): number => {
+    const t = (pct - Y_MIN) / (yMax - Y_MIN);
+    return M_TOP + (1 - Math.max(0, Math.min(1, t))) * innerH;
+  };
+
   const lastQuarter = quarters[quarters.length - 1];
   const firstQuarter = quarters[0];
   const lastQuarterX = xFor(lastQuarter);
@@ -129,31 +148,19 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
 
   const labelHeight = 22;
   const labelX = VB_W - M_RIGHT + 14;
-  const labelsUpper = parties
-    .filter((series) => series.last.percentage_avg > BREAK_AT)
+  const labelData = parties
     .map((series) => ({
       party: series.party,
-      label: `${series.label} ${series.last.percentage_avg.toFixed(1)}%`,
+      label: `${chartPartyLabel(series.party)} ${series.last.percentage_avg.toFixed(1)}%`,
       color: series.color,
       x: xFor(series.last.quarter_start),
       y: yFor(series.last.percentage_avg),
     }))
     .sort((a, b) => a.y - b.y);
-  const labelsLower = parties
-    .filter((series) => series.last.percentage_avg <= BREAK_AT)
-    .map((series) => ({
-      party: series.party,
-      label: `${series.label} ${series.last.percentage_avg.toFixed(1)}%`,
-      color: series.color,
-      x: xFor(series.last.quarter_start),
-      y: yFor(series.last.percentage_avg),
-    }))
-    .sort((a, b) => a.y - b.y);
-  const placedLabels = [
-    ...placeLabels(labelsUpper, M_TOP + labelHeight / 2, upperBottom - labelHeight / 2, labelHeight, 8),
-    ...placeLabels(labelsLower, lowerTop + labelHeight / 2, VB_H - M_BOTTOM - labelHeight / 2, labelHeight, 8),
-  ];
-  const xTickStride = quarterCount > 8 ? 2 : 1;
+  const placedLabels = placeLabels(labelData, M_TOP + labelHeight / 2, VB_H - M_BOTTOM - labelHeight / 2, labelHeight, 8);
+  const lateStartSeries = parties
+    .filter((series) => series.first.quarter_start !== firstQuarter)
+    .map((series) => `${series.label} od ${quarterLabel(series.first.quarter_start)}`);
 
   return (
     <section>
@@ -165,36 +172,30 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
           </div>
           <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Trendy kwartalne</h2>
           <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[760px] text-[15px] sm:text-base">
-            Jedna wspólna plansza, ale ze złamaną skalą: przedział 0-15% dostał więcej pionowego miejsca, więc mniejsze partie przestają ginąć pod KO i PiS.
+            Jedna wspólna plansza, jedna skala. Górny limit dopasowuje się do realnych danych, a etykiety po prawej rozkładam automatycznie, żeby się nie sklejały.
           </p>
         </div>
       </header>
 
       <div className="border border-border bg-muted p-2 sm:p-4 min-w-0 overflow-x-auto">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-1 pb-3">
+          <div className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            Oś Y: 0-{yMax}% · wszystkie {quarterCount} kwartały
+          </div>
+          <div className="font-sans text-[13px] text-secondary-foreground">
+            Dane są od {quarterLabel(firstQuarter)}; część serii startuje później, gdy pojawia się osobno w sondażach.
+          </div>
+        </div>
         <svg
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           className="w-full min-w-[320px] h-auto block"
           role="img"
-          aria-label={`Wykres trendu kwartalnego ${parties.length} partii ze złamaną skalą osi Y`}
+          aria-label={`Wykres trendu kwartalnego ${parties.length} partii na wspólnej skali do ${yMax}%`}
         >
-          <rect x={M_LEFT} y={M_TOP} width={innerW} height={upperH} fill="var(--background)" opacity={0.42} rx={10} />
-          <rect x={M_LEFT} y={lowerTop} width={innerW} height={lowerH} fill="var(--background)" opacity={0.68} rx={10} />
-          <rect x={highlightX} y={M_TOP} width={highlightW} height={upperH} fill="var(--muted)" opacity={0.72} rx={10} />
-          <rect x={highlightX} y={lowerTop} width={highlightW} height={lowerH} fill="var(--muted)" opacity={0.86} rx={10} />
+          <rect x={M_LEFT} y={M_TOP} width={innerW} height={innerH} fill="var(--background)" opacity={0.5} rx={10} />
+          <rect x={highlightX} y={M_TOP} width={highlightW} height={innerH} fill="var(--muted)" opacity={0.82} rx={10} />
 
-          {[20, 30, 40, 50].map((tick) => {
-            const y = yFor(tick);
-            return (
-              <g key={tick}>
-                <line x1={M_LEFT} y1={y} x2={VB_W - M_RIGHT} y2={y} stroke="var(--border)" strokeWidth={0.8} strokeDasharray="3 5" opacity={0.55} />
-                <text x={M_LEFT - 7} y={y + 3} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="end">
-                  {tick}%
-                </text>
-              </g>
-            );
-          })}
-
-          {[0, 5, 10, 15].map((tick) => {
+          {yTicks.map((tick) => {
             const y = yFor(tick);
             return (
               <g key={tick}>
@@ -219,28 +220,20 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
             const x = xFor(quarter);
             return (
               <g key={quarter}>
-                <line x1={x} y1={M_TOP} x2={x} y2={upperBottom} stroke="var(--border)" strokeWidth={0.8} opacity={quarter === lastQuarter ? 0.5 : 0.28} />
-                <line x1={x} y1={lowerTop} x2={x} y2={VB_H - M_BOTTOM} stroke="var(--border)" strokeWidth={0.8} opacity={quarter === lastQuarter ? 0.5 : 0.28} />
-                {(index % xTickStride === 0 || index === quarterCount - 1) && (
-                  <text x={x} y={VB_H - 9} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="middle">
-                    {quarterLabel(quarter)}
-                  </text>
-                )}
+                <line x1={x} y1={M_TOP} x2={x} y2={VB_H - M_BOTTOM} stroke="var(--border)" strokeWidth={0.8} opacity={quarter === lastQuarter ? 0.48 : 0.28} />
+                <text
+                  x={x}
+                  y={VB_H - (index % 2 === 0 ? 9 : 21)}
+                  className="font-mono"
+                  fontSize={10}
+                  fill="var(--muted-foreground)"
+                  textAnchor={index === 0 ? "start" : index === quarterCount - 1 ? "end" : "middle"}
+                >
+                  {quarterLabel(quarter)}
+                </text>
               </g>
             );
           })}
-
-          <g opacity={0.85}>
-            <path d={`M ${M_LEFT - 2} ${upperBottom - 6} l 6 4 l -6 4 l 6 4`} stroke="var(--muted-foreground)" strokeWidth={1.1} fill="none" />
-            <path d={`M ${M_LEFT - 2} ${lowerTop - 12} l 6 4 l -6 4 l 6 4`} stroke="var(--muted-foreground)" strokeWidth={1.1} fill="none" />
-          </g>
-
-          <text x={VB_W - M_RIGHT - 8} y={M_TOP + 14} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="end">
-            15-50% (ściśnięte)
-          </text>
-          <text x={VB_W - M_RIGHT - 8} y={lowerTop + 14} className="font-mono" fontSize={10} fill="var(--muted-foreground)" textAnchor="end">
-            0-15% (powiększone)
-          </text>
 
           {parties.map((series) => {
             const line = pathFromSeries(series.points, xFor, yFor, (point) => point.percentage_avg);
@@ -254,10 +247,11 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
                       key={`${series.party}-${point.quarter_start}`}
                       cx={xFor(point.quarter_start)}
                       cy={yFor(point.percentage_avg)}
-                      r={isLast ? 4.3 : 2.3}
+                      r={isLast ? 4.3 : 2.1}
                       fill="var(--background)"
                       stroke={series.color}
-                      strokeWidth={isLast ? 2.2 : 1.6}
+                      strokeWidth={isLast ? 2.2 : 1.5}
+                      opacity={isLast ? 1 : 0.9}
                     />
                   );
                 })}
@@ -306,6 +300,12 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
           })}
         </svg>
       </div>
+
+      {lateStartSeries.length > 0 && (
+        <p className="mt-3 font-mono text-[10px] text-muted-foreground tracking-wide">
+          Późniejszy start osobnych serii: {lateStartSeries.join(" · ")}.
+        </p>
+      )}
     </section>
   );
 }
