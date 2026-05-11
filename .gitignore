@@ -14,7 +14,7 @@ wheels/
 /logs
 /logs/*
 sejm-stats-439117-39efc9d2f8b8.json
-
+backups/sejmograf_public_*.dump
 # supagraf data fixtures: too large for git (~190MB JSON + PDFs).
 # Anchored to repo root so source modules under supagraf/fixtures/ stay tracked.
 /fixtures/
