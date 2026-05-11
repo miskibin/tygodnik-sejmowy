@@ -45,3 +45,16 @@ secrets/
 # Embedding-eval local caches (corpus snapshot, encoded vector pickles, raw results).
 # Fixture queries under tests/fixtures/embed_eval/ ARE tracked.
 scripts/embed_eval/_cache/
+
+# Local env backups created during mixvm cutover — contain old managed-project secrets.
+*.old_managed
+
+# One-off VM ops scripts — hardcoded SSH password / DB creds for mixvm.
+# Reusable patterns live in CLAUDE.md / memory; the scripts themselves shouldn't ship.
+scripts/ssh_*.py
+scripts/rebind_*.py
+scripts/fix_pg*.py
+scripts/fix_ports.py
+scripts/wipe_db_dir_restart.py
+scripts/deploy_supabase_vm.py
+scripts/gen_supabase_keys.py
