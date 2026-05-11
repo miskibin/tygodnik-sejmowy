@@ -23,7 +23,8 @@ export type PersonaId =
   | "emeryt"
   | "kierowca"
   | "mieszkaniec"
-  | "podatnik";
+  | "podatnik"
+  | "imigrant";
 
 export const PERSONAS: Record<
   PersonaId,
@@ -38,11 +39,12 @@ export const PERSONAS: Record<
   kierowca:       { label: "kierowca",       icon: "◎", color: "#5a4a2a",       section: "Transport" },
   mieszkaniec:    { label: "mieszkaniec",    icon: "⌂", color: "var(--destructive)", section: "Mieszkanie" },
   podatnik:       { label: "podatnik",       icon: "₧", color: "#5a4a6b",       section: "Podatki" },
+  imigrant:       { label: "imigrant",       icon: "✈", color: "#2a5a6b",       section: "Cudzoziemcy" },
 };
 
 export const PERSONA_IDS = Object.keys(PERSONAS) as PersonaId[];
 
-// DB persona_tags (25-tag taxonomy from supagraf/enrich/print_personas.py)
+// DB persona_tags (26-tag taxonomy from supagraf/enrich/print_personas.py)
 // → frontend persona chip. Mapping is intentionally many-to-few:
 //   - jdg + przedsiebiorca-pracodawca + podatnik-vat → przedsiebiorca
 //   - najemca + wlasciciel-mieszkania + odbiorca-energii → mieszkaniec
@@ -53,6 +55,7 @@ export const PERSONA_IDS = Object.keys(PERSONAS) as PersonaId[];
 //   - podatnik-pit + konsument → podatnik
 //   - pracownik-najemny → pracownik
 //   - emeryt → emeryt
+//   - imigrant → imigrant
 // Tags not listed (student, wies, duze-miasto, dzialkowicz, wedkarz, mysliwy)
 // don't surface as chips — too narrow for a homepage filter row.
 const DB_TAG_TO_PERSONA: Record<string, PersonaId> = {
@@ -83,6 +86,8 @@ const DB_TAG_TO_PERSONA: Record<string, PersonaId> = {
 
   "podatnik-pit": "podatnik",
   "konsument": "podatnik",
+
+  "imigrant": "imigrant",
 };
 
 export function dbTagsToPersonas(tags: readonly string[] | null | undefined): PersonaId[] {

@@ -11,8 +11,8 @@ def _ok_rationale() -> str:
     return "Uzasadnienie testowe wystarczajaco dlugie."
 
 
-def test_taxonomy_has_25_tags():
-    assert len(PERSONA_TAGS) == 25
+def test_taxonomy_has_26_tags():
+    assert len(PERSONA_TAGS) == 26
 
 
 def test_extra_field_forbidden():

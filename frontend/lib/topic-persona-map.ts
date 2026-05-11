@@ -3,7 +3,7 @@
 // Topic chips (lib/topics.ts) are the primary filter row; persona chips
 // (lib/personas.ts) are a secondary "I am X" toggle. Prints carry both
 // `topic_tags` (LLM-set, 11-value enum) and `persona_tags` (LLM-set,
-// 25-value taxonomy collapsed to 9 personas via dbTagsToPersonas).
+// 26-value taxonomy collapsed to 10 personas via dbTagsToPersonas).
 //
 // Citizen review (2026-05-08) flagged that prints tagged only with
 // `najemca`/`wlasciciel-mieszkania` (→ persona "mieszkaniec") were missed
@@ -28,6 +28,11 @@ const PERSONA_TO_TOPIC: Record<PersonaId, readonly TopicId[]> = {
   kierowca:       ["transport"],
   mieszkaniec:    ["mieszkanie-media"],
   podatnik:       ["biznes-podatki"],
+  // No clean topic-chip mapping — ustawa o cudzoziemcach / zatrudnianiu
+  // cudzoziemców / specustawa ukraińska cut across praca-zus, sady-prawa,
+  // and edukacja-rodzina depending on framing. Leave widening empty so
+  // toggling "imigrant" doesn't drag unrelated prints onto the page.
+  imigrant:       [],
 };
 
 export function personaToTopics(persona: PersonaId): readonly TopicId[] {

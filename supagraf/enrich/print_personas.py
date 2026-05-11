@@ -22,7 +22,10 @@ JOB_NAME = "print_personas"
 PROMPT_NAME = "print_personas"
 MAX_INPUT_CHARS = 8000
 
-# Taxonomy locked. Adding/removing requires a migration + prompt bump (v2).
+# Taxonomy locked. Adding/removing requires a migration + prompt bump.
+# 26 tags after 2026-05 addition of `imigrant` (cudzoziemcy / osoby z PESEL UKR /
+# karta pobytu) — Sejm regularly legislates on legalization, zatrudnianie
+# cudzoziemców, integracja, status uchodźcy.
 PERSONA_TAGS = (
     "najemca", "wlasciciel-mieszkania", "rodzic-ucznia", "pacjent-nfz",
     "kierowca-zawodowy", "rolnik", "jdg", "emeryt", "pracownik-najemny",
@@ -30,6 +33,7 @@ PERSONA_TAGS = (
     "duze-miasto", "podatnik-pit", "podatnik-vat", "kierowca-prywatny",
     "odbiorca-energii", "beneficjent-rodzinny", "opiekun-seniora",
     "dzialkowicz", "wedkarz", "mysliwy", "hodowca", "konsument",
+    "imigrant",
 )
 
 PersonaTag = Literal[
@@ -39,6 +43,7 @@ PersonaTag = Literal[
     "duze-miasto", "podatnik-pit", "podatnik-vat", "kierowca-prywatny",
     "odbiorca-energii", "beneficjent-rodzinny", "opiekun-seniora",
     "dzialkowicz", "wedkarz", "mysliwy", "hodowca", "konsument",
+    "imigrant",
 ]
 
 
