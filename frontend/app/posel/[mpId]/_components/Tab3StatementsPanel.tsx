@@ -1,5 +1,5 @@
-import type { MpStatementsData } from "@/lib/db/posel-tabs";
-import { StatementCard } from "@/components/statement/StatementCard";
+import type { MpStatementsStats, MpStatementRow } from "@/lib/db/posel-tabs";
+import { PoselStatementsListClient } from "./PoselStatementsListClient";
 
 const PL_MONTHS = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"];
 
@@ -110,8 +110,16 @@ function ActivityChart({ monthly }: { monthly: Array<{ ym: string; count: number
   );
 }
 
-export function Tab3StatementsPanel({ data }: { data: MpStatementsData }) {
-  if (data.total === 0) {
+export function Tab3StatementsPanel({
+  stats,
+  initialRows,
+  mpId,
+}: {
+  stats: MpStatementsStats;
+  initialRows: MpStatementRow[];
+  mpId: number;
+}) {
+  if (stats.total === 0) {
     return (
       <p className="font-serif italic text-muted-foreground text-center py-12">
         Ten poseł nie wystąpił jeszcze na posiedzeniach Sejmu w tej kadencji.
@@ -119,16 +127,18 @@ export function Tab3StatementsPanel({ data }: { data: MpStatementsData }) {
     );
   }
   const avgPerProc =
-    data.proceedingsTouched > 0 ? (data.total / data.proceedingsTouched).toFixed(1).replace(".", ",") : "—";
-  const longestKchars = Math.round(data.longest / 1000);
+    stats.proceedingsTouched > 0
+      ? (stats.total / stats.proceedingsTouched).toFixed(1).replace(".", ",")
+      : "—";
+  const longestKchars = Math.round(stats.longest / 1000);
 
   return (
     <div className="grid gap-7">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <KpiTile
           label="Wystąpień łącznie"
-          value={data.total.toLocaleString("pl-PL")}
-          sub={`na ${data.proceedingsTouched} posiedzeniach`}
+          value={stats.total.toLocaleString("pl-PL")}
+          sub={`na ${stats.proceedingsTouched} posiedzeniach`}
           color="var(--destructive)"
         />
         <KpiTile
@@ -139,35 +149,19 @@ export function Tab3StatementsPanel({ data }: { data: MpStatementsData }) {
         />
         <KpiTile
           label="Najdłuższe wystąpienie"
-          value={longestKchars > 0 ? `${longestKchars}k` : data.longest.toString()}
+          value={longestKchars > 0 ? `${longestKchars}k` : stats.longest.toString()}
           sub="znaków tekstu"
           color="var(--success)"
         />
       </div>
 
-      <ActivityChart monthly={data.monthly} />
+      <ActivityChart monthly={stats.monthly} />
 
       <div>
         <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
           Wystąpienia chronologicznie
         </div>
-        <div className="border-t border-border">
-          {data.rows.map((r) => (
-            <StatementCard
-              key={r.id}
-              variant="inline"
-              id={r.id}
-              mpId={null}
-              speakerName={null}
-              function={r.function}
-              date={r.date}
-              proceedingNumber={r.proceedingNumber}
-              rapporteur={r.rapporteur}
-              secretary={r.secretary}
-              excerpt={r.excerpt}
-            />
-          ))}
-        </div>
+        <PoselStatementsListClient mpId={mpId} initialRows={initialRows} total={stats.total} />
       </div>
     </div>
   );
