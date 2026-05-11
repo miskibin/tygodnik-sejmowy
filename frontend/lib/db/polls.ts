@@ -99,17 +99,20 @@ export async function getRecentPolls(limit = 20): Promise<RecentPollRow[]> {
   const rows = polls ?? [];
   if (rows.length === 0) return [];
   const pollsterCodes = Array.from(new Set(rows.map((p) => (p.pollster as string) ?? "").filter(Boolean)));
-  const { data: pollsters, error: eNames } = await sb
-    .from("pollsters")
-    .select("code, name_full")
-    .in("code", pollsterCodes);
-  if (eNames) throw eNames;
-  const pollsterNames = new Map<string, string>(
-    (pollsters ?? []).map((r) => [
-      r.code as string,
-      ((r.name_full as string) ?? (r.code as string) ?? "").trim(),
-    ]),
-  );
+  const pollsterNames = new Map<string, string>();
+  if (pollsterCodes.length > 0) {
+    const { data: pollsters, error: eNames } = await sb
+      .from("pollsters")
+      .select("code, name_full")
+      .in("code", pollsterCodes);
+    if (eNames) throw eNames;
+    for (const r of pollsters ?? []) {
+      pollsterNames.set(
+        r.code as string,
+        ((r.name_full as string) ?? (r.code as string) ?? "").trim(),
+      );
+    }
+  }
   const ids = rows.map((p) => p.id as number);
   const { data: results, error: e2 } = await sb
     .from("poll_results")
