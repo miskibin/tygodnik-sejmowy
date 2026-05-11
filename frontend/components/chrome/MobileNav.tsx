@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { trackExternalLinkClick, trackNavClick } from "@/lib/analytics-events";
 import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { useProfile } from "@/lib/profile";
 import { ThemeToggle } from "./ThemeToggle";
@@ -67,7 +68,15 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={close}
+                onClick={() => {
+                  trackNavClick({
+                    fromPath: pathname,
+                    targetPath: item.href,
+                    navArea: "mobile_nav",
+                    label: item.label,
+                  });
+                  close();
+                }}
                 className="block px-3 py-3 rounded-md font-sans text-[15px] transition-colors"
                 style={{
                   color: on ? "var(--background)" : "var(--foreground)",
@@ -89,7 +98,15 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
               <Link
                 key={s.href}
                 href={s.href}
-                onClick={close}
+                onClick={() => {
+                  trackNavClick({
+                    fromPath: pathname,
+                    targetPath: s.href,
+                    navArea: "mobile_nav",
+                    label: s.label,
+                  });
+                  close();
+                }}
                 className="flex items-baseline justify-between gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-muted"
                 style={{
                   color: on ? "var(--destructive)" : "var(--secondary-foreground)",
@@ -108,7 +125,15 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
           <ThemeToggle variant="mobile" />
           <Link
             href="/alerty"
-            onClick={close}
+            onClick={() => {
+              trackNavClick({
+                fromPath: pathname,
+                targetPath: "/alerty",
+                navArea: "mobile_nav",
+                label: "Alerty",
+              });
+              close();
+            }}
             className="relative flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 border border-border rounded-full text-secondary-foreground text-[13px]"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -126,7 +151,10 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
             href="https://patronite.pl/tygodniksejmowy"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={close}
+            onClick={() => {
+              trackExternalLinkClick({ destinationDomain: "patronite.pl", placement: "mobile_nav_support" });
+              close();
+            }}
             className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full bg-foreground text-background text-[13px] font-medium"
           >
             Wesprzyj
