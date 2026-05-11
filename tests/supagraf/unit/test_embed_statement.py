@@ -65,7 +65,12 @@ def stub_audit(monkeypatch):
 
 
 def test_embed_statement_happy(monkeypatch):
-    fake = _FakeStmtSelect({"id": 7, "body_text": "Wysoka Izbo!"})
+    # Include vocative + substantive content; strip_speech_boilerplate removes
+    # the salutation but the topic survives. The test asserts the substantive
+    # text is what gets embedded, not the boilerplate.
+    fake = _FakeStmtSelect(
+        {"id": 7, "body_text": "Panie Marszałku! Wysoka Izbo! Apeluję o zmianę ustawy o kredytach hipotecznych."}
+    )
     fake_cli = _FakeClient(fake)
     monkeypatch.setattr(mod, "supabase", lambda: fake_cli)
 
@@ -87,7 +92,9 @@ def test_embed_statement_happy(monkeypatch):
         entity_id="7",
     )
     assert res is fake_result
-    assert captured["text"] == "Wysoka Izbo!"
+    assert "Apeluję o zmianę ustawy o kredytach hipotecznych" in captured["text"]
+    assert "Panie Marszałku" not in captured["text"]
+    assert "Wysoka Izbo" not in captured["text"]
     assert captured["entity_type"] == "proceeding_statement"
     assert captured["entity_id"] == "7"
     # Provenance update must have been issued.

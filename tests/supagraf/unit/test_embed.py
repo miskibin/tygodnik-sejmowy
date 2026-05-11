@@ -61,9 +61,19 @@ def test_happy_path(monkeypatch):
     assert calls[0][1] == {"model": "m1", "prompt": "hello world"}
 
 
-def test_wrong_dim_raises(monkeypatch):
-    monkeypatch.setattr(embed_mod.httpx, "post", lambda *a, **k: _ok([0.1] * 512))
-    with pytest.raises(EmbedResponseError, match="expected dim 1024"):
+def test_shorter_dim_zero_pads(monkeypatch):
+    """768-d (legacy nomic) padded to EMBED_DIM with zeros — preserves cosine."""
+    monkeypatch.setattr(embed_mod.httpx, "post", lambda *a, **k: _ok([0.1] * 768))
+    vec = embed_text("x")
+    assert len(vec) == EMBED_DIM
+    assert vec[:768] == [0.1] * 768
+    assert vec[768:] == [0.0] * (EMBED_DIM - 768)
+
+
+def test_over_cap_dim_raises(monkeypatch):
+    """> EMBED_DIM raises immediately, no truncation."""
+    monkeypatch.setattr(embed_mod.httpx, "post", lambda *a, **k: _ok([0.1] * (EMBED_DIM + 1)))
+    with pytest.raises(EmbedResponseError, match=f"expected dim <= {EMBED_DIM}"):
         embed_text("x")
 
 

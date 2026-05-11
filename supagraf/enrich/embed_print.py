@@ -1,10 +1,10 @@
 """Enrichment job: print -> embedding row + provenance stamp.
 
-Embeds the LLM-produced `prints.summary` (semantic essence — 4-6 Polish
-sentences). Prior implementation embedded the first 1400 chars of paddle
-markdown; that was mostly Sejm boilerplate (druk number, marszałek, intro)
-with a weak semantic signal. Switching to the summary makes top-k similarity
-search return on-topic prints instead of structurally-similar headers.
+Embeds `title + summary` (newline-separated). The 2026-05-12 embedding eval
+(docs/embedding_eval_2026-05-12.md) showed `title_plus_summary` beats
+`summary_only` by +0.051 nDCG@10 absolute (0.940 vs 0.889) with the
+production qwen3-embedding:0.6b model — title carries strong topical
+signal that pure summaries dilute.
 
 Pre-condition: print_summary must have run first. Pending discriminator
 on the CLI side filters `summary IS NOT NULL AND embedded_at IS NULL`.
@@ -51,7 +51,7 @@ def embed_print(
     row = (
         supabase()
         .table("prints")
-        .select("number, summary")
+        .select("number, title, summary")
         .eq("number", entity_id)
         .single()
         .execute()
@@ -64,7 +64,9 @@ def embed_print(
         raise ValueError(
             f"print {entity_id} has no summary — run summary enricher first"
         )
-    text = summary[:MAX_INPUT_CHARS]
+    title = ((row or {}).get("title") or "").strip()
+    body = summary.strip()
+    text = (f"{title}\n\n{body}" if title else body)[:MAX_INPUT_CHARS]
 
     result = embed_and_store(
         text=text,

@@ -37,5 +37,11 @@ backups/sejmograf_public_*.dump
 # Third-party Claude Code skills (re-fetch with `npx skills add ...`)
 /skills/
 /skills-lock.json
-
+.mcp.json
 secrets/
+./.mcp.json
+*mcp.json
+
+# Embedding-eval local caches (corpus snapshot, encoded vector pickles, raw results).
+# Fixture queries under tests/fixtures/embed_eval/ ARE tracked.
+scripts/embed_eval/_cache/
