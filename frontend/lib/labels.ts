@@ -21,6 +21,7 @@ const AFFECTED_GROUP_LABELS: Record<string, string> = {
   "bezrobotny": "bezrobotny",
   "podatnik": "podatnik",
   "konsument": "konsument",
+  "imigrant": "imigrant",
 };
 
 export function affectedGroupLabel(slug: string): string {
