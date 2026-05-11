@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { trackExternalLinkClick, trackNavClick } from "@/lib/analytics-events";
 import { useProfile } from "@/lib/profile";
+import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
 import { TygodnikLogoMark } from "./TygodnikLogoMark";
@@ -83,12 +83,6 @@ export function Masthead() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => trackNavClick({
-                  fromPath: pathname,
-                  targetPath: item.href,
-                  navArea: "masthead_primary",
-                  label: item.label,
-                })}
                 className="px-3 xl:px-4 py-2 rounded-full whitespace-nowrap transition-all duration-150 hover:bg-muted"
                 style={{
                   color: on ? "var(--background)" : "var(--secondary-foreground)",
@@ -138,15 +132,7 @@ export function Masthead() {
                     <Link
                       key={s.href}
                       href={s.href}
-                      onClick={() => {
-                        trackNavClick({
-                          fromPath: pathname,
-                          targetPath: s.href,
-                          navArea: "masthead_secondary",
-                          label: s.label,
-                        });
-                        setMoreOpen(false);
-                      }}
+                      onClick={() => setMoreOpen(false)}
                       className="block w-full px-3 py-2 rounded transition-colors hover:bg-muted"
                       style={{
                         color: on ? "var(--destructive)" : "var(--secondary-foreground)",
@@ -181,31 +167,25 @@ export function Masthead() {
 
           <ThemeToggle />
 
-          <a
-            href="https://patronite.pl/tygodniksejmowy"
-            target="_blank"
-            rel="noopener noreferrer"
+          <PatroniteTrackedLink
+            placement="masthead_desktop"
             aria-label="Wesprzyj"
-            onClick={() => trackExternalLinkClick({ destinationDomain: "patronite.pl", placement: "masthead_support_desktop" })}
             className="hidden sm:inline-flex px-4 py-2 rounded-full bg-foreground text-background text-[12.5px] font-medium tracking-wide items-center gap-1.5 transition-colors hover:bg-destructive"
           >
             Wesprzyj
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" /></svg>
-          </a>
+          </PatroniteTrackedLink>
           {/* Mobile-only Wesprzyj icon */}
-          <a
-            href="https://patronite.pl/tygodniksejmowy"
-            target="_blank"
-            rel="noopener noreferrer"
+          <PatroniteTrackedLink
+            placement="masthead_mobile_icon"
             aria-label="Wesprzyj"
             title="Wesprzyj"
-            onClick={() => trackExternalLinkClick({ destinationDomain: "patronite.pl", placement: "masthead_support_mobile_icon" })}
             className="sm:hidden w-9 h-9 inline-flex items-center justify-center rounded-full bg-foreground text-background"
           >
             <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" />
             </svg>
-          </a>
+          </PatroniteTrackedLink>
         </div>
       </div>
     </header>

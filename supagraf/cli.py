@@ -219,7 +219,8 @@ def cmd_daily(
       4. enrich: unified Gemini call on prints with no impact_punch yet
       5. embed:  qwen3 embeddings on prints/statements/promises with no
                  embedded_at marker yet
-      6. refresh: matviews mp_discipline_summary + minister_reply_stats
+      6. refresh: matviews mp_discipline_summary + mp_attendance +
+                 mp_activity_summary + minister_reply_stats
 
     Exit code 0 only if every phase finished without unhandled exceptions.
     """
@@ -761,17 +762,20 @@ def cmd_fetch_polls(
 
 @app.command("refresh-aggregates")
 def cmd_refresh_aggregates():
-    """Refresh on-demand materialized views (mp_discipline_summary, minister_reply_stats).
+    """Refresh on-demand materialized views (mp_discipline_summary, mp_attendance,
+    mp_activity_summary, minister_reply_stats, …).
 
     Heavy: rebuilds matviews from large source tables. PostgREST anon role's
     8s statement_timeout will reject this — invoke against service-role-keyed
     SUPABASE_KEY, or run the SQL directly via psql:
         select refresh_mp_discipline();
+        select refresh_mp_activity();
         select refresh_minister_reply_stats();
     """
     client = supabase()
     for fn in (
         "refresh_mp_discipline",
+        "refresh_mp_activity",
         "refresh_mp_rebellion_count",
         "refresh_voting_promise_link",
         "refresh_polls_mv",

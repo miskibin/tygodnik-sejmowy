@@ -4,12 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { trackExternalLinkClick, trackNavClick } from "@/lib/analytics-events";
 import { TygodnikLogoMark } from "./TygodnikLogoMark";
+import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 import { useProfile } from "@/lib/profile";
 import { ThemeToggle } from "./ThemeToggle";
 import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
-
 export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
   const pathname = usePathname();
   const { postcode, district } = useProfile();
@@ -68,16 +67,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => {
-                  trackNavClick({
-                    fromPath: pathname,
-                    targetPath: item.href,
-                    navArea: "mobile_nav",
-                    label: item.label,
-                  });
-                  close();
-                }}
-                className="block px-3 py-3 rounded-md font-sans text-[15px] transition-colors"
+                onClick={close}                className="block px-3 py-3 rounded-md font-sans text-[15px] transition-colors"
                 style={{
                   color: on ? "var(--background)" : "var(--foreground)",
                   background: on ? "var(--foreground)" : "transparent",
@@ -98,15 +88,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
               <Link
                 key={s.href}
                 href={s.href}
-                onClick={() => {
-                  trackNavClick({
-                    fromPath: pathname,
-                    targetPath: s.href,
-                    navArea: "mobile_nav",
-                    label: s.label,
-                  });
-                  close();
-                }}
+                onClick={close}
                 className="flex items-baseline justify-between gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-muted"
                 style={{
                   color: on ? "var(--destructive)" : "var(--secondary-foreground)",
@@ -125,15 +107,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
           <ThemeToggle variant="mobile" />
           <Link
             href="/alerty"
-            onClick={() => {
-              trackNavClick({
-                fromPath: pathname,
-                targetPath: "/alerty",
-                navArea: "mobile_nav",
-                label: "Alerty",
-              });
-              close();
-            }}
+            onClick={close}
             className="relative flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 border border-border rounded-full text-secondary-foreground text-[13px]"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -147,21 +121,16 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
               </span>
             )}
           </Link>
-          <a
-            href="https://patronite.pl/tygodniksejmowy"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              trackExternalLinkClick({ destinationDomain: "patronite.pl", placement: "mobile_nav_support" });
-              close();
-            }}
+          <PatroniteTrackedLink
+            placement="mobile_nav"
+            onClick={close}
             className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full bg-foreground text-background text-[13px] font-medium"
           >
             Wesprzyj
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" />
             </svg>
-          </a>
+          </PatroniteTrackedLink>
         </div>
       </SheetContent>
     </Sheet>

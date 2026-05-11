@@ -1,5 +1,6 @@
 import "server-only";
 
+import { statementListTitle } from "@/lib/speechExcerpt";
 import { supabase } from "@/lib/supabase";
 
 const DEFAULT_TERM = 10;
@@ -208,14 +209,69 @@ export async function getMpStats(mpId: number, term = DEFAULT_TERM): Promise<MpS
   const disc = discRes.data as { n_votes: number; n_aligned: number; pct_aligned: string | number | null } | null;
   const act = actRes.data as { n_statements: number; n_questions: number } | null;
 
+  let attendancePct = att?.pct_attended != null ? Number(att.pct_attended) : null;
+  let attendanceCount = att?.attended ?? 0;
+  let attendanceTotal = att?.total_votes ?? 0;
+  let questionCount = act?.n_questions ?? 0;
+  let statementCount = act?.n_statements ?? 0;
+
+  // Matviews can be empty/stale right after load; head-count from source tables
+  // so hero tiles never contradict tab lists.
+  const needVotes = attendanceTotal === 0;
+  const needStmt = statementCount === 0;
+  const needQ = questionCount === 0;
+  if (needVotes || needStmt || needQ) {
+    const [voteTotalRes, voteAttendRes, stmtRes, qRes] = await Promise.all([
+      needVotes
+        ? sb.from("votes").select("*", { count: "exact", head: true }).eq("term", term).eq("mp_id", mpId)
+        : Promise.resolve({ count: null }),
+      needVotes
+        ? sb
+            .from("votes")
+            .select("*", { count: "exact", head: true })
+            .eq("term", term)
+            .eq("mp_id", mpId)
+            .neq("vote", "ABSENT")
+        : Promise.resolve({ count: null }),
+      needStmt
+        ? sb
+            .from("proceeding_statements")
+            .select("*", { count: "exact", head: true })
+            .eq("term", term)
+            .eq("mp_id", mpId)
+        : Promise.resolve({ count: null }),
+      needQ
+        ? sb.from("question_authors").select("*", { count: "exact", head: true }).eq("term", term).eq("mp_id", mpId)
+        : Promise.resolve({ count: null }),
+    ]);
+
+    if (needVotes) {
+      const t = voteTotalRes.count ?? 0;
+      const a = voteAttendRes.count ?? 0;
+      if (t > 0) {
+        attendanceTotal = t;
+        attendanceCount = a;
+        attendancePct = Math.round((1000 * a) / t) / 10;
+      }
+    }
+    if (needStmt) {
+      const c = stmtRes.count ?? 0;
+      if (c > 0) statementCount = c;
+    }
+    if (needQ) {
+      const c = qRes.count ?? 0;
+      if (c > 0) questionCount = c;
+    }
+  }
+
   return {
-    attendancePct: att?.pct_attended != null ? Number(att.pct_attended) : null,
-    attendanceCount: att?.attended ?? 0,
-    attendanceTotal: att?.total_votes ?? 0,
+    attendancePct,
+    attendanceCount,
+    attendanceTotal,
     loyaltyPct: disc?.pct_aligned != null ? Number(disc.pct_aligned) : null,
     loyaltyVotes: disc?.n_votes ?? null,
-    questionCount: act?.n_questions ?? 0,
-    statementCount: act?.n_statements ?? 0,
+    questionCount,
+    statementCount,
   };
 }
 
@@ -224,7 +280,7 @@ export async function getMpThisWeek(mpId: number, term = DEFAULT_TERM, limit = 1
 
   const [stmts, qa] = await Promise.all([
     sb.from("proceeding_statements")
-      .select("id, num, start_datetime, body_text, function, proceeding_day_id")
+      .select("id, num, start_datetime, body_text, summary_one_line, function, proceeding_day_id")
       .eq("term", term)
       .eq("mp_id", mpId)
       .order("start_datetime", { ascending: false, nullsFirst: false })
@@ -237,16 +293,26 @@ export async function getMpThisWeek(mpId: number, term = DEFAULT_TERM, limit = 1
       .limit(limit),
   ]);
 
-  type Stmt = { id: number; start_datetime: string | null; body_text: string | null; function: string | null };
+  type Stmt = {
+    id: number;
+    start_datetime: string | null;
+    body_text: string | null;
+    summary_one_line: string | null;
+    function: string | null;
+  };
   type QRow = { question_id: number; questions: { kind: string; num: string; title: string; sent_date: string | null; recipient_titles: string[] | null } };
 
-  const stmtEvents: MpEvent[] = ((stmts.data as Stmt[]) ?? []).map((s) => ({
-    kind: "statement",
-    date: s.start_datetime,
-    title: (s.body_text || "").split(/\s+/).slice(0, 14).join(" ") + (s.body_text && s.body_text.length > 80 ? "…" : ""),
-    subtitle: s.function ?? "wystąpienie na posiedzeniu",
-    statementId: s.id,
-  }));
+  const stmtEvents: MpEvent[] = ((stmts.data as Stmt[]) ?? []).map((s) => {
+    const title =
+      statementListTitle(s.body_text, s.summary_one_line).trim() || "Wystąpienie na posiedzeniu Sejmu";
+    return {
+      kind: "statement" as const,
+      date: s.start_datetime,
+      title,
+      subtitle: s.function ?? "wystąpienie na posiedzeniu",
+      statementId: s.id,
+    };
+  });
 
   const qEvents: MpEvent[] = ((qa.data as unknown as QRow[]) ?? []).map((qa) => ({
     kind: "question",

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { trackModuleEntry, trackNavClick } from "@/lib/analytics-events";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, PERSONA_IDS, type PersonaId } from "@/lib/personas";
 import { TOPICS, TOPIC_IDS, type TopicId } from "@/lib/topics";
@@ -23,14 +22,6 @@ export default function Landing() {
     hydrated,
   } = useProfile();
   const [lookupErr, setLookupErr] = useState<string | null>(null);
-
-  useEffect(() => {
-    trackModuleEntry("tygodnik");
-    trackModuleEntry("atlas");
-    trackModuleEntry("obietnice");
-    trackModuleEntry("posel");
-    trackModuleEntry("sondaze");
-  }, []);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -246,12 +237,6 @@ export default function Landing() {
               href={c.href}
               target={c.href.startsWith("http") ? "_blank" : undefined}
               rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
-              onClick={() => trackNavClick({
-                fromPath: "/",
-                targetPath: c.href,
-                navArea: "homepage_pillar",
-                label: c.h,
-              })}
               className="cursor-pointer font-sans text-[12px] text-destructive tracking-wide border-b border-destructive pb-px"
             >
               {c.cta}

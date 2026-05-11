@@ -53,7 +53,7 @@ export function PageHeading({
         </div>
       )}
       <h1
-        className="font-serif font-medium m-0"
+        className="font-serif font-medium m-0 break-words"
         style={{
           fontSize: tokens.fontSize,
           lineHeight: tokens.lineHeight,
