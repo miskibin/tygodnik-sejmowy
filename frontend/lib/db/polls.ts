@@ -45,6 +45,7 @@ export type PollsterSummary = {
 
 // Default 5-party set for the trend chart — anything else clutters.
 export const TREND_DEFAULT_PARTIES = ["KO", "PiS", "Konfederacja", "Lewica", "PSL"] as const;
+const POLL_RESULTS_BATCH_SIZE = 40;
 
 function toNum(x: unknown): number {
   if (x === null || x === undefined) return 0;
@@ -71,6 +72,31 @@ async function withSupabaseRetry<T>(fn: () => Promise<T>, attempts = 4): Promise
     }
   }
   throw lastError;
+}
+
+async function fetchPollResultsByPollIds(
+  sb: ReturnType<typeof supabase>,
+  pollIds: number[],
+): Promise<Array<{ poll_id: number; party_code: string; percentage: number | null }>> {
+  const chunks: number[][] = [];
+  for (let i = 0; i < pollIds.length; i += POLL_RESULTS_BATCH_SIZE) {
+    chunks.push(pollIds.slice(i, i + POLL_RESULTS_BATCH_SIZE));
+  }
+
+  const resultSets = await Promise.all(chunks.map(async (chunk) => {
+    const { data, error } = await withSupabaseRetry(async () => await sb
+      .from("poll_results")
+      .select("poll_id, party_code, percentage")
+      .in("poll_id", chunk));
+    if (error) throw error;
+    return data ?? [];
+  }));
+
+  return resultSets.flat().map((row) => ({
+    poll_id: row.poll_id as number,
+    party_code: row.party_code as string,
+    percentage: row.percentage === null ? null : toNum(row.percentage),
+  }));
 }
 
 function quarterStartOf(dateIso: string): string {
@@ -174,18 +200,16 @@ export async function getPollTrendQuarterly(parties: string[] = [...TREND_DEFAUL
   if (pollRows.length === 0) return [];
 
   const ids = pollRows.map((p) => p.id as number);
-  const { data: results, error: e2 } = await withSupabaseRetry(async () => await sb
-    .from("poll_results")
-    .select("poll_id, party_code, percentage")
-    .in("poll_id", ids));
-  if (e2) throw e2;
+  // Supabase REST defaults to 1000 rows; quarterly history spans hundreds of
+  // polls, so a single unpaginated read silently truncates older results.
+  const results = await fetchPollResultsByPollIds(sb, ids);
 
   const resultsByPoll = new Map<number, Map<string, number>>();
-  for (const row of results ?? []) {
+  for (const row of results) {
     if (row.percentage == null) continue;
-    const pollId = row.poll_id as number;
-    const partyCode = row.party_code as string;
-    const pct = toNum(row.percentage);
+    const pollId = row.poll_id;
+    const partyCode = row.party_code;
+    const pct = row.percentage;
     const bucket = resultsByPoll.get(pollId) ?? new Map<string, number>();
     bucket.set(partyCode, pct);
     resultsByPoll.set(pollId, bucket);
