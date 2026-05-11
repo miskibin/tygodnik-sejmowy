@@ -434,14 +434,33 @@ def stage_polls_from_wikipedia(html_path: Path) -> tuple[int, int]:
             # Build poll_results rows.
             results_rows = _extract_result_rows(cells, col_map, poll_id)
             try:
-                # Replace the stored party breakdown wholesale on every stage
-                # pass. Older loads could contain shifted party codes from
-                # merged Wikipedia colspan cells; upsert alone would preserve
-                # those stale rows forever if a corrected parser stops emitting
-                # them later.
-                client.table("poll_results").delete().eq("poll_id", poll_id).execute()
+                # Upsert first, then prune stale rows. This keeps reingest
+                # resilient: a transient write failure won't leave the poll with
+                # zero results, while corrected parser output can still delete
+                # previously shifted party codes that are no longer emitted.
                 if results_rows:
-                    client.table("poll_results").insert(results_rows).execute()
+                    client.table("poll_results").upsert(
+                        results_rows, on_conflict="poll_id,party_code"
+                    ).execute()
+                    emitted_codes = sorted(
+                        {str(r["party_code"]) for r in results_rows if r.get("party_code")}
+                    )
+                    existing_rows = (
+                        client.table("poll_results")
+                        .select("party_code")
+                        .eq("poll_id", poll_id)
+                        .execute()
+                        .data
+                    ) or []
+                    stale_codes = sorted({
+                        str(r["party_code"])
+                        for r in existing_rows
+                        if r.get("party_code") not in emitted_codes
+                    })
+                    if stale_codes:
+                        client.table("poll_results").delete().eq(
+                            "poll_id", poll_id
+                        ).in_("party_code", stale_codes).execute()
             except Exception as e:
                 logger.warning(
                     "polls.stage: results replace fail poll_id={}: {!r}",

@@ -8,6 +8,10 @@ const M_RIGHT = 264;
 const M_TOP = 18;
 const M_BOTTOM = 46;
 const Y_MIN = 0;
+const LEGEND_LABEL_HEIGHT = 22;
+const LEGEND_MAX_GAP = 10;
+const LEGEND_MIN_GAP = 4;
+const MIN_QUARTER_LABEL_SPACING = 56;
 
 function quarterLabel(iso: string): string {
   // 2025-04-01 -> '25 Q2
@@ -120,11 +124,20 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
   const highlightX = Math.max(M_LEFT, lastQuarterX - 24);
   const highlightW = Math.min(48, VB_W - M_RIGHT - highlightX);
 
-  const labelHeight = 22;
+  const labelHeight = LEGEND_LABEL_HEIGHT;
   const labelX = VB_W - M_RIGHT + 14;
-  const legendGap = 10;
+  const legendGap = parties.length <= 1
+    ? 0
+    : Math.max(
+      LEGEND_MIN_GAP,
+      Math.min(
+        LEGEND_MAX_GAP,
+        Math.floor((innerH - parties.length * labelHeight) / (parties.length - 1)),
+      ),
+    );
   const legendStep = labelHeight + legendGap;
-  const legendTop = M_TOP + Math.max(16, (innerH - legendStep * (parties.length - 1)) / 2);
+  const legendHeight = parties.length * labelHeight + Math.max(0, parties.length - 1) * legendGap;
+  const legendTop = M_TOP + Math.max(0, (innerH - legendHeight) / 2) + labelHeight / 2;
   const legendItems = parties.map((series, index) => ({
     party: series.party,
     label: `${chartPartyLabel(series.party)} ${series.last.percentage_avg.toFixed(1)}%`,
@@ -136,6 +149,8 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
   const lateStartSeries = parties
     .filter((series) => series.first.quarter_start !== firstQuarter)
     .map((series) => `${series.label} od ${quarterLabel(series.first.quarter_start)}`);
+  const maxQuarterLabels = Math.max(2, Math.floor(innerW / MIN_QUARTER_LABEL_SPACING));
+  const quarterLabelStride = quarterCount <= maxQuarterLabels ? 1 : Math.ceil(quarterCount / maxQuarterLabels);
 
   return (
     <section>
@@ -192,6 +207,7 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
           })}
 
           {quarters.map((quarter, index) => {
+            if (index % quarterLabelStride !== 0 && index !== quarterCount - 1) return null;
             const x = xFor(quarter);
             return (
               <g key={quarter}>
