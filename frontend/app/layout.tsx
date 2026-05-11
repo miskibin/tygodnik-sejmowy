@@ -8,9 +8,8 @@ import { ProfileProvider } from "@/lib/profile";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ChromeSlot } from "@/components/chrome/ChromeSlot";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import "./globals.css";
-
-const GA_MEASUREMENT_ID = "G-Q3NSFXD331";
 
 const inter = Inter({
   variable: "--font-inter",

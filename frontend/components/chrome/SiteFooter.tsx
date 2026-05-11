@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 
-// Global site footer mounted in app/layout.tsx beneath ChromeSlot. Server-only
-// (no interactivity). Single source of truth for sitemap stub, data-source
+// Global site footer mounted in app/layout.tsx beneath ChromeSlot. Mostly
+// server-rendered; Patronite CTA uses a tiny client link for one GA event.
 // credit and copyright — bespoke footers on /manifest and /alerty are kept
 // only when they carry page-specific CTAs.
 
@@ -70,14 +71,9 @@ export async function SiteFooter() {
           </p>
           <p className="m-0 mb-3">
             Wsparcie:{" "}
-            <a
-              href="https://patronite.pl/tygodniksejmowy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-destructive hover:underline"
-            >
+            <PatroniteTrackedLink placement="footer" className="text-destructive hover:underline">
               patronite.pl/tygodniksejmowy →
-            </a>
+            </PatroniteTrackedLink>
           </p>
           <p className="m-0 mb-3">
             Kod źródłowy:{" "}
