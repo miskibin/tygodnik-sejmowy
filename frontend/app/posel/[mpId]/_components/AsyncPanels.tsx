@@ -1,10 +1,13 @@
 import { getMpThisWeek } from "@/lib/db/mps";
 import {
   getMpVotes,
-  getMpQuestions,
-  getMpStatementsTab,
+  getMpQuestionsRows,
+  getMpQuestionsStats,
+  getMpStatementsRows,
+  getMpStatementsStats,
   getMpPromiseAlignments,
 } from "@/lib/db/posel-tabs";
+import { MP_QUESTIONS_STATEMENTS_TAB_LIMIT } from "@/lib/posel-tab-page-size";
 import { Tab1VotesPanel } from "./Tab1VotesPanel";
 import { Tab2QuestionsPanel } from "./Tab2QuestionsPanel";
 import { Tab3StatementsPanel } from "./Tab3StatementsPanel";
@@ -20,56 +23,63 @@ export async function TydzienAsync({ mpId }: { mpId: number }) {
   if (thisWeek.length === 0) {
     return (
       <p className="font-serif italic text-muted-foreground text-center py-12">
-        Brak danych o wystąpieniach i interpelacjach tego posła w aktualnej kadencji.
+        W bazie nie ma jeszcze wystąpień ani interpelacji przypisanych do tej osoby w tej kadencji.
       </p>
     );
   }
   return (
-    <ul>
+    <>
+      <p className="font-sans text-[12px] text-muted-foreground leading-snug m-0 mb-5 max-w-[720px] break-words">
+        Najnowsze wystąpienia na posiedzeniach Sejmu oraz interpelacje i zapytania — wg daty w bazie.
+      </p>
+      <ul className="min-w-0">
       {thisWeek.map((e, i) => {
-        const inner = (
-          <>
-            <span className="font-mono text-[11px] text-muted-foreground tracking-wide pt-1">{formatDate(e.date)}</span>
-            <div>
-              <div
-                className="font-sans text-[10px] uppercase tracking-[0.14em] mb-1.5"
-                style={{ color: e.kind === "question" ? "var(--warning)" : "var(--destructive)" }}
-              >
-                {e.kind === "question" ? "Interpelacja" : "Wystąpienie"}
-              </div>
-              {e.title ? (
-                <div className="font-serif text-[18px] font-medium leading-snug mb-1 tracking-[-0.005em]">{e.title}</div>
-              ) : (
-                <div className="font-serif italic text-[14px] text-muted-foreground mb-1">brak treści wystąpienia</div>
-              )}
-              {e.subtitle && <div className="font-sans text-[12px] text-muted-foreground">{e.subtitle}</div>}
-            </div>
-          </>
+        const dateEl = (
+          <span className="font-mono text-[11px] text-muted-foreground tracking-wide shrink-0 sm:pt-1">
+            {formatDate(e.date)}
+          </span>
         );
+        const bodyEl = (
+          <div className="min-w-0">
+            <div
+              className="font-sans text-[10px] uppercase tracking-[0.14em] mb-1.5"
+              style={{ color: e.kind === "question" ? "var(--warning)" : "var(--destructive)" }}
+            >
+              {e.kind === "question" ? "Interpelacja" : "Wystąpienie"}
+            </div>
+            {e.title ? (
+              <div className="font-serif text-[16px] sm:text-[18px] font-medium leading-snug mb-1 tracking-[-0.005em] break-words">
+                {e.title}
+              </div>
+            ) : (
+              <div className="font-serif italic text-[14px] text-muted-foreground mb-1">brak treści wystąpienia</div>
+            )}
+            {e.subtitle && (
+              <div className="font-sans text-[12px] text-muted-foreground break-words">{e.subtitle}</div>
+            )}
+          </div>
+        );
+        const rowLayout =
+          "flex flex-col gap-2 py-4 min-w-0 sm:grid sm:grid-cols-[minmax(0,3.25rem)_minmax(0,1fr)] sm:gap-5 sm:items-start";
         if (e.kind === "statement" && e.statementId != null) {
           return (
-            <li key={i} className="border-b border-border">
-              <a
-                href={`/mowa/${e.statementId}`}
-                className="grid gap-5 py-4 hover:bg-muted"
-                style={{ gridTemplateColumns: "60px 1fr" }}
-              >
-                {inner}
+            <li key={i} className="border-b border-border min-w-0">
+              <a href={`/mowa/${e.statementId}`} className={`${rowLayout} block sm:hover:bg-muted`}>
+                {dateEl}
+                {bodyEl}
               </a>
             </li>
           );
         }
         return (
-          <li
-            key={i}
-            className="grid gap-5 py-4 border-b border-border"
-            style={{ gridTemplateColumns: "60px 1fr" }}
-          >
-            {inner}
+          <li key={i} className={`${rowLayout} border-b border-border`}>
+            {dateEl}
+            {bodyEl}
           </li>
         );
       })}
     </ul>
+    </>
   );
 }
 
@@ -79,13 +89,21 @@ export async function VotesAsync({ mpId }: { mpId: number }) {
 }
 
 export async function QuestionsAsync({ mpId }: { mpId: number }) {
-  const data = await getMpQuestions(mpId);
-  return <Tab2QuestionsPanel data={data} />;
+  const term = 10;
+  const [stats, initialRows] = await Promise.all([
+    getMpQuestionsStats(mpId, term),
+    getMpQuestionsRows(mpId, term, 0, MP_QUESTIONS_STATEMENTS_TAB_LIMIT),
+  ]);
+  return <Tab2QuestionsPanel stats={stats} initialRows={initialRows} mpId={mpId} />;
 }
 
 export async function StatementsAsync({ mpId }: { mpId: number }) {
-  const data = await getMpStatementsTab(mpId);
-  return <Tab3StatementsPanel data={data} />;
+  const term = 10;
+  const [stats, initialRows] = await Promise.all([
+    getMpStatementsStats(mpId, term),
+    getMpStatementsRows(mpId, term, 0, MP_QUESTIONS_STATEMENTS_TAB_LIMIT),
+  ]);
+  return <Tab3StatementsPanel stats={stats} initialRows={initialRows} mpId={mpId} />;
 }
 
 export async function PromisesAsync({ mpId }: { mpId: number }) {
