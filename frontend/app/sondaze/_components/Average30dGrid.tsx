@@ -1,115 +1,242 @@
 import type { PollAverageRow } from "@/lib/db/polls";
-import { NON_ADDITIVE_SERIES_NOTE } from "@/lib/polls/series";
-import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES } from "./partyMeta";
+import { projectSeatsMap } from "@/lib/polls/seats";
+import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES, SEJM_THRESHOLD_PCT } from "./partyMeta";
 
-function daysAgo(iso: string): string {
-  const d = new Date(iso + "T00:00:00Z");
-  const now = new Date();
-  const diff = Math.round((now.getTime() - d.getTime()) / 86400_000);
-  if (diff <= 0) return "dziś";
-  if (diff === 1) return "wczoraj";
-  if (diff < 7) return `${diff} dni temu`;
-  if (diff < 30) return `${Math.floor(diff / 7)} tyg. temu`;
-  return `${Math.floor(diff / 30)} mies. temu`;
-}
+const PL_MONTHS_SHORT = ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"];
 
 function fmtPct(n: number): string {
   return n.toLocaleString("pl-PL", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
+function fmtDayMonth(iso: string): string {
+  const d = new Date(iso + "T00:00:00Z");
+  return `${d.getUTCDate()} ${PL_MONTHS_SHORT[d.getUTCMonth()]}`;
+}
+
 export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
   const main = rows.filter((r) => !RESIDUAL_CODES.has(r.party_code));
   const residual = rows.filter((r) => RESIDUAL_CODES.has(r.party_code));
-  const max = Math.max(1, ...main.map((r) => r.percentage_avg));
-  const total = rows.reduce((sum, r) => sum + r.percentage_avg, 0);
+  const seatsMap = projectSeatsMap(rows);
+  // Universal x-axis cap so all CI bars share the same scale (max party + 4pp).
+  const scaleMax = Math.max(40, Math.ceil((Math.max(0, ...main.map((r) => r.percentage_max_30d)) + 4) / 5) * 5);
+
+  // Date range from the rows themselves — `last_conducted_at` is the freshest
+  // poll per party, so spread tells us the 30d window we're summarising.
+  const dates = main
+    .map((r) => r.last_conducted_at)
+    .filter((d): d is string => !!d)
+    .sort();
+  const dateLo = dates[0];
+  const dateHi = dates[dates.length - 1];
+
+  // Sidebar callout #1 — party with the widest min/max spread (most volatile).
+  const mostVolatile = main
+    .slice()
+    .sort((a, b) => (b.percentage_max_30d - b.percentage_min_30d) - (a.percentage_max_30d - a.percentage_min_30d))[0];
+  // Sidebar callout #2 — closest-to-threshold party that's still under 5%.
+  // If everyone's over, pick the one with the smallest cushion above 5% instead.
+  const subThresholdAll = main.filter((r) => r.percentage_avg < SEJM_THRESHOLD_PCT);
+  const subThreshold = subThresholdAll.length > 0
+    ? subThresholdAll.sort((a, b) => b.percentage_avg - a.percentage_avg)[0]
+    : main.slice().sort((a, b) => a.percentage_avg - b.percentage_avg)[0];
+  const subThresholdProgressPct = subThreshold ? Math.min(100, (subThreshold.percentage_avg / SEJM_THRESHOLD_PCT) * 100) : 0;
+  const subThresholdGap = subThreshold ? SEJM_THRESHOLD_PCT - subThreshold.percentage_avg : 0;
 
   return (
-    <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
-        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">A</div>
-        <div className="min-w-0">
-          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Średnia ważona — ostatnie 30 dni</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Aktualnie</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
-            Wykładniczy zanik z półokresem 14 dni — świeższy sondaż waży więcej. Posortowane od największego.
-          </p>
+    <section className="grid gap-8 lg:gap-12 lg:grid-cols-[1.6fr_1fr] items-start min-w-0">
+      <div className="min-w-0">
+        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-2">
+          Średnia ważona{dateLo && dateHi ? ` · ${fmtDayMonth(dateLo)} – ${fmtDayMonth(dateHi)}` : ""}
         </div>
-      </header>
+        <p className="font-serif text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[680px] mb-6 text-pretty">
+          Wykładniczy zanik z półokresem 14 dni — świeższy sondaż waży więcej. Punkt pokazuje
+          średnią, półprzezroczysty pasek to rozrzut min–max w 30-dniowym oknie.
+        </p>
 
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="border-t border-border">
         {main.map((r) => {
           const color = partyColor(r.party_code);
-          const widthPct = (r.percentage_avg / max) * 100;
+          const seatCount = seatsMap.get(r.party_code)?.seats ?? 0;
+          const qualified = r.percentage_avg >= SEJM_THRESHOLD_PCT;
+          const ciLow = Math.max(0, r.percentage_min_30d);
+          const ciHigh = Math.min(scaleMax, r.percentage_max_30d);
+          const ciLeft = (ciLow / scaleMax) * 100;
+          const ciWidth = ((ciHigh - ciLow) / scaleMax) * 100;
+          const avgLeft = (r.percentage_avg / scaleMax) * 100;
           return (
-            <article
+            <div
               key={r.party_code}
-              className="p-5 bg-muted border border-border"
+              className="py-4 sm:py-5 border-b border-border grid items-center gap-3 sm:gap-5 grid-cols-[1fr_auto] sm:[grid-template-columns:minmax(140px,180px)_minmax(0,1fr)_minmax(70px,90px)_minmax(60px,80px)] min-w-0"
             >
-              <div className="flex items-center gap-3 mb-3">
+              {/* Identity */}
+              <div className="flex items-center gap-3 min-w-0">
                 {partyLogoSrc(r.party_code) ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={partyLogoSrc(r.party_code)!}
-                    alt={partyLabel(r.party_code)}
-                    width={36}
-                    height={36}
+                    alt=""
+                    width={32}
+                    height={32}
                     className="object-contain rounded-sm shrink-0"
                     style={{ background: "var(--background)", border: "1px solid var(--border)" }}
                   />
                 ) : (
                   <span
                     className="inline-flex items-center justify-center font-sans font-semibold shrink-0 rounded-sm"
-                    style={{ width: 36, height: 36, background: color, color: "var(--background)", fontSize: 13, letterSpacing: "0.02em" }}
+                    style={{ width: 32, height: 32, background: color, color: "var(--background)", fontSize: 12 }}
                   >
                     {r.party_code.slice(0, 3).toUpperCase()}
                   </span>
                 )}
                 <div className="min-w-0">
-                  <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted-foreground leading-none mb-1">
+                  <div className="font-serif text-[16px] sm:text-[18px] font-medium leading-tight tracking-[-0.01em] truncate">
                     {r.party_code}
                   </div>
-                  <div className="font-serif text-[18px] font-medium text-foreground leading-tight truncate">
+                  <div className="font-sans text-[11px] text-muted-foreground truncate">
                     {partyLabel(r.party_code)}
                   </div>
                 </div>
               </div>
-              <div className="flex items-baseline gap-1.5 mb-3">
-                <span className="font-serif text-[44px] font-medium text-foreground leading-none" style={{ letterSpacing: "-0.02em" }}>
+
+              {/* CI bar — desktop only; mobile shows simple percent below */}
+              <div className="hidden sm:block relative h-6 min-w-0">
+                <div className="absolute left-0 right-0 top-1/2 h-px bg-border" />
+                <div
+                  className="absolute top-[10px] h-1 rounded-sm"
+                  style={{ left: `${ciLeft}%`, width: `${Math.max(0.5, ciWidth)}%`, background: color, opacity: 0.3 }}
+                />
+                <div
+                  className="absolute top-[6px] w-2.5 h-2.5 rounded-full"
+                  style={{
+                    left: `calc(${avgLeft}% - 5px)`,
+                    background: color,
+                    border: "2px solid var(--background)",
+                  }}
+                />
+                <span
+                  aria-hidden
+                  className="absolute top-[20px] font-mono text-[8.5px] text-muted-foreground"
+                  style={{ left: `${(SEJM_THRESHOLD_PCT / scaleMax) * 100}%` }}
+                >
+                  {SEJM_THRESHOLD_PCT}%
+                </span>
+              </div>
+
+              {/* Big percentage */}
+              <div className="text-right">
+                <span
+                  className="font-serif font-medium tabular-nums"
+                  style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", letterSpacing: "-0.02em", lineHeight: 1 }}
+                >
                   {fmtPct(r.percentage_avg)}
                 </span>
-                <span className="font-serif text-[20px] text-muted-foreground">%</span>
+                <span className="font-mono text-[11px] text-muted-foreground ml-0.5">%</span>
+                <div className="font-mono text-[9.5px] text-muted-foreground mt-1 hidden sm:block">
+                  min {fmtPct(r.percentage_min_30d)} – max {fmtPct(r.percentage_max_30d)}
+                </div>
               </div>
-              <div className="h-1.5 relative border border-border bg-background mb-3">
-                <div className="absolute left-0 top-0 bottom-0" style={{ width: `${widthPct}%`, background: color }} />
+
+              {/* Seats / threshold */}
+              <div className="text-right">
+                {qualified ? (
+                  <>
+                    <div
+                      className="font-serif font-medium tabular-nums leading-none"
+                      style={{ fontSize: "clamp(1.1rem, 2.6vw, 1.45rem)" }}
+                    >
+                      {seatCount}
+                    </div>
+                    <div className="font-mono text-[9.5px] text-muted-foreground mt-1">mandatów</div>
+                  </>
+                ) : (
+                  <div className="font-mono text-[10px] text-destructive uppercase tracking-wider leading-tight">
+                    pod
+                    <br />
+                    progiem
+                  </div>
+                )}
               </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:items-baseline font-mono text-[10px] text-muted-foreground tracking-wide">
-                <span className="min-w-0 break-words">min {fmtPct(r.percentage_min_30d)} – max {fmtPct(r.percentage_max_30d)}%</span>
-                <span className="shrink-0 sm:text-right">n = {r.n_polls}</span>
-              </div>
-              <div className="mt-1 font-mono text-[10px] text-muted-foreground italic">
-                ostatni: {daysAgo(r.last_conducted_at)}
-              </div>
-            </article>
+            </div>
           );
         })}
       </div>
 
       {residual.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-dashed border-border flex flex-wrap gap-x-6 gap-y-2 font-mono text-[11px] text-muted-foreground tracking-wide">
-          <span className="uppercase tracking-[0.16em]">Pozostałe:</span>
+        <div className="mt-5 pt-3 border-t border-dashed border-border flex flex-wrap gap-x-5 gap-y-1.5 font-mono text-[10.5px] text-muted-foreground tracking-wide">
+          <span className="uppercase tracking-[0.14em]">Pozostałe:</span>
           {residual.map((r) => (
             <span key={r.party_code}>
-              <span className="text-secondary-foreground">{partyLabel(r.party_code)}</span>
-              {" "}
+              <span className="text-secondary-foreground">{partyLabel(r.party_code)}</span>{" "}
               <span className="text-foreground font-semibold">{fmtPct(r.percentage_avg)}%</span>
             </span>
           ))}
         </div>
       )}
+      </div>
 
-      <p className="mt-4 font-mono text-[10px] text-muted-foreground tracking-wide leading-relaxed">
-        Suma wszystkich pokazanych serii: {fmtPct(total)}%. {NON_ADDITIVE_SERIES_NOTE}
-      </p>
+      {/* Sidebar — "Co się zmieniło" callouts, mirroring the design mock */}
+      <aside className="min-w-0 lg:sticky lg:top-4">
+        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-3">
+          Co warto wiedzieć
+        </div>
+
+        {mostVolatile && (
+          <div className="bg-muted border border-border p-5 sm:p-6 mb-4">
+            <div className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground mb-2">
+              Największy rozrzut w 30 dniach
+            </div>
+            <div
+              className="font-serif font-medium leading-tight tracking-[-0.015em] m-0 text-balance"
+              style={{ fontSize: "clamp(1.4rem, 4vw, 1.85rem)" }}
+            >
+              {partyLabel(mostVolatile.party_code)}
+            </div>
+            <p className="font-serif italic text-[14px] sm:text-[15px] text-secondary-foreground mt-2 mb-0 leading-[1.5]">
+              {fmtPct(mostVolatile.percentage_min_30d)}% – {fmtPct(mostVolatile.percentage_max_30d)}% w sondażach z ostatniego miesiąca · różnica{" "}
+              {fmtPct(mostVolatile.percentage_max_30d - mostVolatile.percentage_min_30d)} pkt.
+            </p>
+            <p className="font-mono text-[10.5px] text-muted-foreground mt-3 pt-3 border-t border-border m-0 leading-[1.5]">
+              Pojedyncze sondaże mają błąd statystyczny ±3 pkt — większe rozrzuty zwykle oznaczają,
+              że pracownie różnie próbkują tę grupę wyborców.
+            </p>
+          </div>
+        )}
+
+        {subThreshold && (
+          <div className="border border-border p-5 sm:p-6">
+            <div className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground mb-3">
+              {subThresholdGap > 0 ? `Na granicy progu (${SEJM_THRESHOLD_PCT}%)` : `Najbliżej progu od góry`}
+            </div>
+            <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
+              <span className="font-serif text-[20px] sm:text-[22px] font-medium tracking-[-0.01em]">
+                {partyLabel(subThreshold.party_code)}
+              </span>
+              <span
+                className="font-mono text-[12px] tabular-nums"
+                style={{ color: subThresholdGap > 0 ? "var(--warning)" : "var(--success)" }}
+              >
+                {fmtPct(subThreshold.percentage_avg)}% · {subThresholdGap > 0 ? "ryzyko" : "bezpiecznie"}
+              </span>
+            </div>
+            <div className="relative h-1.5 bg-border">
+              <div
+                className="absolute inset-y-0 left-0"
+                style={{ width: `${subThresholdProgressPct}%`, background: partyColor(subThreshold.party_code) }}
+              />
+              <span
+                aria-hidden
+                className="absolute -top-1 bottom-[-4px] border-l-2 border-foreground"
+                style={{ left: "100%", transform: "translateX(-1px)" }}
+              />
+            </div>
+            <p className="font-sans text-[11.5px] text-muted-foreground mt-3 mb-0 leading-[1.5]">
+              {subThresholdGap > 0
+                ? `Brakuje ${fmtPct(subThresholdGap)} pkt do progu. Pod ${SEJM_THRESHOLD_PCT}% partia nie wprowadza nikogo do Sejmu — w średniej liczone, ale w mandatach zero.`
+                : `Zapas ${fmtPct(-subThresholdGap)} pkt nad progiem. Spadek poniżej oznaczałby zero mandatów.`}
+            </p>
+          </div>
+        )}
+      </aside>
     </section>
   );
 }

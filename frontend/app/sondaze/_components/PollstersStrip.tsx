@@ -4,16 +4,9 @@ export function PollstersStrip({ rows }: { rows: PollsterSummary[] }) {
   const total = rows.reduce((acc, r) => acc + r.n_polls, 0);
   return (
     <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
-        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">E</div>
-        <div className="min-w-0">
-          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Kto pyta i ile razy</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Pollsterzy</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
-            Wkład każdej pracowni do bazy. Łącznie {total.toLocaleString("pl-PL")} sondaży.
-          </p>
-        </div>
-      </header>
+      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-3">
+        Pracownie · łącznie {total.toLocaleString("pl-PL")} sondaży
+      </div>
 
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {rows.map((r) => {

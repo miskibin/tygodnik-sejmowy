@@ -1,32 +1,23 @@
 import type { PollAverageRow, RecentPollRow } from "@/lib/db/polls";
-import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES } from "./partyMeta";
-
-// Last-resort fallback when averages aren't available.
-const FALLBACK_PRIMARY_PARTIES = ["KO", "PiS", "Konfederacja", "KKP", "Lewica"];
+import { partyColor, partyLabel, RESIDUAL_CODES } from "./partyMeta";
 
 function sourceDomain(url: string): string {
   try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    return host;
+    return new URL(url).hostname.replace(/^www\./, "");
   } catch {
     return "źródło";
   }
 }
 
 function fmtRange(a: string, b: string): string {
-  // 2026-04-28 -> 28.04
   const fmt = (iso: string) => {
     const d = new Date(iso + "T00:00:00Z");
     const dd = String(d.getUTCDate()).padStart(2, "0");
     const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
     return `${dd}.${mm}`;
   };
-  if (a === b) {
-    const d = new Date(b + "T00:00:00Z");
-    return `${fmt(b)}.${String(d.getUTCFullYear()).slice(2)}`;
-  }
-  const d = new Date(b + "T00:00:00Z");
-  return `${fmt(a)} – ${fmt(b)}.${String(d.getUTCFullYear()).slice(2)}`;
+  if (a === b) return `${fmt(b)}`;
+  return `${fmt(a)} – ${fmt(b)}`;
 }
 
 function fmtPct(n: number | null): string {
@@ -34,150 +25,148 @@ function fmtPct(n: number | null): string {
   return n.toLocaleString("pl-PL", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
-export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; averages?: PollAverageRow[] }) {
-  // Top 5 parties by current 30d average — keeps the table aligned with what
-  // people actually see at the top of the page (e.g. KKP/Braun gets a column
-  // when polling at 8%, instead of being demoted under PSL at 3%).
-  const PRIMARY_PARTIES = (averages && averages.length > 0)
-    ? averages
-        .filter((r) => !RESIDUAL_CODES.has(r.party_code))
-        .slice(0, 5)
-        .map((r) => r.party_code)
-    : FALLBACK_PRIMARY_PARTIES;
-  return (
-    <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
-        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">D</div>
-        <div className="min-w-0">
-          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Surowe odczyty</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Ostatnie sondaże</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
-            Dwadzieścia najświeższych pomiarów. Główne partie w nagłówku — pełna rozpiska po kliknięciu źródła.
-          </p>
-        </div>
-      </header>
+const FALLBACK = ["KO", "PiS", "Konfederacja", "Lewica", "PSL"];
 
-      <div className="border-t border-rule">
-        {/* Header row */}
-        <div className="hidden md:grid items-baseline py-2.5 px-3 border-b border-rule font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground"
-          style={{ gridTemplateColumns: "1.5fr 0.95fr 0.6fr repeat(5, 0.65fr) 1fr", columnGap: 12 }}
+export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; averages?: PollAverageRow[] }) {
+  // Stacked bars need a consistent party ordering — use the current 30d
+  // average ranking so the same color is in the same horizontal position
+  // across every poll.
+  const order =
+    averages && averages.length > 0
+      ? averages.filter((r) => !RESIDUAL_CODES.has(r.party_code)).map((r) => r.party_code)
+      : FALLBACK;
+
+  return (
+    <section className="min-w-0">
+      <div className="font-serif text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-6 text-pretty">
+        {rows.length} najnowszych pomiarów. Każdy pasek to jeden sondaż — szerokość segmentu = procent
+        poparcia. Pojedyncze sondaże mają błąd statystyczny ±3 pkt; w średniej powyżej szum znika.
+      </div>
+
+      <div className="border-t border-border">
+        {/* Header row (desktop) */}
+        <div
+          className="hidden md:grid items-baseline py-2.5 font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground border-b border-border"
+          style={{ gridTemplateColumns: "minmax(120px, 1.3fr) 90px 60px minmax(220px, 2.4fr) minmax(80px, 0.9fr)", columnGap: 16 }}
         >
           <span>Pracownia</span>
           <span>Termin</span>
           <span className="text-right">Próba</span>
-          {PRIMARY_PARTIES.map((p) => {
-            const src = partyLogoSrc(p);
-            return (
-              <span key={p} className="flex justify-end items-center gap-1.5" title={partyLabel(p)}>
-                {src ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={src} alt={partyLabel(p)} width={14} height={14} className="object-contain rounded-sm" style={{ background: "var(--background)", border: "1px solid var(--border)" }} />
-                ) : null}
-                <span>{p}</span>
-              </span>
-            );
-          })}
+          <span>Wyniki — segmenty = % poparcia</span>
           <span className="text-right">Źródło</span>
         </div>
 
         {rows.map((p) => {
           const lookup = new Map(p.results.map((r) => [r.party_code, r.percentage]));
-          const tail = p.results.filter((r) => !PRIMARY_PARTIES.includes(r.party_code) && !RESIDUAL_CODES.has(r.party_code));
+          // Segments scaled so the full width = 100% of the poll (incl. residual buckets).
+          // Anything not in the lookup gets dropped; "Inne" / "Niezdecydowani" included to honour the bar's full width.
+          const segments = p.results
+            .map((r) => ({ code: r.party_code, pct: r.percentage ?? 0 }))
+            .filter((s) => s.pct > 0)
+            .sort((a, b) => order.indexOf(a.code) - order.indexOf(b.code));
+
           return (
-            <div key={p.poll_id} className="border-b border-border py-3 px-3 hover:bg-muted">
-              {/* Mobile: stacked card — desktop: wide table row */}
-              <div className="md:hidden space-y-2.5 font-sans text-[13px]">
-                <div className="flex flex-wrap items-start justify-between gap-2 min-w-0">
-                  <span className="font-serif text-[15px] text-foreground font-medium min-w-0">{p.pollster}</span>
-                  <span className="font-mono text-[11px] text-secondary-foreground shrink-0">
+            <div key={p.poll_id} className="border-b border-border py-3 md:py-3.5 hover:bg-muted/40">
+              {/* Mobile: stacked */}
+              <div className="md:hidden space-y-2.5 font-sans">
+                <div className="flex items-baseline justify-between gap-2 min-w-0">
+                  <span className="font-serif text-[15px] font-medium truncate">{p.pollster}</span>
+                  <span className="font-mono text-[10.5px] text-muted-foreground shrink-0">
                     {fmtRange(p.conducted_at_start, p.conducted_at_end)}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-muted-foreground">
+                <StackedBar segments={segments} />
+                <div className="flex items-baseline justify-between gap-3 font-mono text-[10.5px] text-muted-foreground">
                   <span>
-                    Próba:{" "}
-                    <span className="text-foreground">{p.sample_size ? p.sample_size.toLocaleString("pl-PL") : "—"}</span>
+                    n = <span className="text-foreground">{p.sample_size ? p.sample_size.toLocaleString("pl-PL") : "—"}</span>
                   </span>
-                  {p.source_url ? (
-                    <a
-                      href={p.source_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-destructive hover:underline break-all"
-                      title={p.source_url}
-                    >
+                  {p.source_url && (
+                    <a href={p.source_url} target="_blank" rel="noopener noreferrer" className="text-destructive hover:underline">
                       {sourceDomain(p.source_url)} ↗
                     </a>
-                  ) : (
-                    <span className="italic">brak źródła</span>
                   )}
-                </div>
-                <div className="grid grid-cols-2 min-[400px]:grid-cols-3 gap-x-3 gap-y-2 sm:grid-cols-5">
-                  {PRIMARY_PARTIES.map((code) => {
-                    const v = lookup.get(code) ?? null;
-                    return (
-                      <div key={code} className="min-w-0">
-                        <div className="font-mono text-[9px] uppercase tracking-wide text-muted-foreground truncate" title={partyLabel(code)}>
-                          {code}
-                        </div>
-                        <div className="font-mono text-[13px] text-foreground tabular-nums">
-                          <span className="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle" style={{ background: partyColor(code) }} />
-                          {fmtPct(v)}
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
 
+              {/* Desktop: row */}
               <div
-                className="hidden md:grid items-baseline gap-y-1 font-sans text-[13px]"
-                style={{ gridTemplateColumns: "1.5fr 0.95fr 0.6fr repeat(5, 0.65fr) 1fr", columnGap: 12 }}
+                className="hidden md:grid items-center font-sans text-[13px]"
+                style={{ gridTemplateColumns: "minmax(120px, 1.3fr) 90px 60px minmax(220px, 2.4fr) minmax(80px, 0.9fr)", columnGap: 16 }}
               >
-                <span className="font-serif text-[15px] text-foreground">{p.pollster}</span>
-                <span className="font-mono text-[11px] text-secondary-foreground">{fmtRange(p.conducted_at_start, p.conducted_at_end)}</span>
-                <span className="font-mono text-[11px] text-muted-foreground text-right">
+                <span className="font-serif text-[16px] text-foreground truncate">{p.pollster}</span>
+                <span className="font-mono text-[11px] text-secondary-foreground tabular-nums">
+                  {fmtRange(p.conducted_at_start, p.conducted_at_end)}
+                </span>
+                <span className="font-mono text-[11px] text-muted-foreground text-right tabular-nums">
                   {p.sample_size ? p.sample_size.toLocaleString("pl-PL") : "—"}
                 </span>
-                {PRIMARY_PARTIES.map((code) => {
-                  const v = lookup.get(code) ?? null;
-                  return (
-                    <span key={code} className="font-mono text-[12px] text-right text-foreground">
-                      <span className="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle" style={{ background: partyColor(code) }} />
-                      {fmtPct(v)}
-                    </span>
-                  );
-                })}
+                <StackedBar segments={segments} lookup={lookup} order={order} />
                 <span className="text-right">
                   {p.source_url ? (
                     <a
                       href={p.source_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-mono text-[10px] tracking-wider lowercase text-destructive hover:underline truncate inline-block max-w-full"
-                      title={p.source_url}
+                      className="font-mono text-[10px] tracking-wider lowercase text-destructive hover:underline"
                     >
                       {sourceDomain(p.source_url)} ↗
                     </a>
                   ) : (
-                    <span className="font-mono text-[10px] text-muted-foreground">—</span>
+                    <span className="font-mono text-[10px] text-muted-foreground italic">brak</span>
                   )}
                 </span>
               </div>
-              {tail.length > 0 && (
-                <div className="mt-1.5 ml-0 md:ml-1 font-mono text-[10px] text-muted-foreground tracking-wide">
-                  {tail.map((r, i) => (
-                    <span key={r.party_code}>
-                      {i > 0 ? " · " : ""}
-                      {r.party_code} {fmtPct(r.percentage)}%
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           );
         })}
       </div>
     </section>
+  );
+}
+
+function StackedBar({
+  segments,
+  lookup,
+  order,
+}: {
+  segments: { code: string; pct: number }[];
+  lookup?: Map<string, number | null>;
+  order?: string[];
+}) {
+  const total = segments.reduce((s, x) => s + x.pct, 0);
+  if (total === 0) return <div className="font-mono text-[11px] text-muted-foreground italic">brak danych</div>;
+  return (
+    <div className="min-w-0">
+      <div className="flex h-6 overflow-hidden" style={{ background: "var(--muted)" }}>
+        {segments.map((s) => {
+          const widthPct = s.pct; // segments are already % shares
+          if (widthPct < 0.3) return null;
+          return (
+            <div
+              key={s.code}
+              title={`${partyLabel(s.code)} ${fmtPct(s.pct)}%`}
+              className="flex items-center justify-center font-mono text-[10px] font-semibold text-background overflow-hidden whitespace-nowrap"
+              style={{ width: `${widthPct}%`, background: partyColor(s.code), minWidth: 0 }}
+            >
+              {widthPct >= 6 ? s.pct.toFixed(1) : ""}
+            </div>
+          );
+        })}
+      </div>
+      {/* Inline numeric labels under the bar for the top 5 parties */}
+      {order && lookup && (
+        <div className="hidden lg:flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5 font-mono text-[10px] text-muted-foreground">
+          {order.slice(0, 5).map((code) => {
+            const v = lookup.get(code);
+            return (
+              <span key={code}>
+                <span className="inline-block w-1.5 h-1.5 rounded-full align-middle mr-1" style={{ background: partyColor(code) }} />
+                {code} {fmtPct(v ?? null)}
+              </span>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
