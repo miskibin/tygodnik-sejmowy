@@ -83,6 +83,28 @@ function quarterStartOf(dateIso: string): string {
 function normalizeTrendRowResults(dateIso: string, source: Map<string, number>): Map<string, number> {
   const out = new Map(source);
 
+  // Some stale pre-fix rows already carry KKP as a separate series, but the
+  // Konfederacja column is still shifted into Razem because Polska2050+PSL was
+  // parsed as two standalone cells. Remap only that known broken layout.
+  if (dateIso < "2025-06-17"
+    && out.has("Polska2050")
+    && out.has("PSL")
+    && out.has("Lewica")
+    && out.has("Razem")
+    && out.has("KKP")
+    && !out.has("Konfederacja")) {
+    const p2050 = out.get("Polska2050");
+    const psl = out.get("PSL");
+    const lewica = out.get("Lewica");
+    const razem = out.get("Razem");
+    if (p2050 != null) out.set("TD", p2050);
+    if (psl != null) out.set("Lewica", psl);
+    if (lewica != null) out.set("Razem", lewica);
+    if (razem != null) out.set("Konfederacja", razem);
+    out.delete("Polska2050");
+    out.delete("PSL");
+  }
+
   // Pre-2025-06-17 Wikipedia rows often collapse Polska2050+PSL into one TD
   // cell via colspan=2. Historical rows already loaded before the parser fix
   // are shifted right from that point onward, which is how Razem inherited
@@ -226,7 +248,7 @@ export async function getRecentPolls(limit = 20): Promise<RecentPollRow[]> {
     const { data: pollsters, error: eNames } = await withSupabaseRetry(async () => await sb
       .from("pollsters")
       .select("code, name_full")
-      .in("code", pollsterCodes);
+      .in("code", pollsterCodes));
     if (eNames) throw eNames;
     for (const r of pollsters ?? []) {
       pollsterNames.set(
