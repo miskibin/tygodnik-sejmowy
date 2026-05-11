@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { trackExternalLinkClick, trackNavClick } from "@/lib/analytics-events";
 import { useProfile } from "@/lib/profile";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
@@ -82,6 +83,12 @@ export function Masthead() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => trackNavClick({
+                  fromPath: pathname,
+                  targetPath: item.href,
+                  navArea: "masthead_primary",
+                  label: item.label,
+                })}
                 className="px-3 xl:px-4 py-2 rounded-full whitespace-nowrap transition-all duration-150 hover:bg-muted"
                 style={{
                   color: on ? "var(--background)" : "var(--secondary-foreground)",
@@ -131,7 +138,15 @@ export function Masthead() {
                     <Link
                       key={s.href}
                       href={s.href}
-                      onClick={() => setMoreOpen(false)}
+                      onClick={() => {
+                        trackNavClick({
+                          fromPath: pathname,
+                          targetPath: s.href,
+                          navArea: "masthead_secondary",
+                          label: s.label,
+                        });
+                        setMoreOpen(false);
+                      }}
                       className="block w-full px-3 py-2 rounded transition-colors hover:bg-muted"
                       style={{
                         color: on ? "var(--destructive)" : "var(--secondary-foreground)",
@@ -171,6 +186,7 @@ export function Masthead() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Wesprzyj"
+            onClick={() => trackExternalLinkClick({ destinationDomain: "patronite.pl", placement: "masthead_support_desktop" })}
             className="hidden sm:inline-flex px-4 py-2 rounded-full bg-foreground text-background text-[12.5px] font-medium tracking-wide items-center gap-1.5 transition-colors hover:bg-destructive"
           >
             Wesprzyj
@@ -183,6 +199,7 @@ export function Masthead() {
             rel="noopener noreferrer"
             aria-label="Wesprzyj"
             title="Wesprzyj"
+            onClick={() => trackExternalLinkClick({ destinationDomain: "patronite.pl", placement: "masthead_support_mobile_icon" })}
             className="sm:hidden w-9 h-9 inline-flex items-center justify-center rounded-full bg-foreground text-background"
           >
             <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
