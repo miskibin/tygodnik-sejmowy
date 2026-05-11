@@ -376,7 +376,15 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
               kicker: "Widzisz błąd?",
               children: (
                 <>
-                  Napisz na <a className="text-destructive hover:underline" href="mailto:redakcja@tygodniksejmowy.pl">redakcja@tygodniksejmowy.pl</a>.
+                  Zgłoś go publicznie — repozytorium jest otwarte.
+                  <a
+                    href="https://github.com/miskibin/tygodnik-sejmowy/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 border border-foreground px-3 py-1.5 font-mono text-[10.5px] tracking-[0.14em] uppercase text-foreground hover:bg-foreground hover:text-background transition-colors"
+                  >
+                    ↗ Zgłoś na GitHubie
+                  </a>
                 </>
               ),
             },
