@@ -433,16 +433,20 @@ def stage_polls_from_wikipedia(html_path: Path) -> tuple[int, int]:
 
             # Build poll_results rows.
             results_rows = _extract_result_rows(cells, col_map, poll_id)
-            if results_rows:
-                try:
-                    client.table("poll_results").upsert(
-                        results_rows, on_conflict="poll_id,party_code"
-                    ).execute()
-                except Exception as e:
-                    logger.warning(
-                        "polls.stage: results upsert fail poll_id={}: {!r}",
-                        poll_id, e,
-                    )
+            try:
+                # Replace the stored party breakdown wholesale on every stage
+                # pass. Older loads could contain shifted party codes from
+                # merged Wikipedia colspan cells; upsert alone would preserve
+                # those stale rows forever if a corrected parser stops emitting
+                # them later.
+                client.table("poll_results").delete().eq("poll_id", poll_id).execute()
+                if results_rows:
+                    client.table("poll_results").insert(results_rows).execute()
+            except Exception as e:
+                logger.warning(
+                    "polls.stage: results replace fail poll_id={}: {!r}",
+                    poll_id, e,
+                )
 
     logger.info(
         "polls.stage: inserted={} updated={} skipped={}",
