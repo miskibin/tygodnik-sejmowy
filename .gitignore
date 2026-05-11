@@ -38,3 +38,4 @@ backups/sejmograf_public_*.dump
 /skills/
 /skills-lock.json
 
+secrets/

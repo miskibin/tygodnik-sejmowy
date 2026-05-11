@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Ornament } from "@/components/chrome/Ornament";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
@@ -214,6 +215,30 @@ export default async function BudzetPage() {
           </div>
         </section>
 
+        <Ornament />
+
+        {/* Team */}
+        <section className="mb-4">
+          <SectionTitle
+            kicker="Zespół"
+            title="Kto za tym stoi"
+          />
+          <div className="grid md:grid-cols-2 gap-8">
+            <TeamCard
+              photo="/michal-skibinski.jpg"
+              name="Michał Skibiński"
+              role="Developer · Twórca"
+              bio="Buduje Tygodnik Sejmowy od pierwszej linijki — ETL z Sejmu, baza, backend, frontend, design. Cały kod open source na GitHubie."
+            />
+            <TeamCard
+              photo="/michal-sulawiak.jpg"
+              name="Michał Sulawiak"
+              role="DevOps · Współfundator"
+              bio="Utrzymuje serwery i infrastrukturę, planuje rozwój projektu i pokrywa większość kosztów. Bez niego Tygodnika Sejmowego by nie było."
+            />
+          </div>
+        </section>
+
       </div>
     </main>
   );
@@ -307,6 +332,49 @@ function IncomeRow({
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+function TeamCard({
+  photo,
+  name,
+  role,
+  bio,
+}: {
+  photo: string;
+  name: string;
+  role: string;
+  bio: string;
+}) {
+  return (
+    <div
+      className="bg-background border-2 border-foreground p-5 sm:p-6 flex gap-5 items-start"
+      style={{ boxShadow: "5px 5px 0 var(--foreground)" }}
+    >
+      <div className="shrink-0 border-2 border-foreground overflow-hidden bg-muted">
+        <Image
+          src={photo}
+          alt={name}
+          width={140}
+          height={140}
+          className="block w-[110px] h-[110px] sm:w-[140px] sm:h-[140px] object-cover"
+        />
+      </div>
+      <div className="min-w-0">
+        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-1.5">
+          {role}
+        </div>
+        <h3
+          className="font-serif font-medium m-0 mb-2 leading-tight"
+          style={{ fontSize: "clamp(1.15rem, 2.2vw, 1.4rem)", letterSpacing: "-0.01em" }}
+        >
+          {name}
+        </h3>
+        <p className="font-serif text-[14.5px] leading-[1.55] text-secondary-foreground m-0">
+          {bio}
+        </p>
+      </div>
     </div>
   );
 }
