@@ -172,6 +172,17 @@
   }
 }
 
+/* Hide scrollbar on horizontally-scrolling tab strips. Tabs already
+   show a fade-out hint at the right edge; the always-visible scrollbar
+   was citizen-review noise. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Skeleton shimmer — paper-tinted sweep over warm placeholder bars.
    Honours prefers-reduced-motion (static fallback, no animation). */
 @keyframes ts-shimmer {

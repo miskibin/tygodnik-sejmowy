@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMp, getClubName, getMpStats } from "@/lib/db/mps";
@@ -11,15 +12,13 @@ import {
   PromisesAsync,
   PanelFallback,
 } from "./_components/AsyncPanels";
+import { ProfilPanel } from "./_components/ProfilPanel";
+import { HeroLedeBand } from "./_components/HeroLedeBand";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
-import { PageHeading } from "@/components/chrome/PageHeading";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
+import { ViewMethodologyFooter } from "@/components/chrome/ViewMethodologyFooter";
 
 
-// Per-MP metadata. Title goes into <title> + og:title via the layout's
-// `template: "%s · Tygodnik Sejmowy"`. Description seeds the search snippet.
-// JSON-LD Person schema added via `other` so Google can render a Knowledge
-// Graph card on name searches.
 export async function generateMetadata({
   params,
 }: { params: Promise<{ mpId: string }> }): Promise<Metadata> {
@@ -29,7 +28,8 @@ export async function generateMetadata({
   const mp = await getMp(mpId);
   if (!mp) return {};
   const clubName = await getClubName(mp.clubRef);
-  const role = mp.active ? "Poseł X kadencji" : "Były poseł";
+  const baseRole = guessRoleLabel(mp.firstLastName);
+  const role = mp.active ? `${baseRole} X kadencji` : `By${baseRole === "Posłanka" ? "ła posłanka" : "ły poseł"}`;
   const club = clubName ?? mp.clubRef ?? "klub bezpartyjny";
   const district = mp.districtNum ? ` · okręg ${mp.districtNum}` : "";
   const desc = `${role} · ${club}${district}. Frekwencja, głosowania, interpelacje, wystąpienia, obietnice vs głosy.`;
@@ -59,13 +59,19 @@ function formatPct(p: number | null): string {
   return `${p.toLocaleString("pl-PL", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
 }
 
-// Polish female first names overwhelmingly end in "a"; "Maria", "Anna", "Joanna",
-// etc. all hit. The handful of male exceptions ("Kuba", "Bonawentura") aren't
-// in the Sejm. Heuristic-only — swap for a real `mp.gender` field when ETL has it.
 function guessRoleLabel(firstLastName: string): string {
   const first = firstLastName.split(/\s+/)[0] ?? "";
   const cleaned = first.replace(/[.,]/g, "").toLowerCase();
   return cleaned.endsWith("a") ? "Posłanka" : "Poseł";
+}
+
+// Last name pulled out of "Imię Drugie Nazwisko" to italicize separately
+// in the display title.
+function splitName(full: string): { first: string; last: string } {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length <= 1) return { first: "", last: full };
+  const last = parts.pop()!;
+  return { first: parts.join(" "), last };
 }
 
 export default async function MpPage({ params }: { params: Promise<{ mpId: string }> }) {
@@ -73,7 +79,6 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
   const mpId = Number(raw);
   if (!Number.isFinite(mpId) || mpId <= 0) notFound();
 
-  // Fail closed on DB errors → branded 404 instead of Next default page.
   let mp: Awaited<ReturnType<typeof getMp>> = null;
   try {
     mp = await getMp(mpId);
@@ -91,10 +96,6 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
   }
   if (!mp) notFound();
 
-  // Header + stat-tile data is awaited (small, used by tab labels too).
-  // Tab panel content streams behind <Suspense>, populating as queries resolve.
-  // getMpStats is best-effort: if it throws (rare aggregate-view issue),
-  // render zeros instead of crashing the whole page.
   let clubName: string | null = null;
   let stats: Awaited<ReturnType<typeof getMpStats>>;
   try {
@@ -116,46 +117,57 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
     };
   }
 
+  const roleLabel = guessRoleLabel(mp.firstLastName);
+  const { first, last } = splitName(mp.firstLastName);
+
   const frekwSub =
     stats.attendanceTotal === 0
       ? "brak głosowań w tej kadencji w bazie"
-      : `${stats.attendanceCount} z ${stats.attendanceTotal} głosowań (obecność = brał udział w głosowaniu)`;
+      : `${stats.attendanceCount} z ${stats.attendanceTotal} głosowań`;
 
   const loyaltySub =
     stats.loyaltyVotes != null
-      ? `${stats.loyaltyVotes} głosowań, w których brał udział — zgodnie z większością klubu`
+      ? `${stats.loyaltyVotes} głosowań — zgodnie z większością klubu`
       : "brak danych";
 
-  const statTiles: { k: string; v: string; sub: string; barPct: number | null }[] = [
+  const statTiles: { k: string; v: string; sub: string; color: string }[] = [
     {
       k: "Frekwencja",
       v: formatPct(stats.attendancePct),
       sub: frekwSub,
-      barPct:
-        stats.attendancePct != null && stats.attendanceTotal > 0
-          ? Math.min(100, Math.max(0, stats.attendancePct))
-          : null,
+      color:
+        stats.attendancePct == null
+          ? "var(--muted-foreground)"
+          : stats.attendancePct >= 85
+            ? "var(--success)"
+            : stats.attendancePct >= 70
+              ? "var(--warning)"
+              : "var(--destructive)",
     },
     {
       k: "Głosy z klubem",
       v: formatPct(stats.loyaltyPct),
       sub: loyaltySub,
-      barPct:
-        stats.loyaltyPct != null && stats.loyaltyVotes != null && stats.loyaltyVotes > 0
-          ? Math.min(100, Math.max(0, stats.loyaltyPct))
-          : null,
+      color:
+        stats.loyaltyPct == null
+          ? "var(--muted-foreground)"
+          : stats.loyaltyPct >= 90
+            ? "var(--muted-foreground)"
+            : stats.loyaltyPct >= 75
+              ? "var(--warning)"
+              : "var(--destructive)",
     },
     {
       k: "Interpelacje",
       v: String(stats.questionCount),
       sub: stats.questionCount === 0 ? "brak w bazie" : "łącznie złożone",
-      barPct: null,
+      color: "var(--foreground)",
     },
     {
       k: "Wystąpienia",
       v: String(stats.statementCount),
       sub: stats.statementCount === 0 ? "brak w bazie" : "na posiedzeniach Sejmu",
-      barPct: null,
+      color: "var(--foreground)",
     },
   ];
 
@@ -164,18 +176,21 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
     { id: "wszystko", label: "Wszystkie głosowania", count: stats.attendanceTotal },
     { id: "interpelacje", label: "Interpelacje", count: stats.questionCount },
     { id: "wystapienia", label: "Wystąpienia", count: stats.statementCount },
-    { id: "obietnice", label: "Obietnica vs głosowanie" },
+    { id: "obietnice", label: "Obietnice vs głosy" },
+    { id: "profil", label: "Profil" },
   ];
 
   return (
-    <div className="bg-background text-foreground font-serif pb-20 min-w-0 overflow-x-hidden">
-      {/* Compact hero — breadcrumb + photo + name + meta + actions in one band */}
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9 pb-6">
-        <div className="font-sans text-[11px] tracking-[0.16em] uppercase mb-4 flex items-center gap-3 flex-wrap">
-          <a href="/posel" className="text-muted-foreground hover:text-destructive">‹ Posłowie</a>
+    <div className="bg-background text-foreground font-serif pb-16 sm:pb-20 min-w-0 overflow-x-hidden">
+      {/* Breadcrumb */}
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 sm:pt-8">
+        <div className="font-sans text-[11px] tracking-[0.16em] uppercase flex items-center gap-3 flex-wrap mb-5 sm:mb-7">
+          <Link href="/posel" className="text-muted-foreground hover:text-destructive">
+            ‹ Posłowie
+          </Link>
           {mp.districtNum && (
             <>
-              <span className="text-border">/</span>
+              <span className="text-border" aria-hidden>/</span>
               <span className="text-destructive font-medium normal-case text-[12px] tracking-normal">
                 Okręg {mp.districtNum}
                 {mp.voivodeship ? ` — ${mp.voivodeship}` : ""}
@@ -183,101 +198,127 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
             </>
           )}
         </div>
+      </div>
 
-        <div className="grid items-start gap-4 sm:gap-5 md:gap-7 min-w-0 grid-cols-[88px_1fr] sm:grid-cols-[96px_1fr] md:[grid-template-columns:120px_1fr_auto]">
-          <div className="bg-muted border border-border relative w-full min-w-0" style={{ aspectRatio: "4 / 5" }}>
+      {/* HERO */}
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pb-6 sm:pb-8 border-b border-border">
+        <div
+          className="grid gap-5 md:gap-9 items-end min-w-0 grid-cols-[100px_1fr] sm:grid-cols-[140px_1fr] md:grid-cols-[180px_1fr_240px]"
+        >
+          {/* Portrait */}
+          <div
+            className="relative bg-muted border border-rule"
+            style={{ aspectRatio: "4 / 5", boxShadow: "6px 6px 0 var(--rule)" }}
+          >
             {mp.photoUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={mp.photoUrl} alt={mp.firstLastName} className="w-full h-full object-cover" loading="eager" />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center font-serif italic text-muted-foreground opacity-40" style={{ fontSize: 40 }}>
+              <div className="absolute inset-0 flex items-center justify-center font-serif italic text-muted-foreground opacity-50" style={{ fontSize: "clamp(36px, 5vw, 56px)" }}>
                 {mp.firstLastName.split(" ").map((s) => s[0]).join("").slice(0, 2)}
               </div>
             )}
+            {mp.clubRef && (
+              <span aria-hidden className="absolute inset-x-0 -bottom-1 h-1.5" style={{ background: `var(--destructive)` }} />
+            )}
           </div>
 
+          {/* Name + badges + lede */}
           <div className="min-w-0">
-            <PageHeading
-              kicker={mp.active ? `${guessRoleLabel(mp.firstLastName)} X kadencji` : "Były poseł"}
-              className="mb-2"
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase bg-destructive text-background px-2.5 py-1">
+                {roleLabel} · X kadencja
+              </span>
+              {mp.districtNum && (
+                <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-foreground/40 text-secondary-foreground px-2.5 py-1">
+                  Okręg {mp.districtNum}
+                </span>
+              )}
+              {!mp.active && (
+                <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-warning text-warning px-2.5 py-1">
+                  Były poseł
+                </span>
+              )}
+            </div>
+
+            <h1
+              className="font-serif font-medium m-0 leading-[0.96] tracking-[-0.035em] text-balance break-words"
+              style={{ fontSize: "clamp(2.25rem, 7vw, 5.25rem)" }}
             >
-              {mp.firstLastName}
-            </PageHeading>
-            <p className="font-sans text-[13px] text-secondary-foreground m-0 max-w-[640px] leading-snug break-words text-pretty">
+              {first ? <>{first}{" "}</> : null}
+              <em className="not-italic font-serif italic text-destructive">{last}</em>
+            </h1>
+
+            <p className="font-serif text-secondary-foreground mt-3 sm:mt-4 mb-0 leading-[1.45] text-[15px] sm:text-[17px] max-w-[640px] break-words text-pretty">
               {mp.clubRef ? (
-                <span className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 align-middle">
+                <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 align-middle">
                   <ClubBadge klub={mp.clubRef} size="sm" tooltip={clubName ?? undefined} />
-                  <strong className="text-foreground">{clubName ?? mp.clubRef}</strong>
+                  <strong className="text-foreground font-medium">{clubName ?? mp.clubRef}</strong>
                 </span>
               ) : (
-                <strong className="text-foreground">—</strong>
+                <strong className="text-foreground">brak klubu</strong>
               )}
               {mp.profession ? <> · {mp.profession}</> : null}
               {mp.educationLevel ? <> · wykszt. {mp.educationLevel}</> : null}
-              {mp.birthLocation ? <> · ur. {mp.birthLocation}</> : null}
             </p>
           </div>
 
-          <div className="col-span-2 md:col-span-1 flex w-full min-w-0 flex-col gap-2 md:max-w-none">
+          {/* Action stack — mobile drops to full-width row below */}
+          <div className="col-span-2 md:col-span-1 flex md:flex-col w-full min-w-0 gap-2 mt-2 md:mt-0">
             {mp.email ? (
               <a
                 href={`mailto:${mp.email}`}
-                className="font-sans text-[12.5px] px-4 py-2.5 rounded-full bg-foreground text-background tracking-wide cursor-pointer text-center shrink-0 w-full md:w-auto"
+                className="font-sans text-[12px] sm:text-[13px] px-4 py-2.5 sm:py-3 bg-foreground text-background tracking-[0.04em] text-center shrink-0 flex-1 md:flex-none"
               >
                 ✉ Napisz e-mail
               </a>
             ) : (
-              <span className="font-sans text-[11.5px] px-4 py-2.5 rounded-full bg-muted text-muted-foreground tracking-wide text-center w-full md:w-auto leading-snug">
-                brak publicznego e-maila w Sejmie
+              <span className="font-sans text-[11.5px] px-4 py-2.5 bg-muted text-muted-foreground tracking-wide text-center flex-1 md:flex-none leading-snug">
+                brak publicznego e-maila
               </span>
             )}
-            <span
-              className="font-sans text-[12.5px] px-4 py-2.5 rounded-full border border-border text-muted-foreground tracking-wide text-center cursor-not-allowed opacity-70 w-full md:w-auto shrink-0"
-              title="Funkcja w przygotowaniu."
-            >
-              Obserwuj (wkrótce)
-            </span>
           </div>
         </div>
       </div>
 
-      {/* Stat cards — frekwencja / klub / interpelacje / wystąpienia */}
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pb-2">
-        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          {statTiles.map((s) => (
+      {/* LEDE band — renders only if there's real recent activity */}
+      <Suspense fallback={null}>
+        <HeroLedeBand mpId={mpId} firstLastName={mp.firstLastName} />
+      </Suspense>
+
+      {/* STATS STRIP — single edge-to-edge band of cells */}
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-2">
+        <div className="grid grid-cols-2 md:grid-cols-4">
+          {statTiles.map((s, i) => (
             <div
               key={s.k}
-              className="rounded-lg border border-border bg-muted/30 px-3 py-3 md:px-4 md:py-4 flex flex-col min-h-0 min-[400px]:min-h-[108px] lg:min-h-[118px]"
+              className="py-4 md:py-5 px-3 md:px-5 border-border min-w-0"
+              style={{
+                borderRight: i < statTiles.length - 1 ? "1px solid var(--border)" : undefined,
+                borderBottom: i < 2 ? "1px solid var(--border)" : undefined,
+              }}
             >
-              <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1">
+              <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground mb-1.5">
                 {s.k}
               </div>
               <div
-                className="font-serif font-medium leading-none mb-1.5 tracking-[-0.02em] text-foreground"
-                style={{ fontSize: "clamp(1.25rem, 2.8vw, 1.75rem)" }}
+                className="font-serif font-medium leading-none tabular-nums mb-1.5"
+                style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: s.color, letterSpacing: "-0.025em" }}
               >
                 {s.v}
               </div>
-              <div className="font-sans text-[10.5px] text-muted-foreground leading-snug flex-1 break-words hyphens-auto">
+              <div className="font-sans text-[10.5px] text-muted-foreground leading-snug break-words hyphens-auto">
                 {s.sub}
               </div>
-              {s.barPct != null && (
-                <div className="mt-2 h-1 w-full rounded-full bg-border overflow-hidden shrink-0" aria-hidden>
-                  <div
-                    className="h-full rounded-full bg-foreground/85"
-                    style={{ width: `${s.barPct}%` }}
-                  />
-                </div>
-              )}
             </div>
           ))}
         </div>
         <p className="font-sans text-[10px] text-muted-foreground mt-3 mb-0 tracking-wide">
-          Liczby dotyczą 10. kadencji Sejmu.
+          Liczby dotyczą X kadencji Sejmu.
         </p>
       </div>
 
-      {/* Tabs — each panel streams independently behind its own Suspense boundary. */}
+      {/* Tabs */}
       <PoselTabs
         tabs={tabs}
         panels={{
@@ -306,9 +347,42 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
               <PromisesAsync mpId={mpId} />
             </Suspense>
           ),
+          profil: <ProfilPanel mp={mp} clubName={clubName} />,
         }}
       />
+
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14">
+        <ViewMethodologyFooter
+          columns={[
+            {
+              kicker: "Skąd dane",
+              children: (
+                <>
+                  api.sejm.gov.pl, własne aktualizacje. Frekwencja i lojalność klubowa liczone z
+                  pełnej historii głosowań w tej kadencji.
+                </>
+              ),
+            },
+            {
+              kicker: "Co znaczy lojalność klubowa",
+              children: (
+                <>
+                  Procent głosowań, w których głos posła był zgodny z większością jego klubu. Niższy
+                  wynik = częściej głosuje samodzielnie, niekoniecznie &bdquo;przeciw&rdquo;.
+                </>
+              ),
+            },
+            {
+              kicker: "Widzisz błąd?",
+              children: (
+                <>
+                  Napisz na <a className="text-destructive hover:underline" href="mailto:redakcja@tygodniksejmowy.pl">redakcja@tygodniksejmowy.pl</a>.
+                </>
+              ),
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 }
-

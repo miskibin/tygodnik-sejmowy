@@ -1,21 +1,6 @@
 import type { PollAverageRow } from "@/lib/db/polls";
-import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES, SEJM_SEATS, SEJM_THRESHOLD_PCT } from "./partyMeta";
-
-// Largest-remainder allocation of cap seats across fractional shares.
-function allocateLargestRemainder(cap: number, weights: number[]): number[] {
-  const total = weights.reduce((s, n) => s + n, 0);
-  if (total === 0) return weights.map(() => 0);
-  const ideal = weights.map((n) => (cap * n) / total);
-  const floor = ideal.map((x) => Math.floor(x));
-  const allocated = floor.reduce((s, n) => s + n, 0);
-  const remainder = cap - allocated;
-  const sortedByFrac = ideal
-    .map((x, i) => ({ i, frac: x - Math.floor(x) }))
-    .sort((a, b) => b.frac - a.frac);
-  const out = floor.slice();
-  for (let k = 0; k < remainder; k++) out[sortedByFrac[k % sortedByFrac.length].i]++;
-  return out;
-}
+import { allocateLargestRemainder, projectSeats as projectSeatsBase, COALITION_GOV, COALITION_OPP, type SeatRow } from "@/lib/polls/seats";
+import { partyColor, partyLabel, partyLogoSrc, SEJM_SEATS, SEJM_THRESHOLD_PCT } from "./partyMeta";
 
 // Political left → right ordering for poll-projection seating. Mirrors the
 // Sejm hall layout (Lewica/Razem on left, KO/PSL/Polska2050 in middle,
@@ -32,36 +17,18 @@ const ROWS: ReadonlyArray<{ r: number; c: number }> = [
   { r: 425, c: 91 },
 ];
 
-type Allocation = {
-  party_code: string;
-  pct: number;
-  seats: number;
-  qualified: boolean;
-};
+type Allocation = SeatRow;
 
-function projectSeats(rows: PollAverageRow[]): Allocation[] {
-  const main = rows.filter((r) => !RESIDUAL_CODES.has(r.party_code));
-  const qualified = main.filter((r) => r.percentage_avg >= SEJM_THRESHOLD_PCT);
-  const sizes = qualified.map((r) => r.percentage_avg);
-  const seats = allocateLargestRemainder(SEJM_SEATS, sizes);
-  const seatBy = new Map(qualified.map((r, i) => [r.party_code, seats[i]]));
-  // Sort allocations by political seating order, fall back to descending pct.
-  const ordered = main
-    .slice()
-    .sort((a, b) => {
-      const ai = SEAT_ORDER.indexOf(a.party_code);
-      const bi = SEAT_ORDER.indexOf(b.party_code);
-      const aix = ai === -1 ? 999 : ai;
-      const bix = bi === -1 ? 999 : bi;
-      if (aix !== bix) return aix - bix;
-      return b.percentage_avg - a.percentage_avg;
-    });
-  return ordered.map((r) => ({
-    party_code: r.party_code,
-    pct: r.percentage_avg,
-    seats: seatBy.get(r.party_code) ?? 0,
-    qualified: r.percentage_avg >= SEJM_THRESHOLD_PCT,
-  }));
+// Reorder shared projection into political seating order (left → right).
+function projectSeatsOrdered(rows: PollAverageRow[]): Allocation[] {
+  return projectSeatsBase(rows).slice().sort((a, b) => {
+    const ai = SEAT_ORDER.indexOf(a.party_code);
+    const bi = SEAT_ORDER.indexOf(b.party_code);
+    const aix = ai === -1 ? 999 : ai;
+    const bix = bi === -1 ? 999 : bi;
+    if (aix !== bix) return aix - bix;
+    return b.pct - a.pct;
+  });
 }
 
 type Dot = { cx: number; cy: number; party: string };
@@ -112,11 +79,9 @@ function buildHemicycleDots(allocations: Allocation[]): { dots: Dot[]; logos: { 
 }
 
 const MAJORITY = 231;
-const COALITION_GOV = new Set(["KO", "PSL", "TD", "Polska2050", "Lewica", "Razem"]);
-const COALITION_OPP = new Set(["PiS", "Konfederacja", "KKP", "PJJ"]);
 
-export function SeatProjection({ rows }: { rows: PollAverageRow[] }) {
-  const allocations = projectSeats(rows);
+export function SeatProjection({ rows, compact = false }: { rows: PollAverageRow[]; compact?: boolean }) {
+  const allocations = projectSeatsOrdered(rows);
   const { dots, logos } = buildHemicycleDots(allocations);
 
   const govSeats = allocations.filter((a) => COALITION_GOV.has(a.party_code)).reduce((s, a) => s + a.seats, 0);
@@ -127,17 +92,19 @@ export function SeatProjection({ rows }: { rows: PollAverageRow[] }) {
 
   return (
     <section>
-      <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
-        <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">B</div>
-        <div className="min-w-0">
-          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Gdyby wybory dziś · projekcja 460 mandatów</div>
-          <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Projekcja sali</h2>
-          <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
-            Mandaty rozdzielone proporcjonalnie metodą największej reszty wśród partii powyżej {SEJM_THRESHOLD_PCT}% progu.
-            Bez korekty geograficznej D&apos;Hondta — to przybliżenie, nie prognoza wyborów.
-          </p>
-        </div>
-      </header>
+      {!compact && (
+        <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
+          <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">B</div>
+          <div className="min-w-0">
+            <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Gdyby wybory dziś · projekcja 460 mandatów</div>
+            <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Projekcja sali</h2>
+            <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
+              Mandaty rozdzielone proporcjonalnie metodą największej reszty wśród partii powyżej {SEJM_THRESHOLD_PCT}% progu.
+              Bez korekty geograficznej D&apos;Hondta — to przybliżenie, nie prognoza wyborów.
+            </p>
+          </div>
+        </header>
+      )}
 
       <div className="bg-muted border border-border p-2 sm:p-4 min-w-0 overflow-x-auto">
         <svg viewBox="-540 -540 1080 580" className="w-full min-w-[280px] h-auto block" role="img" aria-label="Projekcja składu Sejmu">
@@ -200,26 +167,30 @@ export function SeatProjection({ rows }: { rows: PollAverageRow[] }) {
         </svg>
       </div>
 
-      <div className="grid gap-3 mt-5 md:grid-cols-3">
-        <Block label="Koalicja rządząca (15. kadencja)" seats={govSeats} threshold={MAJORITY} hint="KO + PSL + Polska2050 + Lewica + Razem" />
-        <Block label="Opozycja" seats={oppSeats} threshold={MAJORITY} hint="PiS + Konfederacja + KKP + PJJ" />
-        <Block label="Pozostali" seats={otherSeats} threshold={MAJORITY} hint="Niezrzeszeni · BS · inne kluby" />
-      </div>
+      {!compact && (
+        <div className="grid gap-3 mt-5 md:grid-cols-3">
+          <Block label="Koalicja rządząca (15. kadencja)" seats={govSeats} threshold={MAJORITY} hint="KO + PSL + Polska2050 + Lewica + Razem" />
+          <Block label="Opozycja" seats={oppSeats} threshold={MAJORITY} hint="PiS + Konfederacja + KKP + PJJ" />
+          <Block label="Pozostali" seats={otherSeats} threshold={MAJORITY} hint="Niezrzeszeni · BS · inne kluby" />
+        </div>
+      )}
 
-      <div className="mt-5 grid gap-y-1.5 md:grid-cols-2 lg:grid-cols-3">
-        {allocations.filter((a) => a.seats > 0).map((a) => (
-          <div key={a.party_code} className="flex items-center gap-2.5 font-sans text-[13px]">
-            <PartyMark code={a.party_code} />
-            <span className="text-foreground flex-1 truncate">{partyLabel(a.party_code)}</span>
-            <span className="font-mono text-[12px] text-foreground tabular-nums">
-              <span className="font-semibold">{a.seats}</span>
-              <span className="text-muted-foreground"> ({a.pct.toFixed(1)}%)</span>
-            </span>
-          </div>
-        ))}
-      </div>
+      {!compact && (
+        <div className="mt-5 grid gap-y-1.5 md:grid-cols-2 lg:grid-cols-3">
+          {allocations.filter((a) => a.seats > 0).map((a) => (
+            <div key={a.party_code} className="flex items-center gap-2.5 font-sans text-[13px]">
+              <PartyMark code={a.party_code} />
+              <span className="text-foreground flex-1 truncate">{partyLabel(a.party_code)}</span>
+              <span className="font-mono text-[12px] text-foreground tabular-nums">
+                <span className="font-semibold">{a.seats}</span>
+                <span className="text-muted-foreground"> ({a.pct.toFixed(1)}%)</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
-      {subThreshold.length > 0 && (
+      {!compact && subThreshold.length > 0 && (
         <p className="mt-4 font-mono text-[10px] text-muted-foreground tracking-wide italic">
           Pod progiem {SEJM_THRESHOLD_PCT}% (0 mandatów):{" "}
           {subThreshold.map((a, i) => (
