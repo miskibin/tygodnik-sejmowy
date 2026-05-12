@@ -257,15 +257,15 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
     <img
       src={`/club-logos/${logoEntry.file}`}
       alt={c.club_name}
-      width={32}
-      height={32}
+      width={40}
+      height={40}
       loading="eager"
       decoding="sync"
       style={{
-        width: 32,
-        height: 32,
+        width: 40,
+        height: 40,
         objectFit: "contain",
-        borderRadius: 4,
+        borderRadius: 5,
         background: "var(--background)",
         border: "1px solid var(--border)",
         flexShrink: 0,
@@ -278,12 +278,12 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        width: 32,
-        height: 32,
-        borderRadius: 4,
+        width: 40,
+        height: 40,
+        borderRadius: 5,
         background: c.clubColor,
         color: "var(--background)",
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: 700,
         flexShrink: 0,
       }}
@@ -298,19 +298,19 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
         flex: 1,
         minHeight: 0,
         display: "grid",
-        gridTemplateColumns: "170px 56px 1fr 170px",
-        gap: 18,
+        gridTemplateColumns: "180px 56px 1fr 220px",
+        gap: 20,
         alignItems: "center",
-        padding: "4px 0",
+        padding: "2px 0",
         borderBottom: isLast ? "none" : "1px solid var(--border)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
         <span
           aria-hidden
           style={{
-            width: 4,
-            height: 32,
+            width: 5,
+            height: 40,
             background: c.clubColor,
             borderRadius: 2,
             flexShrink: 0,
@@ -319,7 +319,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
         {logo}
         <span
           style={{
-            fontSize: 14,
+            fontSize: 17,
             color: "var(--secondary-foreground)",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -336,7 +336,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
         style={{
           fontFamily: "var(--font-mono, monospace)",
           fontVariantNumeric: "tabular-nums",
-          fontSize: 15,
+          fontSize: 18,
           color: "var(--secondary-foreground)",
           textAlign: "right",
         }}
@@ -347,7 +347,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
       <div
         style={{
           display: "flex",
-          height: 30,
+          height: 38,
           background: "var(--muted)",
           border: "1px solid var(--border)",
         }}
@@ -364,7 +364,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
                 justifyContent: "center",
                 width: `${pct * 100}%`,
                 background: s.color,
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: 700,
                 fontFamily: "var(--font-mono, monospace)",
                 color: s.textOnFaint ? "var(--secondary-foreground)" : "var(--background)",
@@ -378,15 +378,16 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
 
       <div
         style={{
-          fontSize: 13,
+          fontSize: 15,
           color: "var(--secondary-foreground)",
           textAlign: "right",
+          whiteSpace: "nowrap",
         }}
       >
         <span
           style={{
             fontFamily: "var(--font-mono, monospace)",
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
@@ -408,7 +409,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
               fontFamily: "var(--font-mono, monospace)",
               marginLeft: 8,
               color: "var(--destructive)",
-              fontSize: 10,
+              fontSize: 11,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
             }}
@@ -441,12 +442,12 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
   const filteredClubs = excludeUnaffiliated(clubs, (c) => c.club_ref)
     .filter((c) => (c.total ?? 0) >= MIN_KLUB_AGGREGATE);
 
-  // PNG title block: print short_title (when available) as the headline, and
-  // the official voting question (header.title) as italic subtitle. The two
-  // are different things — the print is the document being voted on, the
-  // voting title is the procedural question read in the chamber.
-  const pngHeadline = clampForPng(shortTitle, 140);
-  const pngQuestion = clampForPng(header.title, 280);
+  // PNG title block: the voting title (header.title — the official question
+  // read in the chamber) is the primary display. The print's short_title
+  // (when present) sits below as italic context subtitle. Voting title wins
+  // because that's what was actually voted on — the print is incidental.
+  const pngQuestion = clampForPng(header.title, 220);
+  const pngSubtitle = clampForPng(shortTitle, 110);
 
   return (
     <section
@@ -563,55 +564,41 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
             {printNumber ? ` · druk ${printNumber}` : ""}
           </div>
 
-          {pngHeadline && (
-            <div
-              style={{
-                fontFamily: "var(--font-serif, serif)",
-                fontSize: 42,
-                fontWeight: 500,
-                lineHeight: 1.1,
-                letterSpacing: "-0.02em",
-                marginBottom: 16,
-                color: "var(--foreground)",
-              }}
-            >
-              {pngHeadline}
-            </div>
-          )}
+          <div
+            style={{
+              fontFamily: "var(--font-serif, serif)",
+              fontSize: 30,
+              fontWeight: 500,
+              lineHeight: 1.18,
+              letterSpacing: "-0.015em",
+              color: "var(--foreground)",
+              marginBottom: pngSubtitle ? 12 : 0,
+            }}
+          >
+            „{pngQuestion}”
+          </div>
 
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-mono, monospace)",
-                textTransform: "uppercase",
-                fontSize: 10,
-                color: "var(--muted-foreground)",
-                letterSpacing: "0.12em",
-                marginBottom: 4,
-              }}
-            >
-              pytanie poddane pod głosowanie
-            </div>
+          {pngSubtitle && (
             <div
               style={{
                 fontFamily: "var(--font-serif, serif)",
                 fontStyle: "italic",
-                fontSize: pngHeadline ? 15 : 22,
-                lineHeight: 1.35,
+                fontSize: 18,
+                lineHeight: 1.3,
                 color: "var(--secondary-foreground)",
               }}
             >
-              „{pngQuestion}”
+              {pngSubtitle}
             </div>
-          </div>
+          )}
         </div>
 
         {/* Column headers */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "170px 56px 1fr 170px",
-            gap: 18,
+            gridTemplateColumns: "180px 56px 1fr 220px",
+            gap: 20,
             fontFamily: "var(--font-mono, monospace)",
             textTransform: "uppercase",
             fontSize: 10,
@@ -660,7 +647,7 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
           }}
         >
           <span>tygodnik sejmowy · jak głosowały kluby</span>
-          <span>sejmograf.vercel.app</span>
+          <span>tygodniksejmowy.pl</span>
         </div>
       </div>
     </section>
