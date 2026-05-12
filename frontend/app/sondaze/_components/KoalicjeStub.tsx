@@ -13,25 +13,23 @@ const MAJORITY = 231;
 function meanAgreement(
   memberCodes: string[],
   agreement: KlubPairAgreement,
-): { mean: number; pairsCounted: number; minVotings: number } | null {
+): { mean: number; pairsCounted: number } | null {
   const shorts = Array.from(
     new Set(memberCodes.map(pollCodeToKlubShort).filter((s): s is string => s != null)),
   );
   if (shorts.length < 2) return null;
   let sum = 0;
   let n = 0;
-  let minVotings = Infinity;
   for (let i = 0; i < shorts.length; i++) {
     for (let j = i + 1; j < shorts.length; j++) {
       const cell = agreement.byPair.get(`${shorts[i]}|${shorts[j]}`);
       if (!cell) continue;
       sum += cell.agreement;
       n += 1;
-      if (cell.votings < minVotings) minVotings = cell.votings;
     }
   }
   if (n === 0) return null;
-  return { mean: sum / n, pairsCounted: n, minVotings: minVotings === Infinity ? 0 : minVotings };
+  return { mean: sum / n, pairsCounted: n };
 }
 
 // Coalition scenarios are pure arithmetic over the current projection.
@@ -74,11 +72,14 @@ const SCENARIOS: Scenario[] = [
 export function KoalicjeStub({
   rows,
   agreement,
+  term,
 }: {
   rows: PollAverageRow[];
   agreement: KlubPairAgreement;
+  term: number;
 }) {
   const seats = projectSeatsMap(rows);
+  const agreementAvailable = agreement.byPair.size > 0;
 
   const scenarios = SCENARIOS.map((s) => {
     // Keep every named candidate visible — sub-threshold parties (Razem, PJJ
@@ -229,12 +230,14 @@ export function KoalicjeStub({
                     {Math.round(s.cohesion.mean * 100)}%
                   </span>
                   <span className="normal-case tracking-normal lowercase">
-                    średnia z {s.cohesion.pairsCounted} {s.cohesion.pairsCounted === 1 ? "pary" : "par"} klubów · kadencja 10
+                    średnia z {s.cohesion.pairsCounted} {s.cohesion.pairsCounted === 1 ? "pary" : "par"} klubów · kadencja {term}
                   </span>
                 </div>
               ) : (
                 <div className="mt-3 font-mono text-[10.5px] tracking-[0.04em] uppercase text-muted-foreground">
-                  Spójność głosowań — brak danych (jeden klub lub partie spoza Sejmu)
+                  {agreementAvailable
+                    ? "Spójność głosowań — n/d (jeden klub lub partie spoza Sejmu)"
+                    : "Spójność głosowań — dane niedostępne"}
                 </div>
               )}
 
@@ -249,7 +252,7 @@ export function KoalicjeStub({
       <p className="mt-6 font-serif text-[13px] text-muted-foreground leading-[1.55] max-w-[760px] italic">
         Bloki to redakcyjne definicje. „Spójność głosowań” liczona z{" "}
         <code className="not-italic font-mono text-[12px]">klub_pair_agreement_mv</code> — odsetek głosowań, w których
-        większość obu klubów zagłosowała tak samo, uśredniony po wszystkich parach klubów w bloku (kadencja 10).
+        większość obu klubów zagłosowała tak samo, uśredniony po wszystkich parach klubów w bloku (kadencja {term}).
         Mówi, jak często deklarowany sojusz faktycznie chodzi w jednym szyku — nie czy jest politycznie realny.
       </p>
     </section>
