@@ -54,7 +54,9 @@ export function EventMarkers({
               strokeWidth={stroke}
               strokeDasharray={dash}
               opacity={opacity}
-            />
+            >
+              <title>{tooltip}</title>
+            </line>
             <circle cx={x} cy={yTop} r={dotR} fill={color} opacity={opacity}>
               <title>{tooltip}</title>
             </circle>
@@ -69,20 +71,8 @@ export function EventMarkers({
                 style={{ pointerEvents: "none" }}
               >
                 {e.title}
-                <title>{tooltip}</title>
               </text>
             )}
-            {/* Wide invisible hit area so the native <title> tooltip fires
-                anywhere along the vertical line, not just on the 2px dot. */}
-            <rect
-              x={x - 4}
-              y={yTop}
-              width={8}
-              height={yBottom - yTop}
-              fill="transparent"
-            >
-              <title>{tooltip}</title>
-            </rect>
           </g>
         );
       })}

@@ -58,13 +58,17 @@ function ActivityChart({
   const innerH = H - padT - padB;
   const stepX = monthly.length > 1 ? innerW / (monthly.length - 1) : 0;
   const ymIndex = new Map(monthly.map((m, i) => [m.ym, i]));
+  const lastIdx = monthly.length - 1;
   const xForDate = (iso: string): number | null => {
     const i = ymIndex.get(iso.slice(0, 7));
     if (i === undefined) return null;
     if (monthly.length <= 1) return padL + innerW / 2;
     const day = Number(iso.slice(8, 10)) || 1;
     const frac = Math.min(1, Math.max(0, (day - 1) / 30));
-    return padL + (i + frac) * stepX;
+    // Anchors sit at i*stepX; the last anchor is the right edge. Clamp the
+    // intra-month offset so markers in the final bucket never overshoot it.
+    const pos = i === lastIdx ? lastIdx : i + frac;
+    return padL + pos * stepX;
   };
   const yScale = (v: number) => H - padB - (v / niceMax) * innerH;
   const points = monthly.map((m, i) => ({
