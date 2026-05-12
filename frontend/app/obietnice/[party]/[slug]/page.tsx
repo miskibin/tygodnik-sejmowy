@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { MarkdownText } from "@/components/text/MarkdownText";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { ProcessStageBar } from "@/components/tygodnik/atoms/ProcessStageBar";
 import {
   PARTY_TO_KLUB,
   getPromiseDetail,
@@ -10,6 +11,177 @@ import {
   partyLabel,
   partyShort,
 } from "@/lib/db/promises";
+import type { PromiseEvidence } from "@/lib/db/promises";
+
+const SPONSOR_AUTHORITY_LABEL: Record<string, string> = {
+  rzad: "Rząd",
+  prezydent: "Prezydent",
+  klub_poselski: "Posłowie",
+  senat: "Senat",
+  komisja: "Komisja sejmowa",
+  prezydium: "Prezydium Sejmu",
+  obywatele: "Obywatele",
+  inne: "Inne źródło",
+};
+
+function sponsorLine(e: PromiseEvidence): string | null {
+  const auth = e.sponsorAuthority ? SPONSOR_AUTHORITY_LABEL[e.sponsorAuthority] ?? e.sponsorAuthority : null;
+  if (e.sponsorAuthority === "klub_poselski" && e.sponsorMps.length > 0) {
+    const head = e.sponsorMps.slice(0, 2).join(", ");
+    const more = e.sponsorMps.length > 2 ? ` +${e.sponsorMps.length - 2}` : "";
+    return `Posłowie: ${head}${more}`;
+  }
+  return auth;
+}
+
+function EvidenceCard({ e, variant }: { e: PromiseEvidence; variant: "confirmed" | "candidate" }) {
+  const titleSize = variant === "confirmed" ? 18 : 16;
+  const rationaleSize = variant === "confirmed" ? 14.5 : 13.5;
+  const rationaleStyle = variant === "confirmed" ? "normal" : "italic";
+  const sponsor = sponsorLine(e);
+  const v = e.mainVoting;
+  return (
+    <li
+      className={
+        variant === "confirmed"
+          ? "border-l-2 border-foreground pl-4"
+          : "border-l-2 border-dotted border-border pl-4"
+      }
+    >
+      <Link
+        href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
+        className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
+        style={{ fontSize: titleSize }}
+      >
+        {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
+      </Link>
+
+      {(sponsor || e.currentStageType || e.processPassed) && (
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 font-sans text-[11.5px]">
+          {sponsor && (
+            <span className="inline-flex items-baseline gap-1.5">
+              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground">
+                Wniósł:
+              </span>
+              <span className="text-foreground">{sponsor}</span>
+            </span>
+          )}
+          {(e.currentStageType || e.processPassed) && (
+            <span className="inline-flex items-baseline gap-1.5">
+              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground">
+                Status:
+              </span>
+              <span className="text-foreground">
+                {e.processPassed === true
+                  ? "uchwalony"
+                  : e.currentStageType === "Withdrawn"
+                    ? "wycofany"
+                    : e.currentStageType === "Rejected"
+                      ? "odrzucony"
+                      : e.currentStageType === "End"
+                        ? "proces zakończony"
+                        : stageShortLabel(e.currentStageType)}
+              </span>
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="mt-2">
+        <ProcessStageBar
+          currentStageType={e.currentStageType}
+          processPassed={e.processPassed}
+        />
+      </div>
+
+      {v && (
+        <div className="mb-3 inline-flex items-baseline gap-2 flex-wrap font-sans text-[12px]">
+          <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground">
+            Głosowanie:
+          </span>
+          <Link
+            href={`/glosowanie/${v.votingId}`}
+            className="text-foreground hover:text-destructive no-underline"
+          >
+            za {v.yes} · przeciw {v.no}
+          </Link>
+          <span
+            className="font-mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm"
+            style={{
+              color:
+                v.result === "passed"
+                  ? "var(--success)"
+                  : v.result === "failed"
+                    ? "var(--destructive)"
+                    : "var(--muted-foreground)",
+              border: `1px solid ${
+                v.result === "passed"
+                  ? "var(--success)55"
+                  : v.result === "failed"
+                    ? "var(--destructive)55"
+                    : "var(--muted-foreground)55"
+              }`,
+            }}
+          >
+            {v.result === "passed" ? "PRZESZŁO" : v.result === "failed" ? "NIE PRZESZŁO" : "OCZEKUJE"}
+          </span>
+          {v.date && (
+            <span className="font-mono text-[10.5px] text-muted-foreground">
+              {new Date(v.date).toLocaleDateString("pl-PL", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+          )}
+        </div>
+      )}
+
+      {e.rationale && (
+        <p
+          className="m-0 mt-1 font-serif text-secondary-foreground"
+          style={{ fontSize: rationaleSize, lineHeight: 1.6, fontStyle: rationaleStyle }}
+        >
+          <MarkdownText text={e.rationale} />
+        </p>
+      )}
+
+      <div className="font-mono text-[11px] text-muted-foreground mt-2 flex flex-wrap gap-x-3">
+        <span>Druk {e.printNumber}/{e.printTerm}</span>
+        {e.printTopic && (
+          <span className="text-secondary-foreground">
+            {TOPIC_LABEL[e.printTopic] ?? e.printTopic}
+          </span>
+        )}
+        {e.similarity != null && <span>sim {e.similarity.toFixed(2)}</span>}
+      </div>
+    </li>
+  );
+}
+
+// Short label for the inline "Status: ..." chip (the ProcessStageBar handles
+// the visual track separately).
+function stageShortLabel(stageType: string | null): string {
+  if (!stageType) return "trafił do Sejmu";
+  const m: Record<string, string> = {
+    Start: "wpłynął",
+    Opinion: "opinia",
+    GovermentPosition: "stanowisko rządu",
+    GovernmentPosition: "stanowisko rządu",
+    ExpertOpinion: "opinia ekspertów",
+    Referral: "skierowano do I czytania",
+    ReadingReferral: "skierowano do I czytania",
+    Reading: "I czytanie",
+    CommitteeWork: "prace w komisji",
+    CommitteeReport: "sprawozdanie komisji",
+    SejmReading: "II czytanie",
+    Voting: "głosowanie w Sejmie",
+    SenatePosition: "stanowisko Senatu",
+    SenateAmendments: "poprawki Senatu",
+    ToPresident: "do Prezydenta",
+    PresidentSignature: "podpisał Prezydent",
+    PresidentVeto: "weto Prezydenta",
+    ConstitutionalTribunal: "Trybunał Konstytucyjny",
+    Promulgation: "publikacja w Dz.U.",
+  };
+  return m[stageType] ?? stageType;
+}
 
 export const revalidate = 300;
 
@@ -216,37 +388,9 @@ export default async function PromiseDetailPage({
                 >
                   Powiązane druki ({confirmedEvidence.length})
                 </h2>
-                <ul className="list-none p-0 m-0 space-y-5">
+                <ul className="list-none p-0 m-0 space-y-6">
                   {confirmedEvidence.map((e) => (
-                    <li
-                      key={`${e.printTerm}-${e.printNumber}-c`}
-                      className="border-l-2 border-foreground pl-4"
-                    >
-                      <Link
-                        href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
-                        className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
-                        style={{ fontSize: 18 }}
-                      >
-                        {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
-                      </Link>
-                      {e.rationale && (
-                        <p
-                          className="m-0 mt-2 font-serif text-secondary-foreground"
-                          style={{ fontSize: 14.5, lineHeight: 1.6 }}
-                        >
-                          <MarkdownText text={e.rationale} />
-                        </p>
-                      )}
-                      <div className="font-mono text-[11px] text-muted-foreground mt-2 flex flex-wrap gap-x-3">
-                        <span>Druk {e.printNumber}/{e.printTerm}</span>
-                        {e.printTopic && (
-                          <span className="text-secondary-foreground">
-                            {TOPIC_LABEL[e.printTopic] ?? e.printTopic}
-                          </span>
-                        )}
-                        {e.similarity != null && <span>sim {e.similarity.toFixed(2)}</span>}
-                      </div>
-                    </li>
+                    <EvidenceCard key={`${e.printTerm}-${e.printNumber}-c`} e={e} variant="confirmed" />
                   ))}
                 </ul>
               </section>
@@ -263,37 +407,9 @@ export default async function PromiseDetailPage({
                 <p className="font-sans text-[11px] text-muted-foreground mb-3 leading-relaxed max-w-prose">
                   Druki dotykają tematu obietnicy, ale dopasowanie nie jest pewne. Traktuj jako wskazówkę, nie dowód.
                 </p>
-                <ul className="list-none p-0 m-0 space-y-4 opacity-80">
+                <ul className="list-none p-0 m-0 space-y-5 opacity-85">
                   {candidateEvidence.map((e) => (
-                    <li
-                      key={`${e.printTerm}-${e.printNumber}-d`}
-                      className="border-l-2 border-dotted border-border pl-4"
-                    >
-                      <Link
-                        href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
-                        className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
-                        style={{ fontSize: 16 }}
-                      >
-                        {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
-                      </Link>
-                      {e.rationale && (
-                        <p
-                          className="m-0 mt-1.5 font-serif italic text-secondary-foreground"
-                          style={{ fontSize: 13.5, lineHeight: 1.55 }}
-                        >
-                          <MarkdownText text={e.rationale} />
-                        </p>
-                      )}
-                      <div className="font-mono text-[10px] text-muted-foreground mt-1.5 flex flex-wrap gap-x-3">
-                        <span>Druk {e.printNumber}/{e.printTerm}</span>
-                        {e.printTopic && (
-                          <span className="text-secondary-foreground">
-                            {TOPIC_LABEL[e.printTopic] ?? e.printTopic}
-                          </span>
-                        )}
-                        {e.similarity != null && <span>sim {e.similarity.toFixed(2)}</span>}
-                      </div>
-                    </li>
+                    <EvidenceCard key={`${e.printTerm}-${e.printNumber}-d`} e={e} variant="candidate" />
                   ))}
                 </ul>
               </section>

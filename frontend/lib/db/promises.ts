@@ -481,6 +481,14 @@ export function getPartyCodesWithCounts(): Promise<Array<{ code: string; count: 
 // candidates pass the reranker as "confirmed"; another 26% land as "candidate"
 // — surfacing both lets the citizen see plausible legislative links instead
 // of an empty page.
+export type EvidenceVoting = {
+  votingId: number;
+  date: string | null;
+  yes: number;
+  no: number;
+  result: "passed" | "failed" | "pending";
+};
+
 export type PromiseEvidence = {
   printTerm: number;
   printNumber: string;
@@ -491,6 +499,13 @@ export type PromiseEvidence = {
   rationale: string | null;
   rerankedAt: string | null;
   matchStatus: "confirmed" | "candidate";
+  // Druk metadata for the citizen — who tabled it, where it is in the process,
+  // and how the main vote went. All optional (missing data renders blank).
+  sponsorAuthority: string | null;
+  sponsorMps: string[];
+  currentStageType: string | null;
+  processPassed: boolean | null;
+  mainVoting: EvidenceVoting | null;
 };
 
 export type PromiseVotingEntry = {
@@ -534,7 +549,7 @@ export function getPromiseDetail(
 ): Promise<PromiseDetail | null> {
   return unstable_cache(
     async () => loadPromiseDetail(partyCode, slug),
-    ["promise-detail", partyCode, slug],
+    ["promise-detail-v2", partyCode, slug],
     { revalidate: PROMISES_REVALIDATE_SEC },
   )();
 }
@@ -556,7 +571,7 @@ async function loadPromiseDetailById(id: number): Promise<PromiseDetail | null> 
 export function getPromiseDetailById(id: number): Promise<PromiseDetail | null> {
   return unstable_cache(
     async () => loadPromiseDetailById(id),
-    ["promise-detail-id", String(id)],
+    ["promise-detail-id-v2", String(id)],
     { revalidate: PROMISES_REVALIDATE_SEC },
   )();
 }
@@ -595,8 +610,17 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
   if ("error" in relatedRes && relatedRes.error) throw relatedRes.error;
 
   const evidenceRaw = (evidenceRes.data ?? []) as Array<Record<string, unknown>>;
-  // Pull print short_title + topic for evidence rows.
-  const printMeta = new Map<string, { title: string | null; short: string | null; topic: string | null }>();
+  // Pull print metadata for evidence rows (one batch per term).
+  type PrintMeta = {
+    id: number;
+    title: string | null;
+    short: string | null;
+    topic: string | null;
+    sponsorAuthority: string | null;
+    sponsorMps: string[];
+  };
+  const printMeta = new Map<string, PrintMeta>();
+  const printIds: number[] = [];
   if (evidenceRaw.length > 0) {
     const byTerm = new Map<number, string[]>();
     for (const r of evidenceRaw) {
@@ -609,26 +633,156 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
     for (const [term, nums] of byTerm.entries()) {
       const { data, error } = await sb
         .from("prints")
-        .select("term, number, short_title, title, topic")
+        .select("id, term, number, short_title, title, topic, sponsor_authority, sponsor_mps")
         .eq("term", term)
         .in("number", nums);
       if (error) throw error;
       for (const r of (data ?? []) as Array<Record<string, unknown>>) {
         const t = r.term as number;
         const n = r.number as string;
+        const pid = r.id as number;
+        printIds.push(pid);
+        const rawMps = r.sponsor_mps;
+        const mps = Array.isArray(rawMps) ? rawMps.filter((x): x is string => typeof x === "string") : [];
         printMeta.set(`${t}__${n}`, {
+          id: pid,
           short: (r.short_title as string | null) ?? null,
           title: (r.title as string | null) ?? null,
           topic: (r.topic as string | null) ?? null,
+          sponsorAuthority: (r.sponsor_authority as string | null) ?? null,
+          sponsorMps: mps,
         });
       }
+    }
+  }
+
+  // Per-print legislative status (current_stage_type + process_passed) and
+  // canonical voting result. Three parallel batches keyed by the print set.
+  type PrintStatus = {
+    currentStageType: string | null;
+    processPassed: boolean | null;
+    mainVoting: EvidenceVoting | null;
+  };
+  const printStatus = new Map<string, PrintStatus>();
+  if (printIds.length > 0) {
+    const printTuples = Array.from(printMeta.entries()).map(([key, m]) => ({ key, id: m.id }));
+
+    // Build the (term, number) pairs for the processes lookup. Group by term
+    // so we can do one .in("number", ...) per term.
+    const procByTerm = new Map<number, string[]>();
+    for (const r of evidenceRaw) {
+      const t = r.print_term as number;
+      const n = r.print_number as string;
+      const list = procByTerm.get(t) ?? [];
+      list.push(n);
+      procByTerm.set(t, list);
+    }
+
+    const procRows: Array<{ id: number; passed: boolean | null; term: number; number: string }> = [];
+    for (const [term, nums] of procByTerm.entries()) {
+      const { data, error } = await sb
+        .from("processes")
+        .select("id, passed, term, number")
+        .eq("term", term)
+        .in("number", nums);
+      if (error) throw error;
+      for (const r of (data ?? []) as Array<Record<string, unknown>>) {
+        procRows.push({
+          id: r.id as number,
+          passed: (r.passed as boolean | null) ?? null,
+          term: r.term as number,
+          number: r.number as string,
+        });
+      }
+    }
+    const processByKey = new Map<string, { id: number; passed: boolean | null }>();
+    for (const p of procRows) processByKey.set(`${p.term}__${p.number}`, { id: p.id, passed: p.passed });
+
+    const processIds = procRows.map((p) => p.id);
+    const stagesByProcess = new Map<number, string | null>();
+    if (processIds.length > 0) {
+      const { data: stageRows, error: se } = await sb
+        .from("process_stages")
+        .select("process_id, ord, stage_type, stage_date")
+        .in("process_id", processIds)
+        .order("ord", { ascending: false });
+      if (se) throw se;
+      // Latest stage per process = highest ord with non-null stage_date (or
+      // fall back to highest ord if every row is null-dated).
+      for (const r of (stageRows ?? []) as Array<Record<string, unknown>>) {
+        const pid = r.process_id as number;
+        if (stagesByProcess.has(pid)) continue;
+        const stageDate = r.stage_date as string | null;
+        if (stageDate) {
+          stagesByProcess.set(pid, (r.stage_type as string | null) ?? null);
+        }
+      }
+      // Fill processes with no dated stage by taking ord-0 stage_type.
+      for (const r of (stageRows ?? []) as Array<Record<string, unknown>>) {
+        const pid = r.process_id as number;
+        if (stagesByProcess.has(pid)) continue;
+        stagesByProcess.set(pid, (r.stage_type as string | null) ?? null);
+      }
+    }
+
+    // Main voting per print. Rank: main > sprawozdanie > autopoprawka > poprawka > joint > other.
+    const ROLE_RANK: Record<string, number> = {
+      main: 0, sprawozdanie: 1, autopoprawka: 2, poprawka: 3, joint: 4, other: 5,
+    };
+    const votingByPrint = new Map<number, EvidenceVoting>();
+    if (printIds.length > 0) {
+      const { data: linkRows, error: ve } = await sb
+        .from("voting_print_links")
+        .select("print_id, role, votings:voting_id(id, date, yes, no, voting_number)")
+        .in("print_id", printIds);
+      if (ve) throw ve;
+      type Linked = { print_id: number; role: string; v: Record<string, unknown> };
+      const linked: Linked[] = [];
+      for (const r of (linkRows ?? []) as Array<{ print_id: number; role: string; votings: Record<string, unknown> | Record<string, unknown>[] | null }>) {
+        const v = Array.isArray(r.votings) ? r.votings[0] : r.votings;
+        if (!v) continue;
+        linked.push({ print_id: r.print_id, role: r.role, v });
+      }
+      linked.sort((a, b) => {
+        const ra = ROLE_RANK[a.role] ?? 9;
+        const rb = ROLE_RANK[b.role] ?? 9;
+        if (ra !== rb) return ra - rb;
+        return ((b.v.voting_number as number) ?? 0) - ((a.v.voting_number as number) ?? 0);
+      });
+      for (const { print_id, v } of linked) {
+        if (votingByPrint.has(print_id)) continue;
+        const yes = Number(v.yes ?? 0);
+        const no = Number(v.no ?? 0);
+        const date = (v.date as string | null) ?? null;
+        let result: "passed" | "failed" | "pending" = "pending";
+        if (yes + no > 0) result = yes > no ? "passed" : "failed";
+        votingByPrint.set(print_id, {
+          votingId: v.id as number,
+          date,
+          yes,
+          no,
+          result,
+        });
+      }
+    }
+
+    for (const { key, id } of printTuples) {
+      const proc = processByKey.get(key) ?? null;
+      const stageType = proc ? stagesByProcess.get(proc.id) ?? null : null;
+      printStatus.set(key, {
+        currentStageType: stageType,
+        processPassed: proc?.passed ?? null,
+        mainVoting: votingByPrint.get(id) ?? null,
+      });
     }
   }
 
   const evidence: PromiseEvidence[] = evidenceRaw.map((r) => {
     const t = r.print_term as number;
     const n = r.print_number as string;
-    const meta = printMeta.get(`${t}__${n}`) ?? null;
+    const key = `${t}__${n}`;
+    const meta = printMeta.get(key) ?? null;
+    const status = printStatus.get(key) ?? null;
     return {
       printTerm: t,
       printNumber: n,
@@ -639,6 +793,11 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
       rationale: (r.match_rationale as string | null) ?? null,
       rerankedAt: (r.reranked_at as string | null) ?? null,
       matchStatus: (r.match_status as "confirmed" | "candidate") ?? "candidate",
+      sponsorAuthority: meta?.sponsorAuthority ?? null,
+      sponsorMps: meta?.sponsorMps ?? [],
+      currentStageType: status?.currentStageType ?? null,
+      processPassed: status?.processPassed ?? null,
+      mainVoting: status?.mainVoting ?? null,
     };
   });
   // Confirmed first, then candidate; within each bucket already sorted by
