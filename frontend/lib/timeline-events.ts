@@ -20,6 +20,9 @@ export type TimelineEvent = {
   partyCode?: string; // omitted = global; matches POLL_PARTY_COLORS keys
   kind: TimelineEventKind;
   description?: string;
+  // 1 = critical (always shown, incl. dense sparklines). 2 = normal (only on
+  // full-size charts). Default 2.
+  importance?: 1 | 2;
 };
 
 // Add events here. Keep titles short — hover description carries detail.
@@ -47,12 +50,14 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "Konfederacja",
     kind: "scandal",
     description: "Grzegorz Braun gaśnicą gasi menorę w Sejmie; wykluczony z obrad.",
+    importance: 1,
   },
   {
     date: "2023-12-13",
     title: "Zaprzysiężenie rządu Tuska",
     kind: "coalition",
     description: "Prezydent Duda zaprzysięga rząd Tuska; Kosiniak-Kamysz wicepremierem i MON.",
+    importance: 1,
   },
   {
     date: "2023-12-19",
@@ -74,6 +79,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "PiS",
     kind: "scandal",
     description: "Policja zatrzymuje byłych szefów CBA w Pałacu Prezydenckim; trafiają do aresztu.",
+    importance: 1,
   },
   {
     date: "2024-01-23",
@@ -99,12 +105,14 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     title: "Wybory samorządowe",
     kind: "election",
     description: "Pierwsza tura wyborów samorządowych 2024.",
+    importance: 1,
   },
   {
     date: "2024-06-09",
     title: "Wybory do PE",
     kind: "election",
     description: "Wybory do Parlamentu Europejskiego 2024.",
+    importance: 1,
   },
   {
     date: "2024-07-12",
@@ -126,6 +134,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "Razem",
     kind: "coalition",
     description: "Kongres Razem decyduje o wyjściu z klubu Lewicy; Biejat i 4 posłanki opuszczają partię.",
+    importance: 1,
   },
   {
     date: "2024-10-25",
@@ -147,6 +156,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "KO",
     kind: "leadership",
     description: "Rafał Trzaskowski pokonuje Sikorskiego (~75%); zostaje kandydatem KO na prezydenta.",
+    importance: 1,
   },
   {
     date: "2024-11-24",
@@ -154,6 +164,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "PiS",
     kind: "leadership",
     description: "Kaczyński ogłasza prezesa IPN jako kandydata obozu PiS w Krakowie.",
+    importance: 1,
   },
   {
     date: "2024-11-29",
@@ -181,6 +192,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "Konfederacja",
     kind: "leadership",
     description: "Sąd partyjny KWiN usuwa Brauna po ogłoszeniu konkurencyjnej kandydatury prezydenckiej.",
+    importance: 1,
   },
   {
     date: "2025-03-10",
@@ -193,11 +205,13 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     date: "2025-05-18",
     title: "Wybory prezydenckie — I tura",
     kind: "election",
+    importance: 1,
   },
   {
     date: "2025-06-01",
     title: "Wybory prezydenckie — II tura",
     kind: "election",
+    importance: 1,
   },
   {
     date: "2025-06-04",
@@ -205,6 +219,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "KKP",
     kind: "coalition",
     description: "Trzyosobowe koło Konfederacji Korony Polskiej w Sejmie (Fritz, Skalik, Zawiślak).",
+    importance: 1,
   },
   {
     date: "2025-06-17",
@@ -212,6 +227,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "TD",
     kind: "coalition",
     description: "Rada Naczelna PSL kończy projekt Trzeciej Drogi; Hołownia potwierdza.",
+    importance: 1,
   },
   {
     date: "2025-06-28",
@@ -225,6 +241,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     title: "Zaprzysiężenie prezydenta",
     kind: "other",
     description: "Zaprzysiężenie Karola Nawrockiego jako Prezydenta RP.",
+    importance: 1,
   },
   {
     date: "2025-09-09",
@@ -238,6 +255,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "Polska2050",
     kind: "leadership",
     description: "Hołownia ogłasza, że nie będzie ubiegał się o reelekcję; celuje w funkcję w UNHCR.",
+    importance: 1,
   },
   {
     date: "2025-11-07",
@@ -251,6 +269,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     title: "Czarzasty marszałkiem Sejmu",
     kind: "leadership",
     description: "Rotacja koalicyjna: Hołownia ustępuje, Sejm wybiera Włodzimierza Czarzastego.",
+    importance: 1,
   },
   {
     date: "2026-01-31",
@@ -258,6 +277,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     partyCode: "Polska2050",
     kind: "leadership",
     description: "Pokonuje Hennig-Kloskę 350:309 w powtórzonej II turze.",
+    importance: 1,
   },
   {
     date: "2026-03-12",
@@ -302,18 +322,22 @@ function inWindow(iso: string, from?: string, to?: string): boolean {
 }
 
 // Events to show on a chart scoped to `partyCode` (undefined = global-only).
-// Date strings are ISO and lexicographic-compare works.
+// `maxImportance` filters out lower-priority events: pass 1 for compact
+// sparklines (only critical events), omit / pass 2 for full charts.
 export function getEventsForChart({
   partyCode,
   from,
   to,
+  maxImportance = 2,
 }: {
   partyCode?: string | null;
   from?: string;
   to?: string;
+  maxImportance?: 1 | 2;
 }): TimelineEvent[] {
   return TIMELINE_EVENTS.filter((e) => {
     if (e.partyCode && e.partyCode !== partyCode) return false;
+    if ((e.importance ?? 2) > maxImportance) return false;
     return inWindow(e.date, from, to);
   }).sort((a, b) => a.date.localeCompare(b.date));
 }
@@ -324,11 +348,13 @@ export function getEventsForMp({
   klubRef,
   from,
   to,
+  maxImportance,
 }: {
   klubRef: string | null | undefined;
   from?: string;
   to?: string;
+  maxImportance?: 1 | 2;
 }): TimelineEvent[] {
   const partyCode = pollPartyForKlub(klubRef) ?? undefined;
-  return getEventsForChart({ partyCode, from, to });
+  return getEventsForChart({ partyCode, from, to, maxImportance });
 }
