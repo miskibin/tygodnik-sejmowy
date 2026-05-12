@@ -1,18 +1,24 @@
 import type { MpPromiseAlignments, PromiseAlignmentVote } from "@/lib/db/posel-tabs";
+import { alignmentAriaLabel, type PromiseAlignment } from "@/lib/promiseAlignment";
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "2-digit" });
 }
 
-function dotColor(vote: PromiseAlignmentVote["vote"]): string {
-  switch (vote) {
-    case "YES":
+// Color is driven by *alignment*, not the raw YES/NO vote — NO on a reject
+// motion is pro-bill (Bosak/2197 case). The raw vote letter still appears as
+// the dot's glyph for transparency.
+function dotColor(alignment: PromiseAlignment | undefined): string {
+  switch (alignment) {
+    case "aligned":
       return "var(--success)";
-    case "NO":
+    case "opposed":
       return "var(--destructive)";
-    case "ABSTAIN":
+    case "neutral":
       return "var(--warning)";
+    case "absent":
+      return "var(--muted-foreground)";
     default:
       return "var(--border)";
   }
@@ -127,11 +133,13 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
               </div>
               <div className="flex flex-wrap gap-1.5 justify-start md:justify-end">
                 {row.votes.map((v, i) => {
-                  const color = dotColor(v.vote);
+                  const color = dotColor(v.alignment);
+                  const aria = v.alignment ? alignmentAriaLabel(v.alignment) : "Brak głosowania";
                   const tooltip = [
                     v.printShort ?? `druk ${v.printNumber}`,
                     v.date ? formatDate(v.date) : null,
                     `głos: ${dotLabel(v.vote)}`,
+                    aria,
                   ]
                     .filter(Boolean)
                     .join(" · ");
@@ -144,6 +152,8 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
                         border: v.vote === "NONE" ? "1px dashed var(--border)" : "none",
                       }}
                       title={tooltip}
+                      aria-label={aria}
+                      role="img"
                     >
                       {dotLabel(v.vote)[0]}
                     </span>
@@ -165,15 +175,15 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
         <div className="mt-4 pt-3 border-t border-border flex flex-wrap gap-3 font-sans text-[11px] text-secondary-foreground">
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block w-3 h-3 rounded-full" style={{ background: "var(--success)" }} />
-            za drukiem
+            zgodnie z obietnicą
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block w-3 h-3 rounded-full" style={{ background: "var(--destructive)" }} />
-            przeciw
+            wbrew obietnicy
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block w-3 h-3 rounded-full" style={{ background: "var(--warning)" }} />
-            wstrzymał się
+            bez wpływu (poprawka / wstrzymał się)
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block w-3 h-3 rounded-full" style={{ background: "var(--muted-foreground)" }} />
@@ -198,6 +208,9 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
           Druki dopasowane są do obietnic semantycznie, ograniczone do par oznaczonych jako
           „confirmed". Głosowanie wybierane w pierwszej kolejności jako <em>main</em>{" "}
           z <code className="font-mono text-[12px]">voting_print_links</code>; jeśli brak — pierwsze powiązane.
+          Kolor uwzględnia <em>polarność wniosku</em> — głos NIE na &bdquo;wniosek o odrzucenie projektu&rdquo;
+          jest <strong>zgodny</strong> z obietnicą wsparcia tego projektu, nie wbrew niej.
+          Poprawki, wnioski mniejszości i głosowania proceduralne nie są zaliczane jako zgodne ani niezgodne.
         </p>
       </aside>
     </div>
