@@ -329,7 +329,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
           ),
           wszystko: (
             <Suspense fallback={<PanelFallback rows={6} />}>
-              <VotesAsync mpId={mpId} />
+              <VotesAsync mpId={mpId} klubRef={mp.clubRef ?? null} />
             </Suspense>
           ),
           interpelacje: (
@@ -339,7 +339,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
           ),
           wystapienia: (
             <Suspense fallback={<PanelFallback rows={5} />}>
-              <StatementsAsync mpId={mpId} />
+              <StatementsAsync mpId={mpId} klubRef={mp.clubRef ?? null} />
             </Suspense>
           ),
           obietnice: (
@@ -369,6 +369,25 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
                 <>
                   Procent głosowań, w których głos posła był zgodny z większością jego klubu. Niższy
                   wynik = częściej głosuje samodzielnie, niekoniecznie &bdquo;przeciw&rdquo;.
+                </>
+              ),
+            },
+            {
+              kicker: "Znaczniki wydarzeń",
+              children: (
+                <>
+                  Pionowe linie na wykresach (głosowania, wystąpienia) to ręcznie kuratorowana
+                  lista istotnych momentów politycznych — globalnych oraz dla partii tego posła.
+                  Pełna lista i historia zmian w pliku{" "}
+                  <a
+                    href="https://github.com/miskibin/tygodnik-sejmowy/blob/main/frontend/lib/timeline-events.ts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                  >
+                    lib/timeline-events.ts
+                  </a>
+                  .
                 </>
               ),
             },

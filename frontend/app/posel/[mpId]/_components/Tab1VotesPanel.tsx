@@ -1,5 +1,22 @@
 import type { MpVotesData, MpVoteRow, VoteValue } from "@/lib/db/posel-tabs";
 import { VotesList } from "./VotesList";
+import { EventMarkers } from "@/components/charts/EventMarkers";
+import { getEventsForMp, type TimelineEvent } from "@/lib/timeline-events";
+
+// Maps an ISO date onto a monthly bar chart: locate its YYYY-MM bucket,
+// then position by day-of-month within that column. Out-of-window = null.
+function makeMonthlyXFor(yms: string[], padL: number, colW: number) {
+  if (yms.length === 0) return () => null;
+  const idx = new Map(yms.map((ym, i) => [ym, i]));
+  return (iso: string): number | null => {
+    const ym = iso.slice(0, 7);
+    const i = idx.get(ym);
+    if (i === undefined) return null;
+    const day = Number(iso.slice(8, 10)) || 1;
+    const frac = Math.min(1, Math.max(0, (day - 1) / 30));
+    return padL + (i + frac) * colW;
+  };
+}
 
 const PL_MONTHS = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"];
 
@@ -58,8 +75,10 @@ function KpiTile({
 
 function MonthlyChart({
   monthly,
+  events,
 }: {
   monthly: Array<{ ym: string; yes: number; no: number; abstain: number; absent: number }>;
+  events: TimelineEvent[];
 }) {
   if (monthly.length === 0) return null;
   const W = 920;
@@ -69,6 +88,7 @@ function MonthlyChart({
   const padT = 10;
   const colsCount = monthly.length;
   const colW = (W - padL - 6) / colsCount;
+  const xForDate = makeMonthlyXFor(monthly.map((m) => m.ym), padL, colW);
   const max = Math.max(...monthly.map((m) => m.yes + m.no + m.abstain + m.absent), 1);
   const niceMax = Math.ceil(max / 50) * 50 || max;
   const yScale = (v: number) => (v / niceMax) * (H - padT - padB);
@@ -138,6 +158,13 @@ function MonthlyChart({
             </g>
           );
         })}
+        <EventMarkers
+          events={events}
+          xFor={xForDate}
+          yTop={padT}
+          yBottom={H - padB}
+          variant="full"
+        />
       </svg>
       <div className="flex flex-wrap gap-3 mt-3 font-sans text-[11px] text-secondary-foreground">
         {(
@@ -158,7 +185,13 @@ function MonthlyChart({
   );
 }
 
-export function Tab1VotesPanel({ data }: { data: MpVotesData }) {
+export function Tab1VotesPanel({
+  data,
+  klubRef,
+}: {
+  data: MpVotesData;
+  klubRef: string | null;
+}) {
   if (data.rows.length === 0) {
     return (
       <p className="font-serif italic text-muted-foreground text-center py-12">
@@ -167,6 +200,7 @@ export function Tab1VotesPanel({ data }: { data: MpVotesData }) {
     );
   }
   const total = data.rows.length;
+  const events = getEventsForMp({ klubRef });
 
   return (
     <div className="grid gap-7">
@@ -177,7 +211,7 @@ export function Tab1VotesPanel({ data }: { data: MpVotesData }) {
         <KpiTile label="Nieobecny" count={data.totals.absent + data.totals.present} total={total} color="var(--muted-foreground)" />
       </div>
 
-      <MonthlyChart monthly={data.monthly} />
+      <MonthlyChart monthly={data.monthly} events={events} />
 
       <VotesList rows={data.rows as MpVoteRow[]} dissentCount={data.dissentCount} />
     </div>
