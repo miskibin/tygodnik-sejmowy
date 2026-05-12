@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { Ornament } from "@/components/chrome/Ornament";
+import { PatroniteTrackedLink } from "@/components/chrome/PatroniteTrackedLink";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
 
@@ -37,6 +39,23 @@ const PRINCIPLES = [
   "Źródłem prawdy są dane publiczne i dokumenty.",
   "Każdy skrót powinien dać się rozwinąć do etapu, głosowania albo druku.",
   "AI pomaga pomocniczo: w klasyfikacji i redakcji, nie w ustalaniu faktów.",
+] as const;
+
+const AUTHORS = [
+  {
+    name: "miskibin",
+    role: "autor i operator projektu",
+    body: "Produkt, ETL, frontend, warstwa danych i redakcja odpowiedzialności są prowadzone w jednym miejscu.",
+    ctaLabel: "repozytorium projektu →",
+    href: "https://github.com/miskibin/tygodnik-sejmowy",
+  },
+  {
+    name: "patroni i patronki",
+    role: "finansowanie i trwałość",
+    body: "Społeczność utrzymuje projekt przy życiu, ale nie podmienia źródeł, procesu ani odpowiedzialności za publikację.",
+    ctaLabel: "wesprzyj na Patronite →",
+    href: "https://patronite.pl/tygodniksejmowy",
+  },
 ] as const;
 
 function fmtPL(n: number): string {
@@ -209,6 +228,51 @@ export default async function AboutProjectPage() {
                 ))}
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="mb-16">
+          <SectionTitle
+            kicker="Autorzy"
+            title="Kto za tym stoi"
+          />
+          <p className="font-serif text-[16px] leading-[1.65] text-secondary-foreground m-0 mb-8 max-w-[760px]">
+            Ta strona nie jest bezosobowym interfejsem. Jest podpisana: wiadomo, kto odpowiada za
+            produkt, kod, pipeline i publikację, a także skąd bierze się finansowanie projektu.
+          </p>
+          <div className="grid gap-6 md:grid-cols-2">
+            {AUTHORS.map((author) => (
+              <article
+                key={author.name}
+                className="border border-rule bg-background rounded-lg p-5 md:p-6"
+              >
+                <div className="font-serif text-[27px] md:text-[31px] font-medium tracking-[-0.02em] leading-none">
+                  {author.name}
+                </div>
+                <div className="mt-2 font-mono text-[10px] tracking-[0.16em] uppercase text-destructive">
+                  {author.role}
+                </div>
+                <p className="m-0 mt-4 font-sans text-[13px] leading-[1.65] text-secondary-foreground">
+                  {author.body}
+                </p>
+                <div className="mt-5 border-t border-dashed border-border pt-3">
+                  {author.href.includes("patronite.pl") ? (
+                    <PatroniteTrackedLink placement="about-project-authors" className="font-sans text-[11.5px] tracking-wide text-destructive hover:underline">
+                      {author.ctaLabel}
+                    </PatroniteTrackedLink>
+                  ) : (
+                    <Link
+                      href={author.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-sans text-[11.5px] tracking-wide text-destructive hover:underline"
+                    >
+                      {author.ctaLabel}
+                    </Link>
+                  )}
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
