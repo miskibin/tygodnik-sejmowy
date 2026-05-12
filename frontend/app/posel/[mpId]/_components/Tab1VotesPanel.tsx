@@ -99,7 +99,11 @@ function MonthlyChart({
       <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
         Rozkład głosów w czasie
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full block">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full block"
+        style={{ overflow: "visible" }}
+      >
         {ticks.map((t) => {
           const y = H - padB - yScale(t);
           return (
@@ -164,6 +168,7 @@ function MonthlyChart({
           yTop={padT}
           yBottom={H - padB}
           variant="full"
+          chartWidth={W}
         />
       </svg>
       <div className="flex flex-wrap gap-3 mt-3 font-sans text-[11px] text-secondary-foreground">
