@@ -15,7 +15,7 @@ export const SECONDARY_NAV = [
   { href: "/watek",        label: "Wątek",       hint: "pełen cykl" },
   { href: "/mowa",         label: "Mowa",        hint: "transkrypcje" },
   { href: "/komisja",      label: "Komisja",     hint: "posiedzenia" },
-  { href: "/budzet",       label: "Budżet",      hint: "finanse" },
+  { href: "/o-projekcie",  label: "O projekcie", hint: "warsztat" },
   { href: "/alerty",       label: "Alerty",      hint: "subskrypcje" },
 ] as const;
 
