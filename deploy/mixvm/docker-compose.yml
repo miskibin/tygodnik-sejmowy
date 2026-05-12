@@ -39,6 +39,13 @@ services:
     environment:
       OLLAMA_HOST: "http://ollama:11434"
       SUPAGRAF_LLM_TIMEOUT_S: "300"
+      # Bypass Cloudflare edge timeout — talk straight to Kong on the
+      # supabase_default network joined below. Kong routes /rest/v1/* to
+      # supabase-rest exactly like the public HTTPS endpoint does.
+      SUPABASE_URL: "http://supabase-kong:8000"
+    networks:
+      - default
+      - supabase
     # Source code is baked into the image; only persist mutable state on
     # the host. Bind-mounting /app would mask the installed .venv.
     volumes:
@@ -46,3 +53,9 @@ services:
       - ./logs:/app/logs
     profiles: ["jobs"]   # one-shot: never auto-up, only via `compose run`
     command: ["uv", "run", "python", "-m", "supagraf", "daily", "--term", "10"]
+
+networks:
+  default:
+  supabase:
+    external: true
+    name: supabase_default
