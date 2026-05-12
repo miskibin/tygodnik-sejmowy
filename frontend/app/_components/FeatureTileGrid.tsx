@@ -33,7 +33,7 @@ const STAGES = [
   { key: "kom", label: "komisje" },
   { key: "ii", label: "II czyt." },
   { key: "iii", label: "III czyt." },
-  { key: "eli", label: "ELI" },
+  { key: "eli", label: "Dz.U." },
 ] as const;
 
 // Map a stage_type from process_stages into one of the 6 timeline buckets.
@@ -75,14 +75,11 @@ export async function FeatureTileGrid() {
   const standing = committees.filter((c) => c.type === "STANDING").length;
   const totalMembers = committees.reduce((s, c) => s + c.memberCount, 0);
 
-  // ── 07 Alerty — static keyword stub ───────────────────────────────────
-  const alertKeywords = [
-    { label: "najem instytucjonalny", n: 12, hot: true },
-    { label: "składka zdrowotna", n: 5, hot: false },
-    { label: "okręg 13", n: 2, hot: false },
-    { label: "kwota wolna", n: 8, hot: false },
-    { label: "jawność wynagrodzeń", n: 3, hot: true },
-  ];
+  // ── 07 Alerty — honest "what we plan" preview; feature is wkrótce ─────
+  // Mirrors the plannedFeatures list on /alerty/page.tsx so the landing
+  // teaser matches the actual coming-soon page (no fake counts).
+  const alertTriggers = ["fraza", "poseł", "klub", "okręg", "druk", "akt"];
+  const alertChannels = ["e-mail", "RSS", "push", "ICS"];
 
   return (
     <section className="px-4 md:px-8 lg:px-14 py-12 md:py-16 border-b border-rule">
@@ -221,7 +218,7 @@ export async function FeatureTileGrid() {
             num="03"
             kicker="PEŁEN CYKL"
             title="Wątek"
-            description="Każda ustawa — od druku przez czytania, komisje, głosowania, aż po publikację w ELI."
+            description="Każda ustawa — od druku przez czytania, komisje, głosowania, aż po publikację w Dzienniku Ustaw."
             preview={
               <div>
                 <div className="font-serif italic text-[13.5px] leading-snug text-foreground line-clamp-2 mb-3">
@@ -267,13 +264,15 @@ export async function FeatureTileGrid() {
             title="Mowa"
             description="Wystąpienia z mównicy. Wyszukiwanie pełnotekstowe i semantyczne. Każde zdanie z linkiem do nagrania."
             preview={
-              <div className="border-l-2 border-destructive pl-3 py-1">
+              <div className="border-l-2 border-muted-foreground pl-3 py-1">
                 <div className="font-serif italic text-[13px] leading-snug text-muted-foreground">
                   „…poznasz, co konkretnie który poseł powiedział z mównicy — z minutą wideo i kontekstem debaty.&rdquo;
                 </div>
               </div>
             }
-            href={null}
+            href="/mowa"
+            ctaLabel="co planujemy →"
+            comingSoon
             className="lg:col-span-3"
           />
 
@@ -362,24 +361,42 @@ export async function FeatureTileGrid() {
             title="Alerty"
             description="Powiadomienia, gdy w Sejmie padnie konkretne słowo — albo gdy Twój poseł zagłosuje wbrew klubowi."
             preview={
-              <div className="flex flex-wrap gap-1.5">
-                {alertKeywords.map((k) => (
-                  <span
-                    key={k.label}
-                    className="inline-flex items-center gap-1.5 font-sans text-[11px] px-2.5 py-1 border"
-                    style={
-                      k.hot
-                        ? { background: "var(--destructive)", color: "var(--destructive-foreground)", borderColor: "var(--destructive)" }
-                        : { background: "var(--background)", color: "var(--secondary-foreground)", borderColor: "var(--border)" }
-                    }
-                  >
-                    „{k.label}&rdquo;
-                    <span className="font-mono text-[9.5px] opacity-70">{k.n}</span>
-                  </span>
-                ))}
+              <div className="space-y-3">
+                <div>
+                  <div className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+                    wyzwalacze
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {alertTriggers.map((t) => (
+                      <span
+                        key={t}
+                        className="font-sans text-[11px] px-2 py-0.5 border border-border bg-background text-secondary-foreground rounded-sm"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+                    kanały
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {alertChannels.map((c) => (
+                      <span
+                        key={c}
+                        className="font-mono text-[10.5px] px-2 py-0.5 border border-dashed border-border text-muted-foreground rounded-sm"
+                      >
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             }
-            href={null}
+            href="/alerty"
+            ctaLabel="co planujemy →"
+            comingSoon
             className="lg:col-span-3"
           />
         </div>

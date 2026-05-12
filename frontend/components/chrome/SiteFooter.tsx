@@ -86,6 +86,17 @@ export async function SiteFooter() {
               github.com/miskibin/tygodnik-sejmowy →
             </a>
           </p>
+          <p className="m-0 mb-3">
+            Zgłoś błąd lub pomysł:{" "}
+            <a
+              href="https://github.com/miskibin/tygodnik-sejmowy/issues/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive hover:underline"
+            >
+              github.com/.../issues →
+            </a>
+          </p>
           <p className="m-0 text-border">
             © {year} Tygodnik Sejmowy · public-good infrastructure
           </p>

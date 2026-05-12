@@ -18,7 +18,7 @@ const SOURCE_TAGS = [
   "głosowania",
   "komisje",
   "stenogramy",
-  "ELI",
+  "Dz.U./MP",
 ] as const;
 
 export function LandingMethod() {

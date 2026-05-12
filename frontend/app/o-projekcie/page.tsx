@@ -43,19 +43,7 @@ function fmtPL(n: number): string {
   return n.toLocaleString("pl-PL");
 }
 
-function MockChip() {
-  return (
-    <span
-      className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 border ml-3 align-middle"
-      style={{ borderColor: "var(--warning)", color: "var(--warning)" }}
-      title="Dane poglądowe — tabela jeszcze pusta, pokazujemy modelowe liczby"
-    >
-      przykładowo
-    </span>
-  );
-}
-
-function MockNotice() {
+function PatroniteUnavailableNotice() {
   return (
     <aside
       className="mb-12 px-5 py-4 border-l-4"
@@ -68,13 +56,22 @@ function MockNotice() {
         className="font-mono text-[10px] tracking-[0.18em] uppercase mb-1.5"
         style={{ color: "var(--warning)" }}
       >
-        ✶ &nbsp; Uwaga &nbsp; ✶
+        ✶ &nbsp; Wpływy chwilowo niedostępne &nbsp; ✶
       </div>
       <p
         className="font-serif text-[15px] leading-[1.55] m-0 text-foreground"
         style={{ maxWidth: 720 }}
       >
-        Wpływy z Patronite i koszty miesięczne są realne. Pierwsza pełna księga z fakturami w czerwcu 2026.
+        Nie udało się pobrać danych z Patronite. Aktualny stan wpływów sprawdzisz wprost na{" "}
+        <a
+          href="https://patronite.pl/tygodniksejmowy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-destructive hover:underline"
+        >
+          patronite.pl/tygodniksejmowy
+        </a>
+        . Pierwsza pełna księga z fakturami: czerwiec 2026.
       </p>
     </aside>
   );
@@ -111,9 +108,7 @@ export default async function AboutProjectPage() {
     ? Math.min(100, Math.round((monthlyIncome / costsTotal) * 100))
     : 0;
 
-  const headlineIsMock = !patron.ok;
-  const incomeIsMock = !patron.ok;
-  const anyMock = headlineIsMock || incomeIsMock;
+  const patroniteUnavailable = !patron.ok;
 
   return (
     <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
@@ -214,7 +209,7 @@ export default async function AboutProjectPage() {
 
         <Ornament />
 
-        {anyMock ? <MockNotice /> : null}
+        {patroniteUnavailable ? <PatroniteUnavailableNotice /> : null}
 
         <section className="mb-16">
           <SectionTitle
@@ -228,29 +223,28 @@ export default async function AboutProjectPage() {
             wpływy, miesięczny burn i to, z czego składa się utrzymanie projektu.
           </p>
 
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <BigStat
-              kicker={patron.ok ? "Patroni · aktywni" : "Patroni · od początku"}
-              value={fmtPL(patron.ok ? patronCount : 0)}
-              unit={patron.ok && totalEverCount > patronCount
-                ? `aktywni · ${fmtPL(totalEverCount)} kiedykolwiek`
-                : "osób"}
-              mock={headlineIsMock}
-            />
-            <BigStat
-              kicker="Bieżące wpływy"
-              value={fmtPL(monthlyIncome)}
-              unit="zł / mc"
-              accent
-              mock={headlineIsMock}
-            />
-            <BigStat
-              kicker="Pokrycie kosztów"
-              value={`${coveragePct}%`}
-              unit={`z ${fmtPL(costsTotal)} zł/mc`}
-              mock={headlineIsMock}
-            />
-          </section>
+          {patron.ok ? (
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+              <BigStat
+                kicker="Patroni · aktywni"
+                value={fmtPL(patronCount)}
+                unit={totalEverCount > patronCount
+                  ? `aktywni · ${fmtPL(totalEverCount)} kiedykolwiek`
+                  : "osób"}
+              />
+              <BigStat
+                kicker="Bieżące wpływy"
+                value={fmtPL(monthlyIncome)}
+                unit="zł / mc"
+                accent
+              />
+              <BigStat
+                kicker="Pokrycie kosztów"
+                value={`${coveragePct}%`}
+                unit={`z ${fmtPL(costsTotal)} zł/mc`}
+              />
+            </section>
+          ) : null}
 
           <div className="grid md:grid-cols-2 gap-10">
             <div>
@@ -285,9 +279,8 @@ export default async function AboutProjectPage() {
             </div>
 
             <div>
-              <h3 className="font-serif text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule flex items-baseline">
-                <span>Skąd wpływy</span>
-                {incomeIsMock ? <MockChip /> : null}
+              <h3 className="font-serif text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule">
+                Skąd wpływy
               </h3>
               {patron.ok ? (
                 <>
@@ -305,9 +298,9 @@ export default async function AboutProjectPage() {
                 </>
               ) : (
                 <IncomeRow
-                  label="Patronite — brak tokena (PATRONITE_TOKEN)"
+                  label="Patronite — dane chwilowo niedostępne"
                   value="—"
-                  mock
+                  muted
                 />
               )}
               <p
@@ -332,19 +325,13 @@ function BigStat({
   value,
   unit,
   accent = false,
-  mock = false,
 }: {
   kicker: string;
   value: string;
   unit: string;
   accent?: boolean;
-  mock?: boolean;
 }) {
-  const valueColor = mock
-    ? "text-muted-foreground italic"
-    : accent
-      ? "text-destructive italic"
-      : "text-foreground";
+  const valueColor = accent ? "text-destructive italic" : "text-foreground";
   return (
     <div
       className="bg-background border-2 border-foreground p-6"
@@ -352,14 +339,6 @@ function BigStat({
     >
       <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
         {kicker}
-        {mock ? (
-          <span
-            className="ml-2 normal-case tracking-normal"
-            style={{ color: "var(--warning)" }}
-          >
-            (przykładowo)
-          </span>
-        ) : null}
       </div>
       <div
         className={`font-serif font-normal leading-none ${valueColor}`}
@@ -395,23 +374,17 @@ function IncomeRow({
   label,
   value,
   muted = false,
-  mock = false,
 }: {
   label: string;
   value: string;
   muted?: boolean;
-  mock?: boolean;
 }) {
   return (
     <div
       className={`flex items-baseline justify-between gap-3 py-2 border-b border-dotted border-border ${muted ? "text-muted-foreground" : ""}`}
     >
       <span className="font-serif text-[15px]">{label}</span>
-      <span
-        className={`font-mono text-[13px] tabular-nums ${mock ? "italic text-muted-foreground" : ""}`}
-      >
-        {value}
-      </span>
+      <span className="font-mono text-[13px] tabular-nums">{value}</span>
     </div>
   );
 }
