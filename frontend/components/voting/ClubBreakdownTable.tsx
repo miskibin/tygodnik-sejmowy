@@ -235,7 +235,7 @@ function ClubRow({ c }: { c: ClubBreakdownRow }) {
 // Plain <img> with loading="eager" so the off-screen capture target doesn't
 // trip Next/Image's lazy-load IntersectionObserver (which never fires for
 // elements positioned outside the viewport).
-function PngClubRow({ c }: { c: ClubBreakdownRow }) {
+function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
   const segs: Segment[] = [
     { n: c.yes, color: "var(--success)", label: "ZA", textOnFaint: false },
     { n: c.no, color: "var(--destructive)", label: "PRZECIW", textOnFaint: false },
@@ -257,15 +257,15 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
     <img
       src={`/club-logos/${logoEntry.file}`}
       alt={c.club_name}
-      width={24}
-      height={24}
+      width={32}
+      height={32}
       loading="eager"
       decoding="sync"
       style={{
-        width: 24,
-        height: 24,
+        width: 32,
+        height: 32,
         objectFit: "contain",
-        borderRadius: 3,
+        borderRadius: 4,
         background: "var(--background)",
         border: "1px solid var(--border)",
         flexShrink: 0,
@@ -278,12 +278,12 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        width: 24,
-        height: 24,
-        borderRadius: 3,
+        width: 32,
+        height: 32,
+        borderRadius: 4,
         background: c.clubColor,
         color: "var(--background)",
-        fontSize: 10,
+        fontSize: 13,
         fontWeight: 700,
         flexShrink: 0,
       }}
@@ -295,20 +295,22 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
   return (
     <div
       style={{
+        flex: 1,
+        minHeight: 0,
         display: "grid",
-        gridTemplateColumns: "150px 44px 1fr 150px",
-        gap: 14,
+        gridTemplateColumns: "170px 56px 1fr 170px",
+        gap: 18,
         alignItems: "center",
-        padding: "7px 0",
-        borderBottom: "1px solid var(--border)",
+        padding: "4px 0",
+        borderBottom: isLast ? "none" : "1px solid var(--border)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
         <span
           aria-hidden
           style={{
-            width: 3,
-            height: 22,
+            width: 4,
+            height: 32,
             background: c.clubColor,
             borderRadius: 2,
             flexShrink: 0,
@@ -317,7 +319,7 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
         {logo}
         <span
           style={{
-            fontSize: 11,
+            fontSize: 14,
             color: "var(--secondary-foreground)",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -334,7 +336,7 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
         style={{
           fontFamily: "var(--font-mono, monospace)",
           fontVariantNumeric: "tabular-nums",
-          fontSize: 12,
+          fontSize: 15,
           color: "var(--secondary-foreground)",
           textAlign: "right",
         }}
@@ -345,7 +347,7 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
       <div
         style={{
           display: "flex",
-          height: 20,
+          height: 30,
           background: "var(--muted)",
           border: "1px solid var(--border)",
         }}
@@ -362,7 +364,7 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
                 justifyContent: "center",
                 width: `${pct * 100}%`,
                 background: s.color,
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: 700,
                 fontFamily: "var(--font-mono, monospace)",
                 color: s.textOnFaint ? "var(--secondary-foreground)" : "var(--background)",
@@ -376,7 +378,7 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
 
       <div
         style={{
-          fontSize: 11,
+          fontSize: 13,
           color: "var(--secondary-foreground)",
           textAlign: "right",
         }}
@@ -384,7 +386,7 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
         <span
           style={{
             fontFamily: "var(--font-mono, monospace)",
-            fontSize: 9,
+            fontSize: 10,
             color: "var(--muted-foreground)",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
@@ -404,9 +406,9 @@ function PngClubRow({ c }: { c: ClubBreakdownRow }) {
           <span
             style={{
               fontFamily: "var(--font-mono, monospace)",
-              marginLeft: 6,
+              marginLeft: 8,
               color: "var(--destructive)",
-              fontSize: 9,
+              fontSize: 10,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
             }}
@@ -565,11 +567,11 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
             <div
               style={{
                 fontFamily: "var(--font-serif, serif)",
-                fontSize: 34,
+                fontSize: 42,
                 fontWeight: 500,
-                lineHeight: 1.12,
-                letterSpacing: "-0.018em",
-                marginBottom: 14,
+                lineHeight: 1.1,
+                letterSpacing: "-0.02em",
+                marginBottom: 16,
                 color: "var(--foreground)",
               }}
             >
@@ -608,15 +610,15 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "150px 44px 1fr 150px",
-            gap: 14,
+            gridTemplateColumns: "170px 56px 1fr 170px",
+            gap: 18,
             fontFamily: "var(--font-mono, monospace)",
             textTransform: "uppercase",
-            fontSize: 9,
+            fontSize: 10,
             color: "var(--muted-foreground)",
             letterSpacing: "0.14em",
             borderBottom: "1px solid var(--rule)",
-            paddingBottom: 6,
+            paddingBottom: 8,
             marginBottom: 2,
           }}
         >
@@ -626,10 +628,18 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
           <span style={{ textAlign: "right" }}>Dyscyplina</span>
         </div>
 
-        {/* Rows */}
-        <div style={{ flex: 1, minHeight: 0 }}>
-          {filteredClubs.map((c) => (
-            <PngClubRow key={c.club_ref} c={c} />
+        {/* Rows — flex column with each row flex:1 so 4 klubs stretch to fill
+            the square as much as 12 do. No empty bottom space. */}
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {filteredClubs.map((c, i) => (
+            <PngClubRow key={c.club_ref} c={c} isLast={i === filteredClubs.length - 1} />
           ))}
         </div>
 
