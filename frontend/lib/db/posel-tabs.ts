@@ -2,6 +2,12 @@ import "server-only";
 
 import { cleanStatementBody } from "@/lib/speechExcerpt";
 import { supabase } from "@/lib/supabase";
+import {
+  computePromiseAlignment,
+  type MotionPolarity,
+  type PromiseAlignment,
+  type PromiseStance,
+} from "@/lib/promiseAlignment";
 
 const DEFAULT_TERM = 10;
 
@@ -489,6 +495,9 @@ export type PromiseAlignmentVote = {
   printNumber: string;
   printShort: string | null;
   vote: VoteValue | "NONE";
+  // Polarity-aware verdict; "absent" is distinct from "neutral" because the
+  // dot UI uses different glyphs. NONE-vote rows return alignment=undefined.
+  alignment?: PromiseAlignment;
 };
 
 export type PromiseAlignmentRow = {
@@ -536,11 +545,11 @@ export async function getMpPromiseAlignments(
 
   const { data: promisesData, error: prErr } = await sb
     .from("promises")
-    .select("id, title")
+    .select("id, title, stance")
     .eq("party_code", partyCode)
     .limit(500);
   if (prErr) throw prErr;
-  const promises = (promisesData ?? []) as Array<{ id: number; title: string }>;
+  const promises = (promisesData ?? []) as Array<{ id: number; title: string; stance: PromiseStance }>;
   const promiseIds = promises.map((p) => p.id);
   if (promiseIds.length === 0) {
     return { partyCode, rows: [], totalPromises: 0, alignedCount: 0, againstCount: 0 };
@@ -592,11 +601,14 @@ export async function getMpPromiseAlignments(
   }
   const votingIds = Array.from(new Set(bestVotingByPrint.values()));
 
-  let votingMeta = new Map<number, { date: string | null; title: string }>();
-  let mpVoteByVoting = new Map<number, VoteValue>();
+  // motion_polarity (mig 0087) is the polarity of the *motion*, not the bill —
+  // NO on "wniosek o odrzucenie" is pro-bill. Computing alignment without it
+  // mislabels every reject-motion vote.
+  const votingMeta = new Map<number, { date: string | null; title: string; polarity: MotionPolarity | null }>();
+  const mpVoteByVoting = new Map<number, VoteValue>();
   if (votingIds.length > 0) {
     const [vmRes, mvRes] = await Promise.all([
-      sb.from("votings").select("id, date, title").in("id", votingIds).limit(votingIds.length),
+      sb.from("votings").select("id, date, title, motion_polarity").in("id", votingIds).limit(votingIds.length),
       sb
         .from("votes")
         .select("voting_id, vote")
@@ -607,8 +619,13 @@ export async function getMpPromiseAlignments(
     ]);
     if (vmRes.error) throw vmRes.error;
     if (mvRes.error) throw mvRes.error;
-    for (const v of (vmRes.data ?? []) as Array<{ id: number; date: string | null; title: string | null }>) {
-      votingMeta.set(v.id, { date: v.date, title: v.title ?? "" });
+    for (const v of (vmRes.data ?? []) as Array<{
+      id: number;
+      date: string | null;
+      title: string | null;
+      motion_polarity: MotionPolarity | null;
+    }>) {
+      votingMeta.set(v.id, { date: v.date, title: v.title ?? "", polarity: v.motion_polarity });
     }
     for (const v of (mvRes.data ?? []) as Array<{ voting_id: number; vote: string }>) {
       mpVoteByVoting.set(v.voting_id, v.vote as VoteValue);
@@ -645,8 +662,9 @@ export async function getMpPromiseAlignments(
         });
         continue;
       }
-      const meta = votingMeta.get(vid) ?? { date: null, title: "" };
+      const meta = votingMeta.get(vid) ?? { date: null, title: "", polarity: null as MotionPolarity | null };
       const mpVote = (mpVoteByVoting.get(vid) ?? "ABSENT") as VoteValue;
+      const alignment: PromiseAlignment = computePromiseAlignment(mpVote, meta.polarity, promise.stance);
       votes.push({
         votingId: vid,
         date: meta.date,
@@ -655,9 +673,12 @@ export async function getMpPromiseAlignments(
         printNumber: c.printNumber,
         printShort: pr.short_title,
         vote: mpVote,
+        alignment,
       });
-      if (mpVote === "YES") alignedCount++;
-      else if (mpVote === "NO" || mpVote === "ABSTAIN") againstCount++;
+      // KPI tiles count only definitive verdicts; neutral/absent excluded so
+      // amendment-heavy promises don't dilute the percentage.
+      if (alignment === "aligned") alignedCount++;
+      else if (alignment === "opposed") againstCount++;
     }
     if (votes.length > 0) {
       // newest voting first

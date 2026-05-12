@@ -122,6 +122,21 @@ def cmd_backfill_mp_club_history(
     )
 
 
+@backfill_app.command("motion-polarity")
+def cmd_backfill_motion_polarity(
+    term: int = typer.Option(None, "--term", "-t", help="Restrict to one term; default = all."),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+):
+    """Re-tag votings.motion_polarity from votings.topic (mig 0087).
+
+    DB trigger handles fresh inserts; run this after widening the regex set
+    or after migration first apply. Idempotent — only updates rows whose
+    label disagrees with the current classifier.
+    """
+    from supagraf.backfill import backfill_motion_polarity
+    _print_counts("motion-polarity", backfill_motion_polarity(term=term, dry_run=dry_run))
+
+
 @backfill_app.command("all")
 def cmd_backfill_all(dry_run: bool = typer.Option(False, "--dry-run")):
     """Run every backfill in safe dependency order. Idempotent.
