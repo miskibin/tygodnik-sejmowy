@@ -51,7 +51,7 @@ export async function GET() {
       title: "Tygodnik Sejmowy — druki",
       link: SITE_URL,
       description:
-        "Najważniejsze druki sejmowe X kadencji — w prostym polskim, ranking redakcyjny Tygodnika Sejmowego.",
+        "Druki sejmowe X kadencji w wyborze redakcji Tygodnika Sejmowego.",
       language: "pl-pl",
       selfLink: FEED_URL,
     },

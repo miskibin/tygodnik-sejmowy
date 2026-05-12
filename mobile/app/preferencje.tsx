@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,11 +10,13 @@ import {
   View,
 } from "react-native";
 
+import { SupportCard } from "@/components/SupportCard";
 import {
   DEFAULT_PROFILE,
   formatPostcodeInput,
   getProfile,
   isValidPostcode,
+  resetOnboarding,
   setProfile,
   TOPICS,
   type Profile,
@@ -100,6 +103,37 @@ export default function Preferencje() {
       >
         <Text style={styles.saveText}>Zapisz</Text>
       </Pressable>
+
+      <View style={styles.supportWrap}>
+        <Text style={[styles.section, { paddingHorizontal: spacing.lg }]}>WSPARCIE</Text>
+        <SupportCard />
+      </View>
+
+      <View style={styles.debug}>
+        <Text style={styles.section}>DEBUG</Text>
+        <Pressable
+          onPress={() => {
+            Alert.alert(
+              "Pokaż onboarding ponownie?",
+              "Po potwierdzeniu wrócisz do ekranu powitalnego.",
+              [
+                { text: "Anuluj", style: "cancel" },
+                {
+                  text: "Pokaż",
+                  style: "destructive",
+                  onPress: async () => {
+                    await resetOnboarding();
+                    router.replace("/onboarding");
+                  },
+                },
+              ],
+            );
+          }}
+          style={({ pressed }) => [styles.debugBtn, pressed && { opacity: 0.7 }]}
+        >
+          <Text style={styles.debugBtnText}>Pokaż onboarding ponownie</Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }
@@ -107,6 +141,7 @@ export default function Preferencje() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.paper },
   content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  supportWrap: { marginTop: spacing.xxl, marginHorizontal: -spacing.lg },
   section: {
     fontFamily: fonts.sansBold,
     fontSize: fontSize.xs,
@@ -154,4 +189,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveText: { color: colors.paper, fontFamily: fonts.sansBold, fontSize: fontSize.md },
+  debug: {
+    marginTop: spacing.xxl,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    gap: spacing.sm,
+  },
+  debugBtn: {
+    alignSelf: "flex-start",
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    borderStyle: "dashed",
+  },
+  debugBtnText: { fontFamily: fonts.sansBold, fontSize: fontSize.xs, color: colors.inkSoft, letterSpacing: 0.5 },
 });

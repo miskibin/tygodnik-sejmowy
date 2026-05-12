@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { BottomTabs } from "@/components/BottomTabs";
 import { formatDateRange } from "@/lib/format";
 import { getSittingsIndex } from "@/lib/queries/tygodnik";
 import type { SittingInfo } from "@/lib/types";
@@ -20,17 +21,20 @@ export default function Archive() {
   }
 
   return (
-    <FlatList
-      data={q.data ?? []}
-      keyExtractor={(s) => String(s.sittingNum)}
-      renderItem={({ item }) => <Row sitting={item} onPress={() => router.push(`/tygodnik/${item.sittingNum}`)} />}
-      contentContainerStyle={{ padding: spacing.lg, gap: spacing.sm }}
-      ListEmptyComponent={
-        <View style={styles.center}>
-          <Text style={{ fontFamily: fonts.sans, color: colors.inkMuted }}>Brak wydań.</Text>
-        </View>
-      }
-    />
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
+      <FlatList
+        data={q.data ?? []}
+        keyExtractor={(s) => String(s.sittingNum)}
+        renderItem={({ item }) => <Row sitting={item} onPress={() => router.push(`/tygodnik/${item.sittingNum}`)} />}
+        contentContainerStyle={{ padding: spacing.lg, gap: spacing.sm }}
+        ListEmptyComponent={
+          <View style={styles.center}>
+            <Text style={{ fontFamily: fonts.sans, color: colors.inkMuted }}>Brak wydań.</Text>
+          </View>
+        }
+      />
+      <BottomTabs />
+    </View>
   );
 }
 

@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Heart, Bug, Rss, Globe } from "lucide-react";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
+import { GithubIcon, YoutubeIcon, XIcon } from "./BrandIcons";
 import { getLastDataUpdate } from "@/lib/db/freshness";
 
 const PL_DATE = new Intl.DateTimeFormat("pl-PL", {
@@ -49,17 +51,6 @@ export async function SiteFooter() {
       role="contentinfo"
       className="border-t border-rule bg-muted mt-12"
     >
-      {lastUpdate && (
-        <div className="border-b border-rule/60">
-          <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-14 py-2 flex items-center justify-end gap-2 font-mono text-[10.5px] tracking-[0.14em] uppercase text-muted-foreground">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive/70" aria-hidden />
-            <span>Aktualizacja danych</span>
-            <span className="text-secondary-foreground" title={PL_DATE.format(lastUpdate)}>
-              <time dateTime={lastUpdate.toISOString()}>{relativeLabel(lastUpdate)}</time>
-            </span>
-          </div>
-        </div>
-      )}
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-14 py-12 grid gap-10 md:gap-8 grid-cols-1 md:grid-cols-3">
         {/* Wordmark + tagline */}
         <div>
@@ -69,8 +60,17 @@ export async function SiteFooter() {
             </span>
           </Link>
           <p className="font-serif italic text-[13.5px] text-secondary-foreground mt-3 mb-0 leading-snug max-w-[320px]">
-            Co Sejm zmienił w Twoim życiu w tym tygodniu — w prostym polskim, dopasowane do Twojego okręgu.
+            Cotygodniowy przegląd prac Sejmu RP. Wydanie piątkowe, dopasowane do okręgu.
           </p>
+          {lastUpdate && (
+            <div className="mt-4 flex items-center gap-2 font-mono text-[10.5px] tracking-[0.14em] uppercase text-muted-foreground">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive/70" aria-hidden />
+              <span>Aktualizacja danych</span>
+              <span className="text-secondary-foreground" title={PL_DATE.format(lastUpdate)}>
+                <time dateTime={lastUpdate.toISOString()}>{relativeLabel(lastUpdate)}</time>
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Sitemap */}
@@ -97,57 +97,81 @@ export async function SiteFooter() {
           <div className="uppercase tracking-[0.18em] text-muted-foreground mb-3">
             Linki
           </div>
-          <p className="m-0 mb-3">
-            Wsparcie:{" "}
-            <PatroniteTrackedLink placement="footer" className="text-destructive hover:underline">
-              patronite.pl/tygodniksejmowy →
-            </PatroniteTrackedLink>
-          </p>
-          <p className="m-0 mb-3">
-            Kod źródłowy:{" "}
+          <div className="flex items-center gap-3 mb-4">
             <a
-              href="https://github.com/miskibin/tygodnik-sejmowy"
+              href="https://x.com/sejmstats"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-destructive hover:underline"
+              aria-label="X (Twitter): sejmstats"
+              title="X / Twitter"
+              className="text-muted-foreground hover:text-destructive transition-colors"
             >
-              github.com/miskibin/tygodnik-sejmowy →
+              <XIcon className="w-[18px] h-[18px]" />
             </a>
-          </p>
-          <p className="m-0 mb-3">
-            Zgłoś błąd lub pomysł:{" "}
-            <a
-              href="https://github.com/miskibin/tygodnik-sejmowy/issues/new"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-destructive hover:underline"
-            >
-              github.com/.../issues →
-            </a>
-          </p>
-          <p className="m-0 mb-3">
-            YouTube:{" "}
             <a
               href="https://www.youtube.com/watch?v=7URNcMg_9Ow"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-destructive hover:underline"
+              aria-label="YouTube"
+              title="YouTube"
+              className="text-muted-foreground hover:text-destructive transition-colors"
             >
-              youtube.com →
+              <YoutubeIcon className="w-[18px] h-[18px]" />
             </a>
-          </p>
-          <p className="m-0 mb-3">
-            Pokrewne:{" "}
             <a
-              href="https://radoskop.pl/"
+              href="https://github.com/miskibin/tygodnik-sejmowy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-destructive hover:underline"
+              aria-label="Kod źródłowy na GitHubie"
+              title="GitHub — kod źródłowy"
+              className="text-muted-foreground hover:text-destructive transition-colors"
             >
-              radoskop.pl →
+              <GithubIcon className="w-[18px] h-[18px]" />
             </a>
-            <span className="text-muted-foreground"> · ta sama idea dla rad miast i województw</span>
-          </p>
+            <a
+              href="https://github.com/miskibin/tygodnik-sejmowy/issues/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Zgłoś błąd lub pomysł"
+              title="Zgłoś błąd lub pomysł"
+              className="text-muted-foreground hover:text-destructive transition-colors"
+            >
+              <Bug className="w-[18px] h-[18px]" aria-hidden />
+            </a>
+            <a
+              href="/rss.xml"
+              aria-label="Kanał RSS"
+              title="RSS"
+              className="text-muted-foreground hover:text-destructive transition-colors"
+            >
+              <Rss className="w-[18px] h-[18px]" aria-hidden />
+            </a>
+          </div>
+          <ul className="m-0 p-0 list-none space-y-2">
+            <li className="group flex items-start gap-2">
+              <Heart className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-destructive transition-colors" aria-hidden />
+              <div>
+                <span>Wsparcie: </span>
+                <PatroniteTrackedLink placement="footer" className="text-destructive hover:underline">
+                  patronite.pl/tygodniksejmowy
+                </PatroniteTrackedLink>
+              </div>
+            </li>
+            <li className="group flex items-start gap-2">
+              <Globe className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-destructive transition-colors" aria-hidden />
+              <div>
+                <a
+                  href="https://radoskop.pl/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-destructive hover:underline"
+                >
+                  radoskop.pl
+                </a>
+                <span className="text-muted-foreground"> — ta sama idea dla rad miast i województw</span>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>

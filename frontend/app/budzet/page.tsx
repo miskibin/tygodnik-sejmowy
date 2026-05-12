@@ -97,7 +97,7 @@ export default async function BudzetPage() {
       <div className="max-w-[1100px] mx-auto">
         <PageBreadcrumb
           items={[{ label: "Budżet" }]}
-          subtitle="Co miesiąc publikujemy pełen budżet projektu. Bez paywalla, bez grantów uzależniających, bez ukrytych sponsorów."
+          subtitle="Pełen budżet projektu, aktualizowany co miesiąc. Wpływy z Patronite, koszty serwera, hosting, domeny."
         />
 
         {anyMock ? <MockNotice /> : null}

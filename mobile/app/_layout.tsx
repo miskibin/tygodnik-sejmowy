@@ -62,6 +62,7 @@ export default function RootLayout() {
             />
             <Stack.Screen name="tygodnik/archive" options={{ title: "Archiwum" }} />
             <Stack.Screen name="preferencje" options={{ title: "Preferencje" }} />
+            <Stack.Screen name="posel" options={{ headerShown: false }} />
             <Stack.Screen
               name="druk/[term]/[number]"
               options={{ title: "Druk", headerBackTitle: "Wstecz" }}

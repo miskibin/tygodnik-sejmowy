@@ -28,7 +28,7 @@ services:
   daily:
     build:
       context: ./repo
-      dockerfile: ../Dockerfile.supagraf
+      dockerfile: Dockerfile.supagraf
     image: sejmograf/supagraf:local
     container_name: sejmograf-daily
     depends_on:
@@ -39,8 +39,9 @@ services:
     environment:
       OLLAMA_HOST: "http://ollama:11434"
       SUPAGRAF_LLM_TIMEOUT_S: "300"
+    # Source code is baked into the image; only persist mutable state on
+    # the host. Bind-mounting /app would mask the installed .venv.
     volumes:
-      - ./repo:/app:ro
       - ./fixtures:/app/fixtures
       - ./logs:/app/logs
     profiles: ["jobs"]   # one-shot: never auto-up, only via `compose run`

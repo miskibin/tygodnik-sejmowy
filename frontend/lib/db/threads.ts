@@ -62,45 +62,28 @@ export type ThreadSummary = {
   lastRefreshedAt: string | null;
 };
 
-// Threads currently moving through Sejm — passed=false AND seen by ETL in the
-// last `cutoffDays` days. Sorted by most-recent stage_date desc so freshly-active
-// bills surface above stale-but-still-open ones. Default 90d for the /watek
-// view; homepage tile passes a wider window so it still has something to show
-// after a quiet stretch.
+// Threads currently moving through Sejm — passed=false AND a top-level stage
+// dated within the last `cutoffDays` days. Driven off process_stages.stage_date
+// (the real legislative-activity signal); processes.last_refreshed_at is an
+// ETL-touch timestamp that only gets stamped for passed rows by refresh-stale-eli,
+// so it can't be used as an "is this thread active" proxy. Default 90d for the
+// /watek view; homepage tile passes a wider window so it still has something
+// to show after a quiet stretch.
 export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<ThreadSummary[]> {
   const sb = supabase();
-  const cutoff = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000).toISOString();
+  const cutoffDate = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10); // process_stages.stage_date is a DATE, not timestamptz
 
-  // Pull candidate processes; we'll attach the latest stage in a second query
-  // because process_stages → max(stage_date) is awkward in PostgREST.
-  const { data: procs, error: pe } = await sb
-    .from("processes")
-    .select("id, term, number, title, last_refreshed_at")
-    .eq("passed", false)
-    .gte("last_refreshed_at", cutoff)
-    .order("last_refreshed_at", { ascending: false })
-    .limit(limit * 3); // overfetch so we can drop processes with no stages
-  if (pe) throw pe;
-  const rows = (procs ?? []) as Array<{
-    id: number;
-    term: number;
-    number: string;
-    title: string | null;
-    last_refreshed_at: string | null;
-  }>;
-  if (rows.length === 0) return [];
-
-  const procIds = rows.map((r) => r.id);
-
-  // Fetch latest stage per process. We grab top-level (depth=0) stages with
-  // a stage_date and let the client pick the max — keeps the query simple.
+  // Pull every recent top-level stage; dedupe to (process_id → latest) client-side.
+  // PostgREST has no DISTINCT ON / GROUP BY, so we over-fetch and reduce.
   const { data: stageRows, error: se } = await sb
     .from("process_stages")
     .select("process_id, stage_type, stage_name, stage_date")
-    .in("process_id", procIds)
     .eq("depth", 0)
-    .not("stage_date", "is", null)
-    .order("stage_date", { ascending: false });
+    .gte("stage_date", cutoffDate)
+    .order("stage_date", { ascending: false })
+    .limit(2000);
   if (se) throw se;
 
   const latestByProc = new Map<number, { stageType: string; stageName: string; stageDate: string }>();
@@ -111,13 +94,32 @@ export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<T
     stage_date: string | null;
   }>) {
     if (!r.stage_date) continue;
-    if (latestByProc.has(r.process_id)) continue;
+    if (latestByProc.has(r.process_id)) continue; // first wins, already desc-sorted
     latestByProc.set(r.process_id, {
       stageType: r.stage_type ?? "",
       stageName: r.stage_name ?? "",
       stageDate: r.stage_date,
     });
   }
+  if (latestByProc.size === 0) return [];
+
+  const procIds = Array.from(latestByProc.keys());
+
+  // Hydrate processes; drop passed=true rows server-side.
+  const { data: procs, error: pe } = await sb
+    .from("processes")
+    .select("id, term, number, title, last_refreshed_at")
+    .in("id", procIds)
+    .eq("passed", false);
+  if (pe) throw pe;
+  const rows = (procs ?? []) as Array<{
+    id: number;
+    term: number;
+    number: string;
+    title: string | null;
+    last_refreshed_at: string | null;
+  }>;
+  if (rows.length === 0) return [];
 
   // Hydrate short_title from prints (term, number). PostgREST has no
   // composite-IN, so we filter the cartesian and dedupe client-side.
@@ -136,22 +138,20 @@ export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<T
   }
 
   const summaries: ThreadSummary[] = rows.map((r) => {
-    const latest = latestByProc.get(r.id);
+    const latest = latestByProc.get(r.id)!; // guaranteed by procIds derivation
     return {
       processId: r.id,
       term: r.term,
       number: r.number,
       title: r.title ?? "",
       shortTitle: shortByKey.get(`${r.term}::${r.number}`) ?? null,
-      lastStageType: latest?.stageType ?? null,
-      lastStageName: latest?.stageName ?? null,
-      lastStageDate: latest?.stageDate ?? null,
+      lastStageType: latest.stageType,
+      lastStageName: latest.stageName,
+      lastStageDate: latest.stageDate,
       lastRefreshedAt: r.last_refreshed_at ?? null,
     };
   });
 
-  // Sort by latest stage_date desc, with refreshed_at as tiebreak. Unstaged
-  // processes fall to the bottom.
   summaries.sort((a, b) => {
     const da = a.lastStageDate ? Date.parse(a.lastStageDate) : 0;
     const db = b.lastStageDate ? Date.parse(b.lastStageDate) : 0;

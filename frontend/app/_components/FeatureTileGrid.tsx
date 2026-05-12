@@ -106,7 +106,7 @@ export async function FeatureTileGrid() {
             Dalej <span className="italic text-destructive">w numerze</span>
           </h2>
           <p className="font-serif italic text-[14px] md:text-[15px] text-secondary-foreground m-0">
-            Tygodnik to wejście. Pod spodem — siedem działów.
+            Siedem pozostałych działów.
           </p>
         </div>
 
@@ -176,7 +176,7 @@ export async function FeatureTileGrid() {
             num="02"
             kicker="POPARCIE PARTII"
             title="Sondaże"
-            description="Średnia ważona z ostatnich 30 dni, bez cherry-pickingu, z mandatami w projekcji."
+            description="Średnia ważona z ostatnich 30 dni. Z przeliczeniem na mandaty w Sejmie."
             preview={
               mainPolls.length > 0 ? (
                 <div>
@@ -283,7 +283,7 @@ export async function FeatureTileGrid() {
             preview={
               <div className="border-l-2 border-muted-foreground pl-3 py-1">
                 <div className="font-serif italic text-[13px] leading-snug text-muted-foreground">
-                  „…poznasz, co konkretnie który poseł powiedział z mównicy — z minutą wideo i kontekstem debaty.&rdquo;
+                  „Każde wystąpienie z&nbsp;mównicy z&nbsp;timestampem do nagrania i&nbsp;linkiem do druku.&rdquo;
                 </div>
               </div>
             }
@@ -361,7 +361,7 @@ export async function FeatureTileGrid() {
             num="07"
             kicker="SUBSKRYPCJE"
             title="Alerty"
-            description="RSS już działa — świeże druki prosto do Twojego czytnika. Push, ICS i alerty po słowach kluczowych — wkrótce."
+            description="RSS działa: nowe druki w czytniku. Push, ICS i alerty słowne — w planach."
             preview={
               <div className="space-y-3">
                 <div>

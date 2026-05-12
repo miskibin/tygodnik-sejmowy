@@ -68,6 +68,127 @@ export type PrintEvent = {
   payload: PrintEventPayload;
 };
 
+// ───────────────── Rich weekly events (mirrors frontend/lib/events-types.ts) ─
+
+export type EventType =
+  | "print"
+  | "vote"
+  | "eli_inforce"
+  | "late_interpellation"
+  | "viral_quote";
+
+export type LinkedPrintRef = {
+  print_id: number;
+  number: string;
+  short_title: string | null;
+  role: string;
+  impact_punch?: string | null;
+};
+
+export type ClubTally = {
+  club_short: string;
+  club_name: string;
+  yes: number;
+  no: number;
+  abstain: number;
+  not_voting: number;
+  total: number;
+};
+
+export type VoteEventPayload = {
+  voting_id: number;
+  voting_number: number;
+  sitting: number;
+  sitting_day: number;
+  date: string;
+  title: string;
+  topic: string;
+  yes: number;
+  no: number;
+  abstain: number;
+  not_participating: number;
+  total_voted: number;
+  linked_prints: LinkedPrintRef[];
+  club_tally: ClubTally[];
+};
+
+export type ActKind =
+  | "ustawa_nowa"
+  | "nowelizacja"
+  | "tekst_jednolity"
+  | "obwieszczenie"
+  | "rozporzadzenie"
+  | "uchwala_sejmu"
+  | "inne";
+
+export type EliInforcePayload = {
+  act_id: number;
+  eli_id: string;
+  publisher: string;
+  year: number;
+  position: number;
+  type: string;
+  act_kind: ActKind | null;
+  title: string;
+  short_title: string | null;
+  in_force: string | null;
+  legal_status_date: string | null;
+  announcement_date: string | null;
+  promulgation_date: string | null;
+  display_address: string | null;
+  keywords: string[] | null;
+};
+
+export type InterpellationAuthor = {
+  mp_id: number;
+  first_last_name: string | null;
+};
+
+export type LateInterpellationPayload = {
+  question_id: number;
+  kind: "interpellation" | "written";
+  num: number;
+  title: string;
+  sent_date: string;
+  answer_delayed_days: number;
+  recipient_titles: string[];
+  authors: InterpellationAuthor[];
+};
+
+export type ViralQuotePayload = {
+  statement_id: number;
+  speaker_name: string;
+  function: string | null;
+  mp_id: number | null;
+  date: string;
+  viral_quote: string | null;
+  viral_reason: string | null;
+  tone: string | null;
+  topic_tags: string[] | null;
+  summary_one_line: string | null;
+  addressee: string | null;
+};
+
+type EventCommon = {
+  term: number;
+  sittingNum: number;
+  eventDate: string | null;
+  impactScore: number;
+  sourceUrl: string;
+};
+
+export type WeeklyEvent =
+  | (EventCommon & { eventType: "print"; payload: PrintEventPayload })
+  | (EventCommon & { eventType: "vote"; payload: VoteEventPayload })
+  | (EventCommon & { eventType: "eli_inforce"; payload: EliInforcePayload })
+  | (EventCommon & { eventType: "late_interpellation"; payload: LateInterpellationPayload })
+  | (EventCommon & { eventType: "viral_quote"; payload: ViralQuotePayload });
+
+export const ACT_KIND_NEW_LAW: ReadonlySet<ActKind> = new Set([
+  "ustawa_nowa",
+  "nowelizacja",
+]);
+
 export type ProcessStage = {
   ord: number;
   depth: number;

@@ -9,8 +9,6 @@ import {
   getPromiseDetailById,
   partyLabel,
   partyShort,
-  statusColor,
-  statusLabel,
 } from "@/lib/db/promises";
 
 export const revalidate = 300;
@@ -22,6 +20,37 @@ function formatDate(iso: string | null): string {
     month: "long",
     year: "numeric",
   });
+}
+
+function hostFromUrl(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    return new URL(url).host.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
+function plural(n: number, one: string, few: string, many: string): string {
+  if (n === 1) return one;
+  const lastTwo = n % 100;
+  const last = n % 10;
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) return few;
+  return many;
+}
+
+function normalize(s: string | null | undefined): string {
+  return (s ?? "").toLocaleLowerCase("pl").replace(/\s+/g, " ").trim();
+}
+
+function quoteAddsContext(title: string, quote: string | null): boolean {
+  if (!quote) return false;
+  const t = normalize(title).replace(/[.…]+$/, "");
+  const q = normalize(quote).replace(/[.…]+$/, "");
+  if (!t || !q) return false;
+  if (t === q) return false;
+  if (q.startsWith(t) || t.startsWith(q)) return false;
+  return true;
 }
 
 const TOPIC_LABEL: Record<string, string> = {
@@ -43,7 +72,6 @@ export default async function PromiseDetailPage({
 }) {
   const { party, slug } = await params;
 
-  // Allow numeric fallback: /obietnice/[party]/[id-as-number].
   let detail = await getPromiseDetail(party, slug);
   if (!detail && /^\d+$/.test(slug)) {
     detail = await getPromiseDetailById(parseInt(slug, 10));
@@ -51,7 +79,31 @@ export default async function PromiseDetailPage({
   if (!detail) notFound();
 
   const klub = detail.partyCode ? PARTY_TO_KLUB[detail.partyCode] ?? null : null;
-  const color = statusColor(detail.status);
+  const confirmedEvidence = detail.evidence.filter((e) => e.matchStatus === "confirmed");
+  const candidateEvidence = detail.evidence.filter((e) => e.matchStatus === "candidate");
+  const showQuoteAsContext = quoteAddsContext(detail.title, detail.sourceQuote);
+  const host = hostFromUrl(detail.sourceUrl);
+
+  // Build the "co rusza w Sejmie" pill that replaces the dead status enum.
+  const activityParts: Array<{ label: string; tone: "strong" | "weak" | "muted" }> = [];
+  if (confirmedEvidence.length > 0) {
+    activityParts.push({
+      label: `${confirmedEvidence.length} ${plural(confirmedEvidence.length, "druk", "druki", "druków")}`,
+      tone: "strong",
+    });
+  }
+  if (candidateEvidence.length > 0) {
+    activityParts.push({
+      label: `${candidateEvidence.length} ${plural(candidateEvidence.length, "możliwy", "możliwe", "możliwych")}`,
+      tone: "weak",
+    });
+  }
+  if (detail.votings.length > 0) {
+    activityParts.push({
+      label: `${detail.votings.length} ${plural(detail.votings.length, "głosowanie", "głosowania", "głosowań")}`,
+      tone: "strong",
+    });
+  }
 
   return (
     <div className="bg-background text-foreground font-serif pb-24">
@@ -71,149 +123,182 @@ export default async function PromiseDetailPage({
           ]}
         />
 
-        {/* Hero — pull-quote first */}
         <header className="border-b-2 border-rule pb-7 mb-7">
           <div className="flex items-center gap-3 mb-5 flex-wrap">
             {klub && <ClubBadge klub={klub} variant="logo" size="lg" />}
             <span className="font-sans text-[13px] font-medium text-foreground">
               {detail.partyCode ? partyLabel(detail.partyCode) : ""}
             </span>
-            <span
-              className="ml-auto inline-flex items-center gap-2 font-sans text-[12px] font-medium uppercase tracking-[0.1em] px-3 py-1.5 rounded-sm"
-              style={{ color, border: `1px solid ${color}55`, background: `${color}14` }}
-            >
-              <span aria-hidden className="inline-block w-[10px] h-[10px] rounded-sm" style={{ background: color }} />
-              {statusLabel(detail.status)}
-            </span>
+            {detail.sourceYear && (
+              <span className="font-mono text-[11px] text-muted-foreground">
+                obietnica z {detail.sourceYear}
+              </span>
+            )}
           </div>
 
-          {/* Show ONE primary text — quote when present, else title. Drop the
-              second-rate "stub title" repetition that the citizen test flagged. */}
-          {detail.sourceQuote ? (
+          <h1
+            className="font-serif font-medium m-0 leading-tight"
+            style={{
+              fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
+              textWrap: "balance",
+            }}
+          >
+            {detail.title}
+          </h1>
+
+          {showQuoteAsContext && detail.sourceQuote && (
             <blockquote
-              className="m-0 mb-5 font-serif italic text-foreground"
+              className="m-0 mt-5 font-serif italic text-secondary-foreground"
               style={{
-                fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)",
-                lineHeight: 1.2,
-                borderLeft: "4px solid var(--destructive)",
-                paddingLeft: 24,
+                fontSize: "clamp(1rem, 1.6vw, 1.15rem)",
+                lineHeight: 1.5,
+                borderLeft: "3px solid var(--border)",
+                paddingLeft: 16,
                 textWrap: "pretty",
               }}
             >
-              <span aria-hidden className="text-destructive mr-2" style={{ fontSize: 36 }}>
-                ❝
-              </span>
               {detail.sourceQuote}
             </blockquote>
-          ) : (
-            <h1
-              className="font-serif font-medium m-0 leading-tight"
-              style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)", textWrap: "balance" }}
-            >
-              {detail.title}
-            </h1>
           )}
 
-          <div className="mt-5 flex items-center gap-4 flex-wrap font-sans text-[12px]">
-            {detail.sourceUrl && (
+          <div className="mt-6 flex items-center gap-x-4 gap-y-2 flex-wrap font-sans text-[13px]">
+            {activityParts.length > 0 ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+                  Ruch w Sejmie:
+                </span>
+                {activityParts.map((p, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      color:
+                        p.tone === "strong"
+                          ? "var(--foreground)"
+                          : p.tone === "weak"
+                            ? "var(--secondary-foreground)"
+                            : "var(--muted-foreground)",
+                      fontWeight: p.tone === "strong" ? 500 : 400,
+                    }}
+                  >
+                    {i > 0 && <span className="text-border mr-2">·</span>}
+                    {p.label}
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2 font-sans text-[12px] italic text-muted-foreground">
+                <span className="font-mono text-[10px] tracking-[0.14em] uppercase not-italic">
+                  Ruch w Sejmie:
+                </span>
+                bez ruchu w Sejmie (na razie żaden druk nie został powiązany)
+              </span>
+            )}
+            {host && detail.sourceUrl && (
               <a
                 href={detail.sourceUrl}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="text-destructive underline decoration-dotted underline-offset-4"
+                className="ml-auto font-mono text-[11px] text-destructive underline decoration-dotted underline-offset-4"
               >
-                źródło ↗
+                źródło: {host} ↗
               </a>
-            )}
-            {detail.sourceYear && (
-              <span className="font-mono text-[11px] text-muted-foreground">{detail.sourceYear}</span>
-            )}
-            {detail.confidence != null && (
-              <span className="font-mono text-[11px] text-muted-foreground">
-                uznanie {detail.confidence.toFixed(2)}
-              </span>
             )}
           </div>
         </header>
 
-        {/* Main + sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-10">
           <main>
-            {/* Evidence list — split by rerank verdict.
-                Confirmed: high-confidence LLM-validated links (badge "potwierdzone").
-                Candidate: lower-confidence rerank survivors (badge "możliwe"). */}
-            {(() => {
-              const confirmedEvidence = detail.evidence.filter((e) => e.matchStatus === "confirmed");
-              const candidateEvidence = detail.evidence.filter((e) => e.matchStatus === "candidate");
-              const renderItem = (e: typeof detail.evidence[number]) => (
-                <li
-                  key={`${e.printTerm}-${e.printNumber}`}
-                  className="border-l-2 border-border pl-4"
+            {confirmedEvidence.length > 0 && (
+              <section className="mb-10" aria-labelledby="evidence-heading">
+                <h2
+                  id="evidence-heading"
+                  className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3"
                 >
-                  <Link
-                    href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
-                    className="font-serif text-foreground hover:text-destructive no-underline"
-                    style={{ fontSize: 18 }}
-                  >
-                    {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
-                  </Link>
-                  <div className="font-mono text-[11px] text-muted-foreground mt-1">
-                    Druk {e.printNumber}/{e.printTerm}
-                    {e.printTopic && (
-                      <>
-                        {" · "}
-                        <span className="text-secondary-foreground">{TOPIC_LABEL[e.printTopic] ?? e.printTopic}</span>
-                      </>
-                    )}
-                    {e.similarity != null && <> · sim {e.similarity.toFixed(2)}</>}
-                  </div>
-                  {e.rationale && (
-                    <p
-                      className="m-0 mt-2 font-serif italic text-secondary-foreground"
-                      style={{ fontSize: 14, lineHeight: 1.55 }}
+                  Powiązane druki ({confirmedEvidence.length})
+                </h2>
+                <ul className="list-none p-0 m-0 space-y-5">
+                  {confirmedEvidence.map((e) => (
+                    <li
+                      key={`${e.printTerm}-${e.printNumber}-c`}
+                      className="border-l-2 border-foreground pl-4"
                     >
-                      <MarkdownText text={e.rationale} />
-                    </p>
-                  )}
-                </li>
-              );
-              return (
-                <>
-                  {confirmedEvidence.length > 0 && (
-                    <section className="mb-10" aria-labelledby="evidence-heading">
-                      <h2
-                        id="evidence-heading"
-                        className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3"
+                      <Link
+                        href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
+                        className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
+                        style={{ fontSize: 18 }}
                       >
-                        Powiązane druki ({confirmedEvidence.length})
-                      </h2>
-                      <ul className="list-none p-0 m-0 space-y-4">
-                        {confirmedEvidence.map(renderItem)}
-                      </ul>
-                    </section>
-                  )}
-                  {candidateEvidence.length > 0 && (
-                    <section className="mb-10" aria-labelledby="candidate-evidence-heading">
-                      <h2
-                        id="candidate-evidence-heading"
-                        className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1"
-                      >
-                        Możliwe powiązania ({candidateEvidence.length})
-                      </h2>
-                      <p className="font-mono text-[10px] text-muted-foreground mb-3 leading-relaxed">
-                        Druki o temat dotyka obietnicy, ale LLM nie potwierdził jednoznacznie.
-                        Traktuj jako wskazówkę, nie dowód.
-                      </p>
-                      <ul className="list-none p-0 m-0 space-y-4 opacity-80">
-                        {candidateEvidence.map(renderItem)}
-                      </ul>
-                    </section>
-                  )}
-                </>
-              );
-            })()}
+                        {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
+                      </Link>
+                      {e.rationale && (
+                        <p
+                          className="m-0 mt-2 font-serif text-secondary-foreground"
+                          style={{ fontSize: 14.5, lineHeight: 1.6 }}
+                        >
+                          <MarkdownText text={e.rationale} />
+                        </p>
+                      )}
+                      <div className="font-mono text-[11px] text-muted-foreground mt-2 flex flex-wrap gap-x-3">
+                        <span>Druk {e.printNumber}/{e.printTerm}</span>
+                        {e.printTopic && (
+                          <span className="text-secondary-foreground">
+                            {TOPIC_LABEL[e.printTopic] ?? e.printTopic}
+                          </span>
+                        )}
+                        {e.similarity != null && <span>sim {e.similarity.toFixed(2)}</span>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
-            {/* Voting timeline */}
+            {candidateEvidence.length > 0 && (
+              <section className="mb-10" aria-labelledby="candidate-evidence-heading">
+                <h2
+                  id="candidate-evidence-heading"
+                  className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1"
+                >
+                  Możliwe powiązania ({candidateEvidence.length})
+                </h2>
+                <p className="font-sans text-[11px] text-muted-foreground mb-3 leading-relaxed max-w-prose">
+                  Druki dotykają tematu obietnicy, ale dopasowanie nie jest pewne. Traktuj jako wskazówkę, nie dowód.
+                </p>
+                <ul className="list-none p-0 m-0 space-y-4 opacity-80">
+                  {candidateEvidence.map((e) => (
+                    <li
+                      key={`${e.printTerm}-${e.printNumber}-d`}
+                      className="border-l-2 border-dotted border-border pl-4"
+                    >
+                      <Link
+                        href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
+                        className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
+                        style={{ fontSize: 16 }}
+                      >
+                        {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
+                      </Link>
+                      {e.rationale && (
+                        <p
+                          className="m-0 mt-1.5 font-serif italic text-secondary-foreground"
+                          style={{ fontSize: 13.5, lineHeight: 1.55 }}
+                        >
+                          <MarkdownText text={e.rationale} />
+                        </p>
+                      )}
+                      <div className="font-mono text-[10px] text-muted-foreground mt-1.5 flex flex-wrap gap-x-3">
+                        <span>Druk {e.printNumber}/{e.printTerm}</span>
+                        {e.printTopic && (
+                          <span className="text-secondary-foreground">
+                            {TOPIC_LABEL[e.printTopic] ?? e.printTopic}
+                          </span>
+                        )}
+                        {e.similarity != null && <span>sim {e.similarity.toFixed(2)}</span>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
             {detail.votings.length > 0 && (
               <section aria-labelledby="voting-heading" className="mb-10">
                 <h2
@@ -239,7 +324,7 @@ export default async function PromiseDetailPage({
                     return (
                       <li
                         key={v.votingId}
-                        className="grid grid-cols-[80px_1fr_auto] gap-3 items-baseline border-b border-border pb-3"
+                        className="grid grid-cols-[90px_1fr_auto] gap-3 items-baseline border-b border-border pb-3"
                       >
                         <span className="font-mono text-[11px] text-muted-foreground">
                           {formatDate(v.date)}
@@ -261,63 +346,53 @@ export default async function PromiseDetailPage({
             )}
 
             {detail.evidence.length === 0 && detail.votings.length === 0 && (
-              <p className="font-serif italic text-muted-foreground py-8" style={{ fontSize: 16 }}>
-                Brak potwierdzonych dopasowań do druków sejmowych. Status oparty na deklaracji
-                własnej partii lub przeglądzie ręcznym.
-              </p>
+              <section
+                className="mb-10 px-5 py-6 border-l-2"
+                style={{ borderColor: "var(--border)", background: "var(--muted)" }}
+              >
+                <p
+                  className="m-0 font-serif text-secondary-foreground"
+                  style={{ fontSize: 15.5, lineHeight: 1.6 }}
+                >
+                  Nie znaleźliśmy druków sejmowych dopasowanych do tej obietnicy. Może to znaczyć, że
+                  partia nie podjęła jeszcze działań legislacyjnych — albo że dopasowanie semantyczne
+                  ich nie znalazło. Wrócimy do tego, gdy bazę uzupełnimy.
+                </p>
+              </section>
             )}
           </main>
 
-          <aside className="lg:border-l lg:border-rule lg:pl-10">
+          <aside className="lg:border-l lg:border-rule lg:pl-8 space-y-8">
             {detail.related.length > 0 && (
-              <div className="mb-8">
+              <div>
                 <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3">
                   Inne obietnice {detail.partyCode ? partyShort(detail.partyCode) : ""}
                 </div>
                 <ul className="list-none p-0 m-0 space-y-3">
-                  {detail.related.slice(0, 3).map((r) => {
-                    const c = statusColor(r.status);
+                  {detail.related.slice(0, 5).map((r) => {
                     const href =
                       r.partyCode && r.slug
                         ? `/obietnice/${encodeURIComponent(r.partyCode)}/${encodeURIComponent(r.slug)}`
                         : `/obietnice/${r.id}`;
                     return (
-                      <li key={r.id} className="border-b border-dotted border-border pb-3">
+                      <li key={r.id} className="border-b border-dotted border-border pb-3 last:border-0">
                         <Link
                           href={href}
-                          className="font-serif text-foreground hover:text-destructive no-underline leading-snug"
+                          className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
                           style={{ fontSize: 14 }}
                         >
                           {r.title}
                         </Link>
-                        <div className="mt-1.5 inline-flex items-center gap-1.5 font-sans text-[10px]" style={{ color: c }}>
-                          <span aria-hidden className="inline-block w-[6px] h-[6px] rounded-sm" style={{ background: c }} />
-                          {statusLabel(r.status)}
-                        </div>
                       </li>
                     );
                   })}
                 </ul>
-              </div>
-            )}
-
-            {detail.partyCode && (
-              <div>
-                <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3">
-                  Porównaj
-                </div>
-                <Link
-                  href={`/obietnice?compare=${encodeURIComponent(detail.partyCode)},PiS`}
-                  className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4 block"
-                >
-                  {partyShort(detail.partyCode)} vs PiS →
-                </Link>
-                {detail.partyCode !== "KO" && (
+                {detail.partyCode && (
                   <Link
-                    href={`/obietnice?compare=${encodeURIComponent(detail.partyCode)},KO`}
-                    className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4 block mt-1.5"
+                    href={`/obietnice?parties=${encodeURIComponent(detail.partyCode)}`}
+                    className="block mt-4 font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4"
                   >
-                    {partyShort(detail.partyCode)} vs KO →
+                    Wszystkie obietnice {partyShort(detail.partyCode)} →
                   </Link>
                 )}
               </div>

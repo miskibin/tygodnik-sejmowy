@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import { BottomTabs } from "@/components/BottomTabs";
 import { Markdown } from "@/components/Markdown";
 import { ProcessStages } from "@/components/ProcessStages";
 import { VotingSummary } from "@/components/VotingSummary";
@@ -52,7 +53,7 @@ export default function DrukDetail() {
   const sponsorLabel = print.sponsorAuthority ? SPONSOR_LABEL[print.sponsorAuthority] : null;
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
       <Stack.Screen options={{ title: `Druk ${print.number}` }} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.headerCard}>
@@ -151,7 +152,8 @@ export default function DrukDetail() {
           </Section>
         ) : null}
       </ScrollView>
-    </>
+      <BottomTabs />
+    </View>
   );
 }
 

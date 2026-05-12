@@ -76,12 +76,12 @@ export function LandingHero() {
             className="font-medium tracking-[-0.035em] leading-[0.98] m-0 mb-5"
             style={{ fontSize: "clamp(2.25rem, 6.5vw, 4.25rem)", textWrap: "balance" }}
           >
-            W piątek dowiesz się, co Sejm zmienił{" "}
-            <span className="italic text-destructive">w Twoim życiu.</span>
+            Co Sejm uchwalił, odrzucił, o&nbsp;czym debatował.{" "}
+            <span className="italic text-destructive">W&nbsp;piątek, w&nbsp;Twoim okręgu.</span>
           </h1>
           <p className="font-serif italic text-[15px] md:text-[17px] text-secondary-foreground leading-[1.55] m-0 mb-5 max-w-[520px]">
-            Co piątek skrót w&nbsp;prostym polskim — czytaj na&nbsp;stronie albo przez{" "}
-            <a href="/rss.xml" className="not-italic font-mono text-[13px] tracking-wide text-destructive hover:underline">RSS</a>. Bez tabel, bez slangu prawniczego, bez agitacji. Dopasowane do&nbsp;Twojego okręgu i&nbsp;sytuacji życiowej.
+            Wydanie piątkowe na&nbsp;stronie i&nbsp;przez{" "}
+            <a href="/rss.xml" className="not-italic font-mono text-[13px] tracking-wide text-destructive hover:underline">RSS</a>. Wpisz kod pocztowy obok, by zobaczyć, co dotyczy Twojego okręgu.
           </p>
           <div className="flex gap-4 font-mono text-[11px] text-muted-foreground tracking-wide">
             <span><strong className="text-foreground font-semibold">3 min</strong> czytania</span>

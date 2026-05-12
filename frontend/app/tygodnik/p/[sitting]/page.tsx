@@ -28,7 +28,7 @@ export async function generateMetadata({
   if (!s) return {};
   const dates = fmtDateRange(s.firstDate, s.lastDate);
   const title = `Tygodnik #${s.sittingNum} — ${dates || "posiedzenie Sejmu"}`;
-  const desc = `Co Sejm zmienił w Twoim życiu w ${s.sittingNum}. posiedzeniu — ${s.eventCount} wydarzeń w prostym polskim, dopasowanych do okręgu i sytuacji życiowej.`;
+  const desc = `Posiedzenie nr ${s.sittingNum} Sejmu${dates ? `, ${dates}` : ""}. ${s.eventCount} odnotowanych wydarzeń: głosowania, druki, debaty.`;
   const path = `/tygodnik/p/${sittingNum}`;
   return {
     title,

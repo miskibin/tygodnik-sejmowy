@@ -2,6 +2,13 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
+import type {
+  ActivityFilter,
+  HubCounts,
+  HubFilters,
+  HubSort,
+  PromiseHubRow,
+} from "./promises-shared";
 
 const PROMISES_REVALIDATE_SEC = 300;
 
@@ -11,99 +18,18 @@ const getEnrichedPromisesCached = unstable_cache(
   { revalidate: PROMISES_REVALIDATE_SEC },
 );
 
-// 5-status enum from migration 0027 CHECK constraint. Anything else stored is
-// a DB-violation and should be rendered as "—".
-export type PromiseStatus =
-  | "fulfilled"
-  | "in_progress"
-  | "broken"
-  | "contradicted_by_vote"
-  | "no_action";
-
-export const PROMISE_STATUSES: ReadonlyArray<PromiseStatus> = [
-  "fulfilled",
-  "in_progress",
-  "broken",
-  "contradicted_by_vote",
-  "no_action",
-];
-
-// Citizen-facing party labels. DB stores compact codes (KO/L/Konf/P2050/PiS/PSL/TD).
-export const PARTY_LABEL: Record<string, string> = {
-  KO: "Koalicja Obywatelska",
-  L: "Lewica",
-  P2050: "Polska 2050",
-  PSL: "PSL",
-  TD: "Trzecia Droga",
-  PiS: "PiS",
-  Konf: "Konfederacja",
-};
-
-export const PARTY_SHORT: Record<string, string> = {
-  KO: "KO",
-  L: "Lewica",
-  P2050: "P2050",
-  PSL: "PSL",
-  TD: "TD",
-  PiS: "PiS",
-  Konf: "Konfederacja",
-};
-
-// Bridge promises party_code → ClubBadge `klub` key (atlas constants).
-export const PARTY_TO_KLUB: Record<string, string> = {
-  KO: "KO",
-  L: "Lewica",
-  P2050: "Polska2050",
-  PSL: "PSL-TD",
-  TD: "PSL-TD",
-  PiS: "PiS",
-  Konf: "Konfederacja",
-};
-
-// Plan default: 5 main parties as primary cards, everything else rolled into "Pozostałe".
-export const PRIMARY_PARTIES: ReadonlyArray<string> = ["KO", "PiS", "Konf", "L", "PSL"];
-
-export function partyLabel(code: string): string {
-  return PARTY_LABEL[code] ?? code;
-}
-export function partyShort(code: string): string {
-  return PARTY_SHORT[code] ?? code;
-}
-
-export function statusLabel(status: string | null): string {
-  switch (status) {
-    case "fulfilled":
-      return "zrealizowane";
-    case "in_progress":
-      return "w realizacji";
-    case "broken":
-      return "złamane";
-    case "contradicted_by_vote":
-      return "sprzeczne z głosem";
-    case "no_action":
-      return "brak działań";
-    default:
-      return "—";
-  }
-}
-
-// Status → indicator color (token). Green = delivered, amber = active, red =
-// broken/contradicted, muted = silent.
-export function statusColor(status: string | null): string {
-  switch (status) {
-    case "fulfilled":
-      return "var(--success)";
-    case "in_progress":
-      return "var(--warning)";
-    case "broken":
-    case "contradicted_by_vote":
-      return "var(--destructive)";
-    case "no_action":
-      return "var(--muted-foreground)";
-    default:
-      return "var(--muted-foreground)";
-  }
-}
+export {
+  PARTY_LABEL,
+  PARTY_SHORT,
+  PARTY_TO_KLUB,
+  PRIMARY_PARTIES,
+  PROMISE_STATUSES,
+  partyLabel,
+  partyShort,
+  statusColor,
+  statusLabel,
+} from "./promises-shared";
+export type { PromiseStatus } from "./promises-shared";
 
 // One enriched ledger row with everything the cards/detail need.
 export type PromiseRow = {
@@ -142,6 +68,21 @@ export type PromiseFilters = {
   topics?: string[];
   search?: string;
 };
+
+export {
+  ACTIVITY_FILTERS,
+  ACTIVITY_LABEL,
+  HUB_SORTS,
+  isActivityFilter,
+  isHubSort,
+} from "./promises-shared";
+export type {
+  ActivityFilter,
+  HubCounts,
+  HubFilters,
+  HubSort,
+  PromiseHubRow,
+} from "./promises-shared";
 
 // Internal helper — fetch base promises + enrich with top-1 confirmed match.
 async function fetchEnrichedPromises(): Promise<PromiseRow[]> {
@@ -291,6 +232,143 @@ function defaultSort(rows: PromiseRow[]): PromiseRow[] {
     if (yb !== ya) return yb - ya;
     return a.title.localeCompare(b.title, "pl");
   });
+}
+
+// ---- Hub redesign queries (build on promise_activity_v) ----
+
+async function fetchPromiseHubRows(): Promise<PromiseHubRow[]> {
+  const sb = supabase();
+  // Two round trips, joined in JS. 258 promises × ~508 match rows = trivial
+  // payload; avoids needing a DB view for v1. If perf ever bites, swap in
+  // promise_activity_v (migration 0085) and read directly.
+  const [{ data: promises, error: pe }, { data: matches, error: me }] = await Promise.all([
+    sb
+      .from("promises")
+      .select("id, party_code, slug, title, source_url, source_quote"),
+    sb
+      .from("promise_print_candidates")
+      .select("promise_id, match_status, reranked_at")
+      .in("match_status", ["confirmed", "candidate"]),
+  ]);
+  if (pe) throw pe;
+  if (me) throw me;
+
+  type MatchAccum = { confirmed: number; candidate: number; last: string | null };
+  const byPromise = new Map<number, MatchAccum>();
+  for (const r of (matches ?? []) as Array<Record<string, unknown>>) {
+    const pid = r.promise_id as number;
+    const status = r.match_status as string;
+    const reranked = (r.reranked_at as string | null) ?? null;
+    const acc = byPromise.get(pid) ?? { confirmed: 0, candidate: 0, last: null };
+    if (status === "confirmed") acc.confirmed += 1;
+    else if (status === "candidate") acc.candidate += 1;
+    if (reranked && (!acc.last || reranked > acc.last)) acc.last = reranked;
+    byPromise.set(pid, acc);
+  }
+
+  return ((promises ?? []) as Array<Record<string, unknown>>).map((p) => {
+    const id = p.id as number;
+    const m = byPromise.get(id);
+    return {
+      id,
+      partyCode: (p.party_code as string) ?? null,
+      slug: (p.slug as string) ?? null,
+      title: (p.title as string) ?? "",
+      sourceUrl: (p.source_url as string) ?? null,
+      sourceQuote: (p.source_quote as string) ?? null,
+      confirmedCount: m?.confirmed ?? 0,
+      candidateCount: m?.candidate ?? 0,
+      lastActivityAt: m?.last ?? null,
+    } satisfies PromiseHubRow;
+  });
+}
+
+const getPromiseHubRowsCached = unstable_cache(
+  async () => fetchPromiseHubRows(),
+  ["promise-hub-rows", "v1"],
+  { revalidate: PROMISES_REVALIDATE_SEC },
+);
+
+function applyActivityFilter(rows: PromiseHubRow[], filter: ActivityFilter): PromiseHubRow[] {
+  switch (filter) {
+    case "with-prints":
+      return rows.filter((r) => r.confirmedCount + r.candidateCount > 0);
+    case "confirmed":
+      return rows.filter((r) => r.confirmedCount > 0);
+    case "stale":
+      return rows.filter((r) => r.confirmedCount + r.candidateCount === 0);
+    case "all":
+    default:
+      return rows;
+  }
+}
+
+function hubSort(rows: PromiseHubRow[], sort: HubSort): PromiseHubRow[] {
+  const copy = [...rows];
+  switch (sort) {
+    case "alpha":
+      copy.sort((a, b) => a.title.localeCompare(b.title, "pl"));
+      return copy;
+    case "recent":
+      copy.sort((a, b) => {
+        const da = a.lastActivityAt ?? "";
+        const db = b.lastActivityAt ?? "";
+        if (db !== da) return db.localeCompare(da);
+        return b.confirmedCount - a.confirmedCount;
+      });
+      return copy;
+    case "evidence":
+    default:
+      copy.sort((a, b) => {
+        if (b.confirmedCount !== a.confirmedCount) return b.confirmedCount - a.confirmedCount;
+        if (b.candidateCount !== a.candidateCount) return b.candidateCount - a.candidateCount;
+        return a.title.localeCompare(b.title, "pl");
+      });
+      return copy;
+  }
+}
+
+// One-shot enriched fetch for the /obietnice hub: returns the rows after the
+// caller's filters, plus the unfiltered counts the sidebar needs. Counts are
+// computed from the full set so the sidebar tells users the real scale of the
+// data, not the scale of their current filter.
+export async function getPromisesEnriched(
+  filters: HubFilters = {},
+): Promise<{ rows: PromiseHubRow[]; counts: HubCounts; total: number }> {
+  const all = await getPromiseHubRowsCached();
+
+  const partyTotals = new Map<string, number>();
+  for (const r of all) {
+    if (!r.partyCode) continue;
+    partyTotals.set(r.partyCode, (partyTotals.get(r.partyCode) ?? 0) + 1);
+  }
+  const counts: HubCounts = {
+    total: all.length,
+    withPrints: all.filter((r) => r.confirmedCount + r.candidateCount > 0).length,
+    confirmed: all.filter((r) => r.confirmedCount > 0).length,
+    stale: all.filter((r) => r.confirmedCount + r.candidateCount === 0).length,
+    byParty: [...partyTotals.entries()]
+      .map(([code, count]) => ({ code, count }))
+      .sort((a, b) => b.count - a.count),
+  };
+
+  const activity: ActivityFilter = filters.activity ?? "all";
+  const sort: HubSort = filters.sort ?? "evidence";
+  const partySet =
+    filters.parties && filters.parties.length > 0 ? new Set(filters.parties) : null;
+  const search = (filters.q ?? "").trim().toLocaleLowerCase("pl");
+
+  let rows = applyActivityFilter(all, activity);
+  if (partySet) rows = rows.filter((r) => r.partyCode != null && partySet.has(r.partyCode));
+  if (search) {
+    rows = rows.filter((r) => {
+      const hay = `${r.title}\n${r.sourceQuote ?? ""}`.toLocaleLowerCase("pl");
+      return hay.includes(search);
+    });
+  }
+  rows = hubSort(rows, sort);
+
+  return { rows, counts, total: all.length };
 }
 
 // Default ledger — used by feed; respects optional filters. Server-side joins

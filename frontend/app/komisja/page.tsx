@@ -1,46 +1,53 @@
-import Link from "next/link";
-import { getCommitteeList, committeeTypeLabel, type CommitteeListItem } from "@/lib/db/committees";
+import {
+  getCommitteeList,
+  getCommitteeActivityStats,
+  activityTier,
+  type CommitteeListItem,
+  type CommitteeActivity,
+} from "@/lib/db/committees";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { CommitteeRow } from "@/components/komisja/CommitteeRow";
 
+type GroupKey = "STANDING" | "EXTRAORDINARY" | "INVESTIGATIVE" | "OTHER";
 
-function formatDate(iso: string | null): string {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
-}
+const GROUP_HEADING: Record<GroupKey, string> = {
+  STANDING: "Komisje stałe",
+  EXTRAORDINARY: "Komisje nadzwyczajne",
+  INVESTIGATIVE: "Komisje śledcze",
+  OTHER: "Pozostałe",
+};
 
-function CommitteeRow({ c }: { c: CommitteeListItem }) {
-  return (
-    <Link
-      href={`/komisja/${c.id}`}
-      className="block border border-border hover:border-destructive bg-background transition-colors px-4 py-3"
-    >
-      <div className="grid items-baseline gap-x-4 gap-y-1 grid-cols-[64px_1fr_auto] md:grid-cols-[80px_1fr_140px_120px]">
-        <div className="font-mono text-[11px] tracking-wide text-destructive uppercase">{c.code}</div>
-        <div className="font-serif text-[15px] leading-snug min-w-0">{c.name}</div>
-        <div className="font-sans text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground hidden md:block">
-          {committeeTypeLabel(c.type)}
-        </div>
-        <div className="font-mono text-[11px] text-muted-foreground text-right">
-          {c.memberCount > 0 ? `${c.memberCount} czł.` : "—"}
-          {c.appointmentDate && (
-            <span className="hidden md:inline">
-              {" · "}
-              {formatDate(c.appointmentDate)}
-            </span>
-          )}
-        </div>
-      </div>
-    </Link>
-  );
+const GROUP_BLURB: Record<GroupKey, string> = {
+  STANDING: "Stałe komitety przedmiotowe (zdrowie, edukacja, finanse…). Pracują przez całą kadencję.",
+  EXTRAORDINARY: "Powołane ad hoc do konkretnego tematu lub projektu ustawy.",
+  INVESTIGATIVE: "Sejmowe komisje badające konkretne sprawy publiczne. Funkcja zbliżona do procesu sądowego.",
+  OTHER: "Komisje pozostałe — np. regulaminowa, etyki, sprawozdawcza.",
+};
+
+function sortByActivity(
+  items: CommitteeListItem[],
+  stats: Map<number, CommitteeActivity>,
+): CommitteeListItem[] {
+  return [...items].sort((a, b) => {
+    const sa = stats.get(a.id);
+    const sb = stats.get(b.id);
+    const aCount = sa?.last30dCount ?? 0;
+    const bCount = sb?.last30dCount ?? 0;
+    if (bCount !== aCount) return bCount - aCount;
+    const aDate = sa?.lastSittingDate ? new Date(sa.lastSittingDate).getTime() : 0;
+    const bDate = sb?.lastSittingDate ? new Date(sb.lastSittingDate).getTime() : 0;
+    if (bDate !== aDate) return bDate - aDate;
+    return a.name.localeCompare(b.name, "pl");
+  });
 }
 
 export default async function KomisjaIndexPage() {
-  const committees = await getCommitteeList();
+  const [committees, activity] = await Promise.all([
+    getCommitteeList(),
+    getCommitteeActivityStats(),
+  ]);
 
-  const standingCount = committees.filter((c) => c.type === "STANDING").length;
-  const extraCount = committees.filter((c) => c.type === "EXTRAORDINARY" || c.type === "INVESTIGATIVE").length;
-
-  const grouped: Record<string, CommitteeListItem[]> = {
+  const grouped: Record<GroupKey, CommitteeListItem[]> = {
     STANDING: [],
     EXTRAORDINARY: [],
     INVESTIGATIVE: [],
@@ -52,76 +59,118 @@ export default async function KomisjaIndexPage() {
     else if (c.type === "INVESTIGATIVE") grouped.INVESTIGATIVE.push(c);
     else grouped.OTHER.push(c);
   }
+  for (const k of Object.keys(grouped) as GroupKey[]) {
+    grouped[k] = sortByActivity(grouped[k], activity);
+  }
+
+  // Aggregate counters: active = had at least one sitting in last 30d.
+  const activeCount = committees.filter((c) => {
+    const a = activity.get(c.id);
+    return (a?.last30dCount ?? 0) > 0;
+  }).length;
+  const hotCount = committees.filter((c) => {
+    const a = activity.get(c.id);
+    return a ? activityTier(a) === "hot" : false;
+  }).length;
+
+  const order: GroupKey[] = ["STANDING", "EXTRAORDINARY", "INVESTIGATIVE", "OTHER"];
 
   return (
     <main className="bg-background text-foreground font-serif pb-20">
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8">
         <PageBreadcrumb
           items={[{ label: "Komisje" }]}
-          subtitle={`${standingCount} komisji stałych i ${extraCount} nadzwyczajnych w X kadencji.`}
+          subtitle={
+            <>
+              {committees.length} komisji w X kadencji ·{" "}
+              <span className="text-foreground">{activeCount}</span> aktywnych w ostatnim miesiącu
+              {hotCount > 0 && (
+                <>
+                  {" · "}
+                  <span className="text-destructive">{hotCount}</span> bardzo aktywnych
+                </>
+              )}
+              . Sortowane wg częstości posiedzeń.
+            </>
+          }
         />
       </div>
 
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-2 md:pt-4 space-y-10">
-        {grouped.STANDING.length > 0 && (
-          <section>
-            <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-4">
-              ✶ Komisje stałe · {grouped.STANDING.length}
-            </div>
-            <ul className="grid gap-2">
-              {grouped.STANDING.map((c) => (
-                <li key={c.id}>
-                  <CommitteeRow c={c} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-2 md:pt-4 space-y-12">
+        {/* Legend bar */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-sans text-muted-foreground border-b border-border pb-3">
+          <span className="font-sans text-[10.5px] tracking-[0.14em] uppercase">Aktywność:</span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-destructive border border-destructive" />
+            3+ posiedzeń / 30 dni
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-foreground border border-foreground" />
+            posiedzenie w ostatnim miesiącu
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full border border-foreground/60" />
+            w ostatnich 3 miesiącach
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full border border-border" />
+            nieaktywna
+          </span>
+        </div>
 
-        {grouped.EXTRAORDINARY.length > 0 && (
-          <section>
-            <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-4">
-              ✶ Komisje nadzwyczajne · {grouped.EXTRAORDINARY.length}
-            </div>
-            <ul className="grid gap-2">
-              {grouped.EXTRAORDINARY.map((c) => (
-                <li key={c.id}>
-                  <CommitteeRow c={c} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+        {order.map((k) => {
+          const list = grouped[k];
+          if (list.length === 0) return null;
+          const isDim = k === "OTHER";
 
-        {grouped.INVESTIGATIVE.length > 0 && (
-          <section>
-            <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-4">
-              ✶ Komisje śledcze · {grouped.INVESTIGATIVE.length}
-            </div>
-            <ul className="grid gap-2">
-              {grouped.INVESTIGATIVE.map((c) => (
-                <li key={c.id}>
-                  <CommitteeRow c={c} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+          // Within standing committees, split active vs quiet to keep the
+          // signal-to-noise high. Quiet = no sittings in last 30d AND
+          // last sitting >90 days ago. Hidden under <details>.
+          const visible: CommitteeListItem[] = [];
+          const quiet: CommitteeListItem[] = [];
+          for (const c of list) {
+            const a = activity.get(c.id);
+            const isQuiet = !a || (a.last30dCount === 0 && (a.daysSinceLast === null || a.daysSinceLast > 90));
+            if (isQuiet && k !== "OTHER") quiet.push(c);
+            else visible.push(c);
+          }
 
-        {grouped.OTHER.length > 0 && (
-          <section>
-            <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-4">
-              ✶ Pozostałe · {grouped.OTHER.length}
-            </div>
-            <ul className="grid gap-2">
-              {grouped.OTHER.map((c) => (
-                <li key={c.id}>
-                  <CommitteeRow c={c} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+          return (
+            <section key={k}>
+              <div
+                className={`font-sans text-[11px] tracking-[0.16em] uppercase mb-2 ${
+                  isDim ? "text-muted-foreground" : "text-destructive"
+                }`}
+              >
+                ✶ {GROUP_HEADING[k]} · {list.length}
+              </div>
+              <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-4 leading-relaxed">
+                {GROUP_BLURB[k]}
+              </p>
+              <ul className="grid gap-2">
+                {visible.map((c) => (
+                  <li key={c.id}>
+                    <CommitteeRow c={c} activity={activity.get(c.id) ?? null} />
+                  </li>
+                ))}
+              </ul>
+              {quiet.length > 0 && (
+                <details className="mt-3">
+                  <summary className="cursor-pointer font-sans text-[11px] tracking-[0.14em] uppercase text-muted-foreground hover:text-destructive py-2">
+                    Uśpione w ostatnich 3 miesiącach · {quiet.length}
+                  </summary>
+                  <ul className="grid gap-2 mt-2">
+                    {quiet.map((c) => (
+                      <li key={c.id}>
+                        <CommitteeRow c={c} activity={activity.get(c.id) ?? null} />
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </section>
+          );
+        })}
       </div>
     </main>
   );

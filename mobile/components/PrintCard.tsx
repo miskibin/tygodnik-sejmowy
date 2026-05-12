@@ -1,22 +1,57 @@
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatShortDate } from "@/lib/format";
-import { TOPIC_LABEL } from "@/lib/profile";
+import { TOPIC_ICON, TOPIC_LABEL } from "@/lib/profile";
 import {
-  SPONSOR_LABEL,
   affectedGroupLabel,
   processChip,
   type LinkedVoting,
   type PrintEvent,
 } from "@/lib/types";
-import { colors, fonts, fontSize, radius, spacing } from "@/theme";
+import { colors, fonts, fontSize, spacing } from "@/theme";
 
-const SEVERITY_COLOR: Record<"low" | "medium" | "high", string> = {
-  low: "#e8e1d2",
-  medium: "#f0d8c0",
-  high: "#f0c4b8",
-};
+// Short status label for the eyebrow row (e.g. "MIESZKANIE · PRZYJĘTA").
+// processChip returns longer labels suited for chips; here we want one word.
+function shortStatus(stageType: string | null | undefined, passed: boolean | null | undefined): string | null {
+  if (passed) return "PRZYJĘTA";
+  switch (stageType) {
+    case "PresidentSignature":
+    case "ToPresident":
+      return "U PREZYDENTA";
+    case "Veto":
+      return "WETO";
+    case "SenatePosition":
+    case "SenatePositionConsideration":
+      return "W SENACIE";
+    case "CommitteeReport":
+      return "SPRAWOZDANIE";
+    case "ThirdReading":
+      return "III CZYTANIE";
+    case "SecondReading":
+      return "II CZYTANIE";
+    case "FirstReading":
+    case "Reading":
+    case "SejmReading":
+    case "ReadingReferral":
+      return "I CZYTANIE";
+    case "CommitteeWork":
+    case "Referral":
+      return "W KOMISJI";
+    default:
+      return null;
+  }
+}
+
+function formatPopulation(n: number | null | undefined): string | null {
+  if (!n || n <= 0) return null;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".0", "")} mln`;
+  if (n >= 1_000) return `${Math.round(n / 1_000)} tys.`;
+  return String(n);
+}
+
+function severityLabel(sev: "low" | "medium" | "high"): string {
+  return sev === "high" ? "WYSOKI" : sev === "medium" ? "ŚREDNI" : "NISKI";
+}
 
 export function PrintCard({
   event,
@@ -30,11 +65,18 @@ export function PrintCard({
   const router = useRouter();
   const p = event.payload;
   const title = p.short_title || p.title;
-  const sponsorKey = (p.sponsor_authority ?? null) as keyof typeof SPONSOR_LABEL | null;
-  const sponsor = sponsorKey ? SPONSOR_LABEL[sponsorKey] ?? null : null;
-  const topics = (p.topic_tags ?? []).filter((t) => !!TOPIC_LABEL[t]).slice(0, 4);
-  const affected = (p.affected_groups ?? []).slice(0, 3);
-  const stateChip = processChip(p.current_stage_type, p.process_passed);
+  const topTopic = (p.topic_tags ?? []).find((t) => !!TOPIC_LABEL[t]) ?? null;
+  const topicEyebrow = topTopic ? TOPIC_LABEL[topTopic].toUpperCase() : null;
+  const topicIcon = topTopic ? TOPIC_ICON[topTopic] ?? null : null;
+  const status = shortStatus(p.current_stage_type, p.process_passed) ?? processChip(p.current_stage_type, p.process_passed)?.label.toUpperCase();
+  const statusKind = p.process_passed ? "ok" : processChip(p.current_stage_type, p.process_passed)?.kind ?? "info";
+
+  const topAffected = [...(p.affected_groups ?? [])]
+    .filter((g) => g.est_population && g.est_population > 0)
+    .sort((a, b) => (b.est_population ?? 0) - (a.est_population ?? 0))[0]
+    ?? (p.affected_groups ?? [])[0]
+    ?? null;
+  const populationLabel = topAffected ? formatPopulation(topAffected.est_population) : null;
 
   return (
     <Pressable
@@ -42,201 +84,142 @@ export function PrintCard({
       style={({ pressed }) => [
         styles.card,
         highlighted && styles.cardHighlighted,
-        pressed && { opacity: 0.7 },
+        pressed && { opacity: 0.85 },
       ]}
     >
-      <View style={styles.head}>
-        <Text style={styles.number}>Druk {p.number}</Text>
-        {p.change_date ? <Text style={styles.date}>{formatShortDate(p.change_date)}</Text> : null}
+      <View style={styles.eyebrowRow}>
+        {topicIcon ? (
+          <Text style={styles.topicIcon}>{topicIcon}</Text>
+        ) : null}
+        {topicEyebrow ? (
+          <Text style={styles.topic}>{topicEyebrow}</Text>
+        ) : null}
+        {topicEyebrow && status ? <Text style={styles.dot}> · </Text> : null}
+        {status ? (
+          <Text style={[styles.status, statusKind === "ok" ? styles.statusOk : statusKind === "warn" ? styles.statusWarn : styles.statusInfo]}>
+            {status}
+          </Text>
+        ) : null}
       </View>
 
       <Text style={styles.title}>{title}</Text>
 
-      {p.impact_punch ? (
-        <Text style={styles.punch} numberOfLines={5}>
-          {p.impact_punch.replace(/[*_#`]/g, "")}
+      {p.summary_plain || p.impact_punch ? (
+        <Text style={styles.body} numberOfLines={4}>
+          {(p.summary_plain ?? p.impact_punch ?? "").replace(/[*_#`]/g, "")}
         </Text>
       ) : null}
 
-      {affected.length > 0 ? (
-        <View style={styles.affectedRow}>
-          {affected.map((g) => (
-            <View
-              key={g.tag}
-              style={[styles.affectedChip, { backgroundColor: SEVERITY_COLOR[g.severity] }]}
-            >
-              <Text style={styles.affectedText}>{affectedGroupLabel(g.tag)}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
-
-      {p.citizen_action ? (
+      {p.citizen_action || p.impact_punch ? (
         <View style={styles.callout}>
-          <Text style={styles.calloutLabel}>CO MOŻESZ ZROBIĆ</Text>
+          <Text style={styles.calloutLabel}>DOTYCZY CIĘ, JEŚLI</Text>
           <Text style={styles.calloutText} numberOfLines={3}>
-            {p.citizen_action}
+            „{(p.citizen_action ?? p.impact_punch ?? "").replace(/[*_#`]/g, "")}"
           </Text>
         </View>
       ) : null}
 
-      {voting ? <VotingBar voting={voting} /> : null}
-
-      <View style={styles.tags}>
-        {sponsor ? (
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>{sponsor}</Text>
-          </View>
-        ) : null}
-        {topics.map((t) => (
-          <View key={t} style={[styles.chip, styles.chipTopic]}>
-            <Text style={styles.chipText}>{TOPIC_LABEL[t]}</Text>
-          </View>
-        ))}
-        {stateChip ? (
-          <View
-            style={[
-              styles.chip,
-              stateChip.kind === "ok" && styles.chipSuccess,
-              stateChip.kind === "warn" && styles.chipWarn,
-            ]}
-          >
-            <Text
-              style={[
-                styles.chipText,
-                stateChip.kind === "ok" && { color: colors.success },
-                stateChip.kind === "warn" && { color: colors.destructive },
-              ]}
-            >
-              {stateChip.label}
+      {topAffected ? (
+        <View style={styles.kpiStrip}>
+          <View style={styles.kpiCol}>
+            <Text style={styles.kpiKicker}>DOTKNIĘTYCH</Text>
+            <Text style={styles.kpiValue}>
+              {populationLabel ?? "—"}
+              {populationLabel ? <Text style={styles.kpiUnit}> osób</Text> : null}
             </Text>
+            <Text style={styles.kpiSub}>{affectedGroupLabel(topAffected.tag).toLowerCase()}</Text>
           </View>
-        ) : null}
-      </View>
-    </Pressable>
-  );
-}
+          <View style={styles.kpiCol}>
+            <Text style={styles.kpiKicker}>WPŁYW</Text>
+            <Text style={styles.kpiValue}>{severityLabel(topAffected.severity)}</Text>
+            <Text style={styles.kpiSub}>ocena redakcyjna</Text>
+          </View>
+        </View>
+      ) : null}
 
-function VotingBar({ voting }: { voting: LinkedVoting }) {
-  const total = voting.yes + voting.no + voting.abstain;
-  const yesPct = total > 0 ? (voting.yes / total) * 100 : 0;
-  const noPct = total > 0 ? (voting.no / total) * 100 : 0;
-  const absPct = total > 0 ? (voting.abstain / total) * 100 : 0;
-  return (
-    <View style={styles.voting}>
-      <View style={styles.votingHead}>
-        <Text style={styles.votingLabel}>GŁOSOWANIE NR {voting.votingNumber}</Text>
-        <Text style={styles.votingDate}>{formatShortDate(voting.date)}</Text>
-      </View>
-      <View style={styles.votingBar}>
-        <View style={[styles.votingSeg, { backgroundColor: colors.success, flex: yesPct || 0.0001 }]} />
-        <View style={[styles.votingSeg, { backgroundColor: colors.inkMuted, flex: absPct || 0.0001 }]} />
-        <View style={[styles.votingSeg, { backgroundColor: colors.destructive, flex: noPct || 0.0001 }]} />
-      </View>
-      <View style={styles.votingLegend}>
-        <Text style={[styles.votingNum, { color: colors.success }]}>{voting.yes} za</Text>
-        <Text style={[styles.votingNum, { color: colors.inkMuted }]}>{voting.abstain} wstrz.</Text>
-        <Text style={[styles.votingNum, { color: colors.destructive }]}>{voting.no} przeciw</Text>
-      </View>
-    </View>
+      <Text style={styles.footerMeta}>
+        druk {p.number}
+        {voting ? ` · głos. #${voting.votingNumber}` : ""}
+      </Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginHorizontal: spacing.lg,
+    backgroundColor: colors.paper,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xxl,
     marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    gap: spacing.md,
   },
-  cardHighlighted: { borderColor: colors.accent, borderWidth: 2 },
-  head: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  number: {
-    fontFamily: fonts.sansBold,
-    fontSize: fontSize.xs,
-    letterSpacing: 1,
+  cardHighlighted: { backgroundColor: colors.card },
+  eyebrowRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap" },
+  topicIcon: {
+    fontSize: fontSize.md,
     color: colors.accent,
+    marginRight: spacing.xs,
+    lineHeight: fontSize.md,
   },
-  date: { fontFamily: fonts.sans, fontSize: fontSize.xs, color: colors.inkMuted },
+  topic: { fontFamily: fonts.sansBold, fontSize: fontSize.xs, letterSpacing: 1.4, color: colors.accent },
+  dot: { fontFamily: fonts.sans, fontSize: fontSize.xs, color: colors.inkMuted },
+  status: { fontFamily: fonts.sansBold, fontSize: fontSize.xs, letterSpacing: 1.4 },
+  statusOk: { color: colors.success },
+  statusWarn: { color: colors.destructive },
+  statusInfo: { color: colors.inkSoft },
   title: {
     fontFamily: fonts.serif,
-    fontSize: fontSize.md,
-    lineHeight: fontSize.md * 1.3,
+    fontSize: fontSize.xl,
+    lineHeight: fontSize.xl * 1.2,
     color: colors.ink,
   },
-  punch: {
+  body: {
     fontFamily: fonts.sans,
     fontSize: fontSize.sm,
-    lineHeight: fontSize.sm * 1.5,
+    lineHeight: fontSize.sm * 1.6,
     color: colors.inkSoft,
   },
-  affectedRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
-  affectedChip: {
-    paddingVertical: 3,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.sm,
-  },
-  affectedText: {
-    fontFamily: fonts.sansBold,
-    fontSize: fontSize.xs,
-    color: colors.ink,
-  },
   callout: {
-    backgroundColor: colors.muted,
-    padding: spacing.md,
-    borderRadius: radius.sm,
-    gap: 2,
+    backgroundColor: "#f4e3a8",
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.xs,
+    gap: 6,
   },
   calloutLabel: {
     fontFamily: fonts.sansBold,
     fontSize: 10,
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
     color: colors.accent,
   },
   calloutText: {
-    fontFamily: fonts.sans,
+    fontFamily: fonts.serifRegular,
+    fontStyle: "italic",
     fontSize: fontSize.sm,
-    lineHeight: fontSize.sm * 1.4,
+    lineHeight: fontSize.sm * 1.5,
     color: colors.ink,
   },
-  voting: {
-    backgroundColor: colors.paper,
-    borderRadius: radius.sm,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 6,
-  },
-  votingHead: { flexDirection: "row", justifyContent: "space-between" },
-  votingLabel: { fontFamily: fonts.sansBold, fontSize: 10, letterSpacing: 1, color: colors.inkMuted },
-  votingDate: { fontFamily: fonts.sans, fontSize: fontSize.xs, color: colors.inkMuted },
-  votingBar: {
+  kpiStrip: {
     flexDirection: "row",
-    height: 8,
-    borderRadius: 4,
-    overflow: "hidden",
-    backgroundColor: colors.muted,
+    paddingTop: spacing.md,
+    marginTop: spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    gap: spacing.xl,
   },
-  votingSeg: { height: "100%" },
-  votingLegend: { flexDirection: "row", justifyContent: "space-between" },
-  votingNum: { fontFamily: fonts.sansBold, fontSize: fontSize.xs },
-  tags: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
-  chip: {
-    paddingVertical: 3,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: colors.muted,
-    borderRadius: radius.sm,
+  kpiCol: { flex: 1, gap: 4 },
+  kpiKicker: { fontFamily: fonts.sansBold, fontSize: 10, letterSpacing: 1.4, color: colors.inkMuted },
+  kpiValue: { fontFamily: fonts.serif, fontSize: fontSize.lg, color: colors.accent },
+  kpiUnit: { fontFamily: fonts.sans, fontSize: fontSize.xs, color: colors.inkMuted },
+  kpiSub: { fontFamily: fonts.sans, fontSize: 10, color: colors.inkMuted },
+  footerMeta: {
+    fontFamily: fonts.sans,
+    fontSize: fontSize.xs,
+    color: colors.inkMuted,
+    marginTop: spacing.xs,
   },
-  chipTopic: { backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.border },
-  chipSuccess: { backgroundColor: "#e1ecdc" },
-  chipWarn: { backgroundColor: "#f0d8d4" },
-  chipText: { fontFamily: fonts.sansBold, fontSize: fontSize.xs, color: colors.inkSoft },
 });

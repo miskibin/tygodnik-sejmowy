@@ -10,22 +10,29 @@ const KEY_PROFILE = "sejmograf:profile";
 
 export const DEFAULT_PROFILE: Profile = { postcode: null, topics: [] };
 
-export const TOPICS: { id: string; label: string }[] = [
-  { id: "zdrowie", label: "Zdrowie" },
-  { id: "edukacja-rodzina", label: "Edukacja i rodzina" },
-  { id: "praca-zus", label: "Praca i ZUS" },
-  { id: "emerytury", label: "Emerytury" },
-  { id: "mieszkanie-media", label: "Mieszkanie" },
-  { id: "biznes-podatki", label: "Biznes i podatki" },
-  { id: "transport", label: "Transport" },
-  { id: "srodowisko-klimat", label: "Środowisko i klimat" },
-  { id: "rolnictwo-wies", label: "Rolnictwo i wieś" },
-  { id: "sady-prawa", label: "Sądy i prawo" },
-  { id: "bezpieczenstwo-obrona", label: "Bezpieczeństwo" },
+// Per-topic visual identity via glyph icons. Mirrors frontend/lib/topics.ts.
+// Icons stay in the same accent color as the rest of the eyebrow so the
+// newspaper feel holds — only the symbol changes per topic.
+export const TOPICS: { id: string; label: string; icon: string }[] = [
+  { id: "zdrowie",              label: "Zdrowie",              icon: "✚" },
+  { id: "edukacja-rodzina",     label: "Edukacja i rodzina",   icon: "✦" },
+  { id: "praca-zus",            label: "Praca i ZUS",          icon: "⚒" },
+  { id: "emerytury",            label: "Emerytury",            icon: "◷" },
+  { id: "mieszkanie-media",     label: "Mieszkanie",           icon: "⌂" },
+  { id: "biznes-podatki",       label: "Biznes i podatki",     icon: "◧" },
+  { id: "transport",            label: "Transport",            icon: "◎" },
+  { id: "srodowisko-klimat",    label: "Środowisko i klimat",  icon: "❀" },
+  { id: "rolnictwo-wies",       label: "Rolnictwo i wieś",     icon: "☘" },
+  { id: "sady-prawa",           label: "Sądy i prawo",         icon: "⚖" },
+  { id: "bezpieczenstwo-obrona", label: "Bezpieczeństwo",      icon: "⛨" },
 ];
 
 export const TOPIC_LABEL: Record<string, string> = Object.fromEntries(
   TOPICS.map((t) => [t.id, t.label]),
+);
+
+export const TOPIC_ICON: Record<string, string> = Object.fromEntries(
+  TOPICS.map((t) => [t.id, t.icon]),
 );
 
 export async function hasSeenOnboarding(): Promise<boolean> {
@@ -38,6 +45,10 @@ export async function hasSeenOnboarding(): Promise<boolean> {
 
 export async function markOnboardingSeen(): Promise<void> {
   await AsyncStorage.setItem(KEY_SEEN, "1");
+}
+
+export async function resetOnboarding(): Promise<void> {
+  await AsyncStorage.removeItem(KEY_SEEN);
 }
 
 export async function getProfile(): Promise<Profile> {
