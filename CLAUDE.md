@@ -58,6 +58,11 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
 
 - Sequential numbering: 0001..NNNN. Apply via direct psql against the self-hosted Postgres (PostgREST anon statement timeout is 8 s — heavy refreshes need service role / direct connection anyway).
 - Co-existing agents must reserve number ranges to avoid collision. Check `supabase/migrations/` before picking next number.
+- **Connection from dev box (no SSH needed):** direct psycopg over Tailscale.
+  - Host `mixvm.bison-fort.ts.net:5432`, user `postgres.<POOLER_TENANT_ID>` (Supavisor — plain `postgres` rejects), password in `secrets/supabase_vm.env` (gitignored).
+  - `uv run --with 'psycopg[binary]'` — the non-binary wheel can't find libpq on Windows.
+  - `db.msulawiak.pl:5432` is NOT a path: hostname is behind Cloudflare and only HTTPS is tunneled.
+- **Agent pipeline after merging a PR with DDL:** `git pull` → apply via psycopg → `uv run python -m supagraf backfill <name>` → `uv run pytest tests/supagraf/e2e/test_<feature>*.py`. Don't punt to the user once `secrets/supabase_vm.env` is reachable.
 
 ## ELI acts (DU + MP)
 
