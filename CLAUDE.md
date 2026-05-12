@@ -46,7 +46,7 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
   - `deepseek-v4-flash` (`SUPAGRAF_LLM_MODEL_FLASH`) — procedural/meta docs (opinions, OSR, autopoprawka). 1M ctx.
 - Alternative backends behind `SUPAGRAF_LLM_BACKEND`: `gemini` (needs `GOOGLE_API_KEY`) and `ollama` (legacy local; historically `gemma4:e4b`, 9.6 GB, ID c6eb396dbd59). `SUPAGRAF_LLM_MODEL` overrides the per-print picker with a single model name.
 - **Default timeout 300 s** (long Polish prints + structured-JSON inference can take 60-120 s; 60 s default was triggering `ReadTimeout` mid-batch). Override via `SUPAGRAF_LLM_TIMEOUT_S` env.
-- Embedding: `nomic-embed-text-v2-moe` (Ollama, 957 MB). Native dim 768 → zero-padded to 1024 in `supagraf/enrich/embed.py` for `halfvec(1024)` DB column. Cosine-preserving (zeros contribute 0 to dot product + L2 norm).
+- Embedding: `qwen3-embedding:0.6b` (Ollama, 639 MB). Native dim 1024 → fits `halfvec(1024)` DB column directly, no padding. Override via `SUPAGRAF_EMBED_MODEL` env or `--model` flag on embed commands. Legacy `nomic-embed-text-v2-moe` (768-d zero-padded) retired Q2 2026; if mixed-model embeddings appear in the table (`SELECT DISTINCT model FROM embeddings`), wipe non-qwen rows before semantic search — vector spaces are not comparable.
 
 ## Migrations
 
