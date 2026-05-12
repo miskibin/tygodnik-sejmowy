@@ -5,6 +5,7 @@ import {
   getPollsterSummary,
   TREND_DEFAULT_PARTIES,
 } from "@/lib/db/polls";
+import { getKlubPairAgreement, DEFAULT_TERM as COHESION_TERM } from "@/lib/db/coalition_agreement";
 import { RESIDUAL_CODES } from "./_components/partyMeta";
 import { Average30dGrid } from "./_components/Average30dGrid";
 import { QuarterlyTrendChart } from "./_components/QuarterlyTrendChart";
@@ -41,10 +42,11 @@ export default async function SondazePage() {
     return eligible.length > 0 ? eligible : [...TREND_DEFAULT_PARTIES];
   })();
 
-  const [trend, recent, pollsters] = await Promise.all([
+  const [trend, recent, pollsters, agreement] = await Promise.all([
     safe(getPollTrendQuarterly(trendParties), []),
     safe(getRecentPolls(20), []),
     safe(getPollsterSummary(), []),
+    safe(getKlubPairAgreement(COHESION_TERM), { byPair: new Map() }),
   ]);
 
   const mainCount = averages.filter((r) => !RESIDUAL_CODES.has(r.party_code)).length;
@@ -68,7 +70,7 @@ export default async function SondazePage() {
             panels={{
               teraz: <Average30dGrid rows={averages} />,
               trend: <QuarterlyTrendChart rows={trend} />,
-              koalicje: <KoalicjeStub rows={averages} />,
+              koalicje: <KoalicjeStub rows={averages} agreement={agreement} term={COHESION_TERM} />,
               lista: (
                 <div className="space-y-12 sm:space-y-16">
                   <RecentPollsList rows={recent} averages={averages} />
@@ -92,8 +94,37 @@ export default async function SondazePage() {
                 "Largest-remainder · próg 5% dla partii, 8% dla koalicji. Przybliżenie, nie prognoza wyborów (bez geografii D'Hondta).",
             },
             {
-              kicker: "Źródła",
+              kicker: "Źródła sondaży",
               children: "Wikipedia (CC BY-SA) — IBRiS, CBOS, Kantar, United Surveys, OPINIA24, Pollster i inne.",
+            },
+            {
+              kicker: "Znaczniki wydarzeń",
+              children: (
+                <>
+                  Pionowe linie na osiach to ręcznie kuratorowana lista istotnych
+                  momentów politycznych (wybory, zmiany przywództwa, afery, rozłamy).
+                  Daty weryfikowane z mediami i Wikipedią; pełna lista i historia zmian
+                  w pliku{" "}
+                  <a
+                    href="https://github.com/miskibin/tygodnik-sejmowy/blob/main/frontend/lib/timeline-events.ts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                  >
+                    lib/timeline-events.ts
+                  </a>
+                  . Brakuje czegoś?{" "}
+                  <a
+                    href="https://github.com/miskibin/tygodnik-sejmowy/issues/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                  >
+                    Zgłoś na GitHubie
+                  </a>
+                  .
+                </>
+              ),
             },
             {
               kicker: "Aktualizacja",

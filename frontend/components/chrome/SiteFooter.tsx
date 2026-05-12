@@ -17,12 +17,10 @@ const SITEMAP = [
   { href: "/szukaj", label: "Szukaj" },
   { href: "/alerty", label: "Alerty" },
   { href: "/manifest", label: "Manifest" },
-  { href: "/budzet", label: "Budżet" },
+  { href: "/o-projekcie", label: "O projekcie" },
 ] as const;
 
 export async function SiteFooter() {
-  const year = new Date().getFullYear();
-
   return (
     <footer
       role="contentinfo"
@@ -60,15 +58,11 @@ export async function SiteFooter() {
           </ul>
         </nav>
 
-        {/* Sources + copyright */}
+        {/* Links */}
         <div className="font-mono text-[11px] text-muted-foreground tracking-wide leading-[1.65]">
           <div className="uppercase tracking-[0.18em] text-muted-foreground mb-3">
-            Źródła
+            Linki
           </div>
-          <p className="m-0 mb-3">
-            Dane: <span className="text-secondary-foreground">api.sejm.gov.pl</span>,{" "}
-            <span className="text-secondary-foreground">ELI (Dz.U. / M.P.)</span>, oficjalne stenogramy.
-          </p>
           <p className="m-0 mb-3">
             Wsparcie:{" "}
             <PatroniteTrackedLink placement="footer" className="text-destructive hover:underline">
@@ -86,8 +80,39 @@ export async function SiteFooter() {
               github.com/miskibin/tygodnik-sejmowy →
             </a>
           </p>
-          <p className="m-0 text-border">
-            © {year} Tygodnik Sejmowy · public-good infrastructure
+          <p className="m-0 mb-3">
+            Zgłoś błąd lub pomysł:{" "}
+            <a
+              href="https://github.com/miskibin/tygodnik-sejmowy/issues/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive hover:underline"
+            >
+              github.com/.../issues →
+            </a>
+          </p>
+          <p className="m-0 mb-3">
+            YouTube:{" "}
+            <a
+              href="https://www.youtube.com/watch?v=7URNcMg_9Ow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive hover:underline"
+            >
+              youtube.com →
+            </a>
+          </p>
+          <p className="m-0 mb-3">
+            Pokrewne:{" "}
+            <a
+              href="https://radoskop.pl/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive hover:underline"
+            >
+              radoskop.pl →
+            </a>
+            <span className="text-muted-foreground"> · ta sama idea dla rad miast i województw</span>
           </p>
         </div>
       </div>

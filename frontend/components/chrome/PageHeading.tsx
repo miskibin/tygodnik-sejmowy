@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 //   - app/page.tsx (landing) — bespoke entry-point hero
 //   - app/mowa/[id]/page.tsx — magazine-style StatementHero
 //   - app/manifest/page.tsx — editorial display headline w/ <br /> breaks
-//   - app/budzet/page.tsx — editorial display headline w/ <br /> breaks
+//   - app/o-projekcie/page.tsx — editorial display headline w/ <br /> breaks
 //   - app/atlas/page.tsx — multi-line display headline w/ <br /> breaks
 //   - app/obietnice/page.tsx — display title with inline <em>vs</em>
 // These are bespoke editorial spreads, not standard headers.

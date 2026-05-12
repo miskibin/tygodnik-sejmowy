@@ -1,5 +1,7 @@
 import type { MpStatementsStats, MpStatementRow } from "@/lib/db/posel-tabs";
 import { PoselStatementsListClient } from "./PoselStatementsListClient";
+import { EventMarkers } from "@/components/charts/EventMarkers";
+import { getEventsForMp, type TimelineEvent } from "@/lib/timeline-events";
 
 const PL_MONTHS = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"];
 
@@ -37,7 +39,13 @@ function KpiTile({
   );
 }
 
-function ActivityChart({ monthly }: { monthly: Array<{ ym: string; count: number }> }) {
+function ActivityChart({
+  monthly,
+  events,
+}: {
+  monthly: Array<{ ym: string; count: number }>;
+  events: TimelineEvent[];
+}) {
   if (monthly.length === 0) return null;
   const W = 920;
   const H = 200;
@@ -49,6 +57,19 @@ function ActivityChart({ monthly }: { monthly: Array<{ ym: string; count: number
   const innerW = W - padL - 6;
   const innerH = H - padT - padB;
   const stepX = monthly.length > 1 ? innerW / (monthly.length - 1) : 0;
+  const ymIndex = new Map(monthly.map((m, i) => [m.ym, i]));
+  const lastIdx = monthly.length - 1;
+  const xForDate = (iso: string): number | null => {
+    const i = ymIndex.get(iso.slice(0, 7));
+    if (i === undefined) return null;
+    if (monthly.length <= 1) return padL + innerW / 2;
+    const day = Number(iso.slice(8, 10)) || 1;
+    const frac = Math.min(1, Math.max(0, (day - 1) / 30));
+    // Anchors sit at i*stepX; the last anchor is the right edge. Clamp the
+    // intra-month offset so markers in the final bucket never overshoot it.
+    const pos = i === lastIdx ? lastIdx : i + frac;
+    return padL + pos * stepX;
+  };
   const yScale = (v: number) => H - padB - (v / niceMax) * innerH;
   const points = monthly.map((m, i) => ({
     x: padL + i * stepX,
@@ -67,7 +88,11 @@ function ActivityChart({ monthly }: { monthly: Array<{ ym: string; count: number
       <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
         Wystąpienia w czasie
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full block">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full block"
+        style={{ overflow: "visible" }}
+      >
         {ticks.map((t) => (
           <g key={t}>
             <line x1={padL} y1={yScale(t)} x2={W - 4} y2={yScale(t)} stroke="var(--border)" strokeDasharray="2,3" />
@@ -85,6 +110,15 @@ function ActivityChart({ monthly }: { monthly: Array<{ ym: string; count: number
         ))}
         <path d={areaD} fill="var(--destructive)" opacity="0.08" />
         <path d={pathD} fill="none" stroke="var(--destructive)" strokeWidth="1.5" />
+        <EventMarkers
+          events={events
+            .map((e) => ({ ...e, x: xForDate(e.date) }))
+            .filter((e): e is typeof e & { x: number } => e.x != null)}
+          yTop={padT}
+          yBottom={H - padB}
+          variant="full"
+          chartWidth={W}
+        />
         {points.map((p) => (
           <g key={p.ym}>
             <circle cx={p.x} cy={p.y} r={3.5} fill="var(--background)" stroke="var(--destructive)" strokeWidth="1.5">
@@ -114,10 +148,12 @@ export function Tab3StatementsPanel({
   stats,
   initialRows,
   mpId,
+  klubRef,
 }: {
   stats: MpStatementsStats;
   initialRows: MpStatementRow[];
   mpId: number;
+  klubRef: string | null;
 }) {
   if (stats.total === 0) {
     return (
@@ -126,6 +162,7 @@ export function Tab3StatementsPanel({
       </p>
     );
   }
+  const events = getEventsForMp({ klubRef });
   const avgPerProc =
     stats.proceedingsTouched > 0
       ? (stats.total / stats.proceedingsTouched).toFixed(1).replace(".", ",")
@@ -155,7 +192,7 @@ export function Tab3StatementsPanel({
         />
       </div>
 
-      <ActivityChart monthly={stats.monthly} />
+      <ActivityChart monthly={stats.monthly} events={events} />
 
       <div>
         <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">

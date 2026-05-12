@@ -5,6 +5,22 @@ import { useRouter } from "next/navigation";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, PERSONA_IDS, type PersonaId } from "@/lib/personas";
 import { TOPICS, TOPIC_IDS, type TopicId } from "@/lib/topics";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+
+// Polish postcode = NN-NNN. Profile + /api/postcode expect the dashed
+// form; the OTP component edits raw digits, so we marshal at the boundary.
+function digitsToPostcode(digits: string): string {
+  const d = digits.replace(/\D/g, "").slice(0, 5);
+  return d.length > 2 ? `${d.slice(0, 2)}-${d.slice(2)}` : d;
+}
+function postcodeToDigits(pc: string): string {
+  return pc.replace(/\D/g, "").slice(0, 5);
+}
 
 export function LandingHero() {
   const router = useRouter();
@@ -77,17 +93,30 @@ export function LandingHero() {
 
         {/* Right — entry form */}
         <div className="bg-muted border border-rule rounded-lg p-5 md:p-6">
-          <label className="block">
+          <div className="block">
             <div className="font-sans text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
               Kod pocztowy
             </div>
-            <div className="flex items-baseline gap-3 border-b border-rule pb-1.5 mb-1">
-              <input
-                value={postcode}
-                onChange={(e) => setPostcode(e.target.value)}
-                placeholder="00–000"
-                className="font-serif text-[22px] font-medium border-0 outline-none flex-1 bg-transparent text-foreground min-w-0"
-              />
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <InputOTP
+                maxLength={5}
+                inputMode="numeric"
+                pattern="^\d*$"
+                value={postcodeToDigits(postcode)}
+                onChange={(v) => setPostcode(digitsToPostcode(v))}
+                aria-label="Kod pocztowy"
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} className="size-10 text-[18px] font-serif" />
+                  <InputOTPSlot index={1} className="size-10 text-[18px] font-serif" />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={2} className="size-10 text-[18px] font-serif" />
+                  <InputOTPSlot index={3} className="size-10 text-[18px] font-serif" />
+                  <InputOTPSlot index={4} className="size-10 text-[18px] font-serif" />
+                </InputOTPGroup>
+              </InputOTP>
               {district && (
                 <span className="font-serif text-[13px] italic text-destructive truncate">
                   okręg <strong className="not-italic font-semibold">{district.num}</strong> · {district.name}
@@ -100,7 +129,7 @@ export function LandingHero() {
                 <span className="font-mono text-[10px] text-destructive">{lookupErr}</span>
               )}
             </div>
-          </label>
+          </div>
 
           {/* Primary chip row — topical buckets ("Czego dotyczy"). Most
               Sejm legislation is institutional/topical (sądy, obrona, podatki),
@@ -192,7 +221,10 @@ export function LandingHero() {
           </button>
 
           <div className="mt-3 font-sans text-[10.5px] text-muted-foreground tracking-wide text-center">
-            Bez konta · Bez śledzenia · Profil zostaje na Twoim urządzeniu
+            Bez konta · Profil zostaje na Twoim urządzeniu
+          </div>
+          <div className="mt-2 font-serif text-[12.5px] leading-[1.55] text-secondary-foreground text-center max-w-[34rem] mx-auto">
+            Źródła publiczne. Przetwarzanie jawne. Każdy skrót da się sprawdzić u podstaw.
           </div>
         </div>
       </div>

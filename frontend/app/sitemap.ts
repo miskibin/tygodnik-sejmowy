@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/obietnice`, lastModified: now, changeFrequency: "weekly",  priority: 0.85 },
     { url: `${SITE_URL}/atlas`,     lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/szukaj`,    lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/budzet`,    lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/o-projekcie`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/komisja`,   lastModified: now, changeFrequency: "weekly",  priority: 0.6 },
     { url: `${SITE_URL}/mowa`,      lastModified: now, changeFrequency: "weekly",  priority: 0.6 },
     { url: `${SITE_URL}/watek`,     lastModified: now, changeFrequency: "weekly",  priority: 0.6 },

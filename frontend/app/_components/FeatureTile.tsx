@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   num: string;
@@ -9,6 +10,7 @@ type Props = {
   preview: ReactNode;
   href: string | null;
   ctaLabel?: string;
+  comingSoon?: boolean;
   className?: string;
 };
 
@@ -20,9 +22,10 @@ export function FeatureTile({
   preview,
   href,
   ctaLabel,
+  comingSoon = false,
   className = "",
 }: Props) {
-  const isLive = href !== null;
+  const isLive = href !== null && !comingSoon;
 
   return (
     <article
@@ -32,9 +35,19 @@ export function FeatureTile({
         <span className="font-mono text-[11px] tracking-[0.18em] text-muted-foreground">
           {num}
         </span>
-        <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-destructive">
-          {kicker}
-        </span>
+        <div className="flex items-baseline gap-2">
+          {comingSoon ? (
+            <Badge
+              variant="outline"
+              className="font-mono text-[9.5px] tracking-[0.18em] uppercase"
+            >
+              wkrótce
+            </Badge>
+          ) : null}
+          <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-destructive">
+            {kicker}
+          </span>
+        </div>
       </header>
 
       <h2 className="font-serif text-[28px] md:text-[32px] font-medium tracking-[-0.02em] leading-none m-0 mb-5">
@@ -54,6 +67,13 @@ export function FeatureTile({
             className="font-sans text-[11.5px] tracking-wide text-destructive hover:underline"
           >
             {ctaLabel ?? "otwórz →"}
+          </Link>
+        ) : href ? (
+          <Link
+            href={href}
+            className="font-sans text-[11.5px] tracking-wide text-muted-foreground hover:text-destructive hover:underline"
+          >
+            {ctaLabel ?? "co planujemy →"}
           </Link>
         ) : (
           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
