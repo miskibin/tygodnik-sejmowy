@@ -42,5 +42,5 @@ def supabase() -> Client:
     return create_client(url, key)
 
 
-PROJECT_ID = "krtdwpbkzlyxzwpeqzww"
+PROJECT_ID = "wtvjmhthpheoimuuljin"
 DEFAULT_TERM = 10

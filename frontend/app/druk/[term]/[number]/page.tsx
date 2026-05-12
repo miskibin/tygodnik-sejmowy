@@ -408,13 +408,13 @@ export default async function DrukPage({
               </div>
             )}
 
-            {outcome?.passed && !outcome.act && (
+            {outcome?.passed && !outcome.act && (outcome.documentType === "projekt ustawy" || outcome.documentType === "projekt uchwały") && (
               <div
                 className="mt-7 px-4 py-3 border-l-2 font-sans text-[12px] text-secondary-foreground leading-[1.55]"
                 style={{ borderColor: "var(--warning)", background: "var(--muted)" }}
               >
                 <span className="font-medium text-foreground">Uchwalono</span> —
-                {" "}oczekuje na publikację w Dz.U.
+                {" "}oczekuje na publikację w {outcome.documentType === "projekt uchwały" ? "M.P." : "Dz.U."}
                 {outcome.closureDate ? ` (${formatDate(outcome.closureDate)})` : ""}
               </div>
             )}
