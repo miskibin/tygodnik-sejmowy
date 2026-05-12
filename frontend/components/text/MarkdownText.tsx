@@ -35,6 +35,7 @@ const INTERNAL_PREFIXES = [
   "/komisja/",
   "/tygodnik",
   "/szukaj",
+  "/o-projekcie",
   "/budzet",
   "/manifest",
   "/alerty",
