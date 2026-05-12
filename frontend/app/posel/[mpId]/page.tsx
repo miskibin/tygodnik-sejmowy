@@ -329,7 +329,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
           ),
           wszystko: (
             <Suspense fallback={<PanelFallback rows={6} />}>
-              <VotesAsync mpId={mpId} />
+              <VotesAsync mpId={mpId} klubRef={mp.clubRef ?? null} />
             </Suspense>
           ),
           interpelacje: (
@@ -339,7 +339,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
           ),
           wystapienia: (
             <Suspense fallback={<PanelFallback rows={5} />}>
-              <StatementsAsync mpId={mpId} />
+              <StatementsAsync mpId={mpId} klubRef={mp.clubRef ?? null} />
             </Suspense>
           ),
           obietnice: (
