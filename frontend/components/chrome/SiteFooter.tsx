@@ -97,6 +97,29 @@ export async function SiteFooter() {
               github.com/.../issues →
             </a>
           </p>
+          <p className="m-0 mb-3">
+            YouTube:{" "}
+            <a
+              href="https://www.youtube.com/watch?v=7URNcMg_9Ow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive hover:underline"
+            >
+              youtube.com →
+            </a>
+          </p>
+          <p className="m-0 mb-3">
+            Pokrewne:{" "}
+            <a
+              href="https://radoskop.pl/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-destructive hover:underline"
+            >
+              radoskop.pl →
+            </a>
+            <span className="text-muted-foreground"> · ta sama idea dla rad miast i województw</span>
+          </p>
           <p className="m-0 text-border">
             © {year} Tygodnik Sejmowy · public-good infrastructure
           </p>
