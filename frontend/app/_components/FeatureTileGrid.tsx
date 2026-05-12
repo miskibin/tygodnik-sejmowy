@@ -2,7 +2,6 @@ import { getPartyDiscipline } from "@/lib/db/atlas";
 import { getCommitteeList } from "@/lib/db/committees";
 import { getPollAverages30d } from "@/lib/db/polls";
 import { getLatestThread } from "@/lib/db/threads";
-import { getPatroniteStats } from "@/lib/patronite";
 import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES } from "../sondaze/_components/partyMeta";
 import { FeatureTile } from "./FeatureTile";
 
@@ -49,20 +48,12 @@ function stageBucket(stageType: string | null, stageName: string | null): number
   return 0;
 }
 
-function fmtZl(n: number): string {
-  return new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(n);
-}
-
 export async function FeatureTileGrid() {
-  const [polls, thread, committees, discipline, patronite] = await Promise.all([
+  const [polls, thread, committees, discipline] = await Promise.all([
     safe(getPollAverages30d(), []),
     safe(getLatestThread(), null),
     safe(getCommitteeList(10), []),
     safe(getPartyDiscipline(10), []),
-    safe(getPatroniteStats(), {
-      activeCount: 0, monthlyAmount: 0, inactiveCount: 0,
-      totalEverCount: 0, fetchedAt: "", ok: false,
-    }),
   ]);
 
   // ── 01 Atlas — party discipline (loyalty share), 4–6 main klubs ───────
@@ -83,12 +74,6 @@ export async function FeatureTileGrid() {
   // ── 05 Komisja — counts ───────────────────────────────────────────────
   const standing = committees.filter((c) => c.type === "STANDING").length;
   const totalMembers = committees.reduce((s, c) => s + c.memberCount, 0);
-
-  // ── 06 Budżet — monthly target vs patronite ───────────────────────────
-  const target = 600;
-  const raised = patronite.ok ? patronite.monthlyAmount : 0;
-  const coverage = Math.min(100, Math.round((raised / target) * 100));
-  const budzetMonth = new Date().toLocaleDateString("pl-PL", { month: "long", year: "numeric" });
 
   // ── 07 Alerty — static keyword stub ───────────────────────────────────
   const alertKeywords = [
@@ -325,34 +310,49 @@ export async function FeatureTileGrid() {
           {/* Row 3 — 2 tiles, each 1/2 on lg */}
           <FeatureTile
             num="06"
-            kicker="FINANSE"
-            title="Budżet"
-            description="Transparentny budżet projektu: ile wpływa od patronów, ile kosztuje serwer, gdzie idzie reszta."
+            kicker="WARSZTAT"
+            title="O projekcie"
+            description="Skąd bierzemy dane, jak łączymy proces legislacyjny, gdzie pomaga AI i jak wygląda transparentność projektu."
             preview={
               <div>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-serif text-[26px] font-medium leading-none">
-                    {fmtZl(raised)} zł
-                  </span>
-                  <span className="font-sans text-[12px] italic text-muted-foreground">
-                    / {fmtZl(target)} zł
-                  </span>
+                <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2">
+                  <div className="border border-border bg-muted/60 px-2.5 py-2 rounded-md">
+                    <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground mb-1">
+                      źródła
+                    </div>
+                    <div className="font-sans text-[11px] text-secondary-foreground leading-[1.45]">
+                      Sejm · ELI · stenogramy
+                    </div>
+                  </div>
+                  <span className="font-mono text-[11px] text-muted-foreground">→</span>
+                  <div className="border border-border bg-muted/60 px-2.5 py-2 rounded-md">
+                    <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground mb-1">
+                      pipeline
+                    </div>
+                    <div className="font-sans text-[11px] text-secondary-foreground leading-[1.45]">
+                      parsery · łączenie · provenance
+                    </div>
+                  </div>
+                  <span className="font-mono text-[11px] text-muted-foreground">→</span>
+                  <div className="border border-border bg-muted/60 px-2.5 py-2 rounded-md">
+                    <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground mb-1">
+                      wynik
+                    </div>
+                    <div className="font-sans text-[11px] text-secondary-foreground leading-[1.45]">
+                      tygodnik · atlas · linki do źródeł
+                    </div>
+                  </div>
                 </div>
-                <div className="h-[8px] w-full bg-border overflow-hidden">
-                  <div
-                    className="h-full bg-foreground"
-                    style={{ width: `${coverage}%` }}
-                  />
-                </div>
-                <div className="flex justify-between font-mono text-[10px] text-muted-foreground mt-1.5">
-                  <span>{patronite.ok ? `${patronite.activeCount} patronów` : "patronite offline"}</span>
-                  <span>{coverage}% celu</span>
-                  <span>{budzetMonth}</span>
+                <div className="mt-3 flex items-center justify-between gap-3 font-sans text-[11px] text-muted-foreground">
+                  <span>AI tylko wspiera redakcję i klasyfikację.</span>
+                  <span className="px-2 py-0.5 border border-border rounded-full bg-background text-[10px]">
+                    źródło prawdy: dane
+                  </span>
                 </div>
               </div>
             }
-            href="/budzet"
-            ctaLabel="zobacz budżet →"
+            href="/o-projekcie"
+            ctaLabel="poznaj metodę →"
             className="lg:col-span-3"
           />
 
