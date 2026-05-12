@@ -373,6 +373,25 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
               ),
             },
             {
+              kicker: "Znaczniki wydarzeń",
+              children: (
+                <>
+                  Pionowe linie na wykresach (głosowania, wystąpienia) to ręcznie kuratorowana
+                  lista istotnych momentów politycznych — globalnych oraz dla partii tego posła.
+                  Pełna lista i historia zmian w pliku{" "}
+                  <a
+                    href="https://github.com/miskibin/tygodnik-sejmowy/blob/main/frontend/lib/timeline-events.ts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                  >
+                    lib/timeline-events.ts
+                  </a>
+                  .
+                </>
+              ),
+            },
+            {
               kicker: "Widzisz błąd?",
               children: (
                 <>
