@@ -517,31 +517,40 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
         ))}
       </div>
 
-      {/* PNG-only capture target. Fixed 1080x1080 square, off-screen so the
-          live page is unaffected. Always in the DOM so logos load eagerly
-          (off-screen lazy <Image> would never trip the IntersectionObserver,
-          which is why this section uses plain <img loading="eager">). */}
+      {/* PNG-only capture target. Wrapped in a 0×0 clipping container so the
+          inner 1080×1080 node renders with normal positioning — html-to-image
+          serializes the element into an SVG <foreignObject>, and any
+          position:fixed/absolute/negative-offset on the capture root gets
+          preserved in the clone and pushes content outside the SVG viewport
+          (= blank PNG). Static positioning on the capture root avoids that.
+          Always in the DOM so logos load eagerly. */}
       <div
-        ref={captureRef}
         aria-hidden
         style={{
-          position: "fixed",
+          position: "absolute",
           top: 0,
-          left: "-12000px",
-          width: 1080,
-          height: 1080,
-          background: "var(--background)",
-          padding: 56,
-          boxSizing: "border-box",
+          left: 0,
+          width: 0,
+          height: 0,
           overflow: "hidden",
-          zIndex: -1,
           pointerEvents: "none",
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "var(--font-serif, serif)",
-          color: "var(--foreground)",
         }}
       >
+        <div
+          ref={captureRef}
+          style={{
+            width: 1080,
+            height: 1080,
+            background: "var(--background)",
+            padding: 56,
+            boxSizing: "border-box",
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            fontFamily: "var(--font-serif, serif)",
+            color: "var(--foreground)",
+          }}
+        >
         {/* Header block */}
         <div
           style={{
@@ -648,6 +657,7 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
         >
           <span>tygodnik sejmowy · jak głosowały kluby</span>
           <span>tygodniksejmowy.pl</span>
+        </div>
         </div>
       </div>
     </section>
