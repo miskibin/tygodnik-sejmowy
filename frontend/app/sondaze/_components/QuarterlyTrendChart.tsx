@@ -97,21 +97,28 @@ function Sparkline({
 
   const quarters = points.map((p) => p.x);
   const xForDate = makeXForByQuarters(quarters, pad, innerW);
+  // Sparklines are dense; show only importance=1 (critical) events.
   const positionedEvents = getEventsForChart({
     partyCode,
     from: quarters[0],
+    maxImportance: 1,
   })
     .map((e) => ({ ...e, x: xForDate(e.date) }))
     .filter((e): e is typeof e & { x: number } => e.x != null);
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="block w-full h-auto">
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      className="block w-full h-auto"
+      style={{ overflow: "visible" }}
+    >
       {/* Markers behind the line */}
       <EventMarkers
         events={positionedEvents}
         yTop={pad}
         yBottom={h - pad}
         variant="sparkline"
+        chartWidth={w}
       />
       <path d={path} fill="none" stroke={color} strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={lastX} cy={lastY} r={2.8} fill={color} />

@@ -88,7 +88,11 @@ function ActivityChart({
       <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
         Wystąpienia w czasie
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full block">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full block"
+        style={{ overflow: "visible" }}
+      >
         {ticks.map((t) => (
           <g key={t}>
             <line x1={padL} y1={yScale(t)} x2={W - 4} y2={yScale(t)} stroke="var(--border)" strokeDasharray="2,3" />
@@ -113,6 +117,7 @@ function ActivityChart({
           yTop={padT}
           yBottom={H - padB}
           variant="full"
+          chartWidth={W}
         />
         {points.map((p) => (
           <g key={p.ym}>
