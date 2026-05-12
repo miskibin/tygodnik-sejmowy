@@ -94,8 +94,37 @@ export default async function SondazePage() {
                 "Largest-remainder · próg 5% dla partii, 8% dla koalicji. Przybliżenie, nie prognoza wyborów (bez geografii D'Hondta).",
             },
             {
-              kicker: "Źródła",
+              kicker: "Źródła sondaży",
               children: "Wikipedia (CC BY-SA) — IBRiS, CBOS, Kantar, United Surveys, OPINIA24, Pollster i inne.",
+            },
+            {
+              kicker: "Znaczniki wydarzeń",
+              children: (
+                <>
+                  Pionowe linie na osiach to ręcznie kuratorowana lista istotnych
+                  momentów politycznych (wybory, zmiany przywództwa, afery, rozłamy).
+                  Daty weryfikowane z mediami i Wikipedią; pełna lista i historia zmian
+                  w pliku{" "}
+                  <a
+                    href="https://github.com/miskibin/tygodnik-sejmowy/blob/main/frontend/lib/timeline-events.ts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                  >
+                    lib/timeline-events.ts
+                  </a>
+                  . Brakuje czegoś?{" "}
+                  <a
+                    href="https://github.com/miskibin/tygodnik-sejmowy/issues/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                  >
+                    Zgłoś na GitHubie
+                  </a>
+                  .
+                </>
+              ),
             },
             {
               kicker: "Aktualizacja",

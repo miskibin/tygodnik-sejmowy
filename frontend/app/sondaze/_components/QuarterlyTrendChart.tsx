@@ -1,5 +1,41 @@
 import type { PollTrendRow } from "@/lib/db/polls";
 import { partyColor, partyLabel, partyLogoSrc } from "./partyMeta";
+import { EventMarkers } from "@/components/charts/EventMarkers";
+import { getEventsForChart } from "@/lib/timeline-events";
+
+const DAY_MS = 86_400_000;
+
+// Map any ISO date onto a sparkline whose quarter anchors are equally
+// spaced along innerW. Within a [anchor[i], anchor[i+1]] window we linear-
+// interp by date; events beyond the last anchor extend up to (last + one
+// quarter), matching the chart's effective right edge ("now").
+function makeXForByQuarters(quarters: string[], padL: number, innerW: number) {
+  if (quarters.length === 0) return () => null;
+  const n = quarters.length;
+  const anchors = quarters.map((q, i) => ({
+    t: Date.parse(q + "T00:00:00Z"),
+    x: n === 1 ? padL + innerW / 2 : padL + (i / (n - 1)) * innerW,
+  }));
+  const lastT = anchors[n - 1].t;
+  const stepT = n > 1 ? lastT - anchors[n - 2].t : 90 * DAY_MS;
+  const tMin = anchors[0].t;
+  const tMax = lastT + stepT;
+  return (iso: string): number | null => {
+    const t = Date.parse(iso + "T00:00:00Z");
+    if (Number.isNaN(t) || t < tMin || t > tMax) return null;
+    for (let i = 0; i < n - 1; i++) {
+      if (t >= anchors[i].t && t <= anchors[i + 1].t) {
+        const seg = anchors[i + 1].t - anchors[i].t || 1;
+        const frac = (t - anchors[i].t) / seg;
+        return anchors[i].x + frac * (anchors[i + 1].x - anchors[i].x);
+      }
+    }
+    const seg = stepT || 1;
+    const frac = (t - lastT) / seg;
+    const xLast = anchors[n - 1].x;
+    return xLast + frac * (padL + innerW - xLast);
+  };
+}
 
 const PL_MONTHS_NOM = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
 const PL_MONTHS_GEN = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
@@ -31,11 +67,13 @@ function fmtPct(n: number): string {
 function Sparkline({
   points,
   color,
+  partyCode,
   w = 240,
   h = 56,
 }: {
   points: { x: string; y: number }[];
   color: string;
+  partyCode: string;
   w?: number;
   h?: number;
 }) {
@@ -56,8 +94,24 @@ function Sparkline({
   const lastX = xFor(points.length - 1);
   const lastY = yFor(points[points.length - 1].y);
   const firstY = yFor(points[0].y);
+
+  const quarters = points.map((p) => p.x);
+  const xForDate = makeXForByQuarters(quarters, pad, innerW);
+  const events = getEventsForChart({
+    partyCode,
+    from: quarters[0],
+  });
+
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="block w-full h-auto">
+      {/* Markers behind the line */}
+      <EventMarkers
+        events={events}
+        xFor={xForDate}
+        yTop={pad}
+        yBottom={h - pad}
+        variant="sparkline"
+      />
       <path d={path} fill="none" stroke={color} strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={lastX} cy={lastY} r={2.8} fill={color} />
       <text
@@ -167,6 +221,7 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
               <Sparkline
                 points={c.points.map((p) => ({ x: p.quarter_start, y: p.percentage_avg }))}
                 color={color}
+                partyCode={c.code}
               />
               <p className="font-sans text-[12px] sm:text-[13px] text-secondary-foreground mt-2 leading-[1.5]">
                 Od {quarterStartLabelGen(firstQuarter)} {verbose}: <strong className="text-foreground font-mono">{fmtPct(c.first.percentage_avg)}%</strong> → <strong className="text-foreground font-mono">{fmtPct(c.last.percentage_avg)}%</strong>.
