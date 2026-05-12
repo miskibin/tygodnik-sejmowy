@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { MarkdownText } from "@/components/text/MarkdownText";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import {
   PARTY_TO_KLUB,
   getPromiseDetail,
@@ -55,26 +56,20 @@ export default async function PromiseDetailPage({
   return (
     <div className="bg-background text-foreground font-serif pb-24">
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 md:pt-9">
-        {/* Breadcrumb */}
-        <nav
-          aria-label="Ścieżka nawigacji"
-          className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-5"
-        >
-          <Link href="/obietnice" className="hover:text-destructive">
-            ← Rejestr obietnic
-          </Link>
-          {detail.partyCode && (
-            <>
-              <span className="mx-2 text-border">/</span>
-              <Link
-                href={`/obietnice?parties=${encodeURIComponent(detail.partyCode)}`}
-                className="hover:text-destructive"
-              >
-                {partyShort(detail.partyCode)}
-              </Link>
-            </>
-          )}
-        </nav>
+        <PageBreadcrumb
+          items={[
+            { label: "Obietnice", href: "/obietnice" },
+            ...(detail.partyCode
+              ? [
+                  {
+                    label: partyShort(detail.partyCode),
+                    href: `/obietnice?parties=${encodeURIComponent(detail.partyCode)}`,
+                  },
+                ]
+              : []),
+            { label: detail.title },
+          ]}
+        />
 
         {/* Hero — pull-quote first */}
         <header className="border-b-2 border-rule pb-7 mb-7">

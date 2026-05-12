@@ -1,4 +1,5 @@
 import { Ornament } from "@/components/chrome/Ornament";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 // Manifest is a static editorial page — no data, no force-dynamic.
 // Patronite tiers and the anti-feature list are the emotional contract
@@ -42,31 +43,12 @@ const ANTI: Array<[string, string]> = [
 export default function ManifestPage() {
   return (
     <main className="bg-background text-foreground font-serif">
-      {/* Hero */}
-      <section
-        className="border-b border-rule px-4 sm:px-8 md:px-14 pt-14 sm:pt-20 pb-12 sm:pb-15"
-        style={{ maxWidth: 980, margin: "0 auto" }}
-      >
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-destructive m-0 mb-4">
-          ✶ &nbsp; Manifest projektu &nbsp; ✶
-        </p>
-        <h1
-          className="font-serif font-normal m-0"
-          style={{ fontSize: "clamp(2.75rem, 7vw, 4.75rem)", lineHeight: 1.02, letterSpacing: "-0.025em", textWrap: "balance" }}
-        >
-          Tylko 7% Polek i Polaków<br />
-          ufa politykom.{" "}
-          <em className="text-destructive not-italic font-serif italic">Mamy zamiar tę nieufność uszanować —</em>
-          <br />
-          patrząc politykom na ręce.
-        </h1>
-        <p
-          className="font-serif text-secondary-foreground mt-7 mb-0"
-          style={{ fontSize: 19, lineHeight: 1.55, maxWidth: 720, textWrap: "pretty" }}
-        >
-          To nie jest dashboard. To nie jest aplikacja statystyczna. To tygodniowy list do mieszkańców Rzeczypospolitej — i kontrakt z patronami, którzy płacą, żeby to istniało.
-        </p>
-      </section>
+      <div className="px-4 sm:px-8 md:px-14 pt-8" style={{ maxWidth: 980, margin: "0 auto" }}>
+        <PageBreadcrumb
+          items={[{ label: "Manifest" }]}
+          subtitle="Tygodniowy list do mieszkańców Rzeczypospolitej — i kontrakt z patronami, którzy płacą, żeby to istniało."
+        />
+      </div>
 
       {/* Dlaczego — short editorial */}
       <section

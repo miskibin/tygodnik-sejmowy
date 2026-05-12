@@ -7,6 +7,7 @@ import { PERSONAS, type PersonaId } from "@/lib/personas";
 import { TOPICS, type TopicId } from "@/lib/topics";
 import { personasImplyAnyTopic } from "@/lib/topic-persona-map";
 import { Ornament } from "@/components/chrome/Ornament";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { formatPopulation } from "@/lib/labels";
 import type { BriefItem } from "@/lib/db/prints";
 import {
@@ -530,10 +531,12 @@ export function BriefList({
   events,
   sitting,
   sittings,
+  isIndex = false,
 }: {
   events: WeeklyEvent[];
   sitting: SittingInfo;
   sittings: SittingInfo[];
+  isIndex?: boolean;
 }) {
   const { personas, topics, hydrated } = useProfile();
   const [showAll, setShowAll] = useState(false);
@@ -602,20 +605,18 @@ export function BriefList({
     <div className="bg-background font-serif text-foreground">
       {/* Masthead */}
       <div className="border-b border-rule">
-       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-4 pb-3 md:pt-8 md:pb-5">
-        <div className="flex items-baseline justify-between gap-3 md:gap-4 flex-wrap mb-1.5 md:mb-2.5">
-          <h1
-            className="font-serif font-medium m-0"
-            style={{
-              // Mobile clamp tightened so the H1 fits one line on 375px and
-              // doesn't dominate the viewport. Desktop range matches PageHeading "lg".
-              fontSize: "clamp(1.875rem, 5vw, 3.25rem)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.025em",
-            }}
-          >
-            Twój<span className="italic text-destructive"> Tygodnik</span>
-          </h1>
+       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-3 md:pt-8 md:pb-5">
+        <PageBreadcrumb
+          items={
+            isIndex
+              ? [{ label: "Tygodnik" }]
+              : [
+                  { label: "Tygodnik", href: "/tygodnik" },
+                  { label: `Nr ${sitting.sittingNum}` },
+                ]
+          }
+        />
+        <div className="flex items-baseline justify-end gap-3 md:gap-4 flex-wrap mb-1.5 md:mb-2.5">
           <div className="font-mono text-[10.5px] md:text-[11px] text-muted-foreground tracking-wide">
             {partitioned.prints.length} {partitioned.prints.length === 1 ? "projekt" : "projektów"}
             {" · "}

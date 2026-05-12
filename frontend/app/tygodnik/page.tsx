@@ -16,5 +16,5 @@ export default async function TygodnikPage() {
   ]);
   if (!latest) notFound();
   const events = await getEventsBySitting(latest.term, latest.sittingNum);
-  return <BriefList events={events} sitting={latest} sittings={sittings} />;
+  return <BriefList events={events} sitting={latest} sittings={sittings} isIndex />;
 }

@@ -3,10 +3,18 @@ import "server-only";
 import { supabase } from "@/lib/supabase";
 import type { FtsHit, FtsScope, FtsKind } from "./fts-types";
 
-type PrintKey = { term: number; number: string };
+type PrintKey = { term: number | null; number: string };
 
+// Migration 0084 widened entity_id to "term:number"; older deploys still emit
+// bare "number". Both shapes parse to a PrintKey — term=null falls back to
+// "any term", consumer dedupes on (term, number) so cross-kadencja prints
+// can no longer collide once 0084 ships.
 function parsePrintEntityId(entityId: string): PrintKey | null {
   const colon = entityId.indexOf(":");
+  if (colon < 0) {
+    if (!entityId) return null;
+    return { term: null, number: entityId };
+  }
   if (colon < 1) return null;
   const term = Number(entityId.slice(0, colon));
   const number = entityId.slice(colon + 1);
@@ -63,21 +71,30 @@ export async function ftsSearch(
     }
   }
 
-  // Sejm print numbers repeat per kadencja. Without an OR-of-AND query,
-  // .in("number", …) would cross-match between terms. Group requested
-  // numbers by term and OR-combine each (term, number) pair.
-  const printsByTerm = new Map<number, string[]>();
+  // Sejm print numbers repeat per kadencja. Group by term so each (term, number)
+  // pair is fetched precisely; legacy bare-number entity_ids (pre-0084 RPC)
+  // land in a `null`-term bucket and fall back to .in("number", …).
+  const printsByTerm = new Map<number | null, string[]>();
   for (const k of printKeys) {
     const arr = printsByTerm.get(k.term) ?? [];
     arr.push(k.number);
     printsByTerm.set(k.term, arr);
   }
-  const printsFilter = Array.from(printsByTerm.entries())
-    .map(
-      ([term, nums]) =>
-        `and(term.eq.${term},number.in.(${nums.map((n) => `"${n.replace(/"/g, "")}"`).join(",")}))`,
-    )
-    .join(",");
+  const printsFilterParts: string[] = [];
+  const printsLegacyNumbers: string[] = [];
+  for (const [term, nums] of printsByTerm.entries()) {
+    if (term === null) {
+      printsLegacyNumbers.push(...nums);
+    } else {
+      const numList = nums.map((n) => `"${n.replace(/"/g, "")}"`).join(",");
+      printsFilterParts.push(`and(term.eq.${term},number.in.(${numList}))`);
+    }
+  }
+  if (printsLegacyNumbers.length) {
+    const numList = printsLegacyNumbers.map((n) => `"${n.replace(/"/g, "")}"`).join(",");
+    printsFilterParts.push(`number.in.(${numList})`);
+  }
+  const printsFilter = printsFilterParts.join(",");
 
   const [printsRes, promisesRes, stmtsRes, votingsRes, committeesRes, mpsRes] = await Promise.all([
     printKeys.length
@@ -120,10 +137,19 @@ export async function ftsSearch(
   if (committeesRes.error) throw committeesRes.error;
   if (mpsRes.error) throw mpsRes.error;
 
-  // Composite key keeps cross-term prints distinct.
+  // Composite key keeps cross-term prints distinct. Bare-number (legacy)
+  // lookups also use the row's actual term to build a deterministic key,
+  // and the loop below probes both forms when resolving each RPC row.
   const printsByKey = new Map<string, Record<string, unknown>>();
   for (const r of (printsRes.data ?? []) as Record<string, unknown>[]) {
     printsByKey.set(`${r.term}:${r.number}`, r);
+  }
+  function findPrint(entityId: string, key: PrintKey): Record<string, unknown> | undefined {
+    if (key.term !== null) return printsByKey.get(`${key.term}:${key.number}`);
+    for (const r of (printsRes.data ?? []) as Record<string, unknown>[]) {
+      if (String(r.number) === key.number) return r;
+    }
+    return undefined;
   }
   const promisesById = new Map<number, Record<string, unknown>>();
   for (const r of (promisesRes.data ?? []) as Record<string, unknown>[]) {
@@ -151,13 +177,15 @@ export async function ftsSearch(
   for (const r of rows) {
     const headline = r.headline ?? "";
     if (r.kind === "print") {
-      const p = printsByKey.get(r.entity_id);
+      const key = parsePrintEntityId(r.entity_id);
+      if (!key) continue;
+      const p = findPrint(r.entity_id, key);
       if (!p) continue;
       const term = p.term as number;
       const number = String(p.number);
       hits.push({
         kind: "print",
-        id: r.entity_id,
+        id: `${term}:${number}`,
         label: (p.short_title as string) || (p.title as string) || `Druk ${number}`,
         headline,
         href: `/druk/${term}/${number}`,

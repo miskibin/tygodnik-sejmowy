@@ -9,6 +9,7 @@ import {
 import { PromiseFilterBar } from "./_components/PromiseFilterBar";
 import { PromiseFeed } from "./_components/PromiseFeed";
 import { ComparisonView } from "./_components/ComparisonView";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 export const revalidate = 300;
 
@@ -63,17 +64,12 @@ export default async function ObietnicePage({
     return (
       <div className="bg-background text-foreground font-serif pb-20">
         <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9">
-          <div className="border-b-2 border-rule pb-5 mb-6">
-            <div className="font-sans text-[11px] tracking-[0.2em] uppercase text-destructive mb-2">
-              ✶ Porównanie ✶
-            </div>
-            <h1
-              className="font-medium tracking-[-0.03em] m-0 leading-[0.95]"
-              style={{ fontSize: "clamp(1.75rem, 4.5vw, 3rem)", textWrap: "balance" }}
-            >
-              {partyShort(a)} <span className="text-secondary-foreground">vs</span> {partyShort(b)}
-            </h1>
-          </div>
+          <PageBreadcrumb
+            items={[
+              { label: "Obietnice", href: "/obietnice" },
+              { label: `${partyShort(a)} vs ${partyShort(b)}` },
+            ]}
+          />
           <ComparisonView
             partyA={a}
             partyB={b}
@@ -121,18 +117,10 @@ export default async function ObietnicePage({
   return (
     <div className="bg-background text-foreground font-serif pb-20">
       <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-6 md:pt-8">
-        {/* Hero — one line. */}
-        <div className="border-b-2 border-rule pb-5 mb-5">
-          <div className="font-sans text-[11px] tracking-[0.2em] uppercase text-destructive mb-2">
-            ✶ Rejestr {total} obietnic ✶
-          </div>
-          <h1
-            className="font-medium tracking-[-0.035em] m-0 leading-[0.95]"
-            style={{ fontSize: "clamp(2rem, 5.5vw, 4rem)", textWrap: "balance" }}
-          >
-            Co partie obiecały. <em className="text-destructive">Co spełniły.</em>
-          </h1>
-        </div>
+        <PageBreadcrumb
+          items={[{ label: "Obietnice" }]}
+          subtitle={`Rejestr ${total} obietnic — co partie obiecały, co spełniły.`}
+        />
 
         {/* Stat strip — one line, no per-party 0% repetition. Each party is a
             chip that filters the feed below. */}

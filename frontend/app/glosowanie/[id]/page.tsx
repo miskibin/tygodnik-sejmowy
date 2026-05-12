@@ -8,6 +8,7 @@ import { FullRosterGrid } from "@/components/voting/FullRosterGrid";
 import WhatsNextTimeline from "@/components/voting/WhatsNextTimeline";
 import VotingSources from "@/components/voting/VotingSources";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 
 export default async function VotingDetailPage({
@@ -41,6 +42,15 @@ export default async function VotingDetailPage({
 
   return (
     <main className="bg-background text-foreground font-serif min-h-screen">
+      <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-6">
+        <PageBreadcrumb
+          items={[
+            { label: "Głosowania" },
+            { label: header.title || `Głosowanie nr ${id}` },
+          ]}
+          subtitle={`Posiedzenie ${header.sitting} · ${new Date(header.date).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}`}
+        />
+      </div>
       <VotingHero data={data} />
       <VotingMeaning linkedPrint={linkedPrint} clubs={clubs} passed={passed} />
       <ClubBreakdownTable

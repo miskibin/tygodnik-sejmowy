@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Ornament } from "@/components/chrome/Ornament";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
 
@@ -94,24 +95,10 @@ export default async function BudzetPage() {
   return (
     <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
       <div className="max-w-[1100px] mx-auto">
-        <header className="mb-12 pb-7 border-b-2 border-rule">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-destructive mb-3">
-            ✶ &nbsp; Budżet i transparentność &nbsp; ✶
-          </div>
-          <h1
-            className="font-serif font-medium m-0 leading-[0.96]"
-            style={{ fontSize: "clamp(2.5rem, 7vw, 4.75rem)", letterSpacing: "-0.035em" }}
-          >
-            Patrzymy im na ręce —<br />
-            <em className="text-destructive font-serif italic">sami pokazujemy swoje.</em>
-          </h1>
-          <p
-            className="font-serif text-secondary-foreground max-w-[720px] mt-6 mb-0"
-            style={{ fontSize: 18, lineHeight: 1.6 }}
-          >
-            Co miesiąc publikujemy pełen budżet projektu. Bez paywalla, bez grantów uzależniających, bez ukrytych sponsorów. Jeśli osiągniemy cel — pokazujemy gdzie idą nadwyżki. Jeśli nie — mówimy z czego rezygnujemy.
-          </p>
-        </header>
+        <PageBreadcrumb
+          items={[{ label: "Budżet" }]}
+          subtitle="Co miesiąc publikujemy pełen budżet projektu. Bez paywalla, bez grantów uzależniających, bez ukrytych sponsorów."
+        />
 
         {anyMock ? <MockNotice /> : null}
 

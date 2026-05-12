@@ -1,4 +1,5 @@
 import { Ornament } from "@/components/chrome/Ornament";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import {
   getDistrictMap,
   getKlubFlow,
@@ -50,28 +51,10 @@ export default async function AtlasPage() {
   return (
     <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-20 sm:pb-28 min-w-0 w-full">
       <div className="max-w-[1280px] mx-auto min-w-0 w-full">
-        <header className="mb-8 sm:mb-12 pb-6 sm:pb-7 border-b-2 border-rule min-w-0">
-          <h1
-            className="font-serif font-medium m-0 leading-[0.94]"
-            style={{ fontSize: "clamp(3rem, 8vw, 5.75rem)", letterSpacing: "-0.04em", textWrap: "balance" }}
-          >
-            Sejm <em className="text-destructive not-italic font-serif italic">w&nbsp;sześciu</em>
-            <br />
-            ujęciach.
-          </h1>
-          <p
-            className="font-serif text-secondary-foreground max-w-[720px] mt-5 sm:mt-6 mb-0 text-[17px] sm:text-[19px] leading-[1.5] sm:leading-[1.55] text-pretty"
-          >
-            Geografia, koalicje, migracje, opóźnienia, dyscyplina, agenda. Bez wykresów-zombie typu „liczba głosowań na miesiąc”. Tylko dane, które opowiadają historię — i pozwalają ją zweryfikować.
-          </p>
-          <div className="flex flex-wrap gap-x-4 gap-y-1.5 sm:gap-x-6 mt-6 sm:mt-7 font-mono text-[10px] sm:text-[11px] uppercase text-muted-foreground tracking-wide sm:tracking-wider">
-            <span>Aktualizacja: {await formatToday()}</span>
-            <span>·</span>
-            <span>Źródło: ETL sejmograf + API Sejmu RP</span>
-            <span>·</span>
-            <span>n = {heatmap.totalVotings.toLocaleString("pl-PL")} głosowań</span>
-          </div>
-        </header>
+        <PageBreadcrumb
+          items={[{ label: "Atlas" }]}
+          subtitle={`Aktualizacja: ${await formatToday()} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: ETL sejmograf + API Sejmu RP`}
+        />
 
         <div className="grid gap-12 sm:gap-16 md:gap-20 min-w-0 [&>*]:min-w-0">
           <MapaOkregow data={mapData} />

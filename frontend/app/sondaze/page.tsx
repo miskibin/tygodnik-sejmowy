@@ -15,6 +15,7 @@ import { SondazeHero } from "./_components/SondazeHero";
 import { SondazeTabsClient } from "./_components/SondazeTabsClient";
 import { KoalicjeStub } from "./_components/KoalicjeStub";
 import { ViewMethodologyFooter } from "@/components/chrome/ViewMethodologyFooter";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 const TREND_INCLUSION_PCT = 3;
 
@@ -62,6 +63,7 @@ export default async function SondazePage() {
   return (
     <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-12 sm:pb-16 min-w-0">
       <div className="max-w-[1280px] mx-auto min-w-0">
+        <PageBreadcrumb items={[{ label: "Sondaże" }]} />
         <SondazeHero rows={averages} />
 
         <div className="mt-8 sm:mt-12">

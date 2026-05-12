@@ -1,4 +1,5 @@
 import { Ornament } from "@/components/chrome/Ornament";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
 
@@ -113,27 +114,10 @@ export default async function AboutProjectPage() {
   return (
     <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
       <div className="max-w-[1100px] mx-auto">
-        <header className="mb-12 pb-7 border-b-2 border-rule">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-destructive mb-3">
-            ✶ &nbsp; Warsztat, źródła i transparentność &nbsp; ✶
-          </div>
-          <h1
-            className="font-serif font-medium m-0 leading-[0.96]"
-            style={{ fontSize: "clamp(2.5rem, 7vw, 4.75rem)", letterSpacing: "-0.035em" }}
-          >
-            Dane najpierw.
-            <br />
-            <em className="text-destructive font-serif italic">Tekst dopiero potem.</em>
-          </h1>
-          <p
-            className="font-serif text-secondary-foreground max-w-[760px] mt-6 mb-0"
-            style={{ fontSize: 18, lineHeight: 1.6 }}
-          >
-            Supagraf nie zaczyna od narracji. Najpierw zbieramy publiczne źródła, łączymy je w
-            proces legislacyjny i zachowujemy provenance. Dopiero potem opisujemy skutki prostym
-            językiem i pokazujemy, skąd ten opis się bierze.
-          </p>
-        </header>
+        <PageBreadcrumb
+          items={[{ label: "O projekcie" }]}
+          subtitle="Warsztat, źródła i transparentność — najpierw dane, dopiero potem tekst."
+        />
 
         <section className="mb-16 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
