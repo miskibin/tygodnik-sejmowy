@@ -5,6 +5,7 @@ import {
   getPollsterSummary,
   TREND_DEFAULT_PARTIES,
 } from "@/lib/db/polls";
+import { getKlubPairAgreement } from "@/lib/db/coalition_agreement";
 import { RESIDUAL_CODES } from "./_components/partyMeta";
 import { Average30dGrid } from "./_components/Average30dGrid";
 import { QuarterlyTrendChart } from "./_components/QuarterlyTrendChart";
@@ -41,10 +42,11 @@ export default async function SondazePage() {
     return eligible.length > 0 ? eligible : [...TREND_DEFAULT_PARTIES];
   })();
 
-  const [trend, recent, pollsters] = await Promise.all([
+  const [trend, recent, pollsters, agreement] = await Promise.all([
     safe(getPollTrendQuarterly(trendParties), []),
     safe(getRecentPolls(20), []),
     safe(getPollsterSummary(), []),
+    safe(getKlubPairAgreement(10), { byPair: new Map() }),
   ]);
 
   const mainCount = averages.filter((r) => !RESIDUAL_CODES.has(r.party_code)).length;
@@ -68,7 +70,7 @@ export default async function SondazePage() {
             panels={{
               teraz: <Average30dGrid rows={averages} />,
               trend: <QuarterlyTrendChart rows={trend} />,
-              koalicje: <KoalicjeStub rows={averages} />,
+              koalicje: <KoalicjeStub rows={averages} agreement={agreement} />,
               lista: (
                 <div className="space-y-12 sm:space-y-16">
                   <RecentPollsList rows={recent} averages={averages} />
