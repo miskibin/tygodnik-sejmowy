@@ -23,16 +23,21 @@ type Variant = "sparkline" | "full";
 const TOOLTIP_W: Record<Variant, number> = { sparkline: 200, full: 260 };
 const TOOLTIP_H: Record<Variant, number> = { sparkline: 56, full: 70 };
 
+// x is pre-resolved at the call site. Earlier this component took an
+// `xFor: (iso) => number | null` function; that broke RSC serialization
+// when the surrounding chart was rendered into a `panels` slot of a
+// Client Component (functions can't cross the server→client boundary).
+// Caller now does `events.map(e => ({...e, x: xForDate(e.date)})).filter(...)`.
+export type PositionedEvent = TimelineEvent & { x: number };
+
 export function EventMarkers({
   events,
-  xFor,
   yTop,
   yBottom,
   variant,
   chartWidth,
 }: {
-  events: TimelineEvent[];
-  xFor: (isoDate: string) => number | null;
+  events: PositionedEvent[];
   yTop: number;
   yBottom: number;
   variant: Variant;
@@ -53,8 +58,7 @@ export function EventMarkers({
   return (
     <g>
       {events.map((e, i) => {
-        const x = xFor(e.date);
-        if (x == null) return null;
+        const x = e.x;
         const color = e.partyCode
           ? partyColor(e.partyCode)
           : "var(--muted-foreground)";
@@ -113,12 +117,10 @@ export function EventMarkers({
         if (hoveredIdx === null) return null;
         const hovered = events[hoveredIdx];
         if (!hovered) return null;
-        const hx = xFor(hovered.date);
-        if (hx == null) return null;
         return (
           <Tooltip
             event={hovered}
-            x={hx}
+            x={hovered.x}
             yTop={yTop}
             variant={variant}
             chartWidth={chartWidth}

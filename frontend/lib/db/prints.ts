@@ -191,6 +191,10 @@ export type ProcessOutcome = {
   // deadlines (14 d / 7 d) and excludes tax, electoral law, kodeksy, etc.
   // Populated from upstream Sejm API processes.urgencyStatus.
   urgencyStatus: "NORMAL" | "URGENT" | null;
+  // Raw processes.document_type. Drives whether the "awaiting publication"
+  // banner makes sense — wniosek/informacja/lista kandydatów never land
+  // in Dz.U. or M.P.
+  documentType: string | null;
 };
 
 export type MainVotingSeat = {
@@ -267,7 +271,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
   // outcome columns (passed / eli / display_address / eli_act_id / closure_date).
   const { data: proc } = await sb
     .from("processes")
-    .select("id, passed, eli, display_address, eli_act_id, closure_date, urgency_status")
+    .select("id, passed, eli, display_address, eli_act_id, closure_date, urgency_status, document_type")
     .eq("term", term)
     .eq("number", number)
     .limit(1)
@@ -315,6 +319,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
       closureDate: (proc.closure_date as string) ?? null,
       act,
       urgencyStatus: us === "URGENT" || us === "NORMAL" ? us : null,
+      documentType: (proc.document_type as string | null) ?? null,
     };
   }
 

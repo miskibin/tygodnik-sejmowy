@@ -163,8 +163,9 @@ function MonthlyChart({
           );
         })}
         <EventMarkers
-          events={events}
-          xFor={xForDate}
+          events={events
+            .map((e) => ({ ...e, x: xForDate(e.date) }))
+            .filter((e): e is typeof e & { x: number } => e.x != null)}
           yTop={padT}
           yBottom={H - padB}
           variant="full"

@@ -111,8 +111,9 @@ function ActivityChart({
         <path d={areaD} fill="var(--destructive)" opacity="0.08" />
         <path d={pathD} fill="none" stroke="var(--destructive)" strokeWidth="1.5" />
         <EventMarkers
-          events={events}
-          xFor={xForDate}
+          events={events
+            .map((e) => ({ ...e, x: xForDate(e.date) }))
+            .filter((e): e is typeof e & { x: number } => e.x != null)}
           yTop={padT}
           yBottom={H - padB}
           variant="full"
