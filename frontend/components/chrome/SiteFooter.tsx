@@ -21,8 +21,6 @@ const SITEMAP = [
 ] as const;
 
 export async function SiteFooter() {
-  const year = new Date().getFullYear();
-
   return (
     <footer
       role="contentinfo"
@@ -60,15 +58,11 @@ export async function SiteFooter() {
           </ul>
         </nav>
 
-        {/* Sources + copyright */}
+        {/* Links */}
         <div className="font-mono text-[11px] text-muted-foreground tracking-wide leading-[1.65]">
           <div className="uppercase tracking-[0.18em] text-muted-foreground mb-3">
-            Źródła
+            Linki
           </div>
-          <p className="m-0 mb-3">
-            Dane: <span className="text-secondary-foreground">api.sejm.gov.pl</span>,{" "}
-            <span className="text-secondary-foreground">ELI (Dz.U. / M.P.)</span>, oficjalne stenogramy.
-          </p>
           <p className="m-0 mb-3">
             Wsparcie:{" "}
             <PatroniteTrackedLink placement="footer" className="text-destructive hover:underline">
@@ -119,9 +113,6 @@ export async function SiteFooter() {
               radoskop.pl →
             </a>
             <span className="text-muted-foreground"> · ta sama idea dla rad miast i województw</span>
-          </p>
-          <p className="m-0 text-border">
-            © {year} Tygodnik Sejmowy · public-good infrastructure
           </p>
         </div>
       </div>
