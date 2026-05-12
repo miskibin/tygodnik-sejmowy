@@ -17,7 +17,7 @@ const SITEMAP = [
   { href: "/szukaj", label: "Szukaj" },
   { href: "/alerty", label: "Alerty" },
   { href: "/manifest", label: "Manifest" },
-  { href: "/budzet", label: "Budżet" },
+  { href: "/o-projekcie", label: "O projekcie" },
 ] as const;
 
 export async function SiteFooter() {

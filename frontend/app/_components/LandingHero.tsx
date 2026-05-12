@@ -194,6 +194,9 @@ export function LandingHero() {
           <div className="mt-3 font-sans text-[10.5px] text-muted-foreground tracking-wide text-center">
             Bez konta · Bez śledzenia · Profil zostaje na Twoim urządzeniu
           </div>
+          <div className="mt-2 font-serif text-[12.5px] leading-[1.55] text-secondary-foreground text-center max-w-[34rem] mx-auto">
+            Źródła publiczne. Przetwarzanie jawne. Każdy skrót da się sprawdzić u podstaw.
+          </div>
         </div>
       </div>
     </section>
