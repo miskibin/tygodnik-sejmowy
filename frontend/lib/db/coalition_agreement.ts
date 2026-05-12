@@ -2,6 +2,8 @@ import "server-only";
 
 import { supabase } from "@/lib/supabase";
 
+export const DEFAULT_TERM = 10;
+
 // Poll-code → Sejm club_short mapping. Polls use slightly finer codes than
 // what shows up as a parliamentary club (PSL and TD sit in one PSL-TD klub;
 // KKP/PJJ aren't separate Sejm clubs at all, so they have no voting record
@@ -30,7 +32,7 @@ export type KlubPairAgreement = {
 
 // Reads klub_pair_agreement_mv (mig 0051). Returns 0..1 agreement +
 // joint-voting count per unordered pair of Sejm club shorts.
-export async function getKlubPairAgreement(term = 10): Promise<KlubPairAgreement> {
+export async function getKlubPairAgreement(term: number = DEFAULT_TERM): Promise<KlubPairAgreement> {
   const sb = supabase();
   const { data, error } = await sb
     .from("klub_pair_agreement_mv")
