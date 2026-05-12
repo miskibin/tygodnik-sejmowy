@@ -83,9 +83,15 @@ export async function TydzienAsync({ mpId }: { mpId: number }) {
   );
 }
 
-export async function VotesAsync({ mpId }: { mpId: number }) {
+export async function VotesAsync({
+  mpId,
+  klubRef,
+}: {
+  mpId: number;
+  klubRef: string | null;
+}) {
   const data = await getMpVotes(mpId);
-  return <Tab1VotesPanel data={data} />;
+  return <Tab1VotesPanel data={data} klubRef={klubRef} />;
 }
 
 export async function QuestionsAsync({ mpId }: { mpId: number }) {
@@ -97,13 +103,26 @@ export async function QuestionsAsync({ mpId }: { mpId: number }) {
   return <Tab2QuestionsPanel stats={stats} initialRows={initialRows} mpId={mpId} />;
 }
 
-export async function StatementsAsync({ mpId }: { mpId: number }) {
+export async function StatementsAsync({
+  mpId,
+  klubRef,
+}: {
+  mpId: number;
+  klubRef: string | null;
+}) {
   const term = 10;
   const [stats, initialRows] = await Promise.all([
     getMpStatementsStats(mpId, term),
     getMpStatementsRows(mpId, term, 0, MP_QUESTIONS_STATEMENTS_TAB_LIMIT),
   ]);
-  return <Tab3StatementsPanel stats={stats} initialRows={initialRows} mpId={mpId} />;
+  return (
+    <Tab3StatementsPanel
+      stats={stats}
+      initialRows={initialRows}
+      mpId={mpId}
+      klubRef={klubRef}
+    />
+  );
 }
 
 export async function PromisesAsync({ mpId }: { mpId: number }) {
