@@ -48,9 +48,15 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
 - **Default timeout 300 s** (long Polish prints + structured-JSON inference can take 60-120 s; 60 s default was triggering `ReadTimeout` mid-batch). Override via `SUPAGRAF_LLM_TIMEOUT_S` env.
 - Embedding: `qwen3-embedding:0.6b` (Ollama, 639 MB). Native dim 1024 → fits `halfvec(1024)` DB column directly, no padding. Override via `SUPAGRAF_EMBED_MODEL` env or `--model` flag on embed commands. Legacy `nomic-embed-text-v2-moe` (768-d zero-padded) retired Q2 2026; if mixed-model embeddings appear in the table (`SELECT DISTINCT model FROM embeddings`), wipe non-qwen rows before semantic search — vector spaces are not comparable.
 
+## Database
+
+- **Self-hosted Supabase only.** Prod DB is `db.msulawiak.pl` (mixvm). No managed Supabase project is in play — do **not** use Supabase MCP tools or assume cloud-project endpoints; they target unrelated environments and writes go to the wrong DB.
+- Python supabase client reads `SUPABASE_URL` / `SUPABASE_KEY` from `.env`; that's the only authoritative target.
+- DDL goes through direct psql on mixvm (e.g. `ssh sejm@mixvm.bison-fort.ts.net` then `docker exec` into the postgres container). PostgREST over HTTPS can run queries but not migrations.
+
 ## Migrations
 
-- Sequential numbering: 0001..NNNN. Apply via `mcp__supabase__apply_migration` (PostgREST anon timeout 8s — service role / direct psql for heavy refreshes).
+- Sequential numbering: 0001..NNNN. Apply via direct psql against the self-hosted Postgres (PostgREST anon statement timeout is 8 s — heavy refreshes need service role / direct connection anyway).
 - Co-existing agents must reserve number ranges to avoid collision. Check `supabase/migrations/` before picking next number.
 
 ## ELI acts (DU + MP)

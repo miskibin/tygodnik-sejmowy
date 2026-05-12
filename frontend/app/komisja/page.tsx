@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCommitteeList, committeeTypeLabel, type CommitteeListItem } from "@/lib/db/committees";
-import { PageHeading } from "@/components/chrome/PageHeading";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 
 function formatDate(iso: string | null): string {
@@ -55,20 +55,14 @@ export default async function KomisjaIndexPage() {
 
   return (
     <main className="bg-background text-foreground font-serif pb-20">
-      <section className="border-b border-rule">
-        <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 pb-5">
-          <div className="flex items-baseline justify-between gap-4 flex-wrap">
-            <PageHeading>
-              Komisje <span className="italic text-destructive">sejmowe</span>
-            </PageHeading>
-            <p className="font-serif italic text-[12.5px] text-secondary-foreground max-w-[460px] m-0 leading-snug">
-              {standingCount} komisji stałych i {extraCount} nadzwyczajnych w X kadencji. Klucz do tego, kto naprawdę pisze ustawy.
-            </p>
-          </div>
-        </div>
-      </section>
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8">
+        <PageBreadcrumb
+          items={[{ label: "Komisje" }]}
+          subtitle={`${standingCount} komisji stałych i ${extraCount} nadzwyczajnych w X kadencji.`}
+        />
+      </div>
 
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 md:pt-10 space-y-10">
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-2 md:pt-4 space-y-10">
         {grouped.STANDING.length > 0 && (
           <section>
             <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-4">

@@ -58,3 +58,12 @@ scripts/fix_ports.py
 scripts/wipe_db_dir_restart.py
 scripts/deploy_supabase_vm.py
 scripts/gen_supabase_keys.py
+
+# Mobile (Expo) build/runtime artefacts
+mobile/node_modules/
+mobile/.expo/
+mobile/android/
+mobile/ios/
+mobile/dist/
+mobile/.env
+mobile/expo-env.d.ts

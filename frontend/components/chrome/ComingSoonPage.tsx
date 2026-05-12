@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { PageHeading } from "./PageHeading";
+import { PageBreadcrumb } from "./PageBreadcrumb";
 
 // ComingSoonPage — single placeholder for routes whose backing data/auth
 // isn't wired yet. Intentionally quiet: no card-fest, no "explore other
@@ -32,22 +32,24 @@ export function ComingSoonPage({
       className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28"
     >
       <div className="max-w-[760px] mx-auto">
-        <div className="flex items-center gap-3 flex-wrap mb-3">
-          <PageHeading>{routeName}</PageHeading>
-          <span
-            aria-label="Funkcja w przygotowaniu"
-            className="font-mono text-[10px] tracking-[0.18em] uppercase px-2 py-[3px] rounded-sm"
-            style={{
-              background: "var(--destructive)",
-              color: "var(--background)",
-            }}
-          >
-            Wkrótce
-          </span>
-        </div>
+        <PageBreadcrumb
+          items={[{ label: routeName }]}
+          subtitle={
+            <span
+              aria-label="Funkcja w przygotowaniu"
+              className="inline-block font-mono text-[10px] tracking-[0.18em] uppercase px-2 py-[3px] rounded-sm"
+              style={{
+                background: "var(--destructive)",
+                color: "var(--background)",
+              }}
+            >
+              Wkrótce
+            </span>
+          }
+        />
 
         <p
-          className="font-serif text-secondary-foreground max-w-[680px] mt-4 mb-8"
+          className="font-serif text-secondary-foreground max-w-[680px] mb-8"
           style={{ fontSize: 19, lineHeight: 1.55 }}
         >
           {description}

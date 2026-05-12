@@ -43,6 +43,9 @@ _PRE_STEPS = (
     "load_votings",
     # committees after mps (member.mp_id FKs into mps), before prints (independent).
     "load_committees",
+    # committee_sittings: needs committees rows (FK committee_id) — must run
+    # immediately after load_committees. Independent of prints/processes.
+    "load_committee_sittings",
     # prints: parents first, then additionalPrints children, then edges, then attachments.
     # Order matters: print_relationships FKs into prints; attachments need both parent
     # and child print rows present (child attachments point at child print_id).

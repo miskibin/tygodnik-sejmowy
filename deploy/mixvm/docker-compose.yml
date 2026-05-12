@@ -1,0 +1,47 @@
+# Sejmograf daily-pipeline stack for mixvm. Designed to be portainer-visible.
+#
+# - `ollama`: long-running embeddings server. Persistent model cache at
+#   `./ollama_data`. Bound to internal compose network only.
+# - `supagraf-daily`: one-shot run. Triggered via `docker compose run --rm
+#   daily` (cron-friendly). Mounts repo + fixtures + .env read-only.
+#
+# All upstream services (Supabase REST at db.*.pl, Sejm API,
+# DeepSeek API) are reached over public HTTPS — no extra network plumbing.
+
+name: sejmograf
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sejmograf-ollama
+    restart: unless-stopped
+    volumes:
+      - ./ollama_data:/root/.ollama
+    expose:
+      - "11434"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  daily:
+    build:
+      context: ./repo
+      dockerfile: ../Dockerfile.supagraf
+    image: sejmograf/supagraf:local
+    container_name: sejmograf-daily
+    depends_on:
+      ollama:
+        condition: service_started
+    env_file:
+      - ./.env
+    environment:
+      OLLAMA_HOST: "http://ollama:11434"
+      SUPAGRAF_LLM_TIMEOUT_S: "300"
+    volumes:
+      - ./repo:/app:ro
+      - ./fixtures:/app/fixtures
+      - ./logs:/app/logs
+    profiles: ["jobs"]   # one-shot: never auto-up, only via `compose run`
+    command: ["uv", "run", "python", "-m", "supagraf", "daily", "--term", "10"]

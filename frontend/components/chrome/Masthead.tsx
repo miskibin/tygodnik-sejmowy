@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { SearchIcon } from "lucide-react";
 import { useProfile } from "@/lib/profile";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
 import { TygodnikLogoMark } from "./TygodnikLogoMark";
+import { GlobalSearchDialog } from "./GlobalSearchDialog";
 import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
 
 // Tablet (768–1023) inherits the mobile burger nav. At iPad widths the 6 primary
@@ -21,6 +23,19 @@ export function Masthead() {
   const { postcode, district } = useProfile();
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Global Cmd/Ctrl+K → toggle global search dialog.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen((v) => !v);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -60,7 +75,7 @@ export function Masthead() {
             aria-label="Tygodnik Sejmowy"
             className="flex items-center gap-2 sm:gap-2.5 md:gap-3 cursor-pointer"
           >
-            <TygodnikLogoMark className="h-7 w-7 sm:h-8 sm:h-8 shrink-0" />
+            <TygodnikLogoMark className="h-7 w-7 sm:h-8 sm:w-8 shrink-0" />
             <span className="hidden sm:inline font-serif text-[20px] sm:text-[24px] md:text-[26px] font-medium tracking-tight text-foreground leading-none whitespace-nowrap">
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
@@ -154,15 +169,41 @@ export function Masthead() {
 
         {/* Right cluster */}
         <div className="flex items-center justify-end gap-1.5 md:gap-2 font-sans text-xs">
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Szukaj"
+            title="Szukaj (Ctrl+K)"
+            className="hidden md:inline-flex items-center gap-2 px-3 py-1.5 border border-border rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+          >
+            <SearchIcon className="size-3.5" aria-hidden="true" />
+            <span className="text-[12px]">Szukaj</span>
+            <kbd className="hidden xl:inline font-mono text-[10px] px-1.5 py-0.5 border border-border rounded text-muted-foreground">
+              Ctrl K
+            </kbd>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Szukaj"
+            title="Szukaj"
+            className="md:hidden w-9 h-9 inline-flex items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors"
+          >
+            <SearchIcon className="size-4" aria-hidden="true" />
+          </button>
           <Link
             href="/posel"
             title="Twój okręg"
             className="hidden xl:flex items-center gap-2 px-3 py-1.5 border border-border rounded-full text-secondary-foreground bg-background"
           >
             <span className="w-1.5 h-1.5 bg-destructive rounded-full" />
-            <span className="font-mono text-[11px]">{postcode || "--–---"}</span>
+            <span className="font-mono text-[11px]" suppressHydrationWarning>
+              {dateLabel ? (postcode || "--–---") : "--–---"}
+            </span>
             <span className="text-muted-foreground">·</span>
-            <span>Okręg&nbsp;{district?.num ?? "—"}</span>
+            <span suppressHydrationWarning>
+              Okręg&nbsp;{dateLabel ? (district?.num ?? "—") : "—"}
+            </span>
           </Link>
 
           <ThemeToggle />
@@ -188,6 +229,7 @@ export function Masthead() {
           </PatroniteTrackedLink>
         </div>
       </div>
+      <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }

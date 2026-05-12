@@ -53,7 +53,10 @@ def match_promise(
     promise_id: int,
     term: int = 10,
     top_k: int = 25,
-    max_distance: float = 0.55,  # tuned for qwen3-embedding:0.6b — Polish text
+    max_distance: float = 0.65,  # widened from 0.55 (2026-05-12) to bring in more
+    # borderline cosine candidates — only 39% of promises had any surviving
+    # rerank verdict at 0.55; the LLM re-ranker filters out noise the wider
+    # band admits. Tighten back if false-positive rate spikes.
     model: str = DEFAULT_EMBED_MODEL,
 ) -> int:
     r = supabase().rpc(
@@ -75,7 +78,10 @@ def match_all_promises(
     *,
     term: int = 10,
     top_k: int = 25,
-    max_distance: float = 0.55,  # tuned for qwen3-embedding:0.6b — Polish text
+    max_distance: float = 0.65,  # widened from 0.55 (2026-05-12) to bring in more
+    # borderline cosine candidates — only 39% of promises had any surviving
+    # rerank verdict at 0.55; the LLM re-ranker filters out noise the wider
+    # band admits. Tighten back if false-positive rate spikes.
     model: str = DEFAULT_EMBED_MODEL,
 ) -> dict[str, int]:
     """Match every promise that has an embedding. Skips promises without one

@@ -144,51 +144,79 @@ export default async function PromiseDetailPage({
         {/* Main + sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
           <main>
-            {/* Evidence list */}
-            {detail.evidence.length > 0 && (
-              <section className="mb-10" aria-labelledby="evidence-heading">
-                <h2
-                  id="evidence-heading"
-                  className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3"
+            {/* Evidence list — split by rerank verdict.
+                Confirmed: high-confidence LLM-validated links (badge "potwierdzone").
+                Candidate: lower-confidence rerank survivors (badge "możliwe"). */}
+            {(() => {
+              const confirmedEvidence = detail.evidence.filter((e) => e.matchStatus === "confirmed");
+              const candidateEvidence = detail.evidence.filter((e) => e.matchStatus === "candidate");
+              const renderItem = (e: typeof detail.evidence[number]) => (
+                <li
+                  key={`${e.printTerm}-${e.printNumber}`}
+                  className="border-l-2 border-border pl-4"
                 >
-                  Powiązane druki ({detail.evidence.length})
-                </h2>
-                <ul className="list-none p-0 m-0 space-y-4">
-                  {detail.evidence.map((e) => (
-                    <li
-                      key={`${e.printTerm}-${e.printNumber}`}
-                      className="border-l-2 border-border pl-4"
+                  <Link
+                    href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
+                    className="font-serif text-foreground hover:text-destructive no-underline"
+                    style={{ fontSize: 18 }}
+                  >
+                    {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
+                  </Link>
+                  <div className="font-mono text-[11px] text-muted-foreground mt-1">
+                    Druk {e.printNumber}/{e.printTerm}
+                    {e.printTopic && (
+                      <>
+                        {" · "}
+                        <span className="text-secondary-foreground">{TOPIC_LABEL[e.printTopic] ?? e.printTopic}</span>
+                      </>
+                    )}
+                    {e.similarity != null && <> · sim {e.similarity.toFixed(2)}</>}
+                  </div>
+                  {e.rationale && (
+                    <p
+                      className="m-0 mt-2 font-serif italic text-secondary-foreground"
+                      style={{ fontSize: 14, lineHeight: 1.55 }}
                     >
-                      <Link
-                        href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
-                        className="font-serif text-foreground hover:text-destructive no-underline"
-                        style={{ fontSize: 18 }}
+                      <MarkdownText text={e.rationale} />
+                    </p>
+                  )}
+                </li>
+              );
+              return (
+                <>
+                  {confirmedEvidence.length > 0 && (
+                    <section className="mb-10" aria-labelledby="evidence-heading">
+                      <h2
+                        id="evidence-heading"
+                        className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3"
                       >
-                        {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
-                      </Link>
-                      <div className="font-mono text-[11px] text-muted-foreground mt-1">
-                        Druk {e.printNumber}/{e.printTerm}
-                        {e.printTopic && (
-                          <>
-                            {" · "}
-                            <span className="text-secondary-foreground">{TOPIC_LABEL[e.printTopic] ?? e.printTopic}</span>
-                          </>
-                        )}
-                        {e.similarity != null && <> · sim {e.similarity.toFixed(2)}</>}
-                      </div>
-                      {e.rationale && (
-                        <p
-                          className="m-0 mt-2 font-serif italic text-secondary-foreground"
-                          style={{ fontSize: 14, lineHeight: 1.55 }}
-                        >
-                          <MarkdownText text={e.rationale} />
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
+                        Powiązane druki ({confirmedEvidence.length})
+                      </h2>
+                      <ul className="list-none p-0 m-0 space-y-4">
+                        {confirmedEvidence.map(renderItem)}
+                      </ul>
+                    </section>
+                  )}
+                  {candidateEvidence.length > 0 && (
+                    <section className="mb-10" aria-labelledby="candidate-evidence-heading">
+                      <h2
+                        id="candidate-evidence-heading"
+                        className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1"
+                      >
+                        Możliwe powiązania ({candidateEvidence.length})
+                      </h2>
+                      <p className="font-mono text-[10px] text-muted-foreground mb-3 leading-relaxed">
+                        Druki o temat dotyka obietnicy, ale LLM nie potwierdził jednoznacznie.
+                        Traktuj jako wskazówkę, nie dowód.
+                      </p>
+                      <ul className="list-none p-0 m-0 space-y-4 opacity-80">
+                        {candidateEvidence.map(renderItem)}
+                      </ul>
+                    </section>
+                  )}
+                </>
+              );
+            })()}
 
             {/* Voting timeline */}
             {detail.votings.length > 0 && (

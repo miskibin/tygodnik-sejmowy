@@ -1,13 +1,14 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getCommittee,
   getCommitteeMembers,
+  getCommitteeSittings,
   committeeTypeLabel,
   type CommitteeMember,
+  type CommitteeSitting,
 } from "@/lib/db/committees";
 import { MPCardGrid } from "@/components/posel/MPCardGrid";
-import { PageHeading } from "@/components/chrome/PageHeading";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
 
 
@@ -30,9 +31,20 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
 
   let committee: Awaited<ReturnType<typeof getCommittee>> = null;
   let members: CommitteeMember[] = [];
+  let sittings: CommitteeSitting[] = [];
   try {
     committee = await getCommittee(id);
-    if (committee) members = await getCommitteeMembers(committee.id);
+    if (committee) {
+      members = await getCommitteeMembers(committee.id);
+      // Sittings query runs independently — if the table is missing or query
+      // fails, fall back to empty list so member roster still renders.
+      try {
+        sittings = await getCommitteeSittings(committee.id);
+      } catch (sErr) {
+        console.error("[/komisja/[id]] sittings load failed", { id, sErr });
+        sittings = [];
+      }
+    }
   } catch (err) {
     console.error("[/komisja/[id]] load failed", { id, err });
     return (
@@ -57,29 +69,20 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
 
   return (
     <main className="bg-background text-foreground font-serif pb-20">
-      <section className="border-b border-rule">
-        <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9 pb-6">
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase mb-3 flex items-center gap-3 flex-wrap">
-            <Link href="/komisja" className="text-muted-foreground hover:text-destructive">
-              ‹ Komisje
-            </Link>
-            <span className="text-border">/</span>
-            <span className="text-destructive">{committeeTypeLabel(committee.type)}</span>
-            <span className="text-border">·</span>
-            <span className="font-mono text-muted-foreground">{committee.code}</span>
-          </div>
-
-          <PageHeading className="mb-3">
-            {committee.name}
-          </PageHeading>
-
-          {committee.scope && (
-            <p className="font-serif italic text-[15px] text-secondary-foreground m-0 max-w-[760px] leading-relaxed">
-              {committee.scope}
-            </p>
-          )}
-        </div>
-      </section>
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9">
+        <PageBreadcrumb
+          items={[
+            { label: "Komisje", href: "/komisja" },
+            { label: committee.name },
+          ]}
+          subtitle={
+            <>
+              {committeeTypeLabel(committee.type)} · <span className="font-mono">{committee.code}</span>
+              {committee.scope ? ` — ${committee.scope}` : ""}
+            </>
+          }
+        />
+      </div>
 
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 grid grid-cols-2 md:grid-cols-4 gap-x-4 md:gap-x-6 border-b border-border">
         <Tile k="Skład" v={String(members.length)} sub={members.length === 1 ? "członek" : "członków"} pos={0} />
@@ -131,16 +134,89 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
         </section>
 
         <section className="mt-12 border-t border-border pt-6">
-          <p className="font-serif italic text-[13px] text-muted-foreground m-0 max-w-[760px]">
-            Lista posiedzeń komisji — moduł w przygotowaniu, na razie zobacz{" "}
-            <Link href="/atlas" className="underline decoration-dotted underline-offset-4 hover:text-destructive">
-              Atlas Sejmu
-            </Link>
-            .
-          </p>
+          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-5">
+            ✶ Posiedzenia · {sittings.length}
+          </div>
+          {sittings.length === 0 ? (
+            <p className="font-serif italic text-muted-foreground">
+              Brak zarejestrowanych posiedzeń.
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {sittings.map((s) => (
+                <SittingRow key={s.id} s={s} />
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </main>
+  );
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  FINISHED: "zakończone",
+  ONGOING: "trwa",
+  PLANNED: "planowane",
+};
+
+const STATUS_CLASS: Record<string, string> = {
+  FINISHED: "text-muted-foreground border-border",
+  ONGOING: "text-destructive border-destructive",
+  PLANNED: "text-foreground border-foreground/40",
+};
+
+function SittingRow({ s }: { s: CommitteeSitting }) {
+  const dateLabel = s.date
+    ? new Date(s.date).toLocaleDateString("pl-PL", { day: "2-digit", month: "long", year: "numeric" })
+    : "—";
+  const status = s.status ?? "FINISHED";
+  const agendaPreview = s.agendaText.length > 220
+    ? s.agendaText.slice(0, 220).trimEnd() + "…"
+    : s.agendaText;
+
+  return (
+    <li className="border-b border-border pb-4 last:border-b-0">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1">
+        <span className="font-serif text-[15px] font-medium">{dateLabel}</span>
+        <span className="font-sans text-[11px] text-muted-foreground tracking-[0.08em]">
+          nr {s.num}
+        </span>
+        <span className={`font-sans text-[10px] tracking-[0.14em] uppercase border px-1.5 py-0.5 ${STATUS_CLASS[status] ?? STATUS_CLASS.FINISHED}`}>
+          {STATUS_LABEL[status] ?? status.toLowerCase()}
+        </span>
+        {s.closed && (
+          <span className="font-sans text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+            · zamknięte
+          </span>
+        )}
+        {s.remote && (
+          <span className="font-sans text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+            · zdalne
+          </span>
+        )}
+        {s.videoPlayerLink && (
+          <a
+            href={s.videoPlayerLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto font-sans text-[11px] tracking-[0.08em] underline decoration-dotted underline-offset-4 hover:text-destructive"
+          >
+            video →
+          </a>
+        )}
+      </div>
+      {s.room && (
+        <div className="font-sans text-[11px] text-muted-foreground mb-1">
+          {s.room}
+        </div>
+      )}
+      {agendaPreview && (
+        <p className="font-serif text-[14px] leading-relaxed text-secondary-foreground m-0 max-w-[820px]">
+          {agendaPreview}
+        </p>
+      )}
+    </li>
   );
 }
 

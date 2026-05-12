@@ -397,7 +397,12 @@ export function getPartyCodesWithCounts(): Promise<Array<{ code: string; count: 
   )();
 }
 
-// Detail page — full record + all confirmed candidates + voting timeline.
+// Detail page — full record + all reranked candidates (confirmed + candidate)
+// + voting timeline. `matchStatus` distinguishes high-confidence ("confirmed")
+// from lower-confidence ("candidate") rerank verdicts. Only 5% of cosine
+// candidates pass the reranker as "confirmed"; another 26% land as "candidate"
+// — surfacing both lets the citizen see plausible legislative links instead
+// of an empty page.
 export type PromiseEvidence = {
   printTerm: number;
   printNumber: string;
@@ -407,6 +412,7 @@ export type PromiseEvidence = {
   similarity: number | null;
   rationale: string | null;
   rerankedAt: string | null;
+  matchStatus: "confirmed" | "candidate";
 };
 
 export type PromiseVotingEntry = {
@@ -486,10 +492,11 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
     sb
       .from("promise_print_candidates")
       .select(
-        "print_term, print_number, similarity, match_rationale, reranked_at",
+        "print_term, print_number, similarity, match_rationale, reranked_at, match_status",
       )
       .eq("promise_id", id)
-      .eq("match_status", "confirmed")
+      .in("match_status", ["confirmed", "candidate"])
+      .order("match_status", { ascending: true }) // 'candidate' < 'confirmed' alphabetically; flip on JS side
       .order("similarity", { ascending: false }),
     sb
       .from("voting_promise_link_mv")
@@ -553,7 +560,16 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
       similarity: r.similarity == null ? null : Number(r.similarity),
       rationale: (r.match_rationale as string | null) ?? null,
       rerankedAt: (r.reranked_at as string | null) ?? null,
+      matchStatus: (r.match_status as "confirmed" | "candidate") ?? "candidate",
     };
+  });
+  // Confirmed first, then candidate; within each bucket already sorted by
+  // similarity desc (Postgres order).
+  evidence.sort((a, b) => {
+    if (a.matchStatus !== b.matchStatus) {
+      return a.matchStatus === "confirmed" ? -1 : 1;
+    }
+    return (b.similarity ?? 0) - (a.similarity ?? 0);
   });
 
   // Voting metadata join.
@@ -618,7 +634,10 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
     sourceQuote: (p.source_quote as string) ?? null,
     confidence: p.confidence == null ? null : Number(p.confidence),
     normalizedText: (p.normalized_text as string | null) ?? null,
-    matchCount: evidence.length,
+    // matchCount counts only "confirmed" rows so the listing card badge keeps
+    // its strong-signal semantics — even though `evidence` also exposes the
+    // lower-confidence "candidate" rows for the detail page.
+    matchCount: evidence.filter((e) => e.matchStatus === "confirmed").length,
     topMatchTerm: evidence[0]?.printTerm ?? null,
     topMatchNumber: evidence[0]?.printNumber ?? null,
     topMatchSimilarity: evidence[0]?.similarity ?? null,

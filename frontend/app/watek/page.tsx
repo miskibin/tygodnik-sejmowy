@@ -1,6 +1,6 @@
 import { getThreadsInFlight, type ThreadSummary } from "@/lib/db/threads";
 import { stageLabel } from "@/lib/stages";
-import { PageHeading } from "@/components/chrome/PageHeading";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 
 function formatShortDate(iso: string | null): string {
@@ -62,18 +62,10 @@ export default async function WatekIndexPage() {
   return (
     <div className="bg-background text-foreground font-serif pb-24">
       <div className="max-w-[980px] mx-auto px-4 md:px-8 lg:px-14 pt-9 md:pt-12">
-        <PageHeading kicker="Wątki · pełen cykl ustawy">
-          Wątki w toku
-        </PageHeading>
-        <p className="font-serif text-secondary-foreground mt-4 mb-2 max-w-[640px] leading-[1.55] text-[15px]">
-          Każda ustawa ma swoją <em className="text-destructive not-italic">historię</em> — od
-          wpłynięcia projektu, przez czytania, komisje i głosowania, aż do podpisu Prezydenta i
-          publikacji w Dzienniku Ustaw. Tutaj zobaczysz druki, które właśnie się przez ten cykl
-          przeprawiają.
-        </p>
-        <div className="font-sans text-[11px] text-muted-foreground mt-3 mb-7">
-          Aktywność w ostatnich 90 dniach · sortowane wg najnowszego etapu
-        </div>
+        <PageBreadcrumb
+          items={[{ label: "Wątki" }]}
+          subtitle="Aktywność w ostatnich 90 dniach · sortowane wg najnowszego etapu"
+        />
 
         {threads.length === 0 ? (
           <p className="font-serif italic text-muted-foreground mt-8">

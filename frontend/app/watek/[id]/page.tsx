@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getThread, type ThreadStage, type ThreadStageVoting } from "@/lib/db/threads";
 import { stageLabel } from "@/lib/stages";
-import { PageHeading } from "@/components/chrome/PageHeading";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
 
 
@@ -158,18 +158,13 @@ export default async function WatekDetailPage({
   return (
     <div className="bg-background text-foreground font-serif pb-24">
       <div className="max-w-[860px] mx-auto px-4 md:px-8 lg:px-12 pt-8 md:pt-10">
-        <div className="font-sans text-[11px] tracking-[0.16em] uppercase mb-3 flex items-center gap-3 flex-wrap">
-          <a href="/watek" className="text-muted-foreground hover:text-destructive">‹ Wątki</a>
-          <span className="text-border">/</span>
-          <span className="text-destructive">wątek ustawy</span>
-          <span className="font-mono text-muted-foreground tracking-wide normal-case">
-            druk {thread.number} · kadencja {thread.term}
-          </span>
-        </div>
-
-        <PageHeading className="mb-3 max-w-[760px]">
-          {thread.shortTitle || thread.title}
-        </PageHeading>
+        <PageBreadcrumb
+          items={[
+            { label: "Wątki", href: "/watek" },
+            { label: thread.shortTitle || thread.title || `Druk ${thread.number}` },
+          ]}
+          subtitle={`druk ${thread.number} · kadencja ${thread.term}`}
+        />
 
         <div className="font-sans text-[12px] text-secondary-foreground mb-3 flex flex-wrap gap-x-4 gap-y-1">
           <span>

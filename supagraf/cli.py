@@ -16,6 +16,7 @@ from supagraf.stage import acts as stage_acts
 from supagraf.stage import bills as stage_bills
 from supagraf.stage import clubs as stage_clubs
 from supagraf.stage import committees as stage_committees
+from supagraf.stage import committee_sittings as stage_committee_sittings
 from supagraf.stage import districts as stage_districts
 from supagraf.stage import mps as stage_mps
 from supagraf.stage import proceedings as stage_proceedings
@@ -146,12 +147,13 @@ def cmd_backfill_all(dry_run: bool = typer.Option(False, "--dry-run")):
 
 @app.command("stage")
 def cmd_stage(
-    resources: list[str] = typer.Argument(None, help="mps|clubs|votings|committees|processes|bills|questions|videos|proceedings|districts|postcodes|promises|acts (default: all)"),
+    resources: list[str] = typer.Argument(None, help="mps|clubs|votings|committees|committee_sittings|processes|bills|questions|videos|proceedings|districts|postcodes|promises|acts (default: all)"),
     term: int = 10,
 ):
     """Stage fixture JSON to _stage_* tables."""
     targets = resources or [
-        "clubs", "mps", "votings", "committees", "processes", "bills",
+        "clubs", "mps", "votings", "committees", "committee_sittings",
+        "processes", "bills",
         "questions", "videos", "proceedings",
         "districts", "postcodes", "promises",
         "acts",
@@ -161,6 +163,7 @@ def cmd_stage(
         "mps": stage_mps.stage,
         "votings": stage_votings.stage,
         "committees": stage_committees.stage,
+        "committee_sittings": stage_committee_sittings.stage,
         "processes": stage_processes.stage,
         "bills": stage_bills.stage,
         "questions": stage_questions.stage,
@@ -245,6 +248,13 @@ def cmd_daily(
             fetch_committees(term=term)
         except Exception as e:
             logger.error("committees fetch failed: {!r}", e)
+        # Committee sittings: ALWAYS re-fetches (mutable: status PLANNED→
+        # ONGOING→FINISHED, agenda edits). ~31 GETs/day at 1s throttle.
+        try:
+            from supagraf.fetch.committee_sittings import fetch_committee_sittings
+            fetch_committee_sittings(term=term)
+        except Exception as e:
+            logger.error("committee_sittings fetch failed: {!r}", e)
 
     logger.info("=== daily phase 2-3/6: stage + load ===")
     cmd_stage(None, term=term)
@@ -622,11 +632,11 @@ def cmd_enrich_promises(
 def cmd_match_promises(
     term: int = typer.Option(10, "--term", "-t"),
     top_k: int = typer.Option(25, "--top-k"),
-    max_distance: float = typer.Option(0.55, "--max-distance",
-        help="Cosine distance ceiling. Default 0.55 tuned for qwen3-embedding:0.6b "
-             "Polish text. Was 0.60 — yielded near-zero matches because the bulk "
-             "of true positives sit in the 0.4-0.5 cosine band; the LLM re-ranker "
-             "(rerank-promises) filters out the noise this admits."),
+    max_distance: float = typer.Option(0.65, "--max-distance",
+        help="Cosine distance ceiling. Default 0.65 (was 0.55) — after the "
+             "2026-05-12 backfill, only 39% of promises had any surviving "
+             "rerank verdict at 0.55. Widening admits more borderline matches "
+             "for the LLM re-ranker (rerank-promises) to filter."),
 ):
     """Run match_promise_to_prints for every embedded promise.
 
@@ -797,7 +807,7 @@ def cmd_refresh_aggregates():
 
 @app.command("fetch")
 def cmd_fetch(
-    resource: str = typer.Argument(..., help="proceeding-bodies|mp-photos|acts|committees"),
+    resource: str = typer.Argument(..., help="proceeding-bodies|mp-photos|acts|committees|committee-sittings"),
     term: int = typer.Option(10, "--term", "-t"),
     throttle_s: float = typer.Option(0.2, "--throttle", help="seconds between requests (5 req/s default)"),
     limit: int = typer.Option(0, "--limit", "-n", help="cap on statements to attempt; 0 = no cap"),
@@ -858,6 +868,13 @@ def cmd_fetch(
         from supagraf.fetch.committees import fetch_committees
         rep = fetch_committees(term=term, force=force, throttle_s=max(throttle_s, 1.0))
         print(f"\nfetch committees: {rep.to_dict()}")
+        return
+    if resource == "committee-sittings":
+        # Sittings + agenda + video links per committee. Always re-fetches
+        # (mutable). Throttle floor 1.0s — committee count is small.
+        from supagraf.fetch.committee_sittings import fetch_committee_sittings
+        rep = fetch_committee_sittings(term=term, throttle_s=max(throttle_s, 1.0))
+        print(f"\nfetch committee-sittings: {rep.to_dict()}")
         return
     logger.error("unknown fetch resource: {}", resource)
     raise typer.Exit(1)

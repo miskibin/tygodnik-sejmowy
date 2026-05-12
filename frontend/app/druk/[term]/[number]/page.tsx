@@ -6,7 +6,7 @@ import { stageLabel } from "@/lib/stages";
 import { Reader } from "./_components/Reader";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { isUnaffiliated } from "@/lib/clubs/filter";
-import { PageHeading } from "@/components/chrome/PageHeading";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { VotingRow } from "@/components/voting/VotingRow";
 import { PrintCard } from "@/components/print/PrintCard";
 import { HemicycleChart } from "@/components/tygodnik/HemicycleChart";
@@ -126,18 +126,17 @@ export default async function DrukPage({
   return (
     <div className="bg-background text-foreground font-serif pb-20">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9 pb-8 md:pb-10">
-        <div className="font-sans text-[11px] tracking-[0.16em] uppercase mb-3 flex items-center gap-3 flex-wrap">
-          <a href="/tygodnik" className="text-muted-foreground hover:text-destructive">‹ Tygodnik</a>
-          <span className="text-border">/</span>
-          <span className="text-destructive">{documentCategoryLabel(print.documentCategory) ?? "druk sejmowy"}</span>
-          <span className="font-mono text-muted-foreground tracking-wide normal-case">
-            nr {print.number} · kadencja {print.term}
-            {print.changeDate ? ` · ${formatDate(print.changeDate)}` : ""}
-          </span>
-        </div>
-        <PageHeading className="mb-4 max-w-[820px]">
-          {print.shortTitle || print.title}
-        </PageHeading>
+        <PageBreadcrumb
+          items={[
+            { label: "Druki" },
+            { label: `Kadencja ${print.term}` },
+            { label: print.shortTitle || print.title || `Druk ${print.number}` },
+          ]}
+          subtitle={
+            `${documentCategoryLabel(print.documentCategory) ?? "druk sejmowy"} · nr ${print.number}` +
+            (print.changeDate ? ` · ${formatDate(print.changeDate)}` : "")
+          }
+        />
         {(print.isMetaDocument || print.isProcedural) && (
           <div
             className="font-sans text-[12px] text-secondary-foreground mb-5 max-w-[760px] leading-[1.55] px-3 py-2 border-l-2"

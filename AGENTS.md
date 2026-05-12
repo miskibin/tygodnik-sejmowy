@@ -24,7 +24,8 @@
 
 ### Gotchas
 
-- The Supabase project (`wtvjmhthpheoimuuljin`, migrated from `krtdwpbkzlyxzwpeqzww` on 2026-05-09) can return PGRST002 ("schema cache") errors intermittently. This resolves on its own — retry or wait.
+- DB is the self-hosted Supabase at `db.msulawiak.pl` (mixvm). Do **not** use Supabase MCP tools or assume a managed-project endpoint — those target unrelated environments. DDL goes through direct psql on mixvm; PostgREST handles queries only.
+- PostgREST ("schema cache" / PGRST002 / PGRST205) errors can appear after DDL until the cache reloads — `NOTIFY pgrst, 'reload schema'` on the same DB, then retry.
 - The Python `SUPABASE_KEY` in `.env` should be the **service_role** JWT (not the publishable key) for ETL write operations. The frontend uses the publishable/anon key.
 - `uv run python -m supagraf` loads `.env` from workspace root automatically via `supagraf/db.py:load_dotenv()`.
 - Next.js 16 is a canary release — read `node_modules/next/dist/docs/` before modifying frontend code.

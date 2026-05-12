@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMp, getClubName, getMpStats } from "@/lib/db/mps";
@@ -16,7 +15,7 @@ import { ProfilPanel } from "./_components/ProfilPanel";
 import { HeroLedeBand } from "./_components/HeroLedeBand";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
-import { ViewMethodologyFooter } from "@/components/chrome/ViewMethodologyFooter";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 
 export async function generateMetadata({
@@ -184,20 +183,17 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
     <div className="bg-background text-foreground font-serif pb-16 sm:pb-20 min-w-0 overflow-x-hidden">
       {/* Breadcrumb */}
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 sm:pt-8">
-        <div className="font-sans text-[11px] tracking-[0.16em] uppercase flex items-center gap-3 flex-wrap mb-5 sm:mb-7">
-          <Link href="/posel" className="text-muted-foreground hover:text-destructive">
-            ‹ Posłowie
-          </Link>
-          {mp.districtNum && (
-            <>
-              <span className="text-border" aria-hidden>/</span>
-              <span className="text-destructive font-medium normal-case text-[12px] tracking-normal">
-                Okręg {mp.districtNum}
-                {mp.voivodeship ? ` — ${mp.voivodeship}` : ""}
-              </span>
-            </>
-          )}
-        </div>
+        <PageBreadcrumb
+          items={[
+            { label: "Posłowie", href: "/posel" },
+            { label: mp.firstLastName },
+          ]}
+          subtitle={
+            mp.districtNum
+              ? `Okręg ${mp.districtNum}${mp.voivodeship ? ` — ${mp.voivodeship}` : ""}`
+              : undefined
+          }
+        />
       </div>
 
       {/* HERO */}
@@ -321,6 +317,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
       {/* Tabs */}
       <PoselTabs
         tabs={tabs}
+        initialTabId="obietnice"
         panels={{
           tydzien: (
             <Suspense fallback={<PanelFallback rows={4} />}>
@@ -351,65 +348,6 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
         }}
       />
 
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14">
-        <ViewMethodologyFooter
-          columns={[
-            {
-              kicker: "Skąd dane",
-              children: (
-                <>
-                  api.sejm.gov.pl, własne aktualizacje. Frekwencja i lojalność klubowa liczone z
-                  pełnej historii głosowań w tej kadencji.
-                </>
-              ),
-            },
-            {
-              kicker: "Co znaczy lojalność klubowa",
-              children: (
-                <>
-                  Procent głosowań, w których głos posła był zgodny z większością jego klubu. Niższy
-                  wynik = częściej głosuje samodzielnie, niekoniecznie &bdquo;przeciw&rdquo;.
-                </>
-              ),
-            },
-            {
-              kicker: "Znaczniki wydarzeń",
-              children: (
-                <>
-                  Pionowe linie na wykresach (głosowania, wystąpienia) to ręcznie kuratorowana
-                  lista istotnych momentów politycznych — globalnych oraz dla partii tego posła.
-                  Pełna lista i historia zmian w pliku{" "}
-                  <a
-                    href="https://github.com/miskibin/tygodnik-sejmowy/blob/main/frontend/lib/timeline-events.ts"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
-                  >
-                    lib/timeline-events.ts
-                  </a>
-                  .
-                </>
-              ),
-            },
-            {
-              kicker: "Widzisz błąd?",
-              children: (
-                <>
-                  Zgłoś go publicznie — repozytorium jest otwarte.
-                  <a
-                    href="https://github.com/miskibin/tygodnik-sejmowy/issues"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1.5 border border-foreground px-3 py-1.5 font-mono text-[10.5px] tracking-[0.14em] uppercase text-foreground hover:bg-foreground hover:text-background transition-colors"
-                  >
-                    ↗ Zgłoś na GitHubie
-                  </a>
-                </>
-              ),
-            },
-          ]}
-        />
-      </div>
     </div>
   );
 }

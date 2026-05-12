@@ -1,5 +1,27 @@
 import Link from "next/link";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
+import { getLastDataUpdate } from "@/lib/db/freshness";
+
+const PL_DATE = new Intl.DateTimeFormat("pl-PL", {
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Warsaw",
+});
+
+function relativeLabel(d: Date): string {
+  const diffMs = Date.now() - d.getTime();
+  const mins = Math.round(diffMs / 60_000);
+  if (mins < 1) return "przed chwilą";
+  if (mins < 60) return `${mins} min temu`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs} godz. temu`;
+  const days = Math.round(hrs / 24);
+  if (days < 7) return `${days} dni temu`;
+  return PL_DATE.format(d).split(",")[0]!.trim();
+}
 
 // Global site footer mounted in app/layout.tsx beneath ChromeSlot. Mostly
 // server-rendered; Patronite CTA uses a tiny client link for one GA event.
@@ -21,11 +43,23 @@ const SITEMAP = [
 ] as const;
 
 export async function SiteFooter() {
+  const lastUpdate = await getLastDataUpdate();
   return (
     <footer
       role="contentinfo"
       className="border-t border-rule bg-muted mt-12"
     >
+      {lastUpdate && (
+        <div className="border-b border-rule/60">
+          <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-14 py-2 flex items-center justify-end gap-2 font-mono text-[10.5px] tracking-[0.14em] uppercase text-muted-foreground">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive/70" aria-hidden />
+            <span>Aktualizacja danych</span>
+            <span className="text-secondary-foreground" title={PL_DATE.format(lastUpdate)}>
+              <time dateTime={lastUpdate.toISOString()}>{relativeLabel(lastUpdate)}</time>
+            </span>
+          </div>
+        </div>
+      )}
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-14 py-12 grid gap-10 md:gap-8 grid-cols-1 md:grid-cols-3">
         {/* Wordmark + tagline */}
         <div>

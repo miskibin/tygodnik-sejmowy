@@ -195,7 +195,7 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
       >
         <p className="m-0">
           <strong className="text-foreground">Heurystyka.</strong>{" "}
-          Dopasowanie obietnica → druk pochodzi z LLM-rerankera, ograniczone do par oznaczonych jako
+          Druki dopasowane są do obietnic semantycznie, ograniczone do par oznaczonych jako
           „confirmed". Głosowanie wybierane w pierwszej kolejności jako <em>main</em>{" "}
           z <code className="font-mono text-[12px]">voting_print_links</code>; jeśli brak — pierwsze powiązane.
         </p>

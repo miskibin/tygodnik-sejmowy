@@ -1,0 +1,29 @@
+# Minimal supagraf image for daily runs on mixvm.
+# Build context: ./repo (the rsynced supagraf checkout).
+# Python 3.10 per CLAUDE.md ("D:\sejmograf\.venv is Python 3.10").
+
+FROM python:3.10-slim
+
+# uv: pinned-binary install via pip (avoids `curl | sh`)
+RUN pip install --no-cache-dir --upgrade pip uv
+
+# Minimal OS deps for psycopg2 build wheels + DOCX/PDF tooling. Tesseract
+# is NOT installed — daily on the VM only does fetch/stage/load/enrich/embed
+# pipelines; scanned-PDF OCR happens during separate enrichment locally.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        git ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# We bind-mount the repo at runtime, but copy pyproject + uv.lock at build
+# time so dep resolution is cached in the layer.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project
+
+# The actual project code arrives via the read-only bind mount; this final
+# COPY is so a built-but-unmounted image still runs (dev convenience).
+COPY . .
+
+CMD ["uv", "run", "python", "-m", "supagraf", "--help"]

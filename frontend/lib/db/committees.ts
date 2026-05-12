@@ -176,6 +176,105 @@ export async function getCommitteeMembers(
   return enriched;
 }
 
+export type CommitteeSittingStatus = "FINISHED" | "ONGOING" | "PLANNED" | null;
+
+export type CommitteeSitting = {
+  id: number;
+  num: number;
+  date: string | null;
+  startAt: string | null;
+  endAt: string | null;
+  room: string | null;
+  status: CommitteeSittingStatus;
+  closed: boolean;
+  remote: boolean;
+  agendaText: string;
+  videoPlayerLink: string | null;
+};
+
+const SITTING_TAG_RE = /<[^>]+>/g;
+const SITTING_WS_RE = /\s+/g;
+
+function stripHtml(raw: string | null | undefined): string {
+  if (!raw) return "";
+  return raw.replace(SITTING_TAG_RE, " ").replace(SITTING_WS_RE, " ").trim();
+}
+
+// DB-sourced URLs flow into <a href>. Guard against javascript: / data: payloads
+// that a poisoned upstream API response could inject.
+function safeHttpUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
+export async function getCommitteeSittings(
+  committeeId: number,
+  term = DEFAULT_TERM,
+): Promise<CommitteeSitting[]> {
+  const sb = supabase();
+
+  const { data: rows, error } = await sb
+    .from("committee_sittings")
+    .select(
+      "id, num, date, start_at, end_at, room, status, closed, remote, agenda_html",
+    )
+    .eq("term", term)
+    .eq("committee_id", committeeId)
+    .order("date", { ascending: false, nullsFirst: false })
+    .order("num", { ascending: false });
+  if (error) throw error;
+
+  const sittings = (rows ?? []) as {
+    id: number;
+    num: number;
+    date: string | null;
+    start_at: string | null;
+    end_at: string | null;
+    room: string | null;
+    status: CommitteeSittingStatus;
+    closed: boolean | null;
+    remote: boolean | null;
+    agenda_html: string | null;
+  }[];
+
+  if (sittings.length === 0) return [];
+
+  const sittingIds = sittings.map((s) => s.id);
+  const { data: vidRows, error: vidErr } = await sb
+    .from("committee_sitting_videos")
+    .select("sitting_id, player_link, video_type")
+    .in("sitting_id", sittingIds);
+  if (vidErr) throw vidErr;
+
+  const videoBySitting = new Map<number, string>();
+  for (const v of (vidRows ?? []) as { sitting_id: number; player_link: string | null; video_type: string | null }[]) {
+    const safe = safeHttpUrl(v.player_link);
+    if (!safe) continue;
+    if (videoBySitting.has(v.sitting_id)) continue;
+    videoBySitting.set(v.sitting_id, safe);
+  }
+
+  return sittings.map((s) => ({
+    id: s.id,
+    num: s.num,
+    date: s.date,
+    startAt: s.start_at,
+    endAt: s.end_at,
+    room: s.room,
+    status: s.status,
+    closed: !!s.closed,
+    remote: !!s.remote,
+    agendaText: stripHtml(s.agenda_html),
+    videoPlayerLink: videoBySitting.get(s.id) ?? null,
+  }));
+}
+
 export function committeeTypeLabel(t: CommitteeType): string {
   switch (t) {
     case "STANDING":

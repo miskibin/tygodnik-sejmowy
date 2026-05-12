@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
-import { PageHeading } from "@/components/chrome/PageHeading";
+import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
 
 
@@ -75,17 +75,14 @@ export default async function OkregPage({ params }: { params: Promise<{ num: str
   return (
     <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
       <div className="max-w-[900px] mx-auto">
-        <div className="font-sans text-[11px] tracking-[0.16em] uppercase mb-4 flex items-center gap-3">
-          <Link href="/atlas" className="text-muted-foreground hover:text-destructive">‹ Atlas</Link>
-          <span className="text-border">/</span>
-          <span className="text-destructive">Okręg {String(num).padStart(2, "0")}</span>
-        </div>
+        <PageBreadcrumb
+          items={[
+            { label: "Atlas", href: "/atlas" },
+            { label: `Okręg ${num}` },
+          ]}
+        />
 
-        <PageHeading size="xl" className="mb-3">
-          Okręg <em className="text-destructive">{num}</em>
-        </PageHeading>
-
-        <div className="flex flex-wrap gap-4 mt-5 mb-10 font-mono text-[12px] text-muted-foreground tracking-wide uppercase">
+        <div className="flex flex-wrap gap-4 mb-10 font-mono text-[12px] text-muted-foreground tracking-wide uppercase">
           {district.dominant_club_short ? (
             <ClubBadge
               klub={district.dominant_club_short}
