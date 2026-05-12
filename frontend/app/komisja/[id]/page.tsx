@@ -188,14 +188,10 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
             <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-foreground mb-1">
               ✶ Najbliższe posiedzenia · {futureSittings.length}
             </div>
-            <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-4 leading-relaxed">
+            <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-5 leading-relaxed">
               Zaplanowane na przyszłość. Pełny porządek pojawi się tuż przed posiedzeniem.
             </p>
-            <ul className="border border-border divide-y divide-border">
-              {upcomingSittings.map((s) => (
-                <UpcomingSittingRow key={s.id} s={s} />
-              ))}
-            </ul>
+            <UpcomingTimeline sittings={upcomingSittings} />
           </section>
         )}
 
@@ -384,38 +380,92 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
   );
 }
 
-function UpcomingSittingRow({ s }: { s: CommitteeSitting }) {
-  const dateLabel = s.date
-    ? new Date(s.date).toLocaleDateString("pl-PL", { day: "2-digit", month: "long", year: "numeric" })
-    : "—";
-  const relative = formatRelativePlFuture(s.date);
-  const oneLine = s.agendaText.length > 140 ? s.agendaText.slice(0, 140).trimEnd() + "…" : s.agendaText;
+function UpcomingTimeline({ sittings }: { sittings: CommitteeSitting[] }) {
+  // Group consecutive sittings by ISO date so same-day items cluster under
+  // one date marker. Order already chronological (closest first) when passed in.
+  type Group = { dateIso: string | null; items: CommitteeSitting[] };
+  const groups: Group[] = [];
+  for (const s of sittings) {
+    const key = s.date ? s.date.slice(0, 10) : null;
+    const tail = groups[groups.length - 1];
+    if (tail && tail.dateIso === key) tail.items.push(s);
+    else groups.push({ dateIso: key, items: [s] });
+  }
+
   return (
-    <li className="px-4 py-3">
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="font-serif text-[14px]">{dateLabel}</span>
-        {relative && (
-          <span className="font-sans text-[11px] tracking-[0.04em] text-foreground">{relative}</span>
-        )}
-        <span className="font-sans text-[10.5px] text-muted-foreground tracking-[0.08em]">nr {s.num}</span>
-        <span className="font-sans text-[9.5px] tracking-[0.14em] uppercase border border-foreground/40 text-foreground px-1.5 py-0.5">
-          planowane
-        </span>
-        {s.remote && (
-          <span className="font-sans text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground">
-            zdalne
-          </span>
-        )}
-        {s.room && (
-          <span className="font-sans text-[11px] text-muted-foreground ml-auto">{s.room}</span>
-        )}
-      </div>
-      {oneLine && (
-        <p className="font-serif text-[13px] leading-snug text-muted-foreground mt-1 max-w-[820px]">
-          {oneLine}
-        </p>
-      )}
-    </li>
+    <ol className="relative pl-7 md:pl-9 border-l-2 border-border space-y-7">
+      {groups.map((g, gi) => {
+        const dateLabel = g.dateIso
+          ? new Date(g.dateIso).toLocaleDateString("pl-PL", { day: "2-digit", month: "long", year: "numeric" })
+          : "—";
+        const dow = g.dateIso
+          ? new Date(g.dateIso).toLocaleDateString("pl-PL", { weekday: "long" })
+          : null;
+        const relative = formatRelativePlFuture(g.dateIso);
+        const isFirst = gi === 0;
+        return (
+          <li key={`${g.dateIso}-${gi}`} className="relative">
+            <span
+              aria-hidden
+              className={`absolute -left-[34px] md:-left-[42px] top-1 w-3 h-3 rounded-full border-2 ${
+                isFirst ? "bg-destructive border-destructive" : "bg-background border-foreground/60"
+              }`}
+            />
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-2">
+              <span className="font-serif text-[16px] md:text-[17px] font-medium leading-none tracking-[-0.01em]">
+                {dateLabel}
+              </span>
+              {relative && (
+                <span
+                  className={`font-sans text-[11px] tracking-[0.04em] uppercase ${
+                    isFirst ? "text-destructive" : "text-foreground"
+                  }`}
+                >
+                  {relative}
+                </span>
+              )}
+              {dow && (
+                <span className="font-sans text-[11px] text-muted-foreground">{dow}</span>
+              )}
+            </div>
+            <ul className="space-y-2.5">
+              {g.items.map((s) => {
+                const oneLine = s.agendaText.length > 180
+                  ? s.agendaText.slice(0, 180).trimEnd() + "…"
+                  : s.agendaText;
+                return (
+                  <li key={s.id} className="border border-border bg-background px-3 py-2.5">
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <span className="font-sans text-[10px] tracking-[0.14em] uppercase border border-foreground/40 text-foreground px-1.5 py-0.5">
+                        planowane
+                      </span>
+                      <span className="font-sans text-[10.5px] text-muted-foreground tracking-[0.08em]">
+                        nr {s.num}
+                      </span>
+                      {s.remote && (
+                        <span className="font-sans text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+                          zdalne
+                        </span>
+                      )}
+                      {s.room && (
+                        <span className="font-sans text-[11px] text-muted-foreground ml-auto">
+                          {s.room}
+                        </span>
+                      )}
+                    </div>
+                    {oneLine && (
+                      <p className="font-serif text-[13.5px] leading-snug text-secondary-foreground mt-1.5 max-w-[820px]">
+                        {oneLine}
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
