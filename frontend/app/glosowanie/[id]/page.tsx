@@ -43,7 +43,12 @@ export default async function VotingDetailPage({
     <main className="bg-background text-foreground font-serif min-h-screen">
       <VotingHero data={data} />
       <VotingMeaning linkedPrint={linkedPrint} clubs={clubs} passed={passed} />
-      <ClubBreakdownTable clubs={clubs} header={header} shortTitle={linkedPrint?.short_title ?? null} />
+      <ClubBreakdownTable
+        clubs={clubs}
+        header={header}
+        shortTitle={linkedPrint?.short_title ?? null}
+        printNumber={linkedPrint?.number ?? null}
+      />
       <RebelGrid rebels={rebels} term={header.term} />
       <FullRosterGrid
         seats={seats}
