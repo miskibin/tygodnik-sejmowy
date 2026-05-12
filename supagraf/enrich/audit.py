@@ -22,6 +22,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, ParamSpec, TypeVar
 
 from loguru import logger
+import httpx
 from postgrest.exceptions import APIError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -29,6 +30,18 @@ from supagraf.db import supabase
 from supagraf.enrich.embed import ALLOWED_ENTITY_TYPES
 
 ERROR_MAX_CHARS = 4000
+
+# Supabase via Tailscale (mixvm) sees intermittent RemoteProtocolError +
+# ReadError under concurrent load — retry transport-layer drops on top of
+# the postgrest API errors.
+_RETRY_EXC = (
+    APIError,
+    httpx.RemoteProtocolError,
+    httpx.ReadError,
+    httpx.ConnectError,
+    httpx.TimeoutException,
+    httpx.PoolTimeout,
+)
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -42,9 +55,9 @@ def _validate_entity_type(et: str) -> None:
 
 
 @retry(
-    retry=retry_if_exception_type(APIError),
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=4),
+    retry=retry_if_exception_type(_RETRY_EXC),
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
     reraise=True,
 )
 def _insert_run(fn_name: str, model: str, prompt_version: str | None,
@@ -62,9 +75,9 @@ def _insert_run(fn_name: str, model: str, prompt_version: str | None,
 
 
 @retry(
-    retry=retry_if_exception_type(APIError),
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=4),
+    retry=retry_if_exception_type(_RETRY_EXC),
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
     reraise=True,
 )
 def _record_failure(model_run_id: int, entity_type: str, entity_id: str,
@@ -79,6 +92,12 @@ def _record_failure(model_run_id: int, entity_type: str, entity_id: str,
     }).execute()
 
 
+@retry(
+    retry=retry_if_exception_type(_RETRY_EXC),
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
+    reraise=True,
+)
 def _finish_run(run_id: int, status: str, notes: dict | None = None) -> None:
     try:
         supabase().rpc("model_run_finish", {

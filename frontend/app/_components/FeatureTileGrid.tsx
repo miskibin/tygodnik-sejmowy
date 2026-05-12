@@ -90,9 +90,13 @@ export async function FeatureTileGrid() {
   const coverage = Math.min(100, Math.round((raised / target) * 100));
   const budzetMonth = new Date().toLocaleDateString("pl-PL", { month: "long", year: "numeric" });
 
-  // ── 07 Alerty — honest "what we plan" preview; feature is wkrótce ─────
+  // ── 07 Alerty — RSS feed already live; push/ICS still wkrótce. ────────
   const alertTriggers = ["fraza", "poseł", "klub", "okręg", "druk", "akt"];
-  const alertChannels = ["e-mail", "RSS", "push", "ICS"];
+  const alertChannels: Array<{ name: string; live: boolean; href?: string }> = [
+    { name: "RSS", live: true, href: "/rss.xml" },
+    { name: "push", live: false },
+    { name: "ICS", live: false },
+  ];
 
   return (
     <section className="px-4 md:px-8 lg:px-14 py-12 md:py-16 border-b border-rule">
@@ -357,7 +361,7 @@ export async function FeatureTileGrid() {
             num="07"
             kicker="SUBSKRYPCJE"
             title="Alerty"
-            description="Powiadomienia, gdy w Sejmie padnie konkretne słowo — albo gdy Twój poseł zagłosuje wbrew klubowi."
+            description="RSS już działa — świeże druki prosto do Twojego czytnika. Push, ICS i alerty po słowach kluczowych — wkrótce."
             preview={
               <div className="space-y-3">
                 <div>
@@ -380,14 +384,24 @@ export async function FeatureTileGrid() {
                     kanały
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {alertChannels.map((c) => (
-                      <span
-                        key={c}
-                        className="font-mono text-[10.5px] px-2 py-0.5 border border-dashed border-border text-muted-foreground rounded-sm"
-                      >
-                        {c}
-                      </span>
-                    ))}
+                    {alertChannels.map((c) =>
+                      c.live && c.href ? (
+                        <a
+                          key={c.name}
+                          href={c.href}
+                          className="font-mono text-[10.5px] px-2 py-0.5 border border-destructive text-destructive rounded-sm hover:bg-destructive hover:text-background transition-colors"
+                        >
+                          {c.name} ✓
+                        </a>
+                      ) : (
+                        <span
+                          key={c.name}
+                          className="font-mono text-[10.5px] px-2 py-0.5 border border-dashed border-border text-muted-foreground rounded-sm"
+                        >
+                          {c.name}
+                        </span>
+                      ),
+                    )}
                   </div>
                 </div>
               </div>

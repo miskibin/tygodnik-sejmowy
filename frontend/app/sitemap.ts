@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/druk`,      lastModified: now, changeFrequency: "daily",   priority: 0.7 },
     { url: `${SITE_URL}/alerty`,    lastModified: now, changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE_URL}/manifest`,  lastModified: now, changeFrequency: "yearly",  priority: 0.5 },
+    { url: `${SITE_URL}/rss.xml`,   lastModified: now, changeFrequency: "daily",   priority: 0.5 },
   ];
 
   // Dynamic — tolerant of DB failure: if either query throws, fall back

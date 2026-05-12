@@ -59,6 +59,11 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "/",
+    types: {
+      "application/rss+xml": [
+        { url: "/rss.xml", title: "Tygodnik Sejmowy — druki" },
+      ],
+    },
   },
   robots: {
     index: true,
