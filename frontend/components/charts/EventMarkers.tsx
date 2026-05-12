@@ -61,15 +61,20 @@ export function EventMarkers({
         const opacity = e.partyCode ? 0.7 : 0.55;
         const dash = DASH_BY_KIND[e.kind];
         const isHovered = hoveredIdx === i;
+        const a11yLabel = e.description ? `${e.title} (${e.date}). ${e.description}` : `${e.title} (${e.date})`;
         return (
           <g
             key={`${e.date}-${i}`}
+            role="img"
+            aria-label={a11yLabel}
             onMouseEnter={() => setHoveredIdx(i)}
             onMouseLeave={() => setHoveredIdx((curr) => (curr === i ? null : curr))}
             style={{ cursor: "help" }}
           >
             {/* invisible wide halo for hit-testing; pointer-events: stroke so
-                it only catches pointers along the line itself, not the bbox */}
+                it only catches pointers along the line itself, not the bbox.
+                The <title> here is the native fallback for keyboard / AT
+                users when the React-driven hover tooltip isn't reachable. */}
             <line
               x1={x}
               x2={x}
@@ -78,7 +83,9 @@ export function EventMarkers({
               stroke="transparent"
               strokeWidth={haloWidth}
               style={{ pointerEvents: "stroke" }}
-            />
+            >
+              <title>{a11yLabel}</title>
+            </line>
             {/* visible marker */}
             <line
               x1={x}
@@ -102,15 +109,22 @@ export function EventMarkers({
           </g>
         );
       })}
-      {hoveredIdx !== null && events[hoveredIdx] && (
-        <Tooltip
-          event={events[hoveredIdx]}
-          x={xFor(events[hoveredIdx].date)!}
-          yTop={yTop}
-          variant={variant}
-          chartWidth={chartWidth}
-        />
-      )}
+      {(() => {
+        if (hoveredIdx === null) return null;
+        const hovered = events[hoveredIdx];
+        if (!hovered) return null;
+        const hx = xFor(hovered.date);
+        if (hx == null) return null;
+        return (
+          <Tooltip
+            event={hovered}
+            x={hx}
+            yTop={yTop}
+            variant={variant}
+            chartWidth={chartWidth}
+          />
+        );
+      })()}
     </g>
   );
 }
