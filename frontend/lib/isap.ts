@@ -36,6 +36,12 @@ export function buildIsapDocDetailsUrl(ref: ActRef): string {
   return buildIsapDocDetailsUrlFromAddress(buildIsapAddress(ref));
 }
 
+export function buildActDisplayAddress(eliId: string | null | undefined): string | null {
+  const ref = parseActRef(eliId);
+  if (!ref) return null;
+  return `${ref.publisher === "MP" ? "M.P." : "Dz.U."} ${ref.year} poz. ${Number(ref.position)}`;
+}
+
 export function buildIsapPdfUrlFromAddress(address: string, fileName: string): string {
   return `https://isap.sejm.gov.pl/isap.nsf/download.xsp/${encodeURIComponent(address)}/O/${encodeURIComponent(fileName)}`;
 }

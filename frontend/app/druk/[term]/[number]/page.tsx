@@ -11,6 +11,7 @@ import { VotingRow } from "@/components/voting/VotingRow";
 import { PrintCard } from "@/components/print/PrintCard";
 import { HemicycleChart } from "@/components/tygodnik/HemicycleChart";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
+import { getPassedProcessBanner, publicationJournalLabel } from "@/lib/process-status";
 
 
 export async function generateMetadata({
@@ -116,6 +117,10 @@ export default async function DrukPage({
   const totalFiles = attachments.length + subPrints.reduce((n, s) => n + s.attachments.length, 0);
 
   const topLevelStages = stages.filter((s) => s.depth === 0);
+  const pendingPassedBanner =
+    outcome?.passed && !outcome.act
+      ? getPassedProcessBanner(topLevelStages, outcome.closureDate)
+      : null;
   const lastDoneIdx = (() => {
     for (let i = topLevelStages.length - 1; i >= 0; i--) {
       if (topLevelStages[i].stageDate) return i;
@@ -382,7 +387,7 @@ export default async function DrukPage({
                 style={{ borderColor: "var(--success)", background: "var(--muted)" }}
               >
                 <div className="font-sans text-[10px] tracking-[0.16em] uppercase text-success mb-1.5">
-                  ✓ W Dzienniku Ustaw
+                  ✓ W {publicationJournalLabel(outcome.act.displayAddress)}
                 </div>
                 <div className="font-serif text-[16px] text-foreground leading-snug mb-1">
                   {outcome.act.displayAddress}
@@ -402,20 +407,20 @@ export default async function DrukPage({
                     rel="noopener noreferrer"
                     className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
                   >
-                    ↗ Zobacz tekst ustawy w ISAP
+                    ↗ Zobacz tekst aktu w ISAP
                   </a>
                 )}
               </div>
             )}
 
-            {outcome?.passed && !outcome.act && (
+            {pendingPassedBanner && (
               <div
                 className="mt-7 px-4 py-3 border-l-2 font-sans text-[12px] text-secondary-foreground leading-[1.55]"
                 style={{ borderColor: "var(--warning)", background: "var(--muted)" }}
               >
-                <span className="font-medium text-foreground">Uchwalono</span> —
-                {" "}oczekuje na publikację w Dz.U.
-                {outcome.closureDate ? ` (${formatDate(outcome.closureDate)})` : ""}
+                <span className="font-medium text-foreground">{pendingPassedBanner.title}</span> —
+                {" "}{pendingPassedBanner.detail}
+                {pendingPassedBanner.date ? ` (${formatDate(pendingPassedBanner.date)})` : ""}
               </div>
             )}
 

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { normalizeActSourceUrl } from "@/lib/isap";
+import { buildActDisplayAddress, normalizeActSourceUrl } from "@/lib/isap";
 import { supabase } from "@/lib/supabase";
 import { dbTagsToPersonas, type PersonaId } from "@/lib/personas";
 import { dbTagsToTopics, type TopicId } from "@/lib/topics";
@@ -285,6 +285,9 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
   let outcome: ProcessOutcome | null = null;
   if (proc) {
     const eliActId = (proc.eli_act_id as number | null) ?? null;
+    const procEli = (proc.eli as string | null) ?? null;
+    const procDisplayAddress =
+      (proc.display_address as string | null) ?? buildActDisplayAddress(procEli);
     let act: ProcessAct | null = null;
     if (eliActId) {
       // Real column name is promulgation_date (date of publication in
@@ -298,7 +301,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
       if (actRow) {
         act = {
           eliId: (actRow.eli_id as string) ?? "",
-          displayAddress: (proc.display_address as string) ?? "",
+          displayAddress: procDisplayAddress ?? "",
           title: (actRow.title as string) ?? null,
           status: (actRow.status as string) ?? null,
           sourceUrl: normalizeActSourceUrl(
@@ -308,6 +311,16 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
           publishedAt: (actRow.promulgation_date as string) ?? null,
         };
       }
+    }
+    if (!act && (procEli || procDisplayAddress)) {
+      act = {
+        eliId: procEli ?? "",
+        displayAddress: procDisplayAddress ?? "",
+        title: null,
+        status: null,
+        sourceUrl: normalizeActSourceUrl(null, procEli),
+        publishedAt: null,
+      };
     }
     const us = (proc.urgency_status as string | null) ?? null;
     outcome = {

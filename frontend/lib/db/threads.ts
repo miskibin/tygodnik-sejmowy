@@ -1,6 +1,6 @@
 import "server-only";
 
-import { normalizeActSourceUrl } from "@/lib/isap";
+import { buildActDisplayAddress, normalizeActSourceUrl } from "@/lib/isap";
 import { supabase } from "@/lib/supabase";
 
 // Voting tally rendered inline next to a stage row (yes/no/abstain pill).
@@ -258,7 +258,7 @@ export async function getThread(term: number, number: string): Promise<ThreadDet
   const { data: proc, error: pe } = await sb
     .from("processes")
     .select(
-      "id, term, number, title, passed, closure_date, last_refreshed_at, eli_act_id, display_address",
+      "id, term, number, title, passed, closure_date, last_refreshed_at, eli, eli_act_id, display_address",
     )
     .eq("term", term)
     .eq("number", number)
@@ -343,6 +343,9 @@ export async function getThread(term: number, number: string): Promise<ThreadDet
 
   // Resolve outcome act if linked.
   let act: ThreadAct | null = null;
+  const procEli = (proc.eli as string | null) ?? null;
+  const procDisplayAddress =
+    (proc.display_address as string | null) ?? buildActDisplayAddress(procEli);
   const eliActId = (proc.eli_act_id as number | null) ?? null;
   if (eliActId) {
     const { data: actRow } = await sb
@@ -354,7 +357,7 @@ export async function getThread(term: number, number: string): Promise<ThreadDet
     if (actRow) {
       act = {
         eliId: (actRow.eli_id as string) ?? "",
-        displayAddress: (proc.display_address as string) ?? "",
+        displayAddress: procDisplayAddress ?? "",
         title: (actRow.title as string) ?? null,
         status: (actRow.status as string) ?? null,
         sourceUrl: normalizeActSourceUrl(
@@ -364,6 +367,16 @@ export async function getThread(term: number, number: string): Promise<ThreadDet
         publishedAt: (actRow.promulgation_date as string) ?? null,
       };
     }
+  }
+  if (!act && (procEli || procDisplayAddress)) {
+    act = {
+      eliId: procEli ?? "",
+      displayAddress: procDisplayAddress ?? "",
+      title: null,
+      status: null,
+      sourceUrl: normalizeActSourceUrl(null, procEli),
+      publishedAt: null,
+    };
   }
 
   const stages: ThreadStage[] = ((stagesRows ?? []) as Array<{

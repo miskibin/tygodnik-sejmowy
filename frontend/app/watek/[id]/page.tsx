@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getThread, type ThreadStage, type ThreadStageVoting } from "@/lib/db/threads";
+import { getPassedProcessBanner, publicationJournalLabel } from "@/lib/process-status";
 import { stageLabel } from "@/lib/stages";
 import { PageHeading } from "@/components/chrome/PageHeading";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
@@ -140,6 +141,10 @@ export default async function WatekDetailPage({
   // Top-level only — sub-stages (depth>0) are committee internals; we surface
   // them via decision text on the parent row to keep the timeline single-thread.
   const events = thread.stages.filter((s) => s.depth === 0);
+  const pendingPassedBanner =
+    thread.passed && !thread.act
+      ? getPassedProcessBanner(events, thread.closureDate)
+      : null;
 
   // The "current" event is the first one without a stage_date (i.e. pending),
   // unless every stage is dated — then highlight the last dated one.
@@ -211,7 +216,7 @@ export default async function WatekDetailPage({
             style={{ borderColor: "var(--success)", background: "var(--muted)" }}
           >
             <div className="font-sans text-[10px] tracking-[0.16em] uppercase text-success mb-1.5">
-              ✓ Opublikowana w Dzienniku Ustaw
+              ✓ Opublikowano w {publicationJournalLabel(thread.act.displayAddress)}
             </div>
             <div className="font-serif text-[17px] text-foreground leading-snug mb-1">
               {thread.act.displayAddress}
@@ -229,19 +234,20 @@ export default async function WatekDetailPage({
                 rel="noopener noreferrer"
                 className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4"
               >
-                ↗ Tekst ustawy w ISAP
+                ↗ Tekst aktu w ISAP
               </a>
             )}
           </div>
         )}
 
-        {thread.passed && !thread.act && (
+        {pendingPassedBanner && (
           <div
             className="mb-9 px-4 py-3 border-l-2 font-sans text-[12px] text-secondary-foreground leading-[1.55]"
             style={{ borderColor: "var(--warning)", background: "var(--muted)" }}
           >
-            <span className="font-medium text-foreground">Uchwalono</span> — oczekuje na
-            publikację w Dz.U.{thread.closureDate ? ` (${formatLongDate(thread.closureDate)})` : ""}
+            <span className="font-medium text-foreground">{pendingPassedBanner.title}</span> —
+            {" "}{pendingPassedBanner.detail}
+            {pendingPassedBanner.date ? ` (${formatLongDate(pendingPassedBanner.date)})` : ""}
           </div>
         )}
 
