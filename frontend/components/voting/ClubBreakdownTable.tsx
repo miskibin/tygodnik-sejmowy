@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import type { ClubBreakdownRow, VotingHeader } from "@/lib/db/voting";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
+import { CLUB_LOGOS } from "@/lib/atlas/club-logos";
+import { KLUB_LABELS } from "@/lib/atlas/constants";
 import { CopyAsPngButton } from "./CopyAsPngButton";
 import { excludeUnaffiliated, MIN_KLUB_AGGREGATE } from "@/lib/clubs/filter";
 
@@ -10,6 +12,7 @@ type Props = {
   clubs: ClubBreakdownRow[];
   header: VotingHeader;
   shortTitle: string | null;
+  printNumber: string | null;
 };
 
 type Segment = {
@@ -228,6 +231,194 @@ function ClubRow({ c }: { c: ClubBreakdownRow }) {
   );
 }
 
+// Compact, viewport-independent row used inside the PNG capture node only.
+// Plain <img> with loading="eager" so the off-screen capture target doesn't
+// trip Next/Image's lazy-load IntersectionObserver (which never fires for
+// elements positioned outside the viewport).
+function PngClubRow({ c }: { c: ClubBreakdownRow }) {
+  const segs: Segment[] = [
+    { n: c.yes, color: "var(--success)", label: "ZA", textOnFaint: false },
+    { n: c.no, color: "var(--destructive)", label: "PRZECIW", textOnFaint: false },
+    { n: c.abstain, color: "var(--warning)", label: "WSTRZ.", textOnFaint: false },
+    { n: c.not_voting, color: "var(--border)", label: "NIEOB.", textOnFaint: true },
+  ];
+  const total = c.total;
+  const showBroken =
+    c.brokenCount > 0 &&
+    (c.disciplineLabel === "ZA" ||
+      c.disciplineLabel === "PRZECIW" ||
+      c.disciplineLabel === "WSTRZ.");
+
+  const logoEntry = CLUB_LOGOS[c.club_ref];
+  const shortLabel = KLUB_LABELS[c.club_ref] ?? c.club_ref;
+
+  const logo = logoEntry ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/club-logos/${logoEntry.file}`}
+      alt={c.club_name}
+      width={24}
+      height={24}
+      loading="eager"
+      decoding="sync"
+      style={{
+        width: 24,
+        height: 24,
+        objectFit: "contain",
+        borderRadius: 3,
+        background: "var(--background)",
+        border: "1px solid var(--border)",
+        flexShrink: 0,
+      }}
+    />
+  ) : (
+    <span
+      aria-hidden
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 24,
+        height: 24,
+        borderRadius: 3,
+        background: c.clubColor,
+        color: "var(--background)",
+        fontSize: 10,
+        fontWeight: 700,
+        flexShrink: 0,
+      }}
+    >
+      {c.club_ref.slice(0, 2).toUpperCase()}
+    </span>
+  );
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "150px 44px 1fr 150px",
+        gap: 14,
+        alignItems: "center",
+        padding: "7px 0",
+        borderBottom: "1px solid var(--border)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+        <span
+          aria-hidden
+          style={{
+            width: 3,
+            height: 22,
+            background: c.clubColor,
+            borderRadius: 2,
+            flexShrink: 0,
+          }}
+        />
+        {logo}
+        <span
+          style={{
+            fontSize: 11,
+            color: "var(--secondary-foreground)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontFamily: "var(--font-mono, monospace)",
+            fontWeight: 600,
+          }}
+        >
+          {shortLabel}
+        </span>
+      </div>
+
+      <div
+        style={{
+          fontFamily: "var(--font-mono, monospace)",
+          fontVariantNumeric: "tabular-nums",
+          fontSize: 12,
+          color: "var(--secondary-foreground)",
+          textAlign: "right",
+        }}
+      >
+        {c.total}
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          height: 20,
+          background: "var(--muted)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        {segs.map((s, i) => {
+          const pct = total > 0 ? s.n / total : 0;
+          const showLabel = s.n > 0 && pct > 0.08;
+          return (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: `${pct * 100}%`,
+                background: s.color,
+                fontSize: 9,
+                fontWeight: 700,
+                fontFamily: "var(--font-mono, monospace)",
+                color: s.textOnFaint ? "var(--secondary-foreground)" : "var(--background)",
+              }}
+            >
+              {showLabel ? s.n : ""}
+            </div>
+          );
+        })}
+      </div>
+
+      <div
+        style={{
+          fontSize: 11,
+          color: "var(--secondary-foreground)",
+          textAlign: "right",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 9,
+            color: "var(--muted-foreground)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+          }}
+        >
+          za klubem{" "}
+        </span>
+        <span
+          style={{
+            color: c.disciplineLabel === "—" ? "var(--muted-foreground)" : "var(--foreground)",
+            fontWeight: 600,
+          }}
+        >
+          {c.disciplineLabel}
+        </span>
+        {showBroken && (
+          <span
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              marginLeft: 6,
+              color: "var(--destructive)",
+              fontSize: 9,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+            }}
+          >
+            ↪ {c.brokenCount}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function formatDateShort(iso: string): string {
   const d = new Date(iso);
   const dd = String(d.getDate()).padStart(2, "0");
@@ -235,8 +426,25 @@ function formatDateShort(iso: string): string {
   return `${dd}.${mm}.${d.getFullYear()}`;
 }
 
-export function ClubBreakdownTable({ clubs, header, shortTitle }: Props) {
+function clampForPng(s: string | null | undefined, max: number): string | null {
+  if (!s) return null;
+  const trimmed = s.trim();
+  if (trimmed.length <= max) return trimmed;
+  return trimmed.slice(0, max - 1).trimEnd() + "…";
+}
+
+export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: Props) {
   const captureRef = useRef<HTMLDivElement | null>(null);
+
+  const filteredClubs = excludeUnaffiliated(clubs, (c) => c.club_ref)
+    .filter((c) => (c.total ?? 0) >= MIN_KLUB_AGGREGATE);
+
+  // PNG title block: print short_title (when available) as the headline, and
+  // the official voting question (header.title) as italic subtitle. The two
+  // are different things — the print is the document being voted on, the
+  // voting title is the procedural question read in the chamber.
+  const pngHeadline = clampForPng(shortTitle, 140);
+  const pngQuestion = clampForPng(header.title, 280);
 
   return (
     <section
@@ -277,89 +485,174 @@ export function ClubBreakdownTable({ clubs, header, shortTitle }: Props) {
           {shortTitle ?? header.title}
         </div>
 
+        {/* Live (responsive) rows. */}
         <div
-          ref={captureRef}
+          className="hidden sm:grid items-center font-mono uppercase"
           style={{
-            background: "var(--background)",
-            padding: 16,
-            border: "1px solid var(--border)",
+            gridTemplateColumns: "120px 80px 1fr 240px",
+            gap: 24,
+            fontSize: 10,
+            color: "var(--muted-foreground)",
+            letterSpacing: "0.14em",
+            borderBottom: "1px solid var(--rule)",
+            paddingBottom: 10,
+            marginBottom: 4,
           }}
         >
-          {/* Capture-only header — only visible in PNG export, not the live page */}
-          <div
-            className="png-only font-serif"
-            style={{
-              borderBottom: "1px solid var(--border)",
-              paddingBottom: 14,
-              marginBottom: 18,
-            }}
-          >
-            <div
-              className="font-mono uppercase"
-              style={{
-                fontSize: 10,
-                color: "var(--muted-foreground)",
-                letterSpacing: "0.16em",
-                marginBottom: 6,
-              }}
-            >
-              Sejm {header.term} · pos. {header.sitting} · głos. nr {header.voting_number} · {formatDateShort(header.date)}
-            </div>
-            <div style={{ fontSize: 22, fontWeight: 500, color: "var(--foreground)", lineHeight: 1.2 }}>
-              {shortTitle ?? header.title}
-            </div>
-          </div>
-
-          <div
-            className="hidden sm:grid items-center font-mono uppercase"
-            style={{
-              gridTemplateColumns: "120px 80px 1fr 240px",
-              gap: 24,
-              fontSize: 10,
-              color: "var(--muted-foreground)",
-              letterSpacing: "0.14em",
-              borderBottom: "1px solid var(--rule)",
-              paddingBottom: 10,
-              marginBottom: 4,
-            }}
-          >
-            <span>Klub</span>
-            <span className="text-right">Mandaty</span>
-            <span>Rozkład głosów</span>
-            <span className="text-right">Dyscyplina</span>
-          </div>
-
-          {/* Niezrzeszeni excluded — single-MP "klub" rolled-ups distort the
-              narrative. They still appear in the imienna roster below.
-              Also drop sub-MIN_KLUB_AGGREGATE klubs: discipline numbers from
-              <3-MP klubs are noise, not signal. */}
-          {excludeUnaffiliated(clubs, (c) => c.club_ref)
-            .filter((c) => (c.total ?? 0) >= MIN_KLUB_AGGREGATE)
-            .map((c) => (
-              <ClubRow key={c.club_ref} c={c} />
-            ))}
-
-          <div
-            className="png-only font-mono uppercase"
-            style={{
-              marginTop: 18,
-              paddingTop: 12,
-              borderTop: "1px solid var(--border)",
-              fontSize: 9,
-              color: "var(--muted-foreground)",
-              letterSpacing: "0.18em",
-              textAlign: "right",
-            }}
-          >
-            sejmograf.vercel.app
-          </div>
+          <span>Klub</span>
+          <span className="text-right">Mandaty</span>
+          <span>Rozkład głosów</span>
+          <span className="text-right">Dyscyplina</span>
         </div>
+
+        {/* Niezrzeszeni excluded — single-MP "klub" rolled-ups distort the
+            narrative. They still appear in the imienna roster below.
+            Also drop sub-MIN_KLUB_AGGREGATE klubs: discipline numbers from
+            <3-MP klubs are noise, not signal. */}
+        {filteredClubs.map((c) => (
+          <ClubRow key={c.club_ref} c={c} />
+        ))}
       </div>
 
-      <style>{`
-        .png-only { display: none; }
-        .capturing .png-only { display: block; }
-      `}</style>
+      {/* PNG-only capture target. Fixed 1080x1080 square, off-screen so the
+          live page is unaffected. Always in the DOM so logos load eagerly
+          (off-screen lazy <Image> would never trip the IntersectionObserver,
+          which is why this section uses plain <img loading="eager">). */}
+      <div
+        ref={captureRef}
+        aria-hidden
+        style={{
+          position: "fixed",
+          top: 0,
+          left: "-12000px",
+          width: 1080,
+          height: 1080,
+          background: "var(--background)",
+          padding: 56,
+          boxSizing: "border-box",
+          overflow: "hidden",
+          zIndex: -1,
+          pointerEvents: "none",
+          display: "flex",
+          flexDirection: "column",
+          fontFamily: "var(--font-serif, serif)",
+          color: "var(--foreground)",
+        }}
+      >
+        {/* Header block */}
+        <div
+          style={{
+            paddingBottom: 22,
+            borderBottom: "2px solid var(--rule)",
+            marginBottom: 22,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              textTransform: "uppercase",
+              fontSize: 12,
+              color: "var(--muted-foreground)",
+              letterSpacing: "0.18em",
+              marginBottom: 14,
+            }}
+          >
+            Sejm {header.term} · pos. {header.sitting} · głos. nr {header.voting_number} · {formatDateShort(header.date)}
+            {printNumber ? ` · druk ${printNumber}` : ""}
+          </div>
+
+          {pngHeadline && (
+            <div
+              style={{
+                fontFamily: "var(--font-serif, serif)",
+                fontSize: 34,
+                fontWeight: 500,
+                lineHeight: 1.12,
+                letterSpacing: "-0.018em",
+                marginBottom: 14,
+                color: "var(--foreground)",
+              }}
+            >
+              {pngHeadline}
+            </div>
+          )}
+
+          <div>
+            <div
+              style={{
+                fontFamily: "var(--font-mono, monospace)",
+                textTransform: "uppercase",
+                fontSize: 10,
+                color: "var(--muted-foreground)",
+                letterSpacing: "0.12em",
+                marginBottom: 4,
+              }}
+            >
+              pytanie poddane pod głosowanie
+            </div>
+            <div
+              style={{
+                fontFamily: "var(--font-serif, serif)",
+                fontStyle: "italic",
+                fontSize: pngHeadline ? 15 : 22,
+                lineHeight: 1.35,
+                color: "var(--secondary-foreground)",
+              }}
+            >
+              „{pngQuestion}”
+            </div>
+          </div>
+        </div>
+
+        {/* Column headers */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "150px 44px 1fr 150px",
+            gap: 14,
+            fontFamily: "var(--font-mono, monospace)",
+            textTransform: "uppercase",
+            fontSize: 9,
+            color: "var(--muted-foreground)",
+            letterSpacing: "0.14em",
+            borderBottom: "1px solid var(--rule)",
+            paddingBottom: 6,
+            marginBottom: 2,
+          }}
+        >
+          <span>Klub</span>
+          <span style={{ textAlign: "right" }}>Mand.</span>
+          <span>Rozkład głosów</span>
+          <span style={{ textAlign: "right" }}>Dyscyplina</span>
+        </div>
+
+        {/* Rows */}
+        <div style={{ flex: 1, minHeight: 0 }}>
+          {filteredClubs.map((c) => (
+            <PngClubRow key={c.club_ref} c={c} />
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div
+          style={{
+            marginTop: 16,
+            paddingTop: 12,
+            borderTop: "1px solid var(--border)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontFamily: "var(--font-mono, monospace)",
+            textTransform: "uppercase",
+            fontSize: 10,
+            color: "var(--muted-foreground)",
+            letterSpacing: "0.18em",
+          }}
+        >
+          <span>tygodnik sejmowy · jak głosowały kluby</span>
+          <span>sejmograf.vercel.app</span>
+        </div>
+      </div>
     </section>
   );
 }
