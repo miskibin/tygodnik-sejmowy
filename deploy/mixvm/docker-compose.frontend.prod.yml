@@ -1,0 +1,43 @@
+# Prod variant of the frontend stack on mixvm — pulls a prebuilt image from
+# GHCR instead of building on the VM. Use this once the GitHub Actions
+# workflow (.github/workflows/frontend-image.yml) has published an image for
+# the tag you want to deploy.
+#
+# Deploy via Portainer Stack-from-Git:
+#   - Compose path: deploy/mixvm/docker-compose.frontend.prod.yml
+#   - Env vars: SUPABASE_URL, SUPABASE_KEY, FRONTEND_IMAGE_TAG (e.g. v1.0.0)
+#
+# To upgrade: bump FRONTEND_IMAGE_TAG in Portainer + Recreate. No rebuild on
+# the VM — pull is ~30s instead of ~4 min.
+
+name: sejmograf-frontend
+
+services:
+  frontend:
+    # Default to :latest so first-time setup works without a tag bump.
+    # Pin to a version (e.g. v1.0.0) in Portainer for predictable rollouts.
+    image: ghcr.io/miskibin/tygodnik-sejmowy-frontend:${FRONTEND_IMAGE_TAG:-latest}
+    container_name: sejmograf-frontend
+    restart: unless-stopped
+    pull_policy: always
+    ports:
+      - "3001:3000"
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://sejmograf-ollama:11434}
+      PATRONITE_TOKEN: ${PATRONITE_TOKEN:-}
+      NODE_ENV: production
+    mem_limit: 1g
+    cpus: 1.0
+    networks:
+      - default
+      # Same internal-bridge trick as the dev compose — SSR talks to Kong
+      # over supabase_default, skipping the public hop.
+      - supabase
+
+networks:
+  default:
+  supabase:
+    external: true
+    name: supabase_default
