@@ -1,0 +1,34 @@
+# Cloudflare Tunnel for vm.tygodniksejmowy.pl → sejmograf-frontend:3000.
+# Outbound-only connection from this container to Cloudflare's edge — no
+# inbound port needed on the host (mixvm is behind Orange Polska NAT/CGNAT
+# with 80/443 closed from internet, so this is the only path that works
+# without ISP-level changes).
+#
+# TUNNEL_TOKEN is generated in Cloudflare dashboard:
+#   Zero Trust → Networks → Tunnels → Create tunnel → name "sejmograf-vm" →
+#   "Install connector" page → copy the docker --token flag value.
+# Inject via Portainer Stack env at deploy time; never commit it.
+
+name: sejmograf-cloudflared
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: sejmograf-cloudflared
+    restart: unless-stopped
+    # --no-autoupdate: pin to image tag, avoid surprise binary swap mid-run
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    networks:
+      - sejmograf-frontend_default  # to reach sejmograf-frontend container
+    mem_limit: 128m
+    cpus: 0.25
+    # No ports: outbound-only over :443 to argotunnel hosts.
+
+networks:
+  # Re-use the network created by docker-compose.frontend.yml (project name
+  # "sejmograf-frontend" → default net "sejmograf-frontend_default"). The
+  # tunnel resolves the upstream by container name on this bridge.
+  sejmograf-frontend_default:
+    external: true

@@ -1,0 +1,54 @@
+# Frontend self-host on mixvm. Deployed via Portainer Stack-from-Git pointing
+# at this file. Build context = `../../frontend/`. Image is built once on the
+# VM (no registry needed) and re-used across restarts.
+#
+# Port 3001 chosen because 3000 is reserved for any future Next dev session
+# and 80/443 are owned by something else on the host. Caddy/Cloudflare in
+# front comes in a follow-up turn — this stack is just the app container.
+
+name: sejmograf-frontend
+
+services:
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      # SUPABASE_* go in via BuildKit secrets (see top-level `secrets:` block)
+      # so they never persist in image layers, build cache, or `docker history`.
+      # Requires DOCKER_BUILDKIT=1 (default on Compose v2 / Docker 23+).
+      secrets:
+        - supabase_url
+        - supabase_key
+    image: sejmograf-frontend:latest
+    container_name: sejmograf-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://sejmograf-ollama:11434}
+      PATRONITE_TOKEN: ${PATRONITE_TOKEN:-}
+      NODE_ENV: production
+    mem_limit: 1g
+    cpus: 1.0
+    networks:
+      - default
+      # Join supabase_default so SSR can hit Kong over the internal bridge
+      # (~10× faster than going out → Cloudflare → back in).
+      - supabase
+
+networks:
+  default:
+  supabase:
+    external: true
+    name: supabase_default
+
+# Build-time secrets sourced from the deploy host's env (Portainer stack vars).
+# `environment:` keeps them in tmpfs during the build, never written to disk
+# on the builder, and never copied into the resulting image.
+secrets:
+  supabase_url:
+    environment: SUPABASE_URL
+  supabase_key:
+    environment: SUPABASE_KEY
