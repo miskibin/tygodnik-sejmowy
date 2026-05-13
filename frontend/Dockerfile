@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.10
 # Multi-stage build for Next.js 16 standalone output.
 # Three stages keep the runtime image small (~150 MB) and free of pnpm:
 #   1. deps    — install node_modules from lockfile, cached on lockfile hash
