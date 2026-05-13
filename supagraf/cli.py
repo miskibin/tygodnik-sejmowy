@@ -303,6 +303,41 @@ def cmd_daily(
         # (~5-30 new drukı per session day) so cost stays bounded.
         cmd_enrich_prints(kind=EnrichKind.unified, term=term, limit=0)
 
+    if not skip_enrich:
+        # Utterance LLM enrichment (viral_score/quote/tone/topic_tags/...).
+        # Powers Tygodnik "Powiedziane w Sejmie" + MP profile speech panels.
+        # Scoped to the LATEST sitting only: historical sittings (45..N-1)
+        # have NULL viral_score and we intentionally do NOT backfill them
+        # — too expensive (~12 min × N sittings) and citizen-value of stale
+        # quotes is low. New sittings get enriched here as they arrive.
+        logger.info("=== daily: enrich-utterances (latest sitting) ===")
+        try:
+            from supagraf.enrich.utterance_enrich import (
+                UTTERANCE_LLM_MODEL,
+                enrich_statements,
+            )
+            latest = (
+                supabase().table("proceedings")
+                .select("number")
+                .eq("term", term)
+                .order("number", desc=True)
+                .limit(1)
+                .execute()
+                .data
+                or []
+            )
+            if latest:
+                s = int(latest[0]["number"])
+                n_ok, n_failed = enrich_statements(
+                    term=term, sitting_num=s, limit=0,
+                    llm_model=UTTERANCE_LLM_MODEL,
+                )
+                logger.info("enrich-utterances sitting={} ok={} failed={}", s, n_ok, n_failed)
+            else:
+                logger.info("enrich-utterances: no proceedings for term {}", term)
+        except Exception as e:
+            logger.error("enrich-utterances failed: {!r}", e)
+
     if not skip_embed:
         logger.info("=== daily phase 5/6: embed ===")
         cmd_enrich_prints(kind=EnrichKind.embed, term=term, limit=0)
@@ -326,8 +361,9 @@ def cmd_daily(
     # CONCURRENTLY (no read lock) so frontend keeps serving during reload.
     logger.info("=== daily: refresh atlas matviews ===")
     try:
-        r = supabase().rpc("refresh_atlas_matviews", {"p_term": term}).execute()
-        logger.info("refresh_atlas_matviews: {}", r.data)
+        from supagraf.db import call_rpc_scalar
+        r = call_rpc_scalar("refresh_atlas_matviews", {"p_term": term})
+        logger.info("refresh_atlas_matviews: {}", r)
     except Exception as e:
         logger.error("refresh_atlas_matviews failed: {!r}", e)
 
@@ -390,8 +426,9 @@ def cmd_daily(
     # processes that culminated in them. Cheap (single UPDATE), so no skip flag.
     logger.info("=== daily: backfill_process_act_links ===")
     try:
-        r = supabase().rpc("backfill_process_act_links", {"p_term": term}).execute()
-        logger.info("backfill_process_act_links affected={}", r.data)
+        from supagraf.db import call_rpc_scalar
+        r = call_rpc_scalar("backfill_process_act_links", {"p_term": term})
+        logger.info("backfill_process_act_links affected={}", r)
     except Exception as e:
         logger.error("backfill_process_act_links failed: {!r}", e)
 
@@ -819,7 +856,11 @@ def cmd_refresh_aggregates():
         select refresh_mp_activity();
         select refresh_minister_reply_stats();
     """
-    client = supabase()
+    from supagraf.db import call_rpc_scalar
+    # Direct-PG path (SUPAGRAF_LOAD_DIRECT_DSN set) sidesteps Kong/PostgREST
+    # timeouts — these REFRESH MATERIALIZED VIEW calls regularly exceed the
+    # 60s nginx upstream timeout. Falls back to Supabase HTTP client when
+    # DSN is unset (dev box reaches db over Cloudflare with longer timeout).
     for fn in (
         "refresh_mp_discipline",
         "refresh_mp_activity",
@@ -829,13 +870,13 @@ def cmd_refresh_aggregates():
         "refresh_minister_reply_stats",
     ):
         try:
-            client.rpc(fn).execute()
+            call_rpc_scalar(fn)
             print(f"refreshed: {fn}")
         except Exception as e:
             if "57014" in str(e) or "timeout" in str(e).lower():
                 logger.error(
-                    "PostgREST timeout on {}; use service-role key or run "
-                    "`select {}();` via psql",
+                    "timeout on {}; set SUPAGRAF_LOAD_DIRECT_DSN to bypass "
+                    "Kong, or run `select {}();` via psql",
                     fn, fn,
                 )
                 raise typer.Exit(code=2)

@@ -7,9 +7,15 @@ from loguru import logger
 from postgrest.exceptions import APIError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import call_rpc_scalar, call_rpc_table, supabase
+
+try:
+    from psycopg import OperationalError as _PgOperationalError
+except ImportError:  # psycopg only required on the direct-PG path
+    _PgOperationalError = type("_NoPsycopg", (Exception,), {})
 
 
+_RPC_RETRY_EXC = (APIError, _PgOperationalError)
 _TRANSIENT_TIMEOUT_CODE = "57014"
 
 
@@ -79,47 +85,53 @@ _PRE_STEPS = (
 
 
 @retry(
-    retry=retry_if_exception_type(APIError),
+    retry=retry_if_exception_type(_RPC_RETRY_EXC),
     stop=stop_after_attempt(4),
     wait=wait_exponential(multiplier=1, min=1, max=10),
     reraise=True,
 )
-def _rpc_int(client, fn: str, term: int) -> int:
-    r = client.rpc(fn, {"p_term": term}).execute()
-    return int(r.data or 0)
+def _rpc_int(fn: str, term: int) -> int:
+    return int(call_rpc_scalar(fn, {"p_term": term}) or 0)
 
 
 @retry(
-    retry=retry_if_exception_type(APIError),
+    retry=retry_if_exception_type(_RPC_RETRY_EXC),
     stop=stop_after_attempt(4),
     wait=wait_exponential(multiplier=1, min=1, max=10),
     reraise=True,
 )
-def _rpc_load_votes_sitting(client, term: int, sitting: int) -> int:
-    r = client.rpc(
-        "load_votes_for_sitting", {"p_term": term, "p_sitting": sitting}
-    ).execute()
-    return int(r.data or 0)
+def _rpc_load_votes_sitting(term: int, sitting: int) -> int:
+    return int(
+        call_rpc_scalar(
+            "load_votes_for_sitting", {"p_term": term, "p_sitting": sitting},
+        ) or 0
+    )
 
 
 def run_core_load(term: int = 10) -> LoadReport:
     """Run the core load. Each SQL function runs in its own RPC call so each fits
     well under the anon-role statement_timeout (default 8s on Supabase). The big
     load_votes step is further split per-sitting.
+
+    When SUPAGRAF_LOAD_DIRECT_DSN is set the RPC calls go through psycopg
+    directly to Postgres, bypassing Kong's 60s upstream timeout (which used to
+    504 on load_proceedings from the mixvm container).
     """
-    client = supabase()
+    # supabase() is still kept warm so model_run_finish (and any non-RPC
+    # writes downstream of load) don't lazy-init on a cold cache.
+    supabase()
     steps: list[LoadStep] = []
 
     for fn in _PRE_STEPS:
-        affected = _rpc_int(client, fn, term)
+        affected = _rpc_int(fn, term)
         logger.info("load {}: affected={}", fn, affected)
         steps.append(LoadStep(step=fn, affected=affected))
 
-    sittings = client.rpc("staged_sittings", {"p_term": term}).execute().data or []
+    sittings = call_rpc_table("staged_sittings", {"p_term": term})
     total_votes = 0
     for row in sittings:
         s = row["sitting"]
-        n = _rpc_load_votes_sitting(client, term, s)
+        n = _rpc_load_votes_sitting(term, s)
         total_votes += n
         logger.info("load_votes sitting={}: affected={}", s, n)
     steps.append(LoadStep(step="load_votes", affected=total_votes))

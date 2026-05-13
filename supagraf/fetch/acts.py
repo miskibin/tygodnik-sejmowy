@@ -419,7 +419,7 @@ def refresh_stale_eli(
     # Late imports — avoid circular dependencies and keep the fetch module
     # importable in environments without supabase creds (e.g. pure unit tests).
     from supagraf.db import supabase
-    from supagraf.load import _rpc_int  # type: ignore[attr-defined]
+    from supagraf.load import _rpc_int
     from supagraf.stage.acts import stage as stage_acts_fn
 
     client = supabase()
@@ -527,7 +527,7 @@ def refresh_stale_eli(
             except Exception as e:  # noqa: BLE001
                 logger.error("refresh_stale_eli: stage_acts {} failed: {!r}", pub, e)
         try:
-            n = _rpc_int(client, "load_acts", term)
+            n = _rpc_int("load_acts", term)
             logger.info("refresh_stale_eli: load_acts affected={}", n)
         except Exception as e:  # noqa: BLE001
             logger.error("refresh_stale_eli: load_acts failed: {!r}", e)

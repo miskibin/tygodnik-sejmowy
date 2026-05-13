@@ -27,6 +27,7 @@ dependencies = [
     "onnxruntime<1.24",
     "beautifulsoup4>=4.14.3",
     "lxml>=6.1.0",
+    "psycopg[binary]>=3.2",
 ]
 
 # Paddle is the legacy heavy OCR backend, kept as an optional install.
