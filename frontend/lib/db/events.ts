@@ -227,7 +227,10 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
       ev.payload.seats = byVoting.get(ev.payload.voting_id) ?? [];
       const meta = metaByVoting.get(ev.payload.voting_id);
       ev.payload.majority_votes = meta?.majority_votes ?? null;
-      ev.payload.motion_polarity = meta?.motion_polarity ?? null;
+      // DB enum carries an "other" bucket; MotionPolarity in the app type
+      // doesn't model it (it has no downstream use). Treat as unknown → null.
+      const rawPolarity = meta?.motion_polarity ?? null;
+      ev.payload.motion_polarity = rawPolarity === "other" ? null : rawPolarity;
     }
   }
 
