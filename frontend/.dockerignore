@@ -1,0 +1,30 @@
+# Build artifacts (will be regenerated)
+.next
+out
+node_modules
+
+# Source control
+.git
+.gitignore
+
+# Editor / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Local env (env injected at runtime via compose / `docker run -e`, NOT baked
+# into the image — keeps the image cacheable + secrets out of layers)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Tests / docs (not needed at runtime)
+coverage
+*.md
