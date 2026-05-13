@@ -124,7 +124,7 @@ export default async function DrukPage({
         <Hero print={print} outcome={outcome} />
       </div>
 
-      <Timeline stages={stages} votings={relatedVotings} />
+      <Timeline stages={stages} votings={relatedVotings} processStillOpen={!!processStillOpen} />
 
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
         <Streszczenie print={print} />

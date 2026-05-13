@@ -119,14 +119,143 @@ function buildStations(stages: ProcessStage[], votings: LinkedVoting[]): Station
   });
 }
 
+// ── Future-phase projection ──────────────────────────────────────────
+// The DB only stores stages that actually happened (or are scheduled).
+// To show citizens the *remaining* path the bill will travel, we layer a
+// canonical Sejm legislative path on top of the real stations: find the
+// highest phase already reached, then append the unreached phases as
+// dashed "future" stations.
+type PhaseKey =
+  | "intake"
+  | "reading_referral"
+  | "reading_1"
+  | "committee"
+  | "reading_2"
+  | "reading_3"
+  | "senate"
+  | "president"
+  | "promulgation";
+
+const PHASE_ORDER: PhaseKey[] = [
+  "intake",
+  "reading_referral",
+  "reading_1",
+  "committee",
+  "reading_2",
+  "reading_3",
+  "senate",
+  "president",
+  "promulgation",
+];
+
+const PHASE_META: Record<PhaseKey, { label: string; actor: string; note: string }> = {
+  intake: { label: "Wpłynięcie", actor: "Wnioskodawca", note: "Projekt wpływa do Sejmu." },
+  reading_referral: {
+    label: "Skier. do czytania",
+    actor: "Marszałek Sejmu",
+    note: "Marszałek kieruje projekt do pierwszego czytania.",
+  },
+  reading_1: {
+    label: "I czytanie",
+    actor: "Sejm · plenum",
+    note: "Pierwsze czytanie projektu w Sejmie lub komisji.",
+  },
+  committee: {
+    label: "Praca w komisji",
+    actor: "Komisja sejmowa",
+    note: "Rozpatrzenie projektu i zgłaszanie poprawek.",
+  },
+  reading_2: {
+    label: "II czytanie",
+    actor: "Sejm · plenum",
+    note: "Debata, zgłaszanie poprawek z plenum.",
+  },
+  reading_3: {
+    label: "III czytanie",
+    actor: "Sejm · plenum",
+    note: "Głosowanie nad całością projektu.",
+  },
+  senate: {
+    label: "Senat",
+    actor: "30 dni na decyzję",
+    note: "Senat przyjmie, odrzuci lub zaproponuje poprawki.",
+  },
+  president: {
+    label: "Prezydent",
+    actor: "21 dni",
+    note: "Podpis, weto albo skierowanie do Trybunału Konstytucyjnego.",
+  },
+  promulgation: {
+    label: "Dz.U.",
+    actor: "wejście w życie",
+    note: "14 dni od ogłoszenia, chyba że ustawa stanowi inaczej.",
+  },
+};
+
+// Map an existing process stage to a canonical phase, when possible.
+// Anything not recognized (Opinia, GovermentPosition, Withdrawn, …)
+// returns null and is ignored for the projection.
+function phaseOf(s: ProcessStage): PhaseKey | null {
+  const t = s.stageType;
+  const n = (s.stageName || "").toLowerCase();
+  if (t === "Start") return "intake";
+  if (t === "Referral" || t === "ReadingReferral") return "reading_referral";
+  if (t === "Reading") return "reading_1";
+  if (t === "SejmReading" || t === "Voting") {
+    if (/\biii\s+czytanie\b/.test(n)) return "reading_3";
+    if (/\bii\s+czytanie\b/.test(n)) return "reading_2";
+    if (/\bi\s+czytanie\b/.test(n)) return "reading_1";
+    return "reading_2";
+  }
+  if (t === "CommitteeWork" || t === "CommitteeReport") return "committee";
+  if (t === "SenatePosition" || t === "SenateAmendments" || t === "SenatePositionConsideration")
+    return "senate";
+  if (
+    t === "ToPresident" ||
+    t === "PresidentSignature" ||
+    t === "PresidentVeto" ||
+    t === "Veto" ||
+    t === "PresidentMotionConsideration"
+  )
+    return "president";
+  if (t === "Promulgation") return "promulgation";
+  return null;
+}
+
+function projectFutureStations(stages: ProcessStage[]): Station[] {
+  const phases = stages
+    .filter((s) => s.depth === 0)
+    .map(phaseOf)
+    .filter((p): p is PhaseKey => p !== null);
+  if (phases.length === 0) return [];
+  const maxIdx = Math.max(...phases.map((p) => PHASE_ORDER.indexOf(p)));
+  if (maxIdx < 0 || maxIdx >= PHASE_ORDER.length - 1) return [];
+  return PHASE_ORDER.slice(maxIdx + 1).map((key, i) => {
+    const meta = PHASE_META[key];
+    return {
+      ord: 10_000 + i,
+      stage: meta.label,
+      date: null,
+      actor: meta.actor,
+      note: meta.note,
+      status: "future" as StationStatus,
+      branch: null,
+    };
+  });
+}
+
 export function Timeline({
   stages,
   votings,
+  processStillOpen,
 }: {
   stages: ProcessStage[];
   votings: LinkedVoting[];
+  processStillOpen: boolean;
 }) {
-  const stations = buildStations(stages, votings);
+  const real = buildStations(stages, votings);
+  const future = processStillOpen ? projectFutureStations(stages) : [];
+  const stations: Station[] = [...real, ...future];
   const currentIdx = stations.findIndex((s) => s.status === "current");
   const [hover, setHover] = useState<number>(currentIdx >= 0 ? currentIdx : stations.length - 1);
 
