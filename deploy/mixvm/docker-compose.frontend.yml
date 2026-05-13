@@ -1,0 +1,42 @@
+# Frontend self-host on mixvm. Deployed via Portainer Stack-from-Git pointing
+# at this file. Build context = `../../frontend/`. Image is built once on the
+# VM (no registry needed) and re-used across restarts.
+#
+# Port 3001 chosen because 3000 is reserved for any future Next dev session
+# and 80/443 are owned by something else on the host. Caddy/Cloudflare in
+# front comes in a follow-up turn — this stack is just the app container.
+
+name: sejmograf-frontend
+
+services:
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      args:
+        SUPABASE_URL: ${SUPABASE_URL}
+        SUPABASE_KEY: ${SUPABASE_KEY}
+    image: sejmograf-frontend:latest
+    container_name: sejmograf-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://sejmograf-ollama:11434}
+      PATRONITE_TOKEN: ${PATRONITE_TOKEN:-}
+      NODE_ENV: production
+    mem_limit: 1g
+    cpus: 1.0
+    networks:
+      - default
+      # Join supabase_default so SSR can hit Kong over the internal bridge
+      # (~10× faster than going out → Cloudflare → back in).
+      - supabase
+
+networks:
+  default:
+  supabase:
+    external: true
+    name: supabase_default
