@@ -10,7 +10,7 @@
 ### Environment setup
 
 - Python 3.10 is required (`.python-version`). Install via `uv python install 3.10` if missing.
-- `uv sync` installs the supagraf package in editable mode automatically.
+- `uv sync` installs only dependencies (supagraf is a virtual workspace package). Run `uv pip install -e .` after `uv sync` to install supagraf itself in editable mode — required for pytest to resolve `supagraf.*` imports correctly (otherwise `tests/supagraf/__init__.py` shadows the real package).
 - Frontend uses `pnpm install` (lockfile: `frontend/pnpm-lock.yaml`).
 - Both services require `.env` (root) and `frontend/.env.local` populated from secrets (`SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`). See `.env.example`.
 
@@ -29,4 +29,5 @@
 - The Python `SUPABASE_KEY` in `.env` should be the **service_role** JWT (not the publishable key) for ETL write operations. The frontend uses the publishable/anon key.
 - `uv run python -m supagraf` loads `.env` from workspace root automatically via `supagraf/db.py:load_dotenv()`.
 - Next.js 16 is a canary release — read `node_modules/next/dist/docs/` before modifying frontend code.
-- The `msw` build script warning during `pnpm install` is benign (ignored build script).
+- The `msw` build script warning during `pnpm install` is benign (ignored build script). The `pnpm-workspace.yaml` lists `msw`, `sharp`, and `unrs-resolver` in `ignoredBuiltDependencies`.
+- Frontend `.env.local` uses server-side env vars: `SUPABASE_URL`, `SUPABASE_ANON_KEY` (or `SUPABASE_KEY`), and `SUPABASE_SERVICE_ROLE_KEY` — not `NEXT_PUBLIC_` prefixed.
