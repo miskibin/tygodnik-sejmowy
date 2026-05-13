@@ -7,7 +7,7 @@ from loguru import logger
 from postgrest.exceptions import APIError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import call_rpc_scalar, call_rpc_table, supabase
+from supagraf.db import call_rpc_scalar, supabase
 
 try:
     from psycopg import OperationalError as _PgOperationalError
@@ -47,6 +47,13 @@ _PRE_STEPS = (
     # BEFORE votings — votings.term, votings.sitting FKs into proceedings(term, number).
     "load_proceedings",
     "load_votings",
+    # votes: monolithic single-call (0002_core_load_fns.sql). Previously
+    # split per-sitting in Python via staged_sittings() + load_votes_for_sitting()
+    # to fit under the 8s PostgREST anon timeout; those SQL functions never
+    # existed in repo migrations, so the path 404'd on every direct-DSN run.
+    # With SUPAGRAF_LOAD_DIRECT_DSN set, statement_timeout is irrelevant
+    # (superuser, no Kong), so the single load_votes(p_term) call is fine.
+    "load_votes",
     # committees after mps (member.mp_id FKs into mps), before prints (independent).
     "load_committees",
     # committee_sittings: needs committees rows (FK committee_id) — must run
@@ -94,31 +101,21 @@ def _rpc_int(fn: str, term: int) -> int:
     return int(call_rpc_scalar(fn, {"p_term": term}) or 0)
 
 
-@retry(
-    retry=retry_if_exception_type(_RPC_RETRY_EXC),
-    stop=stop_after_attempt(4),
-    wait=wait_exponential(multiplier=1, min=1, max=10),
-    reraise=True,
-)
-def _rpc_load_votes_sitting(term: int, sitting: int) -> int:
-    return int(
-        call_rpc_scalar(
-            "load_votes_for_sitting", {"p_term": term, "p_sitting": sitting},
-        ) or 0
-    )
-
-
 def run_core_load(term: int = 10) -> LoadReport:
-    """Run the core load. Each SQL function runs in its own RPC call so each fits
-    well under the anon-role statement_timeout (default 8s on Supabase). The big
-    load_votes step is further split per-sitting.
+    """Run the core load. Each SQL function is invoked via a single RPC call.
 
-    When SUPAGRAF_LOAD_DIRECT_DSN is set the RPC calls go through psycopg
-    directly to Postgres, bypassing Kong's 60s upstream timeout (which used to
-    504 on load_proceedings from the mixvm container).
+    Path:
+      - SUPAGRAF_LOAD_DIRECT_DSN set → psycopg straight to Postgres (no Kong,
+        no PostgREST statement_timeout). Heavy functions like load_votes (one
+        UPSERT across all sittings) and load_proceedings finish here.
+      - DSN unset → falls back to Supabase HTTP client. Older split-per-sitting
+        logic against staged_sittings()/load_votes_for_sitting() existed in
+        Python but those SQL functions were never shipped in repo migrations,
+        so that path was dead code. Migrations only define monolithic
+        load_votes(p_term integer).
     """
-    # supabase() is still kept warm so model_run_finish (and any non-RPC
-    # writes downstream of load) don't lazy-init on a cold cache.
+    # supabase() kept warm so model_run_finish (and any non-RPC writes
+    # downstream of load) don't lazy-init on a cold cache.
     supabase()
     steps: list[LoadStep] = []
 
@@ -127,13 +124,4 @@ def run_core_load(term: int = 10) -> LoadReport:
         logger.info("load {}: affected={}", fn, affected)
         steps.append(LoadStep(step=fn, affected=affected))
 
-    sittings = call_rpc_table("staged_sittings", {"p_term": term})
-    total_votes = 0
-    for row in sittings:
-        s = row["sitting"]
-        n = _rpc_load_votes_sitting(term, s)
-        total_votes += n
-        logger.info("load_votes sitting={}: affected={}", s, n)
-    steps.append(LoadStep(step="load_votes", affected=total_votes))
-    logger.info("load load_votes (total): affected={}", total_votes)
     return LoadReport(steps=steps)

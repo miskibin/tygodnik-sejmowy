@@ -27,7 +27,7 @@ function requiredEnv(name: string): string {
 
 const config: ExpoConfig = {
   name: "Sejmograf",
-  slug: "sejmograf",
+  slug: "tygodnik-sejmowy",
   scheme: "sejmograf",
   version: "0.1.0",
   orientation: "portrait",
