@@ -11,9 +11,9 @@ The truth table:
     polarity   motion-passed   bill outcome    rendered as
     ──────────────────────────────────────────────────────
     pass       true            passed          "ustawa przyjęta w trzecim czytaniu"
-    pass       false           rejected        "ustawa odrzucona w trzecim czytaniu"
+    pass       false           rejected        "ustawa odrzucona"
     reject     true            rejected        "ustawa odrzucona"
-    reject     false           continues       "wniosek o odrzucenie odrzucony — projekt skierowany dalej"  ← BUG CASE
+    reject     false           continues       "wniosek o odrzucenie odrzucony — projekt skierowany do dalszej pracy"  ← BUG CASE
     amendment  any             indeterminate   per-vote chip only — no bill claim
     minority   any             indeterminate
     procedural any             indeterminate
@@ -142,8 +142,10 @@ def _motion_passed(yes: int, majority_votes: int) -> bool:
     return yes >= majority_votes
 
 
-@pytest.mark.parametrize("voting_id,polarity,yes,no,maj,expected,topic", REAL_FIXTURES,
-                         ids=lambda v: f"v{v}" if isinstance(v, int) else None)
+@pytest.mark.parametrize(
+    "voting_id,polarity,yes,no,maj,expected,topic",
+    [pytest.param(*row, id=f"v{row[0]}") for row in REAL_FIXTURES],
+)
 def test_bill_outcome_real_cases(voting_id, polarity, yes, no, maj, expected, topic) -> None:
     actual = compute_bill_outcome(polarity, _motion_passed(yes, maj))
     assert actual == expected, (
