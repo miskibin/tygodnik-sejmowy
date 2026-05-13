@@ -82,8 +82,28 @@ def _build_rpc_sql(fn: str, args: dict[str, Any] | None) -> tuple[str, tuple]:
     for k in args:
         if not _IDENT_RE.match(k):
             raise ValueError(f"unsafe arg name: {k!r}")
-    named = ", ".join([f"{k} => %s" for k in args])
-    return f"SELECT * FROM {fn}({named})", tuple(args.values())
+    # Explicit casts on the SQL side. Postgres' named-argument call form
+    # (=>) requires exact-or-implicit-castable type match; with no cast,
+    # psycopg encodes small Python ints as int2 (smallint), and that fails
+    # to resolve against a function declared with `integer` p_term. The
+    # Supabase HTTP client side-steps this because PostgREST receives
+    # JSON and casts via the declared arg signature. Mirror that here.
+    parts = []
+    vals = []
+    for k, v in args.items():
+        if isinstance(v, bool):
+            cast = "::boolean"
+        elif isinstance(v, int):
+            cast = "::int"
+        elif isinstance(v, float):
+            cast = "::double precision"
+        elif isinstance(v, str):
+            cast = "::text"
+        else:
+            cast = ""
+        parts.append(f"{k} => %s{cast}")
+        vals.append(v)
+    return f"SELECT * FROM {fn}({', '.join(parts)})", tuple(vals)
 
 
 def call_rpc_scalar(fn: str, args: dict[str, Any] | None = None) -> Any:
