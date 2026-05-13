@@ -41,6 +41,65 @@ export function billOutcomeLabel(outcome: BillOutcome): string {
   return LABEL_PL[outcome];
 }
 
+/**
+ * Verdict-stamp words for the giant headline on /glosowanie/[id].
+ *
+ * Pre-fix the stamp always read "PRZYJĘTA" / "ODRZUCONA" — feminine, matching
+ * "ustawa". That's misleading when the vote is a "wniosek o odrzucenie": the
+ * MOTION was rejected but the BILL survives. Issue #25 follow-up: vary the
+ * subject by polarity so the stamp says "WNIOSEK ODRZUCONY" (masculine) for
+ * motion votes, avoiding the "ustawa odrzucona" misread entirely.
+ *
+ * Verb agrees grammatically with the subject:
+ *   USTAWA / POPRAWKA (feminine)         → PRZYJĘTA / ODRZUCONA
+ *   WNIOSEK / WNIOSEK MNIEJSZOŚCI (masc) → PRZYJĘTY / ODRZUCONY
+ *   GŁOSOWANIE (neuter)                  → PRZYJĘTE / ODRZUCONE
+ *
+ * Sublabel describes the bill-level consequence ("projekt skierowany do
+ * dalszych prac", "ustawa odrzucona w trzecim czytaniu", etc.) so the reader
+ * gets both the motion result and what it means for the bill.
+ */
+export type VerdictStampWords = {
+  subject: string;
+  verb: string;
+  /** Bill-level consequence, one short line. Empty string when no claim. */
+  sublabel: string;
+};
+
+import type { MotionPolarity as _MP } from "@/lib/promiseAlignment";
+
+function subjectFor(polarity: _MP | null): { subject: string; gender: "f" | "m" | "n" } {
+  if (polarity === "pass") return { subject: "USTAWA", gender: "f" };
+  if (polarity === "reject") return { subject: "WNIOSEK", gender: "m" };
+  if (polarity === "amendment") return { subject: "POPRAWKA", gender: "f" };
+  if (polarity === "minority") return { subject: "WNIOSEK MNIEJSZOŚCI", gender: "m" };
+  if (polarity === "procedural") return { subject: "WNIOSEK", gender: "m" };
+  return { subject: "GŁOSOWANIE", gender: "n" };
+}
+
+function verbFor(motionPassed: boolean, gender: "f" | "m" | "n"): string {
+  if (gender === "f") return motionPassed ? "PRZYJĘTA" : "ODRZUCONA";
+  if (gender === "m") return motionPassed ? "PRZYJĘTY" : "ODRZUCONY";
+  return motionPassed ? "PRZYJĘTE" : "ODRZUCONE";
+}
+
+function sublabelFor(outcome: BillOutcome): string {
+  if (outcome === "passed") return "ustawa przyjęta w trzecim czytaniu";
+  if (outcome === "rejected") return "projekt zamknięty";
+  if (outcome === "continues") return "projekt skierowany do dalszych prac";
+  return "";
+}
+
+export function verdictStampWords(
+  polarity: _MP | null,
+  motionPassed: boolean,
+): VerdictStampWords {
+  const { subject, gender } = subjectFor(polarity);
+  const verb = verbFor(motionPassed, gender);
+  const sublabel = sublabelFor(computeBillOutcome(polarity, motionPassed));
+  return { subject, verb, sublabel };
+}
+
 /** Short chip label for VotingRow.verdict on /druk pages. */
 const VERDICT_LABEL_PL: Record<BillOutcome, string> = {
   passed: "ustawa przyjęta",

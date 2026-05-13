@@ -197,3 +197,96 @@ def test_non_bill_level_motions_never_claim_outcome(polarity) -> None:
     """
     assert compute_bill_outcome(polarity, True) == "indeterminate"
     assert compute_bill_outcome(polarity, False) == "indeterminate"
+
+
+# ─── Verdict-stamp truth table (mirror of bill_outcome.ts verdictStampWords) ──
+# The giant headline on /glosowanie/[id]. Pre-fix it always read "PRZYJĘTA" /
+# "ODRZUCONA" (feminine, matching "ustawa") — feels like "ustawa odrzucona"
+# even when the vote was a procedural motion. Subject + grammatical gender
+# now derive from polarity.
+
+def _stamp_words(polarity: MotionPolarity, motion_passed: bool) -> tuple[str, str, str]:
+    """Python mirror of frontend/lib/voting/bill_outcome.ts verdictStampWords.
+    Returns (subject, verb, sublabel).
+    """
+    if polarity == "pass":
+        subject, gender = "USTAWA", "f"
+    elif polarity == "reject":
+        subject, gender = "WNIOSEK", "m"
+    elif polarity == "amendment":
+        subject, gender = "POPRAWKA", "f"
+    elif polarity == "minority":
+        subject, gender = "WNIOSEK MNIEJSZOŚCI", "m"
+    elif polarity == "procedural":
+        subject, gender = "WNIOSEK", "m"
+    else:
+        subject, gender = "GŁOSOWANIE", "n"
+
+    if gender == "f":
+        verb = "PRZYJĘTA" if motion_passed else "ODRZUCONA"
+    elif gender == "m":
+        verb = "PRZYJĘTY" if motion_passed else "ODRZUCONY"
+    else:
+        verb = "PRZYJĘTE" if motion_passed else "ODRZUCONE"
+
+    outcome = compute_bill_outcome(polarity, motion_passed)
+    if outcome == "passed":
+        sublabel = "ustawa przyjęta w trzecim czytaniu"
+    elif outcome == "rejected":
+        sublabel = "projekt zamknięty"
+    elif outcome == "continues":
+        sublabel = "projekt skierowany do dalszych prac"
+    else:
+        sublabel = ""
+    return subject, verb, sublabel
+
+
+# Each tuple: (voting_id, polarity, yes, maj, expected_subject, expected_verb, expected_sublabel)
+STAMP_FIXTURES: list[tuple[int, MotionPolarity, int, int, str, str, str]] = [
+    # Bug case: reject motion failed → "WNIOSEK ODRZUCONY" (NOT "USTAWA ODRZUCONA")
+    (1517, "reject", 201, 243, "WNIOSEK", "ODRZUCONY", "projekt skierowany do dalszych prac"),
+    (446,  "reject", 188, 229, "WNIOSEK", "ODRZUCONY", "projekt skierowany do dalszych prac"),
+    (55,   "reject", 203, 224, "WNIOSEK", "ODRZUCONY", "projekt skierowany do dalszych prac"),
+    # Reject motion passed → "WNIOSEK PRZYJĘTY" + sublabel "projekt zamknięty"
+    (65,   "reject", 237, 189, "WNIOSEK", "PRZYJĘTY", "projekt zamknięty"),
+    (1513, "reject", 244, 208, "WNIOSEK", "PRZYJĘTY", "projekt zamknięty"),
+    # Third-reading pass succeeded → "USTAWA PRZYJĘTA"
+    (299,  "pass",   415,   1, "USTAWA",  "PRZYJĘTA", "ustawa przyjęta w trzecim czytaniu"),
+    (1113, "pass",   241, 184, "USTAWA",  "PRZYJĘTA", "ustawa przyjęta w trzecim czytaniu"),
+    # Third-reading pass failed → "USTAWA ODRZUCONA" + sublabel "projekt zamknięty"
+    (1978, "pass",   199, 232, "USTAWA",  "ODRZUCONA", "projekt zamknięty"),
+    # Amendment passed/failed — feminine, no bill-level claim
+    (136, "amendment", 238, 201, "POPRAWKA", "PRZYJĘTA", ""),
+    (135, "amendment",  30, 411, "POPRAWKA", "ODRZUCONA", ""),
+    # Minority motions — masculine
+    (900, "minority", 202, 233, "WNIOSEK MNIEJSZOŚCI", "ODRZUCONY", ""),
+    # Procedural — masculine
+    (44,  "procedural", 190, 242, "WNIOSEK", "ODRZUCONY", ""),
+    # Null polarity — neuter fallback
+    (20,  None, 230, 171, "GŁOSOWANIE", "PRZYJĘTE", ""),
+]
+
+
+@pytest.mark.parametrize(
+    "voting_id,polarity,yes,maj,expected_subject,expected_verb,expected_sublabel",
+    [pytest.param(*row, id=f"v{row[0]}") for row in STAMP_FIXTURES],
+)
+def test_verdict_stamp_words_real_cases(
+    voting_id, polarity, yes, maj, expected_subject, expected_verb, expected_sublabel,
+) -> None:
+    subject, verb, sublabel = _stamp_words(polarity, _motion_passed(yes, maj))
+    assert subject == expected_subject, f"voting {voting_id}: subject"
+    assert verb == expected_verb, f"voting {voting_id}: verb"
+    assert sublabel == expected_sublabel, f"voting {voting_id}: sublabel"
+
+
+def test_stamp_avoids_ustawa_odrzucona_misread_for_reject_motions() -> None:
+    """Regression guard for issue #25: a failed 'wniosek o odrzucenie' MUST
+    NOT render as feminine 'ODRZUCONA' (which reads as 'ustawa odrzucona').
+    Subject should be 'WNIOSEK' (masculine), verb 'ODRZUCONY'.
+    """
+    subject, verb, _ = _stamp_words("reject", motion_passed=False)
+    assert subject == "WNIOSEK"
+    assert verb == "ODRZUCONY"
+    # The two words combined never form "USTAWA ODRZUCONA":
+    assert f"{subject} {verb}" != "USTAWA ODRZUCONA"
