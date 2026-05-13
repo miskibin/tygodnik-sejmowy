@@ -18,7 +18,14 @@ export function VerdictStamp({
       ? Math.round(((header.yes + header.no + header.abstain) / turnoutDenom) * 1000) / 10
       : 0;
 
-  const { subject, verb, sublabel } = verdictStampWords(header.motion_polarity, passed);
+  const { headline, tone, motionDescription } = verdictStampWords(header.motion_polarity, passed);
+  // Headline color comes from BILL outcome (not motion outcome) so a citizen
+  // sees green/red that matches what happened to the project, not what
+  // happened to a procedural motion. neutral = amendment/minority/procedural.
+  const headlineColor =
+    tone === "success" ? "var(--success)" :
+    tone === "destructive" ? "var(--destructive)" :
+    "var(--foreground)";
 
   return (
     <div className="flex items-center flex-wrap gap-4 sm:gap-6 mb-7">
@@ -27,40 +34,31 @@ export function VerdictStamp({
         style={{ lineHeight: 0.9 }}
       >
         <div
-          className="font-mono uppercase"
-          style={{
-            fontSize: 11,
-            letterSpacing: "0.18em",
-            color: "var(--muted-foreground)",
-            marginBottom: 6,
-          }}
-        >
-          {subject}
-        </div>
-        <div
           style={{
             fontStyle: "italic",
-            // clamp keeps the verb inside a 320px viewport without breaking the
-            // 92px headline scale on desktop. ~10ch wide at 1cqi sizing.
-            fontSize: "clamp(54px, 14vw, 92px)",
+            // clamp keeps the headline inside a 320px viewport without breaking
+            // the 80px headline scale on desktop. Some bill-outcome strings
+            // ("PROJEKT IDZIE DALEJ") are two words — slightly smaller cap
+            // than the old single-word stamp so it wraps cleanly.
+            fontSize: "clamp(44px, 11.5vw, 80px)",
             fontWeight: 500,
-            color: passed ? "var(--success)" : "var(--destructive)",
+            color: headlineColor,
             letterSpacing: "-0.04em",
           }}
         >
-          {verb}
+          {headline}
         </div>
-        {sublabel && (
+        {motionDescription && (
           <div
             className="font-sans"
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--muted-foreground)",
-              marginTop: 6,
+              marginTop: 10,
               fontStyle: "italic",
             }}
           >
-            {sublabel}
+            {motionDescription}
           </div>
         )}
       </div>

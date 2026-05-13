@@ -44,60 +44,92 @@ export function billOutcomeLabel(outcome: BillOutcome): string {
 /**
  * Verdict-stamp words for the giant headline on /glosowanie/[id].
  *
- * Pre-fix the stamp always read "PRZYJĘTA" / "ODRZUCONA" — feminine, matching
- * "ustawa". That's misleading when the vote is a "wniosek o odrzucenie": the
- * MOTION was rejected but the BILL survives. Issue #25 follow-up: vary the
- * subject by polarity so the stamp says "WNIOSEK ODRZUCONY" (masculine) for
- * motion votes, avoiding the "ustawa odrzucona" misread entirely.
+ * Pre-fix: stamp showed huge motion-level verb (PRZYJĘTY/ODRZUCONY) coloured
+ * by motion outcome, with bill consequence ("projekt zamknięty" etc.) demoted
+ * to a tiny gray sublabel. Citizen review (druk 2197 / voting 1513): reading
+ * giant green "PRZYJĘTY" — even with "WNIOSEK" above — gets parsed as "bill
+ * passed" when in fact a successful reject-motion KILLED the bill.
  *
- * Verb agrees grammatically with the subject:
- *   USTAWA / POPRAWKA (feminine)         → PRZYJĘTA / ODRZUCONA
- *   WNIOSEK / WNIOSEK MNIEJSZOŚCI (masc) → PRZYJĘTY / ODRZUCONY
- *   GŁOSOWANIE (neuter)                  → PRZYJĘTE / ODRZUCONE
+ * New design inverts the hierarchy: the BIG label is the bill-level outcome
+ * (the thing a citizen actually cares about), coloured green/red by bill
+ * fate, and the motion-level description goes underneath in muted italic.
  *
- * Sublabel describes the bill-level consequence ("projekt skierowany do
- * dalszych prac", "ustawa odrzucona w trzecim czytaniu", etc.) so the reader
- * gets both the motion result and what it means for the bill.
+ *   bill outcome      headline             color    motion description below
+ *   ───────────────────────────────────────────────────────────────────────
+ *   passed            USTAWA PRZYJĘTA      success  „głosowanie nad całością — przyjęte"
+ *   rejected (pass)   USTAWA ODRZUCONA     red      „głosowanie nad całością — odrzucone"
+ *   rejected (reject) USTAWA ODRZUCONA     red      „wniosek o odrzucenie przyjęty"
+ *   continues         PROJEKT IDZIE DALEJ  success  „wniosek o odrzucenie odrzucony"
+ *   indeterminate     <motion-subject + verb, neutral>  ""
+ *
+ * Headline subject/verb agreement (Polish gender):
+ *   USTAWA / POPRAWKA  (f) → PRZYJĘTA / ODRZUCONA
+ *   WNIOSEK / PROJEKT  (m) → PRZYJĘTY / ODRZUCONY / IDZIE DALEJ
+ *   GŁOSOWANIE         (n) → PRZYJĘTE / ODRZUCONE
  */
 export type VerdictStampWords = {
-  subject: string;
-  verb: string;
-  /** Bill-level consequence, one short line. Empty string when no claim. */
-  sublabel: string;
+  /** Big italic headline — what happened to the project (or motion if indeterminate). */
+  headline: string;
+  /** Color token name used by the stamp. */
+  tone: "success" | "destructive" | "neutral";
+  /** Smaller line below describing the motion. Empty when no motion-level context to add. */
+  motionDescription: string;
 };
 
-import type { MotionPolarity as _MP } from "@/lib/promiseAlignment";
-
-function subjectFor(polarity: _MP | null): { subject: string; gender: "f" | "m" | "n" } {
-  if (polarity === "pass") return { subject: "USTAWA", gender: "f" };
-  if (polarity === "reject") return { subject: "WNIOSEK", gender: "m" };
-  if (polarity === "amendment") return { subject: "POPRAWKA", gender: "f" };
-  if (polarity === "minority") return { subject: "WNIOSEK MNIEJSZOŚCI", gender: "m" };
-  if (polarity === "procedural") return { subject: "WNIOSEK", gender: "m" };
-  return { subject: "GŁOSOWANIE", gender: "n" };
-}
-
-function verbFor(motionPassed: boolean, gender: "f" | "m" | "n"): string {
-  if (gender === "f") return motionPassed ? "PRZYJĘTA" : "ODRZUCONA";
-  if (gender === "m") return motionPassed ? "PRZYJĘTY" : "ODRZUCONY";
-  return motionPassed ? "PRZYJĘTE" : "ODRZUCONE";
-}
-
-function sublabelFor(outcome: BillOutcome): string {
-  if (outcome === "passed") return "ustawa przyjęta w trzecim czytaniu";
-  if (outcome === "rejected") return "projekt zamknięty";
-  if (outcome === "continues") return "projekt skierowany do dalszych prac";
+function motionDescriptionFor(polarity: MotionPolarity | null, motionPassed: boolean): string {
+  if (polarity === "pass") {
+    return motionPassed
+      ? "głosowanie nad całością projektu"
+      : "głosowanie nad całością projektu odrzucone";
+  }
+  if (polarity === "reject") {
+    return motionPassed
+      ? "wniosek o odrzucenie przyjęty"
+      : "wniosek o odrzucenie odrzucony";
+  }
   return "";
 }
 
+function indeterminateHeadline(polarity: MotionPolarity | null, motionPassed: boolean): { headline: string; tone: "neutral" } {
+  // Subjects + Polish gender for non-bill-claim polarities.
+  const subj = polarity === "amendment"
+    ? { word: "POPRAWKA", gender: "f" as const }
+    : polarity === "minority"
+      ? { word: "WNIOSEK MNIEJSZOŚCI", gender: "m" as const }
+      : polarity === "procedural"
+        ? { word: "WNIOSEK", gender: "m" as const }
+        : { word: "GŁOSOWANIE", gender: "n" as const };
+  const verb = subj.gender === "f"
+    ? (motionPassed ? "PRZYJĘTA" : "ODRZUCONA")
+    : subj.gender === "m"
+      ? (motionPassed ? "PRZYJĘTY" : "ODRZUCONY")
+      : (motionPassed ? "PRZYJĘTE" : "ODRZUCONE");
+  return { headline: `${subj.word} ${verb}`, tone: "neutral" };
+}
+
 export function verdictStampWords(
-  polarity: _MP | null,
+  polarity: MotionPolarity | null,
   motionPassed: boolean,
 ): VerdictStampWords {
-  const { subject, gender } = subjectFor(polarity);
-  const verb = verbFor(motionPassed, gender);
-  const sublabel = sublabelFor(computeBillOutcome(polarity, motionPassed));
-  return { subject, verb, sublabel };
+  const outcome = computeBillOutcome(polarity, motionPassed);
+  if (outcome === "indeterminate") {
+    const { headline, tone } = indeterminateHeadline(polarity, motionPassed);
+    return { headline, tone, motionDescription: "" };
+  }
+  let headline: string;
+  let tone: "success" | "destructive";
+  if (outcome === "passed") {
+    headline = "USTAWA PRZYJĘTA";
+    tone = "success";
+  } else if (outcome === "rejected") {
+    headline = "USTAWA ODRZUCONA";
+    tone = "destructive";
+  } else {
+    // continues — failed reject-motion; bill goes back to committee.
+    headline = "PROJEKT IDZIE DALEJ";
+    tone = "success";
+  }
+  return { headline, tone, motionDescription: motionDescriptionFor(polarity, motionPassed) };
 }
 
 /** Short chip label for VotingRow.verdict on /druk pages. */
