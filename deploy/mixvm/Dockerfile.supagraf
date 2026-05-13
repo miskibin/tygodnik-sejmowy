@@ -8,11 +8,14 @@ FROM python:3.10-slim
 RUN pip install --no-cache-dir --upgrade pip uv
 
 # Minimal OS deps for psycopg2 build wheels + DOCX/PDF tooling. Tesseract
-# is NOT installed — daily on the VM only does fetch/stage/load/enrich/embed
-# pipelines; scanned-PDF OCR happens during separate enrichment locally.
+# IS installed (with Polish traineddata) because daily-print enrichment hits
+# scanned PDFs in the wild — pymupdf returns 0 chars, code falls through to
+# the tesseract path, and missing tesseract was making daily silently skip
+# those prints with TesseractNotFoundError. Polish traineddata is ~5MB.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         git ca-certificates \
+        tesseract-ocr tesseract-ocr-pol \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
