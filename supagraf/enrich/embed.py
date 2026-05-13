@@ -62,7 +62,16 @@ class EmbedResult:
 
 
 def _ollama_url() -> str:
-    return os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
+    # Accept both OLLAMA_BASE_URL (this project's historical name) and
+    # OLLAMA_HOST (the var Ollama's own CLI/SDK uses by convention). The VM
+    # compose was setting OLLAMA_HOST and producing silent ConnectionRefused
+    # against localhost:11434 inside the container; supporting both makes
+    # that misconfig non-fatal.
+    return (
+        os.environ.get("OLLAMA_BASE_URL")
+        or os.environ.get("OLLAMA_HOST")
+        or "http://localhost:11434"
+    ).rstrip("/")
 
 
 @retry(
