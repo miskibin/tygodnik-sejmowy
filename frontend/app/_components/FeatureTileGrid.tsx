@@ -3,8 +3,12 @@ import { getCommitteeList } from "@/lib/db/committees";
 import { getPollAverages30d } from "@/lib/db/polls";
 import { getLatestThread } from "@/lib/db/threads";
 import { getPatroniteStats } from "@/lib/patronite";
+import { getTopViralStatements } from "@/lib/db/statements";
+import { getLatestSittingWithPrints } from "@/lib/db/prints";
+import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
 import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES } from "../sondaze/_components/partyMeta";
 import { FeatureTile } from "./FeatureTile";
+import { FeatureTileCarousel } from "./FeatureTileCarousel";
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
   try { return await p; } catch { return fallback; }
@@ -54,7 +58,7 @@ function fmtZl(n: number): string {
 }
 
 export async function FeatureTileGrid() {
-  const [polls, thread, committees, discipline, patronite] = await Promise.all([
+  const [polls, thread, committees, discipline, patronite, viralSample, latestSitting] = await Promise.all([
     safe(getPollAverages30d(), []),
     safe(getLatestThread(), null),
     safe(getCommitteeList(10), []),
@@ -63,7 +67,16 @@ export async function FeatureTileGrid() {
       activeCount: 0, monthlyAmount: 0, inactiveCount: 0,
       totalEverCount: 0, fetchedAt: "", ok: false,
     }),
+    safe(getTopViralStatements(1), []),
+    safe(getLatestSittingWithPrints(10), null),
   ]);
+  const mowaQuote = viralSample[0] ?? null;
+  const mowaKlubColor = mowaQuote?.clubRef
+    ? KLUB_COLORS[mowaQuote.clubRef] ?? "var(--muted-foreground)"
+    : "var(--muted-foreground)";
+  const mowaKlubLabel = mowaQuote?.clubRef
+    ? KLUB_LABELS[mowaQuote.clubRef] ?? mowaQuote.clubRef
+    : null;
 
   // ── 01 Atlas — party discipline (loyalty share), 4–6 main klubs ───────
   const atlasBars = discipline.slice(0, 6);
@@ -91,12 +104,14 @@ export async function FeatureTileGrid() {
   const budzetMonth = new Date().toLocaleDateString("pl-PL", { month: "long", year: "numeric" });
 
   // ── 07 Alerty — RSS feed already live; push/ICS still wkrótce. ────────
-  const alertTriggers = ["fraza", "poseł", "klub", "okręg", "druk", "akt"];
   const alertChannels: Array<{ name: string; live: boolean; href?: string }> = [
     { name: "RSS", live: true, href: "/rss.xml" },
     { name: "push", live: false },
     { name: "ICS", live: false },
   ];
+  const sittingDate = latestSitting?.lastDate
+    ? new Date(latestSitting.lastDate).toLocaleDateString("pl-PL", { day: "numeric", month: "long" })
+    : null;
 
   return (
     <section className="px-4 md:px-8 lg:px-14 py-12 md:py-16 border-b border-rule">
@@ -110,9 +125,9 @@ export async function FeatureTileGrid() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-px bg-border border border-border">
-          {/* Row 1 — 3 tiles, each 1/3 on lg */}
+        <FeatureTileCarousel slides={[
           <FeatureTile
+            key="01"
             num="01"
             kicker="WYKRESY"
             title="Atlas"
@@ -169,10 +184,11 @@ export async function FeatureTileGrid() {
             }
             href="/atlas"
             ctaLabel="otwórz atlas →"
-            className="lg:col-span-2"
           />
 
+          ,
           <FeatureTile
+            key="02"
             num="02"
             kicker="POPARCIE PARTII"
             title="Sondaże"
@@ -228,10 +244,11 @@ export async function FeatureTileGrid() {
             }
             href="/sondaze"
             ctaLabel="zobacz sondaż →"
-            className="lg:col-span-2"
           />
 
+          ,
           <FeatureTile
+            key="03"
             num="03"
             kicker="PEŁEN CYKL"
             title="Wątek"
@@ -271,29 +288,42 @@ export async function FeatureTileGrid() {
             }
             href="/watek"
             ctaLabel="prześledź wątek →"
-            className="lg:col-span-2"
           />
 
-          {/* Row 2 — 2 tiles, each 1/2 on lg */}
+          ,
           <FeatureTile
+            key="04"
             num="04"
             kicker="TRANSKRYPCJE"
             title="Mowa"
-            description="Wystąpienia z mównicy. Wyszukiwanie pełnotekstowe i semantyczne. Każde zdanie z linkiem do nagrania."
+            description="Wystąpienia z mównicy. Każde zdanie z linkiem do nagrania."
             preview={
-              <div className="border-l-2 border-muted-foreground pl-3 py-1">
-                <div className="font-serif italic text-[13px] leading-snug text-muted-foreground">
-                  „Każde wystąpienie z&nbsp;mównicy z&nbsp;timestampem do nagrania i&nbsp;linkiem do druku.&rdquo;
+              mowaQuote ? (
+                <div className="pl-3 py-0.5 border-l-2" style={{ borderColor: mowaKlubColor }}>
+                  <div className="font-serif italic text-[13.5px] leading-snug text-foreground line-clamp-3 mb-2">
+                    „{mowaQuote.viralQuote}&rdquo;
+                  </div>
+                  <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-wide text-muted-foreground">
+                    <span className="text-foreground/80 truncate">{mowaQuote.speakerName ?? "anonim"}</span>
+                    {mowaKlubLabel && (
+                      <>
+                        <span className="text-border" aria-hidden>·</span>
+                        <span style={{ color: mowaKlubColor }}>{mowaKlubLabel}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="font-mono text-[11px] text-muted-foreground italic">brak danych</div>
+              )
             }
-            href="/mowa"
-            ctaLabel="co planujemy →"
-            comingSoon
-            className="lg:col-span-3"
+            href={mowaQuote ? `/mowa/${mowaQuote.id}` : "/mowa"}
+            ctaLabel="otwórz mowę →"
           />
 
+          ,
           <FeatureTile
+            key="05"
             num="05"
             kicker="POSIEDZENIA"
             title="Komisja"
@@ -320,11 +350,11 @@ export async function FeatureTileGrid() {
             }
             href="/komisja"
             ctaLabel="otwórz listę →"
-            className="lg:col-span-3"
           />
 
-          {/* Row 3 — 2 tiles, each 1/2 on lg */}
+          ,
           <FeatureTile
+            key="06"
             num="06"
             kicker="FINANSE"
             title="Budżet"
@@ -354,31 +384,35 @@ export async function FeatureTileGrid() {
             }
             href="/budzet"
             ctaLabel="zobacz budżet →"
-            className="lg:col-span-3"
           />
 
+          ,
           <FeatureTile
+            key="07"
             num="07"
             kicker="SUBSKRYPCJE"
             title="Alerty"
             description="RSS działa: nowe druki w czytniku. Push, ICS i alerty słowne — w planach."
             preview={
               <div className="space-y-3">
-                <div>
-                  <div className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
-                    wyzwalacze
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {alertTriggers.map((t) => (
-                      <span
-                        key={t}
-                        className="font-sans text-[11px] px-2 py-0.5 border border-border bg-background text-secondary-foreground rounded-sm"
-                      >
-                        {t}
+                {latestSitting ? (
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-serif text-[24px] font-medium leading-none">
+                        {latestSitting.printCount}
                       </span>
-                    ))}
+                      <span className="font-sans text-[11.5px] text-muted-foreground">
+                        nowych druków
+                      </span>
+                    </div>
+                    <div className="font-mono text-[10px] tracking-wide text-muted-foreground">
+                      posiedzenie #{latestSitting.sittingNum}
+                      {sittingDate && <> · do {sittingDate}</>}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="font-mono text-[11px] text-muted-foreground italic">brak danych</div>
+                )}
                 <div>
                   <div className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
                     kanały
@@ -409,9 +443,8 @@ export async function FeatureTileGrid() {
             href="/alerty"
             ctaLabel="co planujemy →"
             comingSoon
-            className="lg:col-span-3"
-          />
-        </div>
+          />,
+        ]} />
       </div>
     </section>
   );

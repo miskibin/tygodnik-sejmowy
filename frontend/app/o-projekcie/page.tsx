@@ -14,7 +14,7 @@ const TEAM = [
   },
   {
     photo: "/michal-sulawiak.jpg",
-    name: "Michał Suławiak",
+    name: "Michał Sulawiak",
     role: "Burza mózgów · hardware · DevOps",
     body:
       "Sponsoruje serwer (mixvm) i utrzymuje infrastrukturę — Supabase, Postgres, deploy. Partner do rozkminiania architektury i kierunku produktu.",

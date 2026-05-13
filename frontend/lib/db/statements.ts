@@ -684,6 +684,32 @@ export type ViralStatementCard = {
   viralScore: number | null;
 };
 
+// Pull the most-quotable single sentence out of a transcript body. Sejm
+// transcripts often open with a procedural preamble (kadencja/posiedzenie)
+// which we already strip on the detail page; for landing snippets we just
+// want a clean middle sentence between 60 and 220 chars.
+function snippetFromBody(body: string | null): string | null {
+  if (!body) return null;
+  const stripped = body
+    .replace(/^\s*\d+\.\s*kadencja[^.]*\./i, "")
+    .replace(/punkt porządku dziennego:[^.]*\./i, "")
+    .replace(/\(druki?\s+nr[^)]*\)/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const sentences = stripped.split(/(?<=[.!?])\s+/);
+  for (const s of sentences) {
+    const t = s.trim();
+    if (t.length >= 60 && t.length <= 220 && /[a-ząęółśżźćń]/i.test(t[0])) {
+      return t;
+    }
+  }
+  // Loose fallback: first 180 chars cut to nearest space.
+  if (stripped.length < 60) return null;
+  const slice = stripped.slice(0, 200);
+  const lastSpace = slice.lastIndexOf(" ");
+  return (lastSpace > 80 ? slice.slice(0, lastSpace) : slice) + "…";
+}
+
 export async function getTopViralStatements(
   limit = 12,
   term = DEFAULT_TERM,
@@ -699,6 +725,13 @@ export async function getTopViralStatements(
     .order("viral_score", { ascending: false, nullsFirst: false })
     .limit(limit);
   if (error) throw error;
+
+  // If the LLM-viral backfill hasn't run yet (prod state at the time of the
+  // landing redesign), fall back to recent body-text snippets so the
+  // typewriter has something real to show. Replaces the awkward empty state.
+  if (!data || data.length === 0) {
+    return getRecentStatementSnippets(limit, term);
+  }
 
   type Row = {
     id: number;
@@ -742,6 +775,63 @@ export async function getTopViralStatements(
         viralScore: score,
       };
     });
+}
+
+async function getRecentStatementSnippets(
+  limit: number,
+  term: number,
+): Promise<ViralStatementCard[]> {
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("proceeding_statements")
+    .select(
+      "id, mp_id, speaker_name, function, body_text, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+    )
+    .eq("term", term)
+    .not("body_text", "is", null)
+    .order("start_datetime", { ascending: false, nullsFirst: false })
+    .limit(limit * 4);
+  if (error) throw error;
+
+  type Row = {
+    id: number;
+    mp_id: number | null;
+    speaker_name: string | null;
+    function: string | null;
+    body_text: string | null;
+    start_datetime: string | null;
+    proceeding_day: { date: string | null; proceeding: { number: number | null } | null } | null;
+  };
+  const rows = (data ?? []) as unknown as Row[];
+
+  const picked: { row: Row; snippet: string }[] = [];
+  for (const r of rows) {
+    const snip = snippetFromBody(r.body_text);
+    if (snip) picked.push({ row: r, snippet: snip });
+    if (picked.length >= limit) break;
+  }
+
+  const mpIds = Array.from(
+    new Set(picked.map((p) => p.row.mp_id).filter((x): x is number => x != null)),
+  );
+  const clubMap = await resolveMpClubs(mpIds, term);
+
+  return picked.map(({ row: r, snippet }): ViralStatementCard => {
+    const club = r.mp_id != null ? clubMap.get(r.mp_id) ?? null : null;
+    return {
+      id: r.id,
+      speakerName: r.speaker_name,
+      function: r.function,
+      clubRef: club?.clubRef ?? null,
+      viralQuote: snippet,
+      viralReason: null,
+      tone: null,
+      topicTags: [],
+      date: r.start_datetime ?? r.proceeding_day?.date ?? null,
+      proceedingNumber: r.proceeding_day?.proceeding?.number ?? null,
+      viralScore: null,
+    };
+  });
 }
 
 export async function getActiveClubs(term = DEFAULT_TERM): Promise<{ clubId: string; name: string }[]> {
