@@ -99,6 +99,7 @@ export type DisciplineRow = {
   loyalty: number;       // 0..1, mean of per-voting loyalty
   votings: number;       // n votings counted (>=5 voting members)
   totalMembersAvg: number; // avg total members per voting (rough klub size)
+  dissents: number;      // total member-votes against the klub line across votings
 };
 
 export async function getPartyDiscipline(term = 10): Promise<DisciplineRow[]> {
@@ -110,7 +111,7 @@ export async function getPartyDiscipline(term = 10): Promise<DisciplineRow[]> {
     .in("club_short", [...MAIN_KLUBS]);
   if (error) throw error;
 
-  type Acc = { sumLoyalty: number; n: number; sumTotal: number };
+  type Acc = { sumLoyalty: number; n: number; sumTotal: number; dissents: number };
   const acc = new Map<string, Acc>();
 
   for (const r of (data ?? []) as Array<{
@@ -123,10 +124,11 @@ export async function getPartyDiscipline(term = 10): Promise<DisciplineRow[]> {
     if (voting < 5) continue; // too thin to define a "klub line"
     const winner = Math.max(yes, no, abstain);
     const loyalty = winner / voting;
-    const a = acc.get(r.club_short) ?? { sumLoyalty: 0, n: 0, sumTotal: 0 };
+    const a = acc.get(r.club_short) ?? { sumLoyalty: 0, n: 0, sumTotal: 0, dissents: 0 };
     a.sumLoyalty += loyalty;
     a.n += 1;
     a.sumTotal += r.total ?? 0;
+    a.dissents += voting - winner;
     acc.set(r.club_short, a);
   }
 
@@ -139,6 +141,7 @@ export async function getPartyDiscipline(term = 10): Promise<DisciplineRow[]> {
       loyalty: a.sumLoyalty / a.n,
       votings: a.n,
       totalMembersAvg: a.sumTotal / a.n,
+      dissents: a.dissents,
     });
   }
   rows.sort((x, y) => y.loyalty - x.loyalty);

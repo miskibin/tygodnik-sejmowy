@@ -30,7 +30,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
           {data.map((d) => {
             const pct = d.loyalty * 100;
             const color = KLUB_COLORS[d.klub] ?? "var(--muted-foreground)";
-            const dissents = Math.round(d.votings * (1 - d.loyalty));
+            const dissents = d.dissents;
             const klubLabel = KLUB_LABELS[d.klub] ?? d.klub;
             return (
               <HoverCard key={d.klub} openDelay={120} closeDelay={80}>
@@ -73,8 +73,8 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
                   <div className="grid grid-cols-2 gap-y-1.5 font-mono text-[11px]">
                     <span className="text-muted-foreground">lojalność średnia</span>
                     <span className="text-right text-foreground font-semibold">{pct.toFixed(1)}%</span>
-                    <span className="text-muted-foreground">odstępstw (~)</span>
-                    <span className="text-right text-foreground">{dissents}</span>
+                    <span className="text-muted-foreground">odstępstw</span>
+                    <span className="text-right text-foreground">{dissents.toLocaleString("pl-PL")}</span>
                     <span className="text-muted-foreground">głosowań w próbie</span>
                     <span className="text-right text-foreground">{d.votings.toLocaleString("pl-PL")}</span>
                     <span className="text-muted-foreground">średnia obecność</span>
@@ -95,11 +95,11 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
         >
           <p className="m-0 mb-3.5">
             <strong className="text-foreground">{KLUB_LABELS[top.klub] ?? top.klub} najbardziej zdyscyplinowany</strong>
-            {" "}— {(top.loyalty * 100).toFixed(1)}% głosów zgodnych. Tylko {Math.round(top.votings * (1 - top.loyalty))} odstępstw w {top.votings.toLocaleString("pl-PL")} głosowaniach.
+            {" "}— {(top.loyalty * 100).toFixed(1)}% głosów zgodnych. Tylko {top.dissents.toLocaleString("pl-PL")} odstępstw w {top.votings.toLocaleString("pl-PL")} głosowaniach.
           </p>
           <p className="m-0 mb-3.5">
             <strong className="text-foreground">{KLUB_LABELS[bottom.klub] ?? bottom.klub} się sypie.</strong>
-            {" "}{(bottom.loyalty * 100).toFixed(1)}% lojalności — {Math.round(bottom.votings * (1 - bottom.loyalty))} głosów wbrew klubowi.
+            {" "}{(bottom.loyalty * 100).toFixed(1)}% lojalności — {bottom.dissents.toLocaleString("pl-PL")} głosów wbrew klubowi.
             {bottom.klub === "Polska2050" && (
               <> Konsekwencja odpływu posłów do Centrum (zob. wykres&nbsp;03).</>
             )}
