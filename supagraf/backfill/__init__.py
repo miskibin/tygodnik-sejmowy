@@ -16,6 +16,7 @@ from supagraf.backfill.etl_review import (  # noqa: F401
     backfill_committee_ids,
     backfill_statement_print_links,
     backfill_is_procedural_substantive,
+    reclassify_main_role_by_polarity,
     run_all,
 )
 from supagraf.backfill.mp_club_history import (  # noqa: F401

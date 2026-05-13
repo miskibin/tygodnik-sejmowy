@@ -86,6 +86,23 @@ def _fetch_all(table: str, select: str, *, eq: dict | None = None,
 # 1. voting_print_links
 # ---------------------------------------------------------------------------
 
+def _role_for_single_print(polarity: str | None) -> str:
+    """Map a single-print voting's motion_polarity → voting_print_links.role.
+
+    Issue #25 follow-up²: only third-reading completion votes (polarity='pass')
+    earn role='main'. Procedural motions (reject / amendment / minority /
+    procedural) get a demoted role so /druk sidebars don't label them as
+    "Głosowanie końcowe" / "całość". NULL polarity stays 'main' — the
+    classifier may miss a legitimate third-reading topic phrasing and
+    demoting on null would lose information.
+    """
+    if polarity is None or polarity == "pass":
+        return "main"
+    if polarity == "amendment":
+        return "poprawka"
+    return "other"
+
+
 def backfill_voting_print_links(*, dry_run: bool = False) -> dict[str, int]:
     """Populate voting_print_links from two sources:
       A) process_stages.voting jsonb (sitting + votingNumber → voting_id)
@@ -93,6 +110,11 @@ def backfill_voting_print_links(*, dry_run: bool = False) -> dict[str, int]:
 
     voting JSONB shape (camelCase from API): {sitting, votingNumber, ...}.
     No voting_id field — we resolve via (term, sitting, voting_number).
+
+    Role assignment is polarity-aware (see _role_for_single_print) — only
+    motion_polarity='pass' votings on a single print get role='main';
+    everything else demotes so /druk doesn't claim "Głosowanie końcowe"
+    for a procedural reject motion.
     """
     client = supabase()
 
@@ -100,11 +122,12 @@ def backfill_voting_print_links(*, dry_run: bool = False) -> dict[str, int]:
     prints_rows = _fetch_all("prints", "id,term,number")
     print_by_key = {(r["term"], r["number"]): r["id"] for r in prints_rows}
 
-    # Build a voting lookup: (term, sitting, voting_number) -> id.
-    voting_rows = _fetch_all("votings", "id,term,sitting,voting_number,title")
+    # Build a voting lookup: (term, sitting, voting_number) -> (id, polarity).
+    voting_rows = _fetch_all("votings", "id,term,sitting,voting_number,title,motion_polarity")
     voting_by_key = {
         (r["term"], r["sitting"], r["voting_number"]): r["id"] for r in voting_rows
     }
+    polarity_by_id = {r["id"]: r.get("motion_polarity") for r in voting_rows}
 
     # Existing links (so we can skip-count rather than rely solely on PK conflict).
     existing = _fetch_all("voting_print_links", "voting_id,print_id")
@@ -137,12 +160,14 @@ def backfill_voting_print_links(*, dry_run: bool = False) -> dict[str, int]:
         if not proc_key:
             continue
         p_term, p_number = proc_key
-        # Main print (1:1 by process number).
+        # Main print (1:1 by process number). Role gated on motion_polarity
+        # so procedural reject motions don't end up tagged "main".
         main_id = print_by_key.get((p_term, p_number))
         if main_id:
             candidates.append({
                 "voting_id": voting_id, "print_id": main_id,
-                "role": "main", "source": "process_stage_json",
+                "role": _role_for_single_print(polarity_by_id.get(voting_id)),
+                "source": "process_stage_json",
             })
             stage_a_count += 1
         # Sub-prints (sprawozdanie / opinion children).
@@ -154,12 +179,15 @@ def backfill_voting_print_links(*, dry_run: bool = False) -> dict[str, int]:
         # (Skipped — main + regex covers 99% of useful links.)
 
     # --- Source B: voting title regex --------------------------------------
+    # Single-print votings: role gated on motion_polarity (see Source A
+    # comment). Multi-print votings stay 'joint' regardless — that flag
+    # describes scope (which prints does this vote affect), not polarity.
     regex_count = 0
     for v in voting_rows:
         nums = _extract_print_numbers(v.get("title") or "")
         if len(nums) < 1:
             continue
-        role = "joint" if len(nums) > 1 else "main"
+        role = "joint" if len(nums) > 1 else _role_for_single_print(v.get("motion_polarity"))
         for num in nums:
             pid = print_by_key.get((v["term"], num))
             if not pid:
@@ -210,6 +238,59 @@ def backfill_voting_print_links(*, dry_run: bool = False) -> dict[str, int]:
             inserted += len(batch)
 
     return {"inserted": inserted, "updated": 0, "skipped": skipped}
+
+
+def reclassify_main_role_by_polarity(*, dry_run: bool = False) -> dict[str, int]:
+    """One-shot re-classifier for existing voting_print_links rows tagged
+    role='main' that should have been demoted by polarity.
+
+    Mirror of migration 0088. Runnable from this side because PostgREST
+    can do row-level updates (we don't have DDL access from the dev
+    sandbox). Idempotent — skips rows already correct.
+
+    Returns counts per resulting role.
+    """
+    client = supabase()
+    # PostgREST embed pattern: pull motion_polarity via the FK in a single
+    # request rather than N joins.
+    page_size = 1000
+    offset = 0
+    fetched: list[dict] = []
+    while True:
+        resp = (
+            client.table("voting_print_links")
+            .select("voting_id,print_id,role,votings:voting_id(motion_polarity)")
+            .eq("role", "main")
+            .range(offset, offset + page_size - 1)
+            .execute()
+        )
+        chunk = resp.data or []
+        if not chunk:
+            break
+        fetched.extend(chunk)
+        if len(chunk) < page_size:
+            break
+        offset += page_size
+
+    counts = {"_total_seen": len(fetched), "_demoted": 0, "_unchanged": 0,
+              "main": 0, "poprawka": 0, "other": 0}
+    for row in fetched:
+        v = row.get("votings") or {}
+        polarity = v.get("motion_polarity") if isinstance(v, dict) else None
+        new_role = _role_for_single_print(polarity)
+        counts[new_role] = counts.get(new_role, 0) + 1
+        if new_role == "main":
+            counts["_unchanged"] += 1
+            continue
+        if dry_run:
+            continue
+        client.table("voting_print_links").update({"role": new_role}).eq(
+            "voting_id", row["voting_id"]
+        ).eq("print_id", row["print_id"]).execute()
+        counts["_demoted"] += 1
+
+    logger.info("reclassify_main_role_by_polarity {}", counts)
+    return counts
 
 
 # ---------------------------------------------------------------------------
@@ -809,6 +890,7 @@ def run_all(*, dry_run: bool = False) -> dict[str, dict[str, int]]:
         ("committee_ids", backfill_committee_ids),
         ("statement_print_links", backfill_statement_print_links),
         ("voting_print_links", backfill_voting_print_links),
+        ("reclassify_main_role_by_polarity", reclassify_main_role_by_polarity),
     ):
         logger.info("=== backfill: {} ===", name)
         try:
