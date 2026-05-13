@@ -53,13 +53,11 @@ function formatDate(iso: string | null): string {
   return new Date(iso).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
 }
 
-// Compact Polish labels for voting roles in the related-votings list.
-// "main" intentionally has NO entry — the upstream voting_print_links ETL
-// tags procedural reject-motions with role="main" too (issue #25 follow-up:
-// voting 1517 is role="main" on druk 10/2449 despite being a "wniosek o
-// odrzucenie"). The chip label is derived per-row from motion_polarity so
-// it can't claim "całość" for a procedural motion.
-const ROLE_LABEL: Record<string, string> = {
+// Compact Polish labels per voting_print_links.role for cases where
+// motion_polarity is null/unknown. When polarity is known, votingChip()
+// below derives a polarity-based label first — the role is only a fallback.
+const ROLE_LABEL_PL: Record<string, string> = {
+  main: "główne",
   sprawozdanie: "sprawozd.",
   autopoprawka: "autopoprawka",
   poprawka: "poprawka",
@@ -67,15 +65,25 @@ const ROLE_LABEL: Record<string, string> = {
   other: "inne",
 };
 
-// Polarity-aware chip label for the `role="main"` row (replaces the blanket
-// "całość" that conflated final third-reading votes with procedural motions).
-function mainRoleLabel(polarity: import("@/lib/promiseAlignment").MotionPolarity | null): string {
-  if (polarity === "pass") return "całość";
+// Polarity drives the chip first (the actual semantics of the voting); role
+// is the fallback when polarity is null. Citizen review (druk 10/2197):
+// voting 1513 ended up role='other' after ETL reclassification (PR #31) but
+// the sidebar still rendered "Głosowanie · other" because the previous fix
+// only handled role==='main'. This handles every role with a Polish label.
+function votingChip(polarity: import("@/lib/promiseAlignment").MotionPolarity | null, role: string): string {
+  if (polarity === "pass") return "całość projektu";
   if (polarity === "reject") return "wniosek o odrzucenie";
   if (polarity === "amendment") return "poprawki";
-  if (polarity === "minority") return "wniosek mniejsz.";
-  if (polarity === "procedural") return "wniosek proc.";
-  return "główne";
+  if (polarity === "minority") return "wniosek mniejszości";
+  if (polarity === "procedural") return "wniosek proceduralny";
+  return ROLE_LABEL_PL[role] ?? "głosowanie";
+}
+
+// Sidebar header — "Głosowanie końcowe" only when the voting really IS the
+// third-reading completion vote. Otherwise describe what was voted on.
+function sidebarHeaderLabel(polarity: import("@/lib/promiseAlignment").MotionPolarity | null, role: string): string {
+  if (polarity === "pass" && role === "main") return "Głosowanie końcowe";
+  return `Głosowanie · ${votingChip(polarity, role)}`;
 }
 
 function StageRow({ s, isLast }: { s: ProcessStage; isLast: boolean }) {
@@ -295,7 +303,7 @@ export default async function DrukPage({
                         yes={v.yes}
                         no={v.no}
                         abstain={v.abstain}
-                        badge={{ label: v.role === "main" ? mainRoleLabel(v.motionPolarity) : (ROLE_LABEL[v.role] ?? v.role) }}
+                        badge={{ label: votingChip(v.motionPolarity, v.role) }}
                         verdict={verdict}
                         isFinal={isFinal}
                       />
@@ -453,18 +461,7 @@ export default async function DrukPage({
             {mainVoting && (
               <>
                 <div className="mt-7 text-[10px] tracking-[0.16em] uppercase text-destructive mb-3.5">
-                  ✶ {
-                    // Issue #25 follow-up: role="main" is set by ETL on any
-                    // voting linked to the print (incl. procedural reject-
-                    // motions). Only label "Głosowanie końcowe" when the
-                    // motion was actually the third-reading bill vote
-                    // (polarity="pass"); otherwise describe what was voted on.
-                    mainVoting.role === "main"
-                      ? (mainVoting.motionPolarity === "pass"
-                          ? "Głosowanie końcowe"
-                          : `Głosowanie · ${mainRoleLabel(mainVoting.motionPolarity)}`)
-                      : `Głosowanie · ${mainVoting.role}`
-                  }
+                  ✶ {sidebarHeaderLabel(mainVoting.motionPolarity, mainVoting.role)}
                 </div>
                 <div
                   className="font-serif font-medium leading-none tracking-[-0.02em]"
