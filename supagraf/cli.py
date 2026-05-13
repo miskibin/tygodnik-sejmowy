@@ -346,21 +346,32 @@ def cmd_daily(
         except Exception as e:
             logger.error("enrich-utterances failed: {!r}", e)
 
-    if not skip_embed:
-        logger.info("=== daily phase 5/6: embed ===")
+    # Embed phase env knobs:
+    #   SUPAGRAF_DAILY_SKIP_EMBED=1  → skip phase 5 entirely (escape hatch
+    #     for hosts where Ollama embedding is too slow to fit in a daily
+    #     window; the embeddings table just stays behind, frontend features
+    #     that need it gracefully degrade).
+    #   SUPAGRAF_EMBED_LIMIT=N       → per-resource cap. Daily then chips
+    #     away at the backlog instead of trying to drain it in one run.
+    skip_embed_env = os.environ.get("SUPAGRAF_DAILY_SKIP_EMBED") == "1"
+    embed_limit_env = int(os.environ.get("SUPAGRAF_EMBED_LIMIT", "0") or 0)
+    if not skip_embed and not skip_embed_env:
+        logger.info("=== daily phase 5/6: embed (limit={}) ===", embed_limit_env or "unbounded")
         try:
-            cmd_enrich_prints(kind=EnrichKind.embed, term=term, limit=0)
+            cmd_enrich_prints(kind=EnrichKind.embed, term=term, limit=embed_limit_env)
         except typer.Exit as e:
             logger.warning("enrich embed completed with failures (exit={}); continuing", e.exit_code)
         # Statements + promises run via their dedicated commands.
         try:
-            cmd_enrich_statements(term=term, limit=0)
+            cmd_enrich_statements(term=term, limit=embed_limit_env)
         except Exception as e:
             logger.error("statement embed failed: {!r}", e)
         try:
-            cmd_enrich_promises(kind="embed", limit=0)
+            cmd_enrich_promises(kind="embed", limit=embed_limit_env)
         except Exception as e:
             logger.error("promise embed failed: {!r}", e)
+    elif skip_embed_env:
+        logger.info("=== daily phase 5/6: embed SKIPPED (SUPAGRAF_DAILY_SKIP_EMBED=1) ===")
 
     logger.info("=== daily phase 6/6: refresh aggregates ===")
     try:
