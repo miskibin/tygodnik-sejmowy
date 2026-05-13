@@ -1,27 +1,29 @@
 # Frontend self-host on mixvm. Deployed via Portainer Stack-from-Git pointing
-# at this file. Build context = `../../frontend/`. Image is built once on the
-# VM (no registry needed) and re-used across restarts.
+# at this file. Image is built by the GitHub Actions workflow on every v* tag
+# (see .github/workflows/frontend-image.yml) and pulled from GHCR — nothing
+# is built on the VM. Recreate = ~30 s pull instead of ~4 min build.
+#
+# Portainer env vars (set in the stack):
+#   - SUPABASE_URL          — required, baked into Next prerender at build
+#   - SUPABASE_KEY          — required, anon key (RLS-respecting)
+#   - FRONTEND_IMAGE_TAG    — image tag to pull (e.g. v0.10.2); defaults to
+#                             :latest, which the workflow re-points on every
+#                             v* tag publish
+#   - OLLAMA_BASE_URL       — optional, defaults to internal compose alias
+#   - PATRONITE_TOKEN       — optional
 #
 # Port 3001 chosen because 3000 is reserved for any future Next dev session
-# and 80/443 are owned by something else on the host. Caddy/Cloudflare in
-# front comes in a follow-up turn — this stack is just the app container.
+# and 80/443 are owned by something else on the host. Cloudflare Tunnel
+# (sejmograf-cloudflared stack) routes vm.tygodniksejmowy.pl → :3001.
 
 name: sejmograf-frontend
 
 services:
   frontend:
-    build:
-      context: ../../frontend
-      dockerfile: Dockerfile
-      # SUPABASE_* go in via BuildKit secrets (see top-level `secrets:` block)
-      # so they never persist in image layers, build cache, or `docker history`.
-      # Requires DOCKER_BUILDKIT=1 (default on Compose v2 / Docker 23+).
-      secrets:
-        - supabase_url
-        - supabase_key
-    image: sejmograf-frontend:latest
+    image: ghcr.io/miskibin/tygodnik-sejmowy-frontend:${FRONTEND_IMAGE_TAG:-latest}
     container_name: sejmograf-frontend
     restart: unless-stopped
+    pull_policy: always
     ports:
       - "3001:3000"
     environment:
@@ -43,12 +45,3 @@ networks:
   supabase:
     external: true
     name: supabase_default
-
-# Build-time secrets sourced from the deploy host's env (Portainer stack vars).
-# `environment:` keeps them in tmpfs during the build, never written to disk
-# on the builder, and never copied into the resulting image.
-secrets:
-  supabase_url:
-    environment: SUPABASE_URL
-  supabase_key:
-    environment: SUPABASE_KEY
