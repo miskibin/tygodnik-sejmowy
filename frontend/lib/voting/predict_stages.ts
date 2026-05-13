@@ -1,3 +1,6 @@
+import { computeBillOutcome, billOutcomeLabel, billAdvancesToSenate, type BillOutcome } from "./bill_outcome";
+import type { MotionPolarity } from "@/lib/promiseAlignment";
+
 // Predicted legislative timeline for a Sejm-passed law.
 //
 // Validated against term-10 historical processes (BILL only, n=29-18 per
@@ -52,24 +55,50 @@ export type PredictInput = {
   presidentSignatureDate?: Date | null;
   promulgationDate?: Date | null;
   passed: boolean;
+  // Motion polarity for this specific vote (issue #25). When provided the
+  // stage label reflects bill-level outcome (a failed "wniosek o odrzucenie"
+  // means the bill CONTINUES — not "ustawa odrzucona"). When omitted the
+  // function falls back to legacy `passed`-only semantics for callers that
+  // haven't been wired yet.
+  motionPolarity?: MotionPolarity | null;
 };
 
+function sejmStageDetail(outcome: BillOutcome): string {
+  return billOutcomeLabel(outcome);
+}
+
+function sejmStageLabel(outcome: BillOutcome): string {
+  if (outcome === "passed") return "Sejm uchwalił";
+  if (outcome === "rejected") return "Sejm odrzucił";
+  if (outcome === "continues") return "Sejm: I czytanie";
+  return "Głosowanie w Sejmie";
+}
+
 export function predictStages(input: PredictInput): PredictedStage[] {
-  const { sejmVoteDate, senatePositionDate, toPresidentDate, presidentSignatureDate, promulgationDate, passed } = input;
+  const { sejmVoteDate, senatePositionDate, toPresidentDate, presidentSignatureDate, promulgationDate, passed, motionPolarity } = input;
+
+  // Resolve bill-level outcome. Without polarity, mimic the legacy boolean so
+  // unmigrated callers keep working — but produce a fresh BillOutcome so the
+  // downstream label/branch logic stays uniform.
+  const outcome: BillOutcome =
+    motionPolarity === undefined
+      ? (passed ? "passed" : "rejected")
+      : computeBillOutcome(motionPolarity, passed);
 
   // Stage 1 — Sejm vote (always known, always past).
   const stages: PredictedStage[] = [
     {
       key: "sejm",
-      label: "Sejm uchwalił",
-      detail: passed ? "ustawa przyjęta w trzecim czytaniu" : "ustawa odrzucona",
+      label: sejmStageLabel(outcome),
+      detail: sejmStageDetail(outcome),
       expectedDate: sejmVoteDate,
       deadlineDate: sejmVoteDate,
-      current: !passed, // if rejected, this is the terminal stage
+      // Sejm stage is terminal unless the bill actually moves to Senate.
+      current: !billAdvancesToSenate(outcome),
     },
   ];
 
-  if (!passed) return stages;
+  if (!billAdvancesToSenate(outcome)) return stages;
 
   // Stage 2 — Senate. No point estimate (gap is 0–26d in observed data).
   const senateActual = senatePositionDate ?? null;

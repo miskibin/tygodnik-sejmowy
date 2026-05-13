@@ -71,7 +71,7 @@ export default async function VotingDetailPage({
         }}
         term={header.term}
       />
-      <WhatsNextTimeline stages={predictedStages} promiseLink={promiseLink} passed={passed} />
+      <WhatsNextTimeline stages={predictedStages} promiseLink={promiseLink} passed={passed} motionPolarity={header.motion_polarity} />
       <VotingSources
         header={header}
         linkedPrint={linkedPrint}
