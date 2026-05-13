@@ -54,14 +54,29 @@ function formatDate(iso: string | null): string {
 }
 
 // Compact Polish labels for voting roles in the related-votings list.
+// "main" intentionally has NO entry — the upstream voting_print_links ETL
+// tags procedural reject-motions with role="main" too (issue #25 follow-up:
+// voting 1517 is role="main" on druk 10/2449 despite being a "wniosek o
+// odrzucenie"). The chip label is derived per-row from motion_polarity so
+// it can't claim "całość" for a procedural motion.
 const ROLE_LABEL: Record<string, string> = {
-  main: "całość",
   sprawozdanie: "sprawozd.",
   autopoprawka: "autopoprawka",
   poprawka: "poprawka",
   joint: "łączne",
   other: "inne",
 };
+
+// Polarity-aware chip label for the `role="main"` row (replaces the blanket
+// "całość" that conflated final third-reading votes with procedural motions).
+function mainRoleLabel(polarity: import("@/lib/promiseAlignment").MotionPolarity | null): string {
+  if (polarity === "pass") return "całość";
+  if (polarity === "reject") return "wniosek o odrzucenie";
+  if (polarity === "amendment") return "poprawki";
+  if (polarity === "minority") return "wniosek mniejsz.";
+  if (polarity === "procedural") return "wniosek proc.";
+  return "główne";
+}
 
 function StageRow({ s, isLast }: { s: ProcessStage; isLast: boolean }) {
   const label = stageLabel(s.stageType, s.stageName);
@@ -280,7 +295,7 @@ export default async function DrukPage({
                         yes={v.yes}
                         no={v.no}
                         abstain={v.abstain}
-                        badge={{ label: ROLE_LABEL[v.role] ?? v.role }}
+                        badge={{ label: v.role === "main" ? mainRoleLabel(v.motionPolarity) : (ROLE_LABEL[v.role] ?? v.role) }}
                         verdict={verdict}
                         isFinal={isFinal}
                       />
@@ -438,7 +453,18 @@ export default async function DrukPage({
             {mainVoting && (
               <>
                 <div className="mt-7 text-[10px] tracking-[0.16em] uppercase text-destructive mb-3.5">
-                  ✶ {mainVoting.role === "main" ? "Głosowanie końcowe" : `Głosowanie · ${mainVoting.role}`}
+                  ✶ {
+                    // Issue #25 follow-up: role="main" is set by ETL on any
+                    // voting linked to the print (incl. procedural reject-
+                    // motions). Only label "Głosowanie końcowe" when the
+                    // motion was actually the third-reading bill vote
+                    // (polarity="pass"); otherwise describe what was voted on.
+                    mainVoting.role === "main"
+                      ? (mainVoting.motionPolarity === "pass"
+                          ? "Głosowanie końcowe"
+                          : `Głosowanie · ${mainRoleLabel(mainVoting.motionPolarity)}`)
+                      : `Głosowanie · ${mainVoting.role}`
+                  }
                 </div>
                 <div
                   className="font-serif font-medium leading-none tracking-[-0.02em]"

@@ -20,6 +20,11 @@ export type VotingHemicycleData = {
   voting_id: number;
   voting_number: number;
   title: string;
+  // Question actually voted on ("wniosek o odrzucenie projektu...", "głosowanie
+  // nad całością projektu", etc.). Distinct from `title`, which is the agenda
+  // kicker. Surfacing both prevents the procedural-motion-vs-bill-vote
+  // confusion (issue #25 follow-up).
+  topic?: string | null;
   date: string;
   yes: number;
   no: number;
@@ -91,6 +96,33 @@ export function VotingHemicycleCard({
       }>
         {primaryTitle}
       </CardTitle>
+
+      {voting.topic?.trim() && (
+        <div
+          className="font-serif italic"
+          style={{
+            fontSize: 13,
+            lineHeight: 1.45,
+            color: "var(--secondary-foreground)",
+            marginBottom: 12,
+          }}
+        >
+          <span
+            className="font-mono"
+            style={{
+              fontSize: 10,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--muted-foreground)",
+              marginRight: 8,
+              fontStyle: "normal",
+            }}
+          >
+            pytanie:
+          </span>
+          „{voting.topic.trim()}".
+        </div>
+      )}
 
       {linkedPrint?.impact_punch && (
         <DotyczyCallout>“{linkedPrint.impact_punch}”</DotyczyCallout>

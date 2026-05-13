@@ -442,11 +442,13 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
   const filteredClubs = excludeUnaffiliated(clubs, (c) => c.club_ref)
     .filter((c) => (c.total ?? 0) >= MIN_KLUB_AGGREGATE);
 
-  // PNG title block: the voting title (header.title — the official question
-  // read in the chamber) is the primary display. The print's short_title
-  // (when present) sits below as italic context subtitle. Voting title wins
-  // because that's what was actually voted on — the print is incidental.
-  const pngQuestion = clampForPng(header.title, 220);
+  // PNG title block: the question actually voted on is `header.topic`
+  // ("wniosek o odrzucenie projektu w pierwszym czytaniu" etc.) — NOT
+  // `header.title`, which is the agenda kicker ("Pkt. 5 ..."). The print's
+  // short_title (when present) sits below as italic context subtitle.
+  // Issue #25 follow-up: rendering the agenda kicker as the "question" made
+  // reject-motion votes read as votes on the bill itself.
+  const pngQuestion = clampForPng(header.topic?.trim() || header.title, 220);
   const pngSubtitle = clampForPng(shortTitle, 110);
 
   return (
@@ -485,7 +487,7 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
             marginBottom: 24,
           }}
         >
-          {shortTitle ?? header.title}
+          {shortTitle ?? header.topic?.trim() ?? header.title}
         </div>
 
         {/* Live (responsive) rows. */}

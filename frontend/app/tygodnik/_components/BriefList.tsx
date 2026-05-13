@@ -719,6 +719,7 @@ export function BriefList({
                   voting_id: ev.payload.voting_id,
                   voting_number: ev.payload.voting_number,
                   title: ev.payload.title,
+                  topic: ev.payload.topic,
                   date: ev.payload.date,
                   yes: ev.payload.yes,
                   no: ev.payload.no,
