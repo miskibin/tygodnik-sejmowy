@@ -15,7 +15,9 @@ WORKDIR /app
 # repo's packageManager field says (or the bundled pnpm if absent).
 RUN corepack enable
 
-COPY package.json pnpm-lock.yaml* ./
+# pnpm-workspace.yaml carries pnpm settings (ignoredBuiltDependencies) — copy
+# it alongside the manifest so install behavior matches local/CI.
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 # pnpm v10 hard-fails install on ANY ignored postinstall script (including
 # transitive ones like msw, even when added to onlyBuiltDependencies). For
 # this image we don't need any postinstall — sharp ships prebuilt binaries
@@ -31,18 +33,20 @@ RUN corepack enable
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build-time vars. Supabase creds are needed at build because Next prerenders
-# routes that hit the DB (/rss.xml, /alerty, ...) — the same vars are also
-# re-read at runtime, so rotation only needs a rebuild if you flip the URL.
-ARG SUPABASE_URL
-ARG SUPABASE_KEY
+# NEXT_PUBLIC_* is baked into the client bundle so it stays a build ARG —
+# not secret by design.
 ARG NEXT_PUBLIC_FEATURE_ACT_KIND_FILTER=0
-ENV SUPABASE_URL=$SUPABASE_URL
-ENV SUPABASE_KEY=$SUPABASE_KEY
 ENV NEXT_PUBLIC_FEATURE_ACT_KIND_FILTER=$NEXT_PUBLIC_FEATURE_ACT_KIND_FILTER
 
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm run build
+# Supabase creds are needed at build because Next prerenders routes that hit
+# the DB (/rss.xml, /alerty, ...). They're injected via BuildKit secrets so
+# they never end up in image layers, build cache, or `docker history`. The
+# same vars are also re-read at runtime, so rotation only needs a rebuild if
+# you flip the URL.
+RUN --mount=type=secret,id=supabase_url,env=SUPABASE_URL \
+    --mount=type=secret,id=supabase_key,env=SUPABASE_KEY \
+    pnpm run build
 
 # ─── runner ──────────────────────────────────────────────────────────────
 FROM node:${NODE_VERSION} AS runner
@@ -56,8 +60,10 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Run as non-root for blast-radius containment if the app is compromised.
+# nextjs joins the nodejs group so --chown=nextjs:nodejs lands on files the
+# user can actually read via its group membership.
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+    adduser --system --uid 1001 --ingroup nodejs nextjs
 
 # Standalone bundle includes a minimal node_modules with only the deps the
 # server actually needs at runtime.

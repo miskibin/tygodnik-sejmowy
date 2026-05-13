@@ -13,9 +13,12 @@ services:
     build:
       context: ../../frontend
       dockerfile: Dockerfile
-      args:
-        SUPABASE_URL: ${SUPABASE_URL}
-        SUPABASE_KEY: ${SUPABASE_KEY}
+      # SUPABASE_* go in via BuildKit secrets (see top-level `secrets:` block)
+      # so they never persist in image layers, build cache, or `docker history`.
+      # Requires DOCKER_BUILDKIT=1 (default on Compose v2 / Docker 23+).
+      secrets:
+        - supabase_url
+        - supabase_key
     image: sejmograf-frontend:latest
     container_name: sejmograf-frontend
     restart: unless-stopped
@@ -40,3 +43,12 @@ networks:
   supabase:
     external: true
     name: supabase_default
+
+# Build-time secrets sourced from the deploy host's env (Portainer stack vars).
+# `environment:` keeps them in tmpfs during the build, never written to disk
+# on the builder, and never copied into the resulting image.
+secrets:
+  supabase_url:
+    environment: SUPABASE_URL
+  supabase_key:
+    environment: SUPABASE_KEY
