@@ -20,6 +20,9 @@ export type VotingHeader = {
   majority_votes: number | null;
   present: number | null;
   topic: string | null;
+  // Classifier label from `classify_motion_polarity()` (migration 0087).
+  // Drives polarity-aware timeline copy on /glosowanie/[id] — see issue #25.
+  motion_polarity: import("@/lib/promiseAlignment").MotionPolarity | null;
 };
 
 export type ClubTallyRow = {
@@ -36,7 +39,7 @@ export async function getVotingHeader(votingId: number): Promise<VotingHeader | 
   const sb = supabase();
   const { data, error } = await sb
     .from("votings")
-    .select("id, term, voting_number, title, date, yes, no, abstain, not_participating, total_voted, sitting, sitting_day, majority_type, majority_votes, present, topic")
+    .select("id, term, voting_number, title, date, yes, no, abstain, not_participating, total_voted, sitting, sitting_day, majority_type, majority_votes, present, topic, motion_polarity")
     .eq("id", votingId)
     .maybeSingle();
   if (error) throw error;
@@ -58,6 +61,7 @@ export async function getVotingHeader(votingId: number): Promise<VotingHeader | 
     majority_votes: (data.majority_votes as number) ?? null,
     present: (data.present as number) ?? null,
     topic: (data.topic as string) ?? null,
+    motion_polarity: (data.motion_polarity as VotingHeader["motion_polarity"]) ?? null,
   };
 }
 
@@ -412,9 +416,10 @@ export async function getVotingPageData(votingId: number): Promise<VotingPageDat
       presidentSignatureDate: byType.PresidentSignature ? new Date(byType.PresidentSignature) : null,
       promulgationDate: null, // Wired below from acts
       passed,
+      motionPolarity: header.motion_polarity,
     });
   } else {
-    predictedStages = predictStages({ sejmVoteDate: new Date(header.date), passed });
+    predictedStages = predictStages({ sejmVoteDate: new Date(header.date), passed, motionPolarity: header.motion_polarity });
   }
 
   // ─── Promise link via voting_promise_link_mv (E3) ───

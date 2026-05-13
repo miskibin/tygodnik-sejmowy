@@ -1,11 +1,17 @@
 import Link from "next/link";
 import type { PredictedStage } from "@/lib/voting/predict_stages";
+import { computeBillOutcome, billAdvancesToSenate, type BillOutcome } from "@/lib/voting/bill_outcome";
+import type { MotionPolarity } from "@/lib/promiseAlignment";
 import type { VotingPageData } from "@/lib/db/voting";
 
 type Props = {
   stages: PredictedStage[];
   promiseLink: VotingPageData["promiseLink"];
   passed: boolean;
+  // Issue #25: when this vote is a procedural motion (wniosek o odrzucenie,
+  // poprawka, etc.) the bill-level outcome diverges from `passed`. Optional
+  // for back-compat; falls back to legacy `passed`-only copy when omitted.
+  motionPolarity?: MotionPolarity | null;
 };
 
 const PL_MONTHS = [
@@ -177,12 +183,39 @@ function StageItem({ stage }: { stage: PredictedStage }) {
   );
 }
 
+const CLOSED_COPY: Record<Exclude<BillOutcome, "passed">, { subtitle: string; line: string }> = {
+  rejected: {
+    subtitle: "proces zamknięty",
+    line: "Ustawa odrzucona — proces zamknięty.",
+  },
+  continues: {
+    // Failed "wniosek o odrzucenie" — bill survives and goes to committee.
+    // Senate/President timeline doesn't apply yet; show why the timeline
+    // stops here instead of pretending the law was rejected.
+    subtitle: "projekt wraca do dalszych prac",
+    line: "Wniosek o odrzucenie nie uzyskał większości — projekt skierowany do dalszej pracy w komisji. Dalsze etapy zostaną wyznaczone po kolejnych głosowaniach.",
+  },
+  indeterminate: {
+    subtitle: "głosowanie proceduralne",
+    line: "Głosowanie nad wnioskiem proceduralnym — etap projektu w Sejmie bez zmian.",
+  },
+};
+
 export default function WhatsNextTimeline({
   stages,
   promiseLink,
   passed,
+  motionPolarity,
 }: Props) {
-  if (!passed) {
+  const outcome: BillOutcome =
+    motionPolarity === undefined
+      ? (passed ? "passed" : "rejected")
+      : computeBillOutcome(motionPolarity, passed);
+
+  if (!billAdvancesToSenate(outcome)) {
+    // `outcome` here is narrowed: billAdvancesToSenate is true only for "passed",
+    // so this branch is "rejected" | "continues" | "indeterminate".
+    const copy = CLOSED_COPY[outcome as Exclude<BillOutcome, "passed">];
     return (
       <section
         className="px-4 sm:px-8 md:px-14 py-12 sm:py-16"
@@ -194,7 +227,7 @@ export default function WhatsNextTimeline({
           <SectionHead
             label="V"
             title="Co dalej z tą ustawą"
-            subtitle="proces zamknięty"
+            subtitle={copy.subtitle}
           />
           <p
             className="font-serif italic m-0"
@@ -204,7 +237,7 @@ export default function WhatsNextTimeline({
               color: "var(--secondary-foreground)",
             }}
           >
-            Ustawa odrzucona — proces zamknięty.
+            {copy.line}
           </p>
         </div>
       </section>

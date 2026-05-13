@@ -11,6 +11,7 @@ import { VotingRow } from "@/components/voting/VotingRow";
 import { PrintCard } from "@/components/print/PrintCard";
 import { HemicycleChart } from "@/components/tygodnik/HemicycleChart";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
+import { computeBillOutcome, verdictChipLabel } from "@/lib/voting/bill_outcome";
 
 
 export async function generateMetadata({
@@ -246,7 +247,13 @@ export default async function DrukPage({
                 </div>
                 <ul className="font-sans text-[13px]">
                   {relatedVotings.map((v) => {
-                    const passed = v.yes > v.no;
+                    // Motion-level outcome (yes >= majority_votes) — drives
+                    // bill-level chip via polarity. When majority_votes is
+                    // missing fall back to yes>no (legacy heuristic).
+                    const motionPassed = v.majorityVotes != null
+                      ? v.yes >= v.majorityVotes
+                      : v.yes > v.no;
+                    const billOutcome = computeBillOutcome(v.motionPolarity, motionPassed);
                     const isFinal = v.role === "main";
                     // Compose title: "Pos. N · głos. N — title". The leading
                     // "Pos./głos." identifier remains valuable as an internal
@@ -254,6 +261,16 @@ export default async function DrukPage({
                     const headline = v.title
                       ? `Pos. ${v.sitting} · głos. ${v.votingNumber} — ${v.title}`
                       : `Pos. ${v.sitting} · głos. ${v.votingNumber}`;
+                    // Verdict chip semantics:
+                    //   - "passed":        bill advanced — chip green
+                    //   - "rejected":      bill rejected — chip red
+                    //   - "continues":     reject-motion lost — chip green
+                    //                      (bill survives), label "projekt dalej"
+                    //   - "indeterminate": vote tells us nothing about bill
+                    //                      status; render motion-level pass/fail.
+                    const verdict = billOutcome === "indeterminate"
+                      ? { label: motionPassed ? "wniosek przyj." : "wniosek odrzuc.", passed: motionPassed }
+                      : { label: verdictChipLabel(billOutcome), passed: billOutcome === "passed" || billOutcome === "continues" };
                     return (
                       <VotingRow
                         key={v.votingId}
@@ -264,7 +281,7 @@ export default async function DrukPage({
                         no={v.no}
                         abstain={v.abstain}
                         badge={{ label: ROLE_LABEL[v.role] ?? v.role }}
-                        verdict={{ label: passed ? "przyjęte" : "odrzuc.", passed }}
+                        verdict={verdict}
                         isFinal={isFinal}
                       />
                     );

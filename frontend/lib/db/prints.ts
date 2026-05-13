@@ -133,6 +133,10 @@ export type LinkedVoting = {
   no: number;
   abstain: number;
   notParticipating: number;
+  majorityVotes: number | null;
+  // Polarity drives the verdict chip on /druk pages — see issue #25 (a failed
+  // "wniosek o odrzucenie" must NOT render as "ustawa odrzucona").
+  motionPolarity: import("@/lib/promiseAlignment").MotionPolarity | null;
 };
 
 export type ClubTally = {
@@ -345,7 +349,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
   };
   const { data: linkedRows } = await sb
     .from("voting_print_links")
-    .select("voting_id, role, votings:voting_id(id, term, sitting, sitting_day, voting_number, date, title, yes, no, abstain, not_participating)")
+    .select("voting_id, role, votings:voting_id(id, term, sitting, sitting_day, voting_number, date, title, yes, no, abstain, not_participating, majority_votes, motion_polarity)")
     .eq("print_id", printId);
   let mainVoting: LinkedVoting | null = null;
   let relatedVotings: LinkedVoting[] = [];
@@ -374,6 +378,8 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
       no: (v.no as number) ?? 0,
       abstain: (v.abstain as number) ?? 0,
       notParticipating: (v.not_participating as number) ?? 0,
+      majorityVotes: (v.majority_votes as number | null) ?? null,
+      motionPolarity: (v.motion_polarity as LinkedVoting["motionPolarity"]) ?? null,
     }));
     if (relatedVotings.length > 0) mainVoting = relatedVotings[0];
   }
