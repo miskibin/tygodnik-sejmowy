@@ -65,6 +65,7 @@ export default async function SzukajPage({
             />
             <button
               type="submit"
+              data-umami-event="search_submit"
               className="px-3 py-1 rounded-full bg-foreground text-background text-[12px] font-medium"
             >
               Szukaj

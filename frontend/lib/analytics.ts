@@ -1,25 +1,29 @@
 /**
- * GA measurement ID (see `app/layout.tsx` gtag bootstrap).
+ * Umami Cloud (cookieless, no PII).
+ * Website ID configured in app/layout.tsx Script tag.
  *
- * Routing and content depth: rely on automatic `page_view` + path.
+ * Automatic: pageviews, referrers, devices, countries, UTM params.
+ * Outbound link tracking: enable in Umami dashboard (Settings -> Tracking).
  *
- * Custom: `patronite_support_click` with param `placement` — fires only on
- * Patronite CTA taps (see `PatroniteTrackedLink`). Mark as conversion in GA4
- * if you want it in conversion reports.
- *
- * Search Console: GA4 Admin → Product links → link the property for
- * https://tygodniksejmowy.pl
+ * Custom events: prefer declarative `data-umami-event="name"` on the element.
+ * Use trackEvent() only when state must be captured at click time.
  */
 
-export const GA_MEASUREMENT_ID = "G-Q3NSFXD331" as const;
-
-/** Single source for Patronite URLs in UI (masthead, mobile nav, footer). */
 export const PATRONITE_SUPPORT_URL = "https://patronite.pl/tygodniksejmowy" as const;
 
-/** Client-only: one lightweight `gtag` call when user taps Wesprzyj / footer link. */
+type UmamiProps = Record<string, string | number | boolean>;
+type UmamiTrack = (event: string, data?: UmamiProps) => void;
+
+function umamiTrack(): UmamiTrack | null {
+  if (typeof window === "undefined") return null;
+  const w = window as { umami?: { track: UmamiTrack } };
+  return w.umami?.track ?? null;
+}
+
+export function trackEvent(name: string, props?: UmamiProps): void {
+  umamiTrack()?.(name, props);
+}
+
 export function trackPatroniteSupportClick(placement: string): void {
-  if (typeof window === "undefined") return;
-  const g = (window as { gtag?: (...args: unknown[]) => void }).gtag;
-  if (typeof g !== "function") return;
-  g("event", "patronite_support_click", { placement });
+  trackEvent("patronite_support_click", { placement });
 }

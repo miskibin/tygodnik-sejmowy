@@ -2,14 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ProfileProvider } from "@/lib/profile";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ChromeSlot } from "@/components/chrome/ChromeSlot";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
-import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import "./globals.css";
+
+const UMAMI_WEBSITE_ID = "85d3ab78-6c6b-4d21-8552-351cd900cd71";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -153,20 +152,12 @@ export default function RootLayout({
             <SiteFooter />
           </ProfileProvider>
         </ThemeProvider>
-        <Analytics />
-        <SpeedInsights />
         <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id={UMAMI_WEBSITE_ID}
           strategy="afterInteractive"
         />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}');
-          `}
-        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}

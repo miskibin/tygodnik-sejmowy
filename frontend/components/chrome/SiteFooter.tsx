@@ -104,6 +104,7 @@ export async function SiteFooter() {
               rel="noopener noreferrer"
               aria-label="X (Twitter): sejmstats"
               title="X / Twitter"
+              data-umami-event="footer_x_click"
               className="text-muted-foreground hover:text-destructive transition-colors"
             >
               <XIcon className="w-[18px] h-[18px]" />
@@ -114,6 +115,7 @@ export async function SiteFooter() {
               rel="noopener noreferrer"
               aria-label="YouTube"
               title="YouTube"
+              data-umami-event="footer_youtube_click"
               className="text-muted-foreground hover:text-destructive transition-colors"
             >
               <YoutubeIcon className="w-[18px] h-[18px]" />
@@ -124,6 +126,7 @@ export async function SiteFooter() {
               rel="noopener noreferrer"
               aria-label="Kod źródłowy na GitHubie"
               title="GitHub — kod źródłowy"
+              data-umami-event="footer_github_click"
               className="text-muted-foreground hover:text-destructive transition-colors"
             >
               <GithubIcon className="w-[18px] h-[18px]" />
@@ -134,6 +137,7 @@ export async function SiteFooter() {
               rel="noopener noreferrer"
               aria-label="Zgłoś błąd lub pomysł"
               title="Zgłoś błąd lub pomysł"
+              data-umami-event="footer_bug_click"
               className="text-muted-foreground hover:text-destructive transition-colors"
             >
               <Bug className="w-[18px] h-[18px]" aria-hidden />
@@ -142,6 +146,7 @@ export async function SiteFooter() {
               href="/rss.xml"
               aria-label="Kanał RSS"
               title="RSS"
+              data-umami-event="footer_rss_click"
               className="text-muted-foreground hover:text-destructive transition-colors"
             >
               <Rss className="w-[18px] h-[18px]" aria-hidden />
@@ -164,11 +169,24 @@ export async function SiteFooter() {
                   href="https://radoskop.pl/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-umami-event="footer_radoskop_click"
                   className="text-destructive hover:underline"
                 >
                   radoskop.pl
                 </a>
                 <span className="text-muted-foreground"> — ta sama idea dla rad miast i województw</span>
+              </div>
+            </li>
+            <li className="flex items-start gap-2 pt-2 mt-1 border-t border-border/60">
+              <span className="w-4 h-4 mt-0.5 shrink-0" aria-hidden />
+              <div>
+                <Link
+                  href="/polityka-prywatnosci"
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  Polityka prywatności
+                </Link>
+                <span className="text-muted-foreground"> — cookieless, brak danych osobowych</span>
               </div>
             </li>
           </ul>
