@@ -6,7 +6,7 @@ const SITE_URL = "https://tygodniksejmowy.pl";
 
 // Sitemap regenerates on each build (or on request — Next.js treats
 // sitemap.ts as a Route Handler). Scope: static top-level routes +
-// curated dynamic (active MPs + recent 50 sittings). Druki/mowy/wątki
+// curated dynamic (active MPs + recent 50 sittings). Procesy/mowy
 // have thousands of long-tail URLs and are skipped to keep the sitemap
 // scannable; Google still discovers them via internal links.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -22,8 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/o-projekcie`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/komisja`,   lastModified: now, changeFrequency: "weekly",  priority: 0.6 },
     { url: `${SITE_URL}/mowa`,      lastModified: now, changeFrequency: "weekly",  priority: 0.6 },
-    { url: `${SITE_URL}/watek`,     lastModified: now, changeFrequency: "weekly",  priority: 0.6 },
-    { url: `${SITE_URL}/druk`,      lastModified: now, changeFrequency: "daily",   priority: 0.7 },
+    { url: `${SITE_URL}/proces`,    lastModified: now, changeFrequency: "daily",   priority: 0.85 },
     { url: `${SITE_URL}/alerty`,    lastModified: now, changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE_URL}/manifest`,  lastModified: now, changeFrequency: "yearly",  priority: 0.5 },
     { url: `${SITE_URL}/rss.xml`,   lastModified: now, changeFrequency: "daily",   priority: 0.5 },

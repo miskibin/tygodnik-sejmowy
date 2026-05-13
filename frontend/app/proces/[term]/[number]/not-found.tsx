@@ -12,7 +12,7 @@ export default async function DrukNotFound() {
 
   let term = "";
   let number = "";
-  const m = path.match(/\/druk\/([^/?#]+)\/([^/?#]+)/);
+  const m = path.match(/\/proces\/([^/?#]+)\/([^/?#]+)/);
   if (m) {
     term = decodeURIComponent(m[1]);
     number = decodeURIComponent(m[2]);

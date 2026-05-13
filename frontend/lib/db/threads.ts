@@ -50,7 +50,7 @@ export type ThreadDetail = {
   act: ThreadAct | null;
 };
 
-export type ThreadSummary = {
+export type ProcessSummary = {
   processId: number;
   term: number;
   number: string;
@@ -67,9 +67,9 @@ export type ThreadSummary = {
 // (the real legislative-activity signal); processes.last_refreshed_at is an
 // ETL-touch timestamp that only gets stamped for passed rows by refresh-stale-eli,
 // so it can't be used as an "is this thread active" proxy. Default 90d for the
-// /watek view; homepage tile passes a wider window so it still has something
+// /proces view; homepage tile passes a wider window so it still has something
 // to show after a quiet stretch.
-export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<ThreadSummary[]> {
+export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<ProcessSummary[]> {
   const sb = supabase();
   const cutoffDate = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -137,7 +137,7 @@ export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<T
     shortByKey.set(`${r.term}::${r.number}`, r.short_title ?? null);
   }
 
-  const summaries: ThreadSummary[] = rows.map((r) => {
+  const summaries: ProcessSummary[] = rows.map((r) => {
     const latest = latestByProc.get(r.id)!; // guaranteed by procIds derivation
     return {
       processId: r.id,
@@ -164,12 +164,66 @@ export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<T
   return summaries.slice(0, limit);
 }
 
+// Procesy uchwalone (passed=true) w ostatnich N dniach, sortowane wg closure_date desc.
+// Powers the /proces "Uchwalone" group. Same shape as getThreadsInFlight so the
+// list page can render both with one row component.
+export async function getPassedProcesses(limit = 30, cutoffDays = 90): Promise<ProcessSummary[]> {
+  const sb = supabase();
+  const cutoffDate = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+
+  const { data: procs, error: pe } = await sb
+    .from("processes")
+    .select("id, term, number, title, last_refreshed_at, closure_date")
+    .eq("passed", true)
+    .gte("closure_date", cutoffDate)
+    .order("closure_date", { ascending: false })
+    .limit(limit);
+  if (pe) throw pe;
+  const rows = (procs ?? []) as Array<{
+    id: number;
+    term: number;
+    number: string;
+    title: string | null;
+    last_refreshed_at: string | null;
+    closure_date: string | null;
+  }>;
+  if (rows.length === 0) return [];
+
+  const { data: printRows } = await sb
+    .from("prints")
+    .select("term, number, short_title")
+    .in("term", Array.from(new Set(rows.map((r) => r.term))))
+    .in("number", Array.from(new Set(rows.map((r) => r.number))));
+  const shortByKey = new Map<string, string | null>();
+  for (const r of (printRows ?? []) as Array<{
+    term: number;
+    number: string;
+    short_title: string | null;
+  }>) {
+    shortByKey.set(`${r.term}::${r.number}`, r.short_title ?? null);
+  }
+
+  return rows.map((r) => ({
+    processId: r.id,
+    term: r.term,
+    number: r.number,
+    title: r.title ?? "",
+    shortTitle: shortByKey.get(`${r.term}::${r.number}`) ?? null,
+    lastStageType: "Promulgation",
+    lastStageName: "Uchwalono",
+    lastStageDate: r.closure_date,
+    lastRefreshedAt: r.last_refreshed_at ?? null,
+  }));
+}
+
 // Pick a recently-active mid-pipeline thread — one whose latest stage is past
-// "druk" but not yet published. Powers the homepage Wątek tile, where a bill
+// "druk" but not yet published. Powers the homepage Proces tile, where a bill
 // in II czyt. or commission tells a more compelling visual story than a brand-
 // new print sitting at stage 0. Falls back to any latest process if no mid-
 // pipeline match exists. Returns null only if `processes` is empty.
-export async function getLatestThread(): Promise<ThreadSummary | null> {
+export async function getLatestThread(): Promise<ProcessSummary | null> {
   const sb = supabase();
 
   // Bias toward stages that read as "in progress": committee work, II/III

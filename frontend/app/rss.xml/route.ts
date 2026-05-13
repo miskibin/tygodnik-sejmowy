@@ -28,7 +28,7 @@ export async function GET() {
   const briefs = await getBriefItems();
 
   const items: RssItem[] = briefs.map((b) => {
-    const url = `${SITE_URL}/druk/${b.term}/${encodeURIComponent(b.number)}`;
+    const url = `${SITE_URL}/proces/${b.term}/${encodeURIComponent(b.number)}`;
     const punch = b.impactPunch ?? "";
     const summary = b.summaryPlain ?? "";
     const desc = truncate([punch, summary].filter(Boolean).join(" — "), MAX_DESC);

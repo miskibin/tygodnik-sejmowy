@@ -21,7 +21,7 @@ export const SECONDARY_NAV = [
   { href: "/szukaj",       label: "Szukaj",      hint: "wyszukiwarka" },
   { href: "/atlas",        label: "Atlas",       hint: "wykresy" },
   { href: "/sondaze",      label: "Sondaże",     hint: "poparcie partii" },
-  { href: "/watek",        label: "Wątek",       hint: "pełen cykl" },
+  { href: "/proces",       label: "Procesy",     hint: "ścieżka ustaw" },
   { href: "/mowa",         label: "Mowa",        hint: "transkrypcje" },
   { href: "/komisja",      label: "Komisja",     hint: "posiedzenia" },
   { href: "/o-projekcie",  label: "O projekcie", hint: "warsztat" },

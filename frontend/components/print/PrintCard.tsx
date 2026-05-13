@@ -53,7 +53,7 @@ function HitVariant(props: Extract<PrintCardProps, { variant: "hit" }>) {
   const sub = props.impactPunch || props.summaryPlain;
   return (
     <Link
-      href={`/druk/${props.term}/${props.number}`}
+      href={`/proces/${props.term}/${props.number}`}
       className="block py-5 px-1 border-b border-border hover:bg-muted"
     >
       <div className="flex items-baseline justify-between gap-4 mb-2 font-sans text-[10px] tracking-[0.18em] uppercase">
@@ -94,7 +94,7 @@ function RowVariant(props: Extract<PrintCardProps, { variant: "row" }>) {
         </span>
       )}
       <a
-        href={`/druk/${props.term}/${encodeURIComponent(props.number)}`}
+        href={`/proces/${props.term}/${encodeURIComponent(props.number)}`}
         className="text-foreground hover:text-destructive underline decoration-dotted underline-offset-4 flex-1 leading-snug"
       >
         {headline}

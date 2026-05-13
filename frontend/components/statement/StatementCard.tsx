@@ -144,7 +144,7 @@ function FeedVariant(
               return (
                 <Link
                   key={`${p.printTerm}/${p.printNumber}/${p.source}`}
-                  href={`/druk/${p.printTerm}/${p.printNumber}`}
+                  href={`/proces/${p.printTerm}/${p.printNumber}`}
                   className="px-1.5 py-0.5 rounded-sm tracking-wide hover:text-destructive"
                   title={p.shortTitle ?? `druk ${p.printNumber}`}
                   style={{

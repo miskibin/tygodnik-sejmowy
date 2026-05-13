@@ -88,7 +88,7 @@ export async function FeatureTileGrid() {
     .slice(0, 4);
   const pollsTotal = mainPolls.reduce((s, r) => s + r.percentage_avg, 0);
 
-  // ── 03 Wątek — latest active bill ─────────────────────────────────────
+  // ── 03 Proces — latest active bill ─────────────────────────────────────
   const threadStage = thread
     ? stageBucket(thread.lastStageType, thread.lastStageName)
     : -1;
@@ -251,7 +251,7 @@ export async function FeatureTileGrid() {
             key="03"
             num="03"
             kicker="PEŁEN CYKL"
-            title="Wątek"
+            title="Proces"
             description="Każda ustawa — od druku przez czytania, komisje, głosowania, aż po publikację w Dzienniku Ustaw."
             preview={
               <div>
@@ -286,8 +286,8 @@ export async function FeatureTileGrid() {
                 </div>
               </div>
             }
-            href="/watek"
-            ctaLabel="prześledź wątek →"
+            href="/proces"
+            ctaLabel="przejrzyj procesy →"
           />
 
           ,

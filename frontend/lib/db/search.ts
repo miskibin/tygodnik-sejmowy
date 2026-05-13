@@ -147,7 +147,7 @@ export async function vectorSearch(
       impactPunch: (r.impact_punch as string) ?? null,
       changeDate: (r.change_date as string) ?? null,
       distance: dist,
-      href: `/druk/${r.term}/${number}`,
+      href: `/proces/${r.term}/${number}`,
     });
   }
 

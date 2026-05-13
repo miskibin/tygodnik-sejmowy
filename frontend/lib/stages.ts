@@ -1,5 +1,5 @@
 // Polish display labels for `process_stages.stage_type` enum values.
-// Single source of truth — imported by DrukPage, ProcessStageBar, /watek.
+// Single source of truth — imported by ProcesPage, ProcessStageBar, list.
 // Add a label-coverage test before touching this dictionary: missing keys
 // caused raw enum strings to leak through the UI ("16.04 GovermentPosition")
 // per citizen review 2026-05-10.

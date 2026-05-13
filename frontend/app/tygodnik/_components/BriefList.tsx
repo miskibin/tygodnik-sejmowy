@@ -146,7 +146,7 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
     >
       <CardTitle
         size={isFirst ? "hero" : "default"}
-        href={`/druk/${item.term}/${item.number}`}
+        href={`/proces/${item.term}/${item.number}`}
         subtitle={
           item.title && item.shortTitle && item.shortTitle !== item.title
             ? item.title

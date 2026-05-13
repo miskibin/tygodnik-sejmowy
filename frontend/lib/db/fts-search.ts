@@ -188,7 +188,7 @@ export async function ftsSearch(
         id: `${term}:${number}`,
         label: (p.short_title as string) || (p.title as string) || `Druk ${number}`,
         headline,
-        href: `/druk/${term}/${number}`,
+        href: `/proces/${term}/${number}`,
         meta: `Druk ${number}`,
       });
     } else if (r.kind === "promise") {

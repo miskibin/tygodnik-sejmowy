@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 // Shared dotted-bottom-rule row primitive used by:
-//   - /druk/[term]/[number] related-votings list
+//   - /proces/[term]/[number] related-votings list
 //   - /posel/[mpId] VotesList ("wszystko" + "wybrane" tabs)
 // Layout: date col (mono) → title col (serif) → optional badges (stage/role)
 // → numerics (yes/no/abstain) → optional MP-vote pill / verdict pill.

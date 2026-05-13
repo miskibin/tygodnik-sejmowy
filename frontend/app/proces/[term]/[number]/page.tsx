@@ -30,7 +30,7 @@ export async function generateMetadata({
     p.impactPunch?.trim() ||
     p.summaryPlain?.trim()?.slice(0, 240) ||
     `Pełny przebieg projektu ustawy ${term}/${number}: etapy procesu, głosowania, opinie, dopasowane obietnice wyborcze.`;
-  const path = `/druk/${term}/${number}`;
+  const path = `/proces/${term}/${number}`;
   return {
     title,
     description: desc,
@@ -66,7 +66,7 @@ export default async function DrukPage({
   try {
     data = await getPrint(term, number);
   } catch (err) {
-    console.error("[/druk/[term]/[number]] getPrint failed", { term, number, err });
+    console.error("[/proces/[term]/[number]] getPrint failed", { term, number, err });
     return (
       <NotFoundPage
         entity="Druk"
@@ -121,7 +121,7 @@ export default async function DrukPage({
               <>
                 {" "}Dotyczy{" "}
                 <a
-                  href={`/druk/${print.term}/${encodeURIComponent(print.parentNumber)}`}
+                  href={`/proces/${print.term}/${encodeURIComponent(print.parentNumber)}`}
                   className="text-destructive underline decoration-dotted underline-offset-4"
                 >
                   druku nr {print.parentNumber}

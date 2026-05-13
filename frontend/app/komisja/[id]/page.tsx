@@ -243,7 +243,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
               {prints.map((p) => (
                 <li key={p.printId}>
                   <Link
-                    href={`/druki/${p.printId}`}
+                    href={`/proces/${p.term}/${encodeURIComponent(p.number)}`}
                     className="flex items-baseline gap-x-3 gap-y-1 px-4 py-3 hover:bg-muted/40 transition-colors"
                   >
                     <span className="font-mono text-[11px] tracking-wide text-destructive w-16 shrink-0">

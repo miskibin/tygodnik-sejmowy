@@ -26,7 +26,7 @@ type MarkdownTextProps = {
 
 // Internal route prefixes used across sejmograf. External = anything else.
 const INTERNAL_PREFIXES = [
-  "/druk/",
+  "/proces/",
   "/mowa/",
   "/glosowanie/",
   "/posel/",

@@ -37,7 +37,7 @@ const SITEMAP = [
   { href: "/atlas", label: "Atlas" },
   { href: "/mowa", label: "Mowa" },
   { href: "/komisja", label: "Komisje" },
-  { href: "/watek", label: "Wątki" },
+  { href: "/proces", label: "Procesy" },
   { href: "/szukaj", label: "Szukaj" },
   { href: "/alerty", label: "Alerty" },
   { href: "/manifest", label: "Manifest" },

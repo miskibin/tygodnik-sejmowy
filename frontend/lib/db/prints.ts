@@ -152,7 +152,7 @@ export type LinkedVoting = {
   abstain: number;
   notParticipating: number;
   majorityVotes: number | null;
-  // Polarity drives the verdict chip on /druk pages — see issue #25 (a failed
+  // Polarity drives the verdict chip on /proces pages — see issue #25 (a failed
   // "wniosek o odrzucenie" must NOT render as "ustawa odrzucona").
   motionPolarity: import("@/lib/promiseAlignment").MotionPolarity | null;
 };

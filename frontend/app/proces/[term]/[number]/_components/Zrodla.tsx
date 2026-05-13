@@ -19,13 +19,13 @@ export function Zrodla({
 }) {
   const items: Source[] = [
     ...attachments.map<Source>((fn) => ({
-      href: `/api/druk/${term}/${encodeURIComponent(number)}/file/${encodeURIComponent(fn)}`,
+      href: `/api/proces/${term}/${encodeURIComponent(number)}/file/${encodeURIComponent(fn)}`,
       label: fn,
       kind: null,
     })),
     ...subPrints.flatMap<Source>((sp) =>
       sp.attachments.map((fn) => ({
-        href: `/api/druk/${term}/${encodeURIComponent(sp.number)}/file/${encodeURIComponent(fn)}`,
+        href: `/api/proces/${term}/${encodeURIComponent(sp.number)}/file/${encodeURIComponent(fn)}`,
         label: fn,
         kind: sp.shortTitle || sp.number,
       })),

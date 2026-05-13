@@ -49,7 +49,7 @@ function EvidenceCard({ e, variant }: { e: PromiseEvidence; variant: "confirmed"
       }
     >
       <Link
-        href={`/druk/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
+        href={`/proces/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
         className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
         style={{ fontSize: titleSize }}
       >

@@ -86,8 +86,8 @@ export default function VotingSources({
             wynik na sejm.gov.pl ↗
           </GhostExt>
           {linkedPrint && (
-            <GhostInt href={`/druk/${term}/${linkedPrint.number}`}>
-              wątek ustawy →
+            <GhostInt href={`/proces/${term}/${linkedPrint.number}`}>
+              proces ustawy →
             </GhostInt>
           )}
           {promiseLink && (

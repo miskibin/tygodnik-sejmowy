@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 
 // Patterns we detect inline:
-//   - "druk nr 2180" / "druku 2180" / "druki 2180, 2199" → /druk/{term}/{n}
+//   - "druk nr 2180" / "druku 2180" / "druki 2180, 2199" → /proces/{term}/{n}
 //   - "ustawa z dn. 9 marca 2024 r. (Dz.U. 2024 poz. 305)" → ISAP link
 //   - "Dz.U. 2026 poz. 305" / "M.P. 2026 poz. 308" → ISAP link
 // Matches are non-greedy; falls back to inert text if pattern unfamiliar.
@@ -100,7 +100,7 @@ export function CitationText({
             return (
               <a
                 key={i}
-                href={`/druk/${term}/${encodeURIComponent(tok.numbers[0])}`}
+                href={`/proces/${term}/${encodeURIComponent(tok.numbers[0])}`}
                 className="text-destructive underline decoration-dotted underline-offset-2 hover:decoration-solid"
                 title={`Otwórz druk nr ${tok.numbers[0]}`}
               >
@@ -116,7 +116,7 @@ export function CitationText({
                 tok.numbers.includes(part) ? (
                   <a
                     key={j}
-                    href={`/druk/${term}/${encodeURIComponent(part)}`}
+                    href={`/proces/${term}/${encodeURIComponent(part)}`}
                     className="text-destructive underline decoration-dotted underline-offset-2 hover:decoration-solid"
                     title={`Otwórz druk nr ${part}`}
                   >

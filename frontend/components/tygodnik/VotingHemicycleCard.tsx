@@ -16,7 +16,7 @@ import type { MotionPolarity } from "@/lib/promiseAlignment";
 // already in the feed (most votes get merged into their print's card via
 // BriefList, eliminating duplicates). The hemicycle was removed from the
 // feed because it duplicated content with print cards; full hemicycle now
-// lives on /druk/[term]/[number] for users who want the visual breakdown.
+// lives on /proces/[term]/[number] for users who want the visual breakdown.
 
 export type VotingHemicycleData = {
   voting_id: number;
@@ -75,7 +75,7 @@ export function VotingHemicycleCard({
   // Title uses CardTitle `href` (same primitive as print ItemView). Footer keeps
   // only non-duplicate actions: druk link is the title when a print is linked.
   const titleHref = linkedPrint
-    ? `/druk/${voting.term}/${linkedPrint.number}`
+    ? `/proces/${voting.term}/${linkedPrint.number}`
     : `/glosowanie/${voting.voting_id}`;
 
   const links: FooterLink[] = linkedPrint

@@ -161,7 +161,7 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
                   return (
                     <a
                       key={`${row.promiseId}-${i}`}
-                      href={`/druk/${v.printTerm}/${v.printNumber}`}
+                      href={`/proces/${v.printTerm}/${v.printNumber}`}
                       className="cursor-pointer hover:opacity-80"
                     >
                       {inner}

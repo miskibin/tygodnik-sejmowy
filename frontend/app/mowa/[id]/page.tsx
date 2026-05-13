@@ -207,7 +207,7 @@ export default async function StatementPage({
                     {s.printRefs.map((p) => (
                       <li key={`${p.printTerm}-${p.printNumber}`} className="mb-1.5">
                         <Link
-                          href={`/druk/${p.printTerm}/${encodeURIComponent(p.printNumber)}`}
+                          href={`/proces/${p.printTerm}/${encodeURIComponent(p.printNumber)}`}
                           className="text-foreground hover:text-destructive underline decoration-dotted underline-offset-4"
                         >
                           druk {p.printNumber}

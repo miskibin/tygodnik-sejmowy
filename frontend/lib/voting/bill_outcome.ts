@@ -132,7 +132,7 @@ export function verdictStampWords(
   return { headline, tone, motionDescription: motionDescriptionFor(polarity, motionPassed) };
 }
 
-/** Short chip label for VotingRow.verdict on /druk pages. */
+/** Short chip label for VotingRow.verdict on /proces pages. */
 const VERDICT_LABEL_PL: Record<BillOutcome, string> = {
   passed: "ustawa przyjęta",
   rejected: "ustawa odrzucona",

@@ -6,7 +6,7 @@
 // the project died mid-flow (rejected in I czytanie, withdrawn, etc.).
 // The full 6-step bar implies the project is moving toward Prezydent —
 // citizen review caught this contradiction (#4: "Zakończono" badge +
-// progressing 6-step bar on /druk/10/2197). Terminated processes now
+// progressing 6-step bar on /proces/10/2197). Terminated processes now
 // render a compact "Proces zakończony" badge instead.
 
 const STEPS = [
