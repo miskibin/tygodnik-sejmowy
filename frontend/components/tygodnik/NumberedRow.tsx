@@ -29,6 +29,8 @@ export type NumberedRowProps = {
   // Vertical padding preset. ItemView uses the larger preset, all other
   // tygodnik cards use the tighter one.
   pad?: "default" | "loose";
+  /** When false, hide the large left ordinal (e.g. viral quote rows). */
+  showOrdinal?: boolean;
 };
 
 const PAD = {
@@ -48,6 +50,7 @@ export function NumberedRow({
   href,
   className,
   pad = "default",
+  showOrdinal = true,
 }: NumberedRowProps) {
   const padClass = PAD[pad];
   const wrapperClass =
@@ -57,13 +60,15 @@ export function NumberedRow({
 
   const inner = (
     <div className="grid gap-4 md:gap-8 grid-cols-1 md:grid-cols-[140px_1fr] xl:grid-cols-[180px_1fr]">
-      <aside className="font-sans text-[11px] text-muted-foreground tracking-wide flex md:block items-start gap-4">
-        <div
-          className="font-serif italic font-medium shrink-0 mb-0 md:mb-2"
-          style={{ fontSize: indexSize, lineHeight: 1, color: indexColor }}
-        >
-          {indexLabel ?? String(idx + 1).padStart(2, "0")}
-        </div>
+      <aside className="min-w-0 font-sans text-[11px] text-muted-foreground tracking-wide flex md:block items-start gap-4">
+        {showOrdinal && (
+          <div
+            className="font-serif italic font-medium shrink-0 mb-0 md:mb-2"
+            style={{ fontSize: indexSize, lineHeight: 1, color: indexColor }}
+          >
+            {indexLabel ?? String(idx + 1).padStart(2, "0")}
+          </div>
+        )}
         <div className="flex-1 min-w-0 flex flex-col gap-2 md:gap-0 md:contents">
           {kicker && (
             <div className="text-[10px] tracking-[0.16em] uppercase md:mb-3.5 leading-snug">

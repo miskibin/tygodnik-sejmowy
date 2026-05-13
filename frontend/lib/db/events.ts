@@ -190,19 +190,44 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
   );
   const voteIds = voteEvents.map((e) => e.payload.voting_id);
   if (voteIds.length > 0) {
-    const { data: seatRows } = await sb
-      .from("votes")
-      .select("voting_id, mp_id, club_ref, vote")
-      .in("voting_id", voteIds);
+    const [{ data: seatRows }, { data: voteMetaRows }] = await Promise.all([
+      sb
+        .from("votes")
+        .select("voting_id, mp_id, club_ref, vote")
+        .in("voting_id", voteIds),
+      sb
+        .from("votings")
+        .select("id, majority_votes, motion_polarity")
+        .in("id", voteIds),
+    ]);
     type SeatRow = { voting_id: number; mp_id: number; club_ref: string | null; vote: string };
+    type VoteMetaRow = {
+      id: number;
+      majority_votes: number | null;
+      motion_polarity:
+        | "pass"
+        | "reject"
+        | "amendment"
+        | "minority"
+        | "procedural"
+        | "other"
+        | null;
+    };
     const byVoting = new Map<number, Array<{ mp_id: number; club_ref: string | null; vote: string }>>();
     for (const r of (seatRows ?? []) as SeatRow[]) {
       const list = byVoting.get(r.voting_id) ?? [];
       list.push({ mp_id: r.mp_id, club_ref: r.club_ref, vote: r.vote });
       byVoting.set(r.voting_id, list);
     }
+    const metaByVoting = new Map<number, VoteMetaRow>();
+    for (const r of (voteMetaRows ?? []) as VoteMetaRow[]) {
+      metaByVoting.set(r.id, r);
+    }
     for (const ev of voteEvents) {
       ev.payload.seats = byVoting.get(ev.payload.voting_id) ?? [];
+      const meta = metaByVoting.get(ev.payload.voting_id);
+      ev.payload.majority_votes = meta?.majority_votes ?? null;
+      ev.payload.motion_polarity = meta?.motion_polarity ?? null;
     }
   }
 

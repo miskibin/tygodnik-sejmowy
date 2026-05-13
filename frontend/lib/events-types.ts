@@ -6,6 +6,7 @@
 import type { TopicId } from "@/lib/topics";
 import type { PersonaId } from "@/lib/personas";
 import type { BriefItem } from "@/lib/db/prints";
+import type { MotionPolarity } from "@/lib/promiseAlignment";
 import { dbTagsToPersonas } from "@/lib/personas";
 import { dbTagsToTopics } from "@/lib/topics";
 
@@ -87,6 +88,9 @@ export type VoteEventPayload = {
   abstain: number;
   not_participating: number;
   total_voted: number;
+  // Enriched in lib/db/events.ts after fetch from votings.
+  majority_votes?: number | null;
+  motion_polarity?: MotionPolarity | null;
   linked_prints: LinkedPrint[];
   club_tally: ClubTallyRaw[];
   // Enriched in lib/db/events.ts after fetch — per-MP votes for hemicycle.
@@ -176,6 +180,10 @@ export type ViralQuoteEventPayload = {
   key_claims: string[] | null;
   addressee: string | null;
   summary_one_line: string | null;
+  /** Order of this speech in the day's transcript (`proceeding_statements.num`). */
+  statement_num?: number | null;
+  /** Official Sejm proceedings title for the sitting (`proceedings.title`). */
+  proceeding_title?: string | null;
   // Enriched in lib/db/events.ts after fetch.
   photo_url?: string | null;
   klub?: string | null;

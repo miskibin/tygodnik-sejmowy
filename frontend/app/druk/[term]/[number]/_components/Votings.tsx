@@ -77,8 +77,11 @@ export function Votings({
 
 function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTally[] }) {
   const total = v.yes + v.no + v.abstain + v.notParticipating;
+  const hasClubTallies = clubTallies.length > 0;
   const motionPassed = v.majorityVotes != null ? v.yes >= v.majorityVotes : v.yes > v.no;
   const billOutcome = computeBillOutcome(v.motionPolarity, motionPassed);
+  const chip = votingChip(v.motionPolarity, v.role);
+  const emphasizedChip = chip === "całość projektu" || chip === "poprawki";
 
   const verdictLabel = billOutcome === "indeterminate"
     ? motionPassed
@@ -100,7 +103,11 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
 
   return (
     <article
-      className="border border-rule p-6 md:p-7 grid gap-7 lg:gap-8 grid-cols-1 lg:[grid-template-columns:1.1fr_0.9fr_0.9fr]"
+      className={`border border-rule grid grid-cols-1 ${
+        hasClubTallies
+          ? "p-6 md:p-7 gap-7 lg:gap-8 lg:[grid-template-columns:1.1fr_0.9fr_0.9fr]"
+          : "p-5 md:p-6 gap-5 lg:gap-6 lg:[grid-template-columns:1.2fr_0.8fr]"
+      }`}
       style={{ background: "var(--background)" }}
     >
       {/* Left — title + verdict */}
@@ -115,15 +122,23 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
         >
           {shortDate(v.date)} &nbsp;·&nbsp; pos. {v.sitting} &nbsp;·&nbsp; głos. nr {v.votingNumber}
         </div>
+        <div
+          className="font-serif font-medium mb-2 text-foreground"
+          style={{
+            fontSize: emphasizedChip ? 30 : 22,
+            lineHeight: 1.05,
+            letterSpacing: "-0.014em",
+            textTransform: "uppercase",
+          }}
+        >
+          {chip}
+        </div>
         <h3
-          className="font-serif font-medium m-0 mb-1 text-foreground"
-          style={{ fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em" }}
+          className="font-sans m-0 mb-5 text-muted-foreground"
+          style={{ fontSize: 16, lineHeight: 1.35, letterSpacing: "0" }}
         >
           {v.title || `Głosowanie nr ${v.votingNumber}`}.
         </h3>
-        <div className="font-sans text-muted-foreground mb-5" style={{ fontSize: 12.5 }}>
-          {votingChip(v.motionPolarity, v.role)}
-        </div>
         <div
           className="font-serif italic font-medium whitespace-nowrap mb-2.5"
           style={{
@@ -166,34 +181,33 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
             próg: {v.majorityVotes} &nbsp;·&nbsp; suma: {total}
           </div>
         )}
-      </div>
-
-      {/* Right — by club */}
-      <div>
-        {clubTallies.length > 0 ? (
-          <>
-            <Kicker mb={10}>Według klubów</Kicker>
-            <div className="grid gap-1.5">
-              {clubTallies
-                .filter((c) => !isUnaffiliated(c.clubShort))
-                .map((c) => (
-                  <ClubMini key={c.clubShort} c={c} />
-                ))}
-            </div>
-          </>
-        ) : (
+        {!hasClubTallies && (
           <div
-            className="font-mono italic"
+            className="mt-3 font-mono italic"
             style={{
-              fontSize: 11,
+              fontSize: 10.5,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.04em",
+              letterSpacing: "0.03em",
             }}
           >
             Rozkład klubowy dostępny dla głosowania głównego.
           </div>
         )}
       </div>
+
+      {/* Right — by club */}
+      {hasClubTallies && (
+        <div>
+          <Kicker mb={10}>Według klubów</Kicker>
+          <div className="grid gap-1.5">
+            {clubTallies
+              .filter((c) => !isUnaffiliated(c.clubShort))
+              .map((c) => (
+                <ClubMini key={c.clubShort} c={c} />
+              ))}
+          </div>
+        </div>
+      )}
     </article>
   );
 }
@@ -259,7 +273,6 @@ function VoteBar({ v, total }: { v: LinkedVoting; total: number }) {
     { n: v.abstain, color: "var(--warning)", label: "WS." },
     { n: v.notParticipating, color: "var(--border)", label: "NB." },
   ];
-  const thresholdPct = v.majorityVotes != null ? (v.majorityVotes / total) * 100 : null;
   return (
     <div
       className="flex relative"
@@ -269,37 +282,10 @@ function VoteBar({ v, total }: { v: LinkedVoting; total: number }) {
         s.n > 0 ? (
           <div
             key={i}
-            className="relative overflow-hidden"
+            className="overflow-hidden"
             style={{ width: `${(s.n / total) * 100}%`, background: s.color }}
-          >
-            {s.n / total > 0.08 && (
-              <div
-                className="absolute inset-0 px-2 flex items-center justify-between font-mono font-semibold"
-                style={{
-                  fontSize: 11,
-                  color: s.color === "var(--border)" ? "var(--secondary-foreground)" : "var(--background)",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                <span>{s.label}</span>
-                <span>{s.n}</span>
-              </div>
-            )}
-          </div>
+          />
         ) : null,
-      )}
-      {thresholdPct != null && (
-        <div
-          className="absolute"
-          style={{
-            top: -4,
-            bottom: -4,
-            left: `${thresholdPct}%`,
-            width: 1,
-            background: "var(--foreground)",
-          }}
-          aria-label={`Próg większości: ${v.majorityVotes}`}
-        />
       )}
     </div>
   );

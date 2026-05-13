@@ -137,6 +137,19 @@ def cmd_backfill_motion_polarity(
     _print_counts("motion-polarity", backfill_motion_polarity(term=term, dry_run=dry_run))
 
 
+@backfill_app.command("committee-sitting-links")
+def cmd_backfill_committee_sitting_links(
+    term: int = typer.Option(10, "--term", "-t"),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+):
+    """Link prints to real committee sittings via agenda regex."""
+    from supagraf.backfill import backfill_print_committee_sitting_links
+    _print_counts(
+        "committee-sitting-links",
+        backfill_print_committee_sitting_links(term=term, dry_run=dry_run),
+    )
+
+
 @backfill_app.command("all")
 def cmd_backfill_all(dry_run: bool = typer.Option(False, "--dry-run")):
     """Run every backfill in safe dependency order. Idempotent.
@@ -274,6 +287,15 @@ def cmd_daily(
     logger.info("=== daily phase 2-3/6: stage + load ===")
     cmd_stage(None, term=term)
     cmd_load(term=term)
+
+    # Keep print -> committee_sitting links fresh after every load.
+    logger.info("=== daily: backfill committee-sitting-links ===")
+    try:
+        from supagraf.backfill import backfill_print_committee_sitting_links
+        out = backfill_print_committee_sitting_links(term=term)
+        logger.info("backfill_print_committee_sitting_links: {}", out)
+    except Exception as e:
+        logger.error("backfill_print_committee_sitting_links failed: {!r}", e)
 
     if not skip_enrich:
         logger.info("=== daily phase 4/6: enrich (unified) ===")

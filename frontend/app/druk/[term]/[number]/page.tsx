@@ -77,7 +77,18 @@ export default async function DrukPage({
     );
   }
   if (!data) notFound();
-  const { print, stages, mainVoting, votingByClub, relatedVotings, subPrints, matchedPromises, outcome, attachments } = data;
+  const {
+    print,
+    stages,
+    committeeSittings,
+    mainVoting,
+    votingByClub,
+    relatedVotings,
+    subPrints,
+    matchedPromises,
+    outcome,
+    attachments,
+  } = data;
 
   const processStillOpen = !outcome?.passed && !print.currentStageType?.match(/^(End|Withdrawn|Rejected)$/);
 
@@ -91,7 +102,7 @@ export default async function DrukPage({
             { label: print.shortTitle || print.title || `Druk ${print.number}` },
           ]}
           subtitle={
-            `${documentCategoryLabel(print.documentCategory) ?? "druk sejmowy"} · nr ${print.number}` +
+            `${documentCategoryLabel(print.documentCategory) ?? "druk sejmowy"}` +
             (print.changeDate ? ` · ${formatDate(print.changeDate)}` : "")
           }
         />
@@ -134,7 +145,7 @@ export default async function DrukPage({
           votingByClub={votingByClub}
           processStillOpen={!!processStillOpen}
         />
-        <Komisje stages={stages} />
+        <Komisje stages={stages} committeeSittings={committeeSittings} />
 
         {/* Dz.U. publication banner — kept from old layout, repositioned here. */}
         {outcome?.passed && outcome.act && (

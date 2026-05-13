@@ -16,3 +16,4 @@ export { AffectedGroups } from "./AffectedGroups";
 export { CitizenAction } from "./CitizenAction";
 export { EliTimelineStrip } from "./EliTimelineStrip";
 export { DelayStamp } from "./DelayStamp";
+export { TopicChips } from "./TopicChips";

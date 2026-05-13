@@ -9,6 +9,14 @@ export const PRIMARY_NAV = [
   { href: "/obietnice", label: "Obietnice" },
 ] as const;
 
+// Sidebar "Główne" gets two extra high-traffic explorer routes while desktop
+// top nav stays lean (PRIMARY_NAV + Więcej).
+export const SIDEBAR_MAIN_NAV = [
+  ...PRIMARY_NAV,
+  { href: "/atlas",   label: "Atlas" },
+  { href: "/sondaze", label: "Sondaże" },
+] as const;
+
 export const SECONDARY_NAV = [
   { href: "/szukaj",       label: "Szukaj",      hint: "wyszukiwarka" },
   { href: "/atlas",        label: "Atlas",       hint: "wykresy" },

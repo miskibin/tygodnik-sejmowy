@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { HomeIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,7 +24,7 @@ export type PageBreadcrumbProps = {
 
 export function PageBreadcrumb({ items, subtitle, className }: PageBreadcrumbProps) {
   return (
-    <nav className={`mb-6 sm:mb-8 pb-4 sm:pb-5 border-b border-border ${className ?? ""}`}>
+    <nav className={cn("mb-6 sm:mb-8 pb-4 sm:pb-5 border-b border-border", className)}>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

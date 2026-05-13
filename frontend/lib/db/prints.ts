@@ -80,6 +80,9 @@ export type BriefItem = {
     no: number;
     abstain: number;
     notParticipating: number;
+    // Optional semantics for verdict labeling in compact vote bars.
+    majorityVotes?: number | null;
+    motionPolarity?: import("@/lib/promiseAlignment").MotionPolarity | null;
   } | null;
 };
 
@@ -117,6 +120,21 @@ export type ProcessStage = {
     topic?: string;
     description?: string;
   } | null;
+};
+
+export type LinkedCommitteeSitting = {
+  sittingId: number;
+  committeeId: number;
+  committeeCode: string;
+  committeeName: string;
+  sittingNum: number;
+  date: string | null;
+  startAt: string | null;
+  endAt: string | null;
+  room: string | null;
+  status: "FINISHED" | "ONGOING" | "PLANNED" | null;
+  matchedPrintNumber: string;
+  videoPlayerLink: string | null;
 };
 
 // Canonical voting linked to this print via voting_print_links (mig 0047).
@@ -210,6 +228,7 @@ export type MainVotingSeat = {
 export type PrintWithStages = {
   print: PrintDetail;
   stages: ProcessStage[];
+  committeeSittings: LinkedCommitteeSitting[];
   // Canonical "ostatnie głosowanie" — sourced from voting_print_links FK
   // (migration 0047), not from process_stages.voting JSON sort.
   mainVoting: LinkedVoting | null;
@@ -338,6 +357,29 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     decision: (r.decision as string) ?? null,
     sittingNum: (r.sitting_num as number | null) ?? null,
     voting: (r.voting as ProcessStage["voting"]) ?? null,
+  }));
+
+  const { data: committeeSittingRows } = await sb
+    .from("print_committee_sittings_v")
+    .select(
+      "sitting_id, committee_id, committee_code, committee_name, sitting_num, date, start_at, end_at, room, status, matched_print_number, video_player_link",
+    )
+    .eq("print_id", printId)
+    .order("date", { ascending: false, nullsFirst: false })
+    .order("sitting_num", { ascending: false });
+  const committeeSittings: LinkedCommitteeSitting[] = (committeeSittingRows ?? []).map((r) => ({
+    sittingId: (r.sitting_id as number) ?? 0,
+    committeeId: (r.committee_id as number) ?? 0,
+    committeeCode: (r.committee_code as string) ?? "",
+    committeeName: (r.committee_name as string) ?? "",
+    sittingNum: (r.sitting_num as number) ?? 0,
+    date: (r.date as string | null) ?? null,
+    startAt: (r.start_at as string | null) ?? null,
+    endAt: (r.end_at as string | null) ?? null,
+    room: (r.room as string | null) ?? null,
+    status: ((r.status as string | null) ?? null) as LinkedCommitteeSitting["status"],
+    matchedPrintNumber: (r.matched_print_number as string) ?? "",
+    videoPlayerLink: (r.video_player_link as string | null) ?? null,
   }));
 
   // Canonical voting from voting_print_links FK (mig 0047). Role priority:
@@ -511,7 +553,19 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     voting: null,
   };
 
-  return { print: detail, stages, mainVoting, votingByClub, mainVotingSeats, relatedVotings, subPrints, matchedPromises, outcome, attachments };
+  return {
+    print: detail,
+    stages,
+    committeeSittings,
+    mainVoting,
+    votingByClub,
+    mainVotingSeats,
+    relatedVotings,
+    subPrints,
+    matchedPromises,
+    outcome,
+    attachments,
+  };
 }
 
 // Per-sitting (posiedzenie) metadata for the Tygodnik archive index + nav.

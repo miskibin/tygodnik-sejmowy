@@ -22,6 +22,9 @@ from supagraf.backfill.etl_review import (  # noqa: F401
 from supagraf.backfill.mp_club_history import (  # noqa: F401
     backfill_mp_club_history,
 )
+from supagraf.backfill.committee_sitting_links import (  # noqa: F401
+    backfill_print_committee_sitting_links,
+)
 from supagraf.backfill.motion_polarity import (  # noqa: F401
     backfill_motion_polarity,
     classify as classify_motion_polarity,

@@ -71,6 +71,13 @@ function stageNote(s: ProcessStage): string {
   return s.stageName || stageLabel(s.stageType, s.stageName);
 }
 
+function compactStageLabel(s: ProcessStage): string {
+  const full = stageLabel(s.stageType, s.stageName);
+  const reading = full.match(/\b([ivx]+)\s+czytanie\b/i);
+  if (reading) return `${reading[1].toUpperCase()} czytanie`;
+  return full;
+}
+
 // Attach a vote-branch indicator to a station when a rejection / amendment
 // motion exists in relatedVotings with a matching date. Only "reject" /
 // "amendment" polarities surface as a branch — "pass" votings are
@@ -109,7 +116,7 @@ function buildStations(stages: ProcessStage[], votings: LinkedVoting[]): Station
     const status: StationStatus = !hasDate ? "future" : isLastDated ? "current" : "done";
     return {
       ord: s.ord,
-      stage: stageLabel(s.stageType, s.stageName),
+      stage: compactStageLabel(s),
       date: s.stageDate,
       actor: stageActor(s.stageType),
       note: stageNote(s),
@@ -256,6 +263,14 @@ export function Timeline({
   const real = buildStations(stages, votings);
   const future = processStillOpen ? projectFutureStations(stages) : [];
   const stations: Station[] = [...real, ...future];
+  const hasFailedTerminal = stages.some(
+    (s) => s.depth === 0 && (s.stageType === "Rejected" || s.stageType === "Withdrawn"),
+  );
+  const currentTone = processStillOpen
+    ? "var(--warning)"
+    : hasFailedTerminal
+    ? "var(--destructive)"
+    : "var(--success)";
   const currentIdx = stations.findIndex((s) => s.status === "current");
   const [hover, setHover] = useState<number>(currentIdx >= 0 ? currentIdx : stations.length - 1);
 
@@ -275,33 +290,42 @@ export function Timeline({
   const active = stations[hover] ?? stations[stations.length - 1];
 
   return (
-    <section className="py-10 border-b border-border" style={{ background: "var(--muted)" }}>
+    <section className="py-12 md:py-14 border-b border-border" style={{ background: "var(--muted)" }}>
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
         <SectionHead title="Ścieżka projektu" />
 
         {/* Horizontal station strip — md+ */}
         <div
-          className="hidden md:grid"
+          className="hidden md:grid mt-2 md:mt-3"
           style={{ gridTemplateColumns: `repeat(${stations.length}, minmax(0, 1fr))` }}
         >
           {stations.map((s, i) => (
             <StationCell
               key={i}
+              index={i}
               s={s}
               first={i === 0}
               last={i === stations.length - 1}
               prevDone={i > 0 && stations[i - 1].status !== "future"}
               hover={hover === i}
+              currentTone={currentTone}
               onHover={() => setHover(i)}
             />
           ))}
         </div>
 
         {/* Vertical stack — mobile */}
-        <ol className="md:hidden relative pl-6 m-0">
-          <div className="absolute left-2 top-2 bottom-2 w-px bg-border" />
+        <ol className="md:hidden relative m-0 pl-0">
+          <div className="absolute left-3 top-3 bottom-3 w-px bg-border" />
           {stations.map((s, i) => (
-            <StationRowMobile key={i} s={s} active={hover === i} onClick={() => setHover(i)} />
+            <StationRowMobile
+              key={i}
+              s={s}
+              active={hover === i}
+              last={i === stations.length - 1}
+              currentTone={currentTone}
+              onClick={() => setHover(i)}
+            />
           ))}
         </ol>
 
@@ -313,7 +337,7 @@ export function Timeline({
 
 function SectionHead({ title, subtitle }: { title: string; subtitle?: string | null }) {
   return (
-    <div className="mb-5 flex items-baseline gap-4 border-b border-border pb-3">
+      <div className="mb-6 md:mb-7 flex items-baseline gap-4 border-b border-border pb-3">
       <h2
         className="font-serif font-medium text-foreground m-0"
         style={{ fontSize: 22, lineHeight: 1, letterSpacing: "-0.015em" }}
@@ -326,18 +350,22 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
 }
 
 function StationCell({
+  index,
   s,
   first,
   last,
   prevDone,
   hover,
+  currentTone,
   onHover,
 }: {
+  index: number;
   s: Station;
   first: boolean;
   last: boolean;
   prevDone: boolean;
   hover: boolean;
+  currentTone: string;
   onHover: () => void;
 }) {
   const done = s.status === "done";
@@ -355,31 +383,54 @@ function StationCell({
       aria-current={current ? "step" : undefined}
       className="flex flex-col items-stretch cursor-pointer relative outline-none focus-visible:[&_.station-date]:underline"
     >
+      {!last && (
+        <div
+          aria-hidden
+          className="absolute right-0 top-[88px] bottom-8 w-px"
+          style={{ background: hover ? "var(--rule)" : "var(--border)", opacity: 0.55 }}
+        />
+      )}
       {/* Branch slot — fixed height so all stations align */}
-      <div className="h-10 relative">
+      <div className="h-24 relative">
         {s.branch && (
           <>
             <div
-              className="absolute top-[22px] left-1/2 bottom-0 w-px"
+              className="absolute top-[56px] left-1/2 bottom-0 w-px"
               style={{ background: "var(--destructive)", transform: "translateX(-0.5px)" }}
             />
             <div
-              className="absolute top-[14px] left-1/2 -translate-x-1/2 w-2.5 h-2.5"
+              className="absolute top-[48px] left-1/2 -translate-x-1/2 w-2.5 h-2.5"
               style={{ background: "var(--destructive)" }}
             />
             <div
-              className="absolute top-[-2px] left-1/2 -translate-x-1/2 whitespace-nowrap font-mono uppercase px-2 py-px"
+              className="absolute top-0 left-1/2 -translate-x-1/2 font-mono uppercase px-2 py-1 leading-[1.2] text-center"
               style={{
                 fontSize: 9.5,
                 color: "var(--destructive-deep)",
                 letterSpacing: "0.1em",
                 background: "var(--muted)",
+                width: "calc(100% - 8px)",
+                maxWidth: 180,
+                whiteSpace: "normal",
+                textWrap: "pretty" as never,
               }}
             >
               głos. {s.branch.vote} · {s.branch.label} → <strong>{s.branch.result}</strong>
             </div>
           </>
         )}
+      </div>
+
+      <div
+        className="text-center font-mono"
+        style={{
+          height: 12,
+          fontSize: 9,
+          color: current ? "var(--destructive)" : "var(--muted-foreground)",
+          letterSpacing: "0.12em",
+        }}
+      >
+        {String(index + 1).padStart(2, "0")}
       </div>
 
       {/* Stage label */}
@@ -402,7 +453,7 @@ function StationCell({
         style={{
           height: 16,
           fontSize: 9.5,
-          color: "var(--destructive)",
+          color: currentTone,
           letterSpacing: "0.16em",
         }}
       >
@@ -428,12 +479,12 @@ function StationCell({
           style={{
             width: nodeSize,
             height: nodeSize,
-            background: done ? "var(--foreground)" : current ? "var(--destructive)" : "var(--muted)",
+            background: done ? "var(--foreground)" : current ? currentTone : "var(--muted)",
             border: future ? "1.5px dashed var(--muted-foreground)" : "3px solid var(--muted)",
             boxShadow: done
               ? "0 0 0 2px var(--foreground)"
               : current
-              ? "0 0 0 2px var(--destructive), 0 0 0 6px var(--highlight)"
+              ? `0 0 0 2px ${currentTone}, 0 0 0 6px var(--highlight)`
               : "none",
             transition: "all 0.18s",
           }}
@@ -444,7 +495,7 @@ function StationCell({
         className="station-date mt-3 text-center font-mono"
         style={{
           fontSize: 11,
-          color: done ? "var(--foreground)" : current ? "var(--destructive)" : "var(--muted-foreground)",
+          color: done ? "var(--foreground)" : current ? currentTone : "var(--muted-foreground)",
           letterSpacing: "0.04em",
           fontWeight: current ? 600 : 400,
         }}
@@ -456,7 +507,7 @@ function StationCell({
         className="mt-2 mx-3"
         style={{
           height: 2,
-          background: hover ? (current ? "var(--destructive)" : "var(--foreground)") : "transparent",
+          background: hover ? (current ? currentTone : "var(--foreground)") : "transparent",
           transition: "background 0.15s",
         }}
       />
@@ -467,41 +518,46 @@ function StationCell({
 function StationRowMobile({
   s,
   active,
+  last,
+  currentTone,
   onClick,
 }: {
   s: Station;
   active: boolean;
+  last: boolean;
+  currentTone: string;
   onClick: () => void;
 }) {
   const done = s.status === "done";
   const current = s.status === "current";
   const future = s.status === "future";
   return (
-    <li className="py-3 relative cursor-pointer" onClick={onClick}>
+    <li className="relative py-3.5 pl-8 pr-1 cursor-pointer select-none" onClick={onClick}>
       <span
-        className="absolute -left-[14px] top-4 rounded-full"
+        className="absolute top-[18px] left-[7px] rounded-full z-[1]"
         style={{
           width: 11,
           height: 11,
-          background: done ? "var(--foreground)" : current ? "var(--destructive)" : "var(--muted)",
+          background: done ? "var(--foreground)" : current ? currentTone : "var(--muted)",
           border: future ? "1.5px dashed var(--muted-foreground)" : "2px solid var(--muted)",
-          boxShadow: current ? "0 0 0 2px var(--destructive)" : done ? "0 0 0 1px var(--foreground)" : "none",
+          boxShadow: current ? `0 0 0 2px ${currentTone}` : done ? "0 0 0 1px var(--foreground)" : "none",
         }}
       />
       <div
-        className="font-mono uppercase mb-0.5"
+        className="font-mono uppercase mb-1"
         style={{
           fontSize: 10,
           letterSpacing: "0.12em",
-          color: current ? "var(--destructive)" : "var(--muted-foreground)",
+          color: current ? currentTone : "var(--muted-foreground)",
         }}
       >
-        {shortDate(s.date)} {current && "· tu jesteśmy"}
+        {shortDate(s.date)}
+        {current && <> &nbsp;·&nbsp; TU JESTEŚMY</>}
       </div>
       <div
-        className="font-serif font-medium"
+        className="font-serif font-medium leading-tight"
         style={{
-          fontSize: 16,
+          fontSize: 17,
           color: done || current ? "var(--foreground)" : "var(--muted-foreground)",
           textDecoration: active ? "underline" : "none",
           textUnderlineOffset: 4,
@@ -509,6 +565,16 @@ function StationRowMobile({
       >
         {s.stage}
       </div>
+      {!last && (
+        <div
+          className="mt-3"
+          style={{
+            height: 1,
+            background: "var(--border)",
+            opacity: 0.65,
+          }}
+        />
+      )}
     </li>
   );
 }

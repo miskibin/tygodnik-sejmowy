@@ -77,7 +77,7 @@ export function LandingHero() {
             style={{ fontSize: "clamp(2.25rem, 6.5vw, 4.25rem)", textWrap: "balance" }}
           >
             Co Sejm uchwalił, odrzucił, o&nbsp;czym debatował.{" "}
-            <span className="italic text-destructive">W&nbsp;piątek, w&nbsp;Twoim okręgu.</span>
+            <span className="italic text-destructive">Krótko, jasno, co&nbsp;tydzień.</span>
           </h1>
           <p className="font-serif italic text-[15px] md:text-[17px] text-secondary-foreground leading-[1.55] m-0 mb-5 max-w-[520px]">
             Wydanie piątkowe na&nbsp;stronie i&nbsp;przez{" "}

@@ -4,6 +4,8 @@
 // on the druk detail page where there's room to study it). Embedded inside
 // print cards when a voting links to that print, and used standalone for
 // votes whose linked print isn't already in the feed.
+import { computeBillOutcome, verdictChipLabel } from "@/lib/voting/bill_outcome";
+import type { MotionPolarity } from "@/lib/promiseAlignment";
 
 export type VoteResult = {
   votingNumber: number;
@@ -11,20 +13,35 @@ export type VoteResult = {
   no: number;
   abstain: number;
   notParticipating: number;
+  majorityVotes?: number | null;
+  motionPolarity?: MotionPolarity | null;
 };
 
+function motionTypeLabel(polarity: MotionPolarity | null | undefined): string | null {
+  if (polarity === "pass") return "nad całością projektu";
+  if (polarity === "reject") return "o odrzucenie projektu";
+  if (polarity === "amendment") return "nad poprawkami";
+  if (polarity === "minority") return "nad wnioskiem mniejszości";
+  if (polarity === "procedural") return "nad wnioskiem proceduralnym";
+  return null;
+}
+
 function verdict(r: VoteResult): { label: string; color: string } {
-  // Tally-level verdict only — describes which side prevailed in this specific
-  // vote, NOT what happened to the project. Citizen review (#1) caught that
-  // labeling a first-reading "wniosek o odrzucenie" vote as "odrzucona" reads
-  // as "ustawa odrzucona" — exactly inverted (failed reject motion = project
-  // continues to committee). True project status needs a `motion_kind` field
-  // (final_passage / reject_in_first_reading / senate_amendments / etc.) on
-  // the vote enrichment, which is on the ETL roadmap. Until then, the chip
-  // describes the wniosek outcome only — agenda caption next to it (e.g.
-  // "Wniosek o odrzucenie projektu w I czytaniu") gives the reader the rest.
-  if (r.yes > r.no) return { label: "wniosek przyjęty", color: "var(--success)" };
-  if (r.no > r.yes) return { label: "wniosek odrzucony", color: "var(--destructive)" };
+  const motionPassed = r.majorityVotes != null ? r.yes >= r.majorityVotes : r.yes > r.no;
+  if (r.motionPolarity) {
+    const outcome = computeBillOutcome(r.motionPolarity, motionPassed);
+    if (outcome !== "indeterminate") {
+      return {
+        label: verdictChipLabel(outcome),
+        color: outcome === "passed" || outcome === "continues"
+          ? "var(--success)"
+          : "var(--destructive)",
+      };
+    }
+  }
+  // Fallback when motion polarity is missing/indeterminate: describe motion only.
+  if (motionPassed) return { label: "wniosek przyjęty", color: "var(--success)" };
+  if (!motionPassed) return { label: "wniosek odrzucony", color: "var(--destructive)" };
   return { label: "remis", color: "var(--muted-foreground)" };
 }
 
@@ -34,12 +51,18 @@ export function VoteResultBar({ result }: { result: VoteResult }) {
   const noPct = total > 0 ? (result.no / total) * 100 : 0;
   const abstPct = total > 0 ? (result.abstain / total) * 100 : 0;
   const v = verdict(result);
+  const motionLabel = motionTypeLabel(result.motionPolarity);
 
   return (
     <div className="my-5">
       <div className="flex items-baseline justify-between mb-2 gap-2">
         <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground">
           wynik głosowania nr {result.votingNumber}
+          {motionLabel && (
+            <span className="normal-case tracking-normal font-sans text-[11px] ml-1.5">
+              · {motionLabel}
+            </span>
+          )}
         </span>
         <span
           className="font-mono text-[10px] tracking-[0.18em] uppercase font-semibold px-2.5 py-0.5 rounded-full border"

@@ -1,6 +1,7 @@
 import type { ClubTallyRow } from "@/lib/db/voting";
 import { isUnaffiliated } from "@/lib/clubs/filter";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
+import { CitationText } from "@/components/tygodnik/CitationLink";
 import { NumberedRow } from "@/components/tygodnik/NumberedRow";
 import {
   CardTitle,
@@ -9,6 +10,7 @@ import {
   VoteResultBar,
   type FooterLink,
 } from "@/components/tygodnik/atoms";
+import type { MotionPolarity } from "@/lib/promiseAlignment";
 
 // Standalone vote card — used only for votes whose linked print isn't
 // already in the feed (most votes get merged into their print's card via
@@ -30,6 +32,8 @@ export type VotingHemicycleData = {
   no: number;
   abstain: number;
   not_participating: number;
+  majority_votes?: number | null;
+  motion_polarity?: MotionPolarity | null;
   term: number;
 };
 
@@ -68,20 +72,22 @@ export function VotingHemicycleCard({
     .sort((a, b) => b.total - a.total)
     .slice(0, KLUB_LIMIT);
 
-  const links: FooterLink[] = [
-    { href: `/glosowanie/${voting.voting_id}`, label: "wyniki głosowania", primary: true },
-  ];
-  if (linkedPrint) {
-    links.push({
-      href: `/druk/${voting.term}/${linkedPrint.number}`,
-      label: "pełny tekst druku",
-    });
-  }
+  // Title uses CardTitle `href` (same primitive as print ItemView). Footer keeps
+  // only non-duplicate actions: druk link is the title when a print is linked.
+  const titleHref = linkedPrint
+    ? `/druk/${voting.term}/${linkedPrint.number}`
+    : `/glosowanie/${voting.voting_id}`;
+
+  const links: FooterLink[] = linkedPrint
+    ? [{ href: `/glosowanie/${voting.voting_id}`, label: "wyniki głosowania", primary: true }]
+    : [];
 
   return (
     <NumberedRow
       idx={idx}
-      indexSize={56}
+      indexSize={64}
+      indexColor="var(--destructive)"
+      pad="loose"
       meta={
         <>
           <div>głos. <span className="text-foreground">{voting.voting_number}</span></div>
@@ -89,11 +95,14 @@ export function VotingHemicycleCard({
         </>
       }
     >
-      <CardTitle subtitle={
-        <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground">
-          {agendaCaption}
-        </span>
-      }>
+      <CardTitle
+        href={titleHref}
+        subtitle={
+          <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground">
+            {agendaCaption}
+          </span>
+        }
+      >
         {primaryTitle}
       </CardTitle>
 
@@ -120,12 +129,14 @@ export function VotingHemicycleCard({
           >
             pytanie:
           </span>
-          „{voting.topic.trim()}".
+          „{voting.topic.trim()}”.
         </div>
       )}
 
       {linkedPrint?.impact_punch && (
-        <DotyczyCallout>“{linkedPrint.impact_punch}”</DotyczyCallout>
+        <DotyczyCallout>
+          “<CitationText term={voting.term}>{linkedPrint.impact_punch}</CitationText>”
+        </DotyczyCallout>
       )}
 
       <VoteResultBar
@@ -135,6 +146,8 @@ export function VotingHemicycleCard({
           no: voting.no,
           abstain: voting.abstain,
           notParticipating: voting.not_participating,
+          majorityVotes: voting.majority_votes ?? null,
+          motionPolarity: voting.motion_polarity ?? null,
         }}
       />
 

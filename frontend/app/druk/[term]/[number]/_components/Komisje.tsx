@@ -1,5 +1,5 @@
 import { stageLabel } from "@/lib/stages";
-import type { ProcessStage } from "@/lib/db/prints";
+import type { LinkedCommitteeSitting, ProcessStage } from "@/lib/db/prints";
 
 function SectionHead({ title, subtitle }: { title: string; subtitle?: string | null }) {
   return (
@@ -20,30 +20,98 @@ function shortDate(iso: string | null): string {
   return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
+/** Nagłówek sekcji: „5 posiedzeń”, „2 posiedzenia”, „1 posiedzenie”. */
+function committeeSectionSubtitle(count: number): string {
+  if (count === 1) return "1 posiedzenie";
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return `${count} posiedzenia`;
+  }
+  return `${count} posiedzeń`;
+}
+
 const COMMITTEE_STAGE_TYPES = new Set(["CommitteeWork", "CommitteeReport", "Reading"]);
 
-export function Komisje({ stages }: { stages: ProcessStage[] }) {
-  // Pull every committee-related stage at any depth. Sub-stages (depth > 0)
-  // are typically the actual posiedzenia — top-level CommitteeWork is the
-  // umbrella entry that contains them.
-  const rows = stages.filter((s) => COMMITTEE_STAGE_TYPES.has(s.stageType));
+type KomisjaRowData = {
+  date: string | null;
+  title: string;
+  subtitle: string | null;
+  stageTag: string | null;
+  sourceTag: string | null;
+  videoPlayerLink: string | null;
+};
+
+function committeeStatusLabel(status: LinkedCommitteeSitting["status"]): string | null {
+  if (status === "FINISHED") return "zakończone";
+  if (status === "ONGOING") return "w toku";
+  if (status === "PLANNED") return "zaplanowane";
+  return null;
+}
+
+function rowsFromRealSittings(sittings: LinkedCommitteeSitting[]): KomisjaRowData[] {
+  return sittings.map((s) => {
+    const status = committeeStatusLabel(s.status);
+    const details = [
+      `nr ${s.sittingNum}`,
+      s.room ? `sala ${s.room}` : null,
+      status,
+    ].filter(Boolean);
+    return {
+      date: s.date,
+      title: s.committeeName || `Komisja ${s.committeeCode}`,
+      subtitle: details.length > 0 ? details.join(" · ") : null,
+      stageTag: `druk nr ${s.matchedPrintNumber}`,
+      sourceTag: "w agendzie",
+      videoPlayerLink: s.videoPlayerLink,
+    };
+  });
+}
+
+function rowsFromProcessStages(stages: ProcessStage[]): KomisjaRowData[] {
+  return stages
+    .filter((s) => COMMITTEE_STAGE_TYPES.has(s.stageType))
+    .map((s) => {
+      const label = stageLabel(s.stageType, s.stageName);
+      return {
+        date: s.stageDate,
+        title: label,
+        subtitle: s.stageName && s.stageName !== label ? s.stageName : null,
+        stageTag: s.depth > 0 ? `etap ${s.depth}` : null,
+        sourceTag: null,
+        videoPlayerLink: null,
+      };
+    });
+}
+
+export function Komisje({
+  stages,
+  committeeSittings,
+}: {
+  stages: ProcessStage[];
+  committeeSittings: LinkedCommitteeSitting[];
+}) {
+  const rows =
+    committeeSittings.length > 0
+      ? rowsFromRealSittings(committeeSittings)
+      : rowsFromProcessStages(stages);
   if (rows.length === 0) return null;
 
   return (
     <section
-      className="py-12 border-b border-border"
+      className="py-12 px-3 md:px-4 lg:px-5 border-b border-border"
       style={{ background: "var(--muted)" }}
     >
       <div className="max-w-[1280px] mx-auto">
-        <SectionHead title="Posiedzenia komisji" subtitle={`${rows.length} ${rows.length === 1 ? "posiedzenie" : "posiedzeń"}`} />
+        <SectionHead title="Posiedzenia komisji" subtitle={committeeSectionSubtitle(rows.length)} />
 
-        <ol className="list-none p-0 m-0 relative">
+        <ol className="list-none p-0 m-0 mt-1 md:mt-2 relative">
           <div
             className="absolute top-2 bottom-3 w-px"
             style={{ left: 96, background: "var(--border)" }}
           />
           {rows.map((k, i) => (
-            <KomisjaRow key={`${k.ord}-${i}`} k={k} />
+            <KomisjaRow key={`${k.date ?? "pending"}-${k.title}-${i}`} row={k} />
           ))}
         </ol>
       </div>
@@ -51,9 +119,8 @@ export function Komisje({ stages }: { stages: ProcessStage[] }) {
   );
 }
 
-function KomisjaRow({ k }: { k: ProcessStage }) {
-  const pending = !k.stageDate;
-  const label = stageLabel(k.stageType, k.stageName);
+function KomisjaRow({ row }: { row: KomisjaRowData }) {
+  const pending = !row.date;
   return (
     <li
       className="grid py-4.5 border-b border-border relative"
@@ -69,16 +136,8 @@ function KomisjaRow({ k }: { k: ProcessStage }) {
           className="font-mono font-medium"
           style={{ fontSize: 13, color: pending ? "var(--muted-foreground)" : "var(--foreground)" }}
         >
-          {pending ? "oczekuje" : shortDate(k.stageDate)}
+          {pending ? "oczekuje" : shortDate(row.date)}
         </div>
-        {k.sittingNum != null && (
-          <div
-            className="font-mono"
-            style={{ fontSize: 10, color: "var(--muted-foreground)", letterSpacing: "0.08em" }}
-          >
-            pos. {k.sittingNum}
-          </div>
-        )}
         <div
           className="absolute rounded-full"
           style={{
@@ -99,9 +158,9 @@ function KomisjaRow({ k }: { k: ProcessStage }) {
             className="font-serif font-medium m-0 text-foreground"
             style={{ fontSize: 18, letterSpacing: "-0.005em" }}
           >
-            {label}
+            {row.title}
           </h3>
-          {k.depth > 0 && (
+          {row.stageTag && (
             <span
               className="font-mono uppercase"
               style={{
@@ -110,11 +169,23 @@ function KomisjaRow({ k }: { k: ProcessStage }) {
                 letterSpacing: "0.12em",
               }}
             >
-              etap {k.depth}
+              {row.stageTag}
+            </span>
+          )}
+          {row.sourceTag && (
+            <span
+              className="font-sans not-italic normal-case"
+              style={{
+                fontSize: 11,
+                color: "var(--muted-foreground)",
+                letterSpacing: "0.02em",
+              }}
+            >
+              {row.sourceTag}
             </span>
           )}
         </div>
-        {k.stageName && k.stageName !== label && (
+        {row.subtitle && (
           <p
             className="font-serif m-0 mb-1.5"
             style={{
@@ -125,20 +196,23 @@ function KomisjaRow({ k }: { k: ProcessStage }) {
               maxWidth: 760,
             }}
           >
-            {k.stageName}
+            {row.subtitle}
           </p>
         )}
-        {k.decision && (
-          <div
-            className="inline-flex items-center gap-2 font-mono uppercase"
+        {row.videoPlayerLink && (
+          <a
+            href={row.videoPlayerLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-sans underline decoration-dotted underline-offset-4 hover:decoration-solid"
             style={{
-              fontSize: 10.5,
-              color: pending ? "var(--muted-foreground)" : "var(--destructive-deep)",
-              letterSpacing: "0.1em",
+              fontSize: 12.5,
+              color: "var(--destructive-deep)",
+              letterSpacing: "0",
             }}
           >
-            → {k.decision}
-          </div>
+            Nagranie z posiedzenia
+          </a>
         )}
       </div>
     </li>

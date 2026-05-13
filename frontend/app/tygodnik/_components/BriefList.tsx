@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
-import { TOPICS, type TopicId } from "@/lib/topics";
+import { dbTagsToTopics, type TopicId } from "@/lib/topics";
 import { personasImplyAnyTopic } from "@/lib/topic-persona-map";
 import { Ornament } from "@/components/chrome/Ornament";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
@@ -34,6 +34,7 @@ import {
   DelayStamp,
   VoteResultBar,
   type KpiSlot,
+  TopicChips,
   type FooterLink,
 } from "@/components/tygodnik/atoms";
 import { FilterBar } from "./FilterBar";
@@ -115,10 +116,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       onClick: () => setExpanded((v) => !v),
       primary: true,
     },
-    {
-      href: `/druk/${item.term}/${item.number}`,
-      label: "pełny tekst druku",
-    },
   ];
   if (item.voting) {
     links.push({
@@ -149,6 +146,7 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
     >
       <CardTitle
         size={isFirst ? "hero" : "default"}
+        href={`/druk/${item.term}/${item.number}`}
         subtitle={
           item.title && item.shortTitle && item.shortTitle !== item.title
             ? item.title
@@ -157,6 +155,8 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       >
         {item.shortTitle || item.title}
       </CardTitle>
+
+      <TopicChips topicIds={item.topics} className="mb-3" />
 
       <StanceSponsorChip
         stance={item.stance}
@@ -382,14 +382,47 @@ function InterpellationCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType:
 
 function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_quote" }>; idx: number }) {
   const s = ev.payload;
-  const links: FooterLink[] = [
-    { href: `/mowa/${s.statement_id}`, label: "czytaj wypowiedź", primary: true },
-  ];
+  const quote = s.viral_quote?.trim() ?? "";
+  const summary = s.summary_one_line?.trim() ?? "";
+  const proceedingPt = s.proceeding_title?.trim() ?? "";
+  const fallbackTitle =
+    summary && summary !== quote ? summary : quote ? "Cytat z debaty sejmowej" : "Wypowiedź sejmowa";
+  const headline = proceedingPt || fallbackTitle;
+  const role = s.function?.trim();
+  const hideRole =
+    !role ||
+    role.localeCompare("poseł", "pl", { sensitivity: "accent" }) === 0;
+
+  const subtitle =
+    proceedingPt
+      ? summary && summary !== quote
+        ? (
+            <span className="font-sans not-italic normal-case tracking-normal text-muted-foreground">
+              {summary}
+            </span>
+          )
+        : s.viral_reason?.trim()
+          ? (
+              <span className="font-sans not-italic normal-case tracking-normal text-muted-foreground">
+                {s.viral_reason.trim()}
+              </span>
+            )
+          : null
+      : s.viral_reason?.trim()
+        ? (
+            <span className="font-sans not-italic normal-case tracking-normal text-muted-foreground">
+              {s.viral_reason.trim()}
+            </span>
+          )
+        : null;
+
   return (
     <NumberedRow
       idx={idx}
+      pad="loose"
+      showOrdinal={false}
       asideExtra={
-        <div className="mb-2">
+        <div className="mb-2 w-full min-w-0">
           <MPAvatar
             mpId={s.mp_id}
             name={s.speaker_name}
@@ -397,16 +430,29 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
             klub={s.klub}
             district={s.district}
             size={48}
+            shape="squircle"
+            layout="stacked"
+            clubBadgeSize="lg"
           />
         </div>
       }
       meta={
         <>
-          {s.function && <div>{s.function}</div>}
-          <div className="mt-1">{formatDate(s.date)}</div>
+          {!hideRole && (
+            <div className="normal-case tracking-normal">{role}</div>
+          )}
+          <div className={`normal-case tracking-normal ${!hideRole ? "mt-1.5" : ""}`}>
+            {formatDate(s.date)}
+          </div>
         </>
       }
     >
+      <CardTitle href={`/mowa/${s.statement_id}`} subtitle={subtitle}>
+        <span className="block break-words text-pretty [overflow-wrap:anywhere]">
+          {headline}
+        </span>
+      </CardTitle>
+
       {s.viral_quote && (
         <blockquote
           className="font-serif italic m-0 mb-4 relative"
@@ -418,7 +464,6 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
             borderLeft: "3px solid var(--destructive)",
           }}
         >
-          {/* Oversized opening quote-mark — type-specific visual flourish. */}
           <span
             aria-hidden
             className="font-serif text-destructive absolute"
@@ -436,26 +481,11 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
           <CitationText term={ev.term}>{s.viral_quote}</CitationText>
         </blockquote>
       )}
-      {s.summary_one_line && (
-        <div className="font-sans text-xs text-muted-foreground mb-2">
-          <CitationText term={ev.term}>{s.summary_one_line}</CitationText>
-        </div>
-      )}
-      <div className="flex flex-wrap gap-2 font-sans text-[10px] mb-1">
-        {(s.topic_tags ?? []).slice(0, 3).map((t) => {
-          const meta = (TOPICS as Record<string, { label: string; icon: string; color: string } | undefined>)[t];
-          return (
-            <span
-              key={t}
-              className="rounded-full border border-border"
-              style={{ padding: "1px 8px", color: meta?.color ?? "var(--secondary-foreground)" }}
-            >
-              {meta?.icon} {meta?.label ?? t}
-            </span>
-          );
-        })}
-      </div>
-      <FooterLinks links={links} />
+      <TopicChips
+        topicIds={dbTagsToTopics(s.topic_tags ?? null).slice(0, 3)}
+        size="sm"
+        className="mb-1"
+      />
     </NumberedRow>
   );
 }
@@ -483,11 +513,6 @@ function ArchiveIndex({ sittings, currentSitting }: { sittings: SittingInfo[]; c
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 mt-4">
             {populated.map((s) => {
               const isCurrent = s.sittingNum === currentSitting;
-              const topicsLabel = s.topTopics
-                .slice(0, 3)
-                .map((t) => TOPICS[t]?.label)
-                .filter(Boolean)
-                .join(" · ");
               return (
                 <Link
                   key={s.sittingNum}
@@ -510,11 +535,11 @@ function ArchiveIndex({ sittings, currentSitting }: { sittings: SittingInfo[]; c
                   <div className="font-sans text-[11px] text-secondary-foreground mt-1 leading-tight">
                     {formatDateRange(s.firstDate, s.lastDate)}
                   </div>
-                  {topicsLabel && (
-                    <div className="font-sans text-[10px] text-muted-foreground mt-1 leading-tight truncate">
-                      {topicsLabel}
-                    </div>
-                  )}
+                  <TopicChips
+                    topicIds={s.topTopics.slice(0, 3)}
+                    size="sm"
+                    className="mt-1.5 text-muted-foreground"
+                  />
                 </Link>
               );
             })}
@@ -565,6 +590,8 @@ export function BriefList({
           no: v.payload.no,
           abstain: v.payload.abstain,
           notParticipating: v.payload.not_participating,
+          majorityVotes: v.payload.majority_votes ?? null,
+          motionPolarity: v.payload.motion_polarity ?? null,
         };
       } else {
         unmerged.push(v);
@@ -603,87 +630,97 @@ export function BriefList({
 
   return (
     <div className="bg-background font-serif text-foreground">
-      {/* Masthead */}
+      {/* Masthead — issue identity + volume stats read as one editorial strip */}
       <div className="border-b border-rule">
-       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-3 md:pt-8 md:pb-5">
-        <PageBreadcrumb
-          items={
-            isIndex
-              ? [{ label: "Tygodnik" }]
-              : [
-                  { label: "Tygodnik", href: "/tygodnik" },
-                  { label: `Nr ${sitting.sittingNum}` },
-                ]
-          }
-        />
-        <div className="flex items-baseline justify-end gap-3 md:gap-4 flex-wrap mb-1.5 md:mb-2.5">
-          <div className="font-mono text-[10.5px] md:text-[11px] text-muted-foreground tracking-wide">
-            {partitioned.prints.length} {partitioned.prints.length === 1 ? "projekt" : "projektów"}
-            {" · "}
-            {partitioned.votes.length} {partitioned.votes.length === 1 ? "głosowanie" : "głosowań"}
-            {" · "}
-            {partitioned.viralQuotes.length} {partitioned.viralQuotes.length === 1 ? "wystąpienie" : "wystąpień"}
-            {hydrated && filterActive && partitioned.prints.length > 0 && (
-              // Desktop only — on mobile this CTA moves below the prints
-              // section to free up above-the-fold real estate.
-              <button
-                onClick={() => setShowAll((v) => !v)}
-                className="hidden md:inline ml-3 cursor-pointer text-destructive underline decoration-dotted underline-offset-4"
-              >
-                {showAll ? "✓ wszystkie projekty" : "pokaż wszystkie projekty"}
-              </button>
-            )}
+        <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-4 md:pt-8 md:pb-6">
+          <PageBreadcrumb
+            className="mb-4 md:mb-5 pb-3 md:pb-4"
+            items={
+              isIndex
+                ? [{ label: "Tygodnik" }]
+                : [
+                    { label: "Tygodnik", href: "/tygodnik" },
+                    { label: `Nr ${sitting.sittingNum}` },
+                  ]
+            }
+          />
+
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8 lg:gap-12">
+            {/* Issue navigation — always first on narrow viewports */}
+            <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-2 md:gap-3 font-sans text-[11.5px] md:text-[12.5px]">
+              {olderSitting ? (
+                <Link
+                  href={`/tygodnik/p/${olderSitting.sittingNum}`}
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  title={`Posiedzenie ${olderSitting.sittingNum} · ${formatDateRange(olderSitting.firstDate, olderSitting.lastDate)}`}
+                >
+                  ← Nr {olderSitting.sittingNum}
+                </Link>
+              ) : (
+                <span className="text-border">← Nr —</span>
+              )}
+              <span className="text-foreground font-medium">
+                <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mr-1.5 md:mr-2">
+                  Nr
+                </span>
+                <span
+                  className="font-serif italic text-destructive tabular-nums"
+                  style={{ fontSize: "clamp(15px, 4vw, 18px)" }}
+                >
+                  {sitting.sittingNum}
+                </span>
+                <span className="text-muted-foreground mx-1.5 md:mx-2">·</span>
+                <span className="text-secondary-foreground">{dateRange}</span>
+              </span>
+              {newerSitting ? (
+                <Link
+                  href={`/tygodnik/p/${newerSitting.sittingNum}`}
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  title={`Posiedzenie ${newerSitting.sittingNum} · ${formatDateRange(newerSitting.firstDate, newerSitting.lastDate)}`}
+                >
+                  Nr {newerSitting.sittingNum} →
+                </Link>
+              ) : (
+                <span className="text-border">Nr — →</span>
+              )}
+            </div>
+
+            {/* Volume snapshot */}
+            <div className="shrink-0 md:max-w-[22rem] md:text-right">
+              <div className="inline-block w-full rounded-xl border border-border/70 bg-muted/25 px-3.5 py-2.5 text-left md:inline md:w-auto md:border-0 md:bg-transparent md:px-0 md:py-0 md:text-right">
+                <div className="font-mono text-[10.5px] md:text-[11px] text-muted-foreground tracking-wide [word-spacing:-0.02em]">
+                  {partitioned.prints.length} {partitioned.prints.length === 1 ? "projekt" : "projektów"}
+                  <span className="mx-1.5 text-border">·</span>
+                  {partitioned.votes.length} {partitioned.votes.length === 1 ? "głosowanie" : "głosowań"}
+                  <span className="mx-1.5 text-border">·</span>
+                  {partitioned.viralQuotes.length}{" "}
+                  {partitioned.viralQuotes.length === 1 ? "wystąpienie" : "wystąpień"}
+                  {hydrated && filterActive && partitioned.prints.length > 0 && (
+                    <button
+                      onClick={() => setShowAll((v) => !v)}
+                      className="hidden md:inline cursor-pointer text-destructive underline decoration-dotted underline-offset-4 md:ml-3"
+                    >
+                      {showAll ? "✓ wszystkie projekty" : "pokaż wszystkie projekty"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {lightWeek && (
+            <div
+              className="font-serif italic text-secondary-foreground mt-4 mb-0 max-w-2xl"
+              style={{ fontSize: 14, lineHeight: 1.55, textWrap: "pretty" }}
+            >
+              Tym razem to {totalEvents} {totalEvents === 1 ? "rzecz" : "rzeczy"}. W typowym tygodniu pojawia się od 5 do 20 rzeczy wartych przeczytania — żadnego wypełniacza.
+            </div>
+          )}
+
+          <div className="mt-5 border-t border-border/70 pt-5 md:mt-6 md:pt-6">
+            <FilterBar />
           </div>
         </div>
-
-        {lightWeek && (
-          <div
-            className="font-serif italic text-secondary-foreground mb-3"
-            style={{ fontSize: 14, lineHeight: 1.55, textWrap: "pretty" }}
-          >
-            Tym razem to {totalEvents} {totalEvents === 1 ? "rzecz" : "rzeczy"}. W typowym tygodniu pojawia się od 5 do 20 rzeczy wartych przeczytania — żadnego wypełniacza.
-          </div>
-        )}
-
-        {/* Issue band — single-line on mobile via smaller font + tighter gap */}
-        <div className="flex items-baseline gap-2 md:gap-3 flex-wrap mb-2.5 md:mb-4 font-sans text-[11.5px] md:text-[12.5px]">
-          {olderSitting ? (
-            <Link
-              href={`/tygodnik/p/${olderSitting.sittingNum}`}
-              className="text-muted-foreground hover:text-destructive transition-colors"
-              title={`Posiedzenie ${olderSitting.sittingNum} · ${formatDateRange(olderSitting.firstDate, olderSitting.lastDate)}`}
-            >
-              ← Nr {olderSitting.sittingNum}
-            </Link>
-          ) : (
-            <span className="text-border">← Nr —</span>
-          )}
-          <span className="text-foreground font-medium">
-            <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mr-1.5 md:mr-2">Nr</span>
-            <span
-              className="font-serif italic text-destructive"
-              style={{ fontSize: "clamp(15px, 4vw, 18px)" }}
-            >
-              {sitting.sittingNum}
-            </span>
-            <span className="text-muted-foreground mx-1.5 md:mx-2">·</span>
-            <span className="text-secondary-foreground">{dateRange}</span>
-          </span>
-          {newerSitting ? (
-            <Link
-              href={`/tygodnik/p/${newerSitting.sittingNum}`}
-              className="text-muted-foreground hover:text-destructive transition-colors"
-              title={`Posiedzenie ${newerSitting.sittingNum} · ${formatDateRange(newerSitting.firstDate, newerSitting.lastDate)}`}
-            >
-              Nr {newerSitting.sittingNum} →
-            </Link>
-          ) : (
-            <span className="text-border">Nr — →</span>
-          )}
-        </div>
-
-        <FilterBar />
-       </div>
       </div>
 
       {/* Sections */}
@@ -725,6 +762,8 @@ export function BriefList({
                   no: ev.payload.no,
                   abstain: ev.payload.abstain,
                   not_participating: ev.payload.not_participating,
+                  majority_votes: ev.payload.majority_votes ?? null,
+                  motion_polarity: ev.payload.motion_polarity ?? null,
                   term: ev.term,
                 }}
                 clubs={ev.payload.club_tally ?? []}

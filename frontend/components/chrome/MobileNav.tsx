@@ -8,7 +8,7 @@ import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 import { useProfile } from "@/lib/profile";
 import { ThemeToggle } from "./ThemeToggle";
-import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
+import { SIDEBAR_MAIN_NAV, SECONDARY_NAV, isActive } from "./nav-items";
 export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
   const pathname = usePathname();
   const { postcode, district } = useProfile();
@@ -61,7 +61,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
           <div className="font-mono text-[10px] text-muted-foreground tracking-[0.16em] uppercase px-3 pb-2">
             Główne
           </div>
-          {PRIMARY_NAV.map((item) => {
+          {SIDEBAR_MAIN_NAV.map((item) => {
             const on = isActive(pathname, item.href);
             return (
               <Link
@@ -82,7 +82,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
           <div className="font-mono text-[10px] text-muted-foreground tracking-[0.16em] uppercase px-3 pt-5 pb-2">
             Działy
           </div>
-          {SECONDARY_NAV.map((s) => {
+          {SECONDARY_NAV.filter((s) => s.href !== "/atlas" && s.href !== "/sondaze").map((s) => {
             const on = isActive(pathname, s.href);
             return (
               <Link
