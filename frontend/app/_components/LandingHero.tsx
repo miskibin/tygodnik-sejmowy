@@ -11,6 +11,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { TypewriterCitation, type TypewriterQuote } from "./TypewriterCitation";
 
 // Polish postcode = NN-NNN. Profile + /api/postcode expect the dashed
 // form; the OTP component edits raw digits, so we marshal at the boundary.
@@ -22,7 +23,11 @@ function postcodeToDigits(pc: string): string {
   return pc.replace(/\D/g, "").slice(0, 5);
 }
 
-export function LandingHero() {
+export function LandingHero({
+  viralQuotes = [],
+}: {
+  viralQuotes?: TypewriterQuote[];
+}) {
   const router = useRouter();
   const {
     postcode,
@@ -73,17 +78,21 @@ export function LandingHero() {
             ✶ tygodnik obywatelski
           </div>
           <h1
-            className="font-medium tracking-[-0.035em] leading-[0.98] m-0 mb-5"
-            style={{ fontSize: "clamp(2.25rem, 6.5vw, 4.25rem)", textWrap: "balance" }}
+            className="font-medium tracking-[-0.04em] leading-[0.95] m-0 mb-4"
+            style={{ fontSize: "clamp(2.5rem, 7vw, 4.75rem)", textWrap: "balance" }}
           >
-            Co Sejm uchwalił, odrzucił, o&nbsp;czym debatował.{" "}
-            <span className="italic text-destructive">Krótko, jasno, co&nbsp;tydzień.</span>
+            Sejm — <span className="italic text-destructive">co&nbsp;tydzień.</span>
           </h1>
-          <p className="font-serif italic text-[15px] md:text-[17px] text-secondary-foreground leading-[1.55] m-0 mb-5 max-w-[520px]">
-            Wydanie piątkowe na&nbsp;stronie i&nbsp;przez{" "}
-            <a href="/rss.xml" className="not-italic font-mono text-[13px] tracking-wide text-destructive hover:underline">RSS</a>. Wpisz kod pocztowy obok, by zobaczyć, co dotyczy Twojego okręgu.
+          <p className="font-serif italic text-[15px] md:text-[17px] text-secondary-foreground leading-[1.5] m-0 max-w-[480px]">
+            Krótko, jasno. Wydanie piątkowe na&nbsp;stronie i&nbsp;przez{" "}
+            <a href="/rss.xml" className="not-italic font-mono text-[13px] tracking-wide text-destructive hover:underline">RSS</a>.
           </p>
-          <div className="flex gap-4 font-mono text-[11px] text-muted-foreground tracking-wide">
+
+          {viralQuotes.length > 0 && (
+            <TypewriterCitation quotes={viralQuotes} />
+          )}
+
+          <div className="mt-7 flex gap-4 font-mono text-[11px] text-muted-foreground tracking-wide">
             <span><strong className="text-foreground font-semibold">3 min</strong> czytania</span>
             <span className="text-border">·</span>
             <span><strong className="text-foreground font-semibold">5–7</strong> rzeczy</span>

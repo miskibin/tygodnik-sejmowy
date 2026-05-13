@@ -301,7 +301,15 @@ def cmd_daily(
         logger.info("=== daily phase 4/6: enrich (unified) ===")
         # 0 limit = process every pending print. Daily volume is tiny
         # (~5-30 new drukı per session day) so cost stays bounded.
-        cmd_enrich_prints(kind=EnrichKind.unified, term=term, limit=0)
+        # cmd_enrich_prints raises typer.Exit(3) when ANY print fails; for
+        # daily we swallow it because the per-print loop already logs +
+        # records each failure (model_runs / enrichment_failures), and
+        # partial failures (404 PDFs, OCR misses) are routine production
+        # data noise that should NOT abort embed/refresh phases below.
+        try:
+            cmd_enrich_prints(kind=EnrichKind.unified, term=term, limit=0)
+        except typer.Exit as e:
+            logger.warning("enrich unified completed with failures (exit={}); continuing", e.exit_code)
 
     if not skip_enrich:
         # Utterance LLM enrichment (viral_score/quote/tone/topic_tags/...).
@@ -340,7 +348,10 @@ def cmd_daily(
 
     if not skip_embed:
         logger.info("=== daily phase 5/6: embed ===")
-        cmd_enrich_prints(kind=EnrichKind.embed, term=term, limit=0)
+        try:
+            cmd_enrich_prints(kind=EnrichKind.embed, term=term, limit=0)
+        except typer.Exit as e:
+            logger.warning("enrich embed completed with failures (exit={}); continuing", e.exit_code)
         # Statements + promises run via their dedicated commands.
         try:
             cmd_enrich_statements(term=term, limit=0)

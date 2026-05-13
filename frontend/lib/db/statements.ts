@@ -666,6 +666,84 @@ export async function getStatementsOverview(term = DEFAULT_TERM): Promise<Statem
   return { totalStatements: stmts.count ?? 0, totalProceedings: procs.count ?? 0 };
 }
 
+// Top-N viral quotes across the whole term, joined with the speaker's current
+// club. Powers the landing-page typewriter + carousel and the /mowa "Najgłośniej
+// w Sejmie" feed. We don't filter by date — viral_score already biases toward
+// memorable + recent. Keep payload tiny (no body_text, no preamble parsing).
+export type ViralStatementCard = {
+  id: number;
+  speakerName: string | null;
+  function: string | null;
+  clubRef: string | null;
+  viralQuote: string;
+  viralReason: string | null;
+  tone: string | null;
+  topicTags: string[];
+  date: string | null;
+  proceedingNumber: number | null;
+  viralScore: number | null;
+};
+
+export async function getTopViralStatements(
+  limit = 12,
+  term = DEFAULT_TERM,
+): Promise<ViralStatementCard[]> {
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("proceeding_statements")
+    .select(
+      "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, topic_tags, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+    )
+    .eq("term", term)
+    .not("viral_quote", "is", null)
+    .order("viral_score", { ascending: false, nullsFirst: false })
+    .limit(limit);
+  if (error) throw error;
+
+  type Row = {
+    id: number;
+    mp_id: number | null;
+    speaker_name: string | null;
+    function: string | null;
+    viral_quote: string | null;
+    viral_reason: string | null;
+    viral_score: number | string | null;
+    tone: string | null;
+    topic_tags: string[] | null;
+    start_datetime: string | null;
+    proceeding_day: { date: string | null; proceeding: { number: number | null } | null } | null;
+  };
+  const rows = (data ?? []) as unknown as Row[];
+
+  const mpIds = Array.from(new Set(rows.map((r) => r.mp_id).filter((x): x is number => x != null)));
+  const clubMap = await resolveMpClubs(mpIds, term);
+
+  return rows
+    .filter((r) => r.viral_quote && r.viral_quote.trim().length > 0)
+    .map((r): ViralStatementCard => {
+      const club = r.mp_id != null ? clubMap.get(r.mp_id) ?? null : null;
+      const score =
+        r.viral_score == null
+          ? null
+          : typeof r.viral_score === "string"
+            ? parseFloat(r.viral_score)
+            : r.viral_score;
+      return {
+        id: r.id,
+        speakerName: r.speaker_name,
+        function: r.function,
+        clubRef: club?.clubRef ?? null,
+        viralQuote: r.viral_quote!,
+        viralReason: r.viral_reason,
+        tone: r.tone,
+        topicTags: r.topic_tags ?? [],
+        date: r.start_datetime ?? r.proceeding_day?.date ?? null,
+        proceedingNumber: r.proceeding_day?.proceeding?.number ?? null,
+        viralScore: score,
+      };
+    });
+}
+
 export async function getActiveClubs(term = DEFAULT_TERM): Promise<{ clubId: string; name: string }[]> {
   const sb = supabase();
   const { data, error } = await sb

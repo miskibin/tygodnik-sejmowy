@@ -1,7 +1,25 @@
+import Image from "next/image";
 import { Ornament } from "@/components/chrome/Ornament";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
+
+const TEAM = [
+  {
+    photo: "/michal-skibinski.jpg",
+    name: "Michał Skibiński",
+    role: "Twórca · solo",
+    body:
+      "Jednoosobowo prowadzi cały projekt: ETL z Sejmu, baza, warstwa LLM, frontend, design i tekst. Wszystko, co widać i czego nie widać.",
+  },
+  {
+    photo: "/michal-sulawiak.jpg",
+    name: "Michał Suławiak",
+    role: "Burza mózgów · hardware · DevOps",
+    body:
+      "Sponsoruje serwer (mixvm) i utrzymuje infrastrukturę — Supabase, Postgres, deploy. Partner do rozkminiania architektury i kierunku produktu.",
+  },
+] as const;
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
   try { return await p; } catch { return fallback; }
@@ -188,6 +206,52 @@ export default async function AboutProjectPage() {
                 ))}
               </div>
             </div>
+          </div>
+        </section>
+
+        <Ornament />
+
+        <section className="mb-16">
+          <SectionTitle
+            kicker="Zespół"
+            title="Kto za tym stoi"
+          />
+          <div className="grid gap-6 md:grid-cols-2">
+            {TEAM.map((person) => (
+              <article
+                key={person.name}
+                className="border border-border bg-muted/40 rounded-lg p-5 flex gap-5"
+              >
+                <div className="shrink-0">
+                  <div
+                    className="relative w-[96px] h-[96px] sm:w-[112px] sm:h-[112px] overflow-hidden border-2 border-foreground bg-background"
+                    style={{ boxShadow: "4px 4px 0 var(--foreground)" }}
+                  >
+                    <Image
+                      src={person.photo}
+                      alt={person.name}
+                      fill
+                      sizes="112px"
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+                    {person.role}
+                  </div>
+                  <h3
+                    className="font-serif font-medium m-0 text-[20px] leading-tight"
+                    style={{ letterSpacing: "-0.01em" }}
+                  >
+                    {person.name}
+                  </h3>
+                  <p className="m-0 mt-2.5 font-sans text-[13px] leading-[1.65] text-secondary-foreground">
+                    {person.body}
+                  </p>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
