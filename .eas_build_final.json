@@ -1,0 +1,54 @@
+Γÿà eas-cli@18.12.3 is now available.
+To upgrade, run:
+npm install -g eas-cli
+Proceeding with outdated version.
+
+- Fetching the buildΓÇª\ Fetching the buildΓÇªΓêÜ Found a matching build for the project @miskibin/tygodnik-sejmowy
+{
+  "id": "03dd7403-a428-4ca4-ac14-fe340ade6100",
+  "status": "FINISHED",
+  "platform": "ANDROID",
+  "artifacts": {
+    "buildUrl": "https://expo.dev/artifacts/eas/tFxGoP47yYM2XU2wm7Lvf.apk",
+    "applicationArchiveUrl": "https://expo.dev/artifacts/eas/tFxGoP47yYM2XU2wm7Lvf.apk"
+  },
+  "fingerprint": {
+    "id": "019e228c-fb97-7efc-bcb5-013715ec133c",
+    "hash": "ee287a385de128b2360c5b9867bb7398e616fa1b"
+  },
+  "initiatingActor": {
+    "id": "ffc58f74-e722-4c0f-8aae-e54ec84d7d5e",
+    "displayName": "miskibin"
+  },
+  "logFiles": [
+    "https://storage.googleapis.com/eas-workflows-production/logs/9db152fa-dde5-4745-8de0-18dbfe813af9/03dd7403-a428-4ca4-ac14-fe340ade6100/2026-05-13T18%3A26%3A37Z-25ddd44a-dcf0-4eca-aa3d-3bbd65f8326a.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260513%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260513T183836Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=2554fa941de88107d8cda03487c065909a0262082dfa1870370ea492841e8e87718481533c39f8d3a5371f2b6a8eb7995577b3a2504ae2141bc0c44c13ab845f7042bc56aacb28b2569e6af9a7e383664774d47bcb0493a939fbccede4faee732838cdcf1513b2189e481ffc4d91fd0130fd4b0c8ea29b892fb846f3b7b6fac3b1255d582553dcd9bc86a1cf0586711bf749dd6611bde8c1a6284b3e536147869c3d78bfcaffeb96e9376e843ca07487be9d8b3ea84a1b41524c96d76c99bd8fcc3a5a98c2c72fc50cf3164b1852ac7be242bdaebcf5b871b790b944d7aa16b34955a8b76b0a909e61a2955510ff5a56bb5fc54578b816d0a0d0f6d0aa383150"
+  ],
+  "project": {
+    "id": "9db152fa-dde5-4745-8de0-18dbfe813af9",
+    "name": "tygodnik-sejmowy",
+    "slug": "tygodnik-sejmowy",
+    "ownerAccount": {
+      "id": "81722f2d-afc4-4247-aec1-735048dbb2e7",
+      "name": "miskibin"
+    }
+  },
+  "distribution": "INTERNAL",
+  "buildProfile": "preview",
+  "sdkVersion": "54.0.0",
+  "appVersion": "0.1.0",
+  "appBuildVersion": "1",
+  "gitCommitHash": "7ed334441f18b33b0ed6c83102e5aa1e181d1d04",
+  "gitCommitMessage": "feat(frontend): rename /druk ΓåÆ /proces, replace /watek with grouped list\n\n/druk/[term]/[number] always showed the full proces around an initiating\ndruk ΓÇö same query, same timeline, same outcomes ΓÇö so the URL now matches\nthe semantics. /watek/[id] was a strict subset of that page; deleted and\nits index reborn at /proces with phase grouping (Sejm / Senat / Prezydent\n/ Uchwalone) modeled after /komisja and /posel directories.\n\n- Move app/druk/[term]/[number] ΓåÆ app/proces/[term]/[number] (incl. _components)\n- Move app/api/druk/.../file/[filename] ΓåÆ app/api/proces/...\n- Swap /druk/ ΓåÆ /proces/ across all link sites (tygodnik, posel, mowa,\n  obietnice, search, citations, RSS, sitemap, not-found, etc.)\n- New app/proces/page.tsx ΓÇö grouped server-rendered index with passed\n  bills section (last 90 days)\n- Add getPassedProcesses + rename ThreadSummary ΓåÆ ProcessSummary\n- Drop /watek folder + nav/footer/tile/sitemap entries\n- Fix stale /druki/{printId} link in komisja detail (route never existed)\n\nCo-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+  "priority": "NORMAL",
+  "createdAt": "2026-05-13T18:15:25.268Z",
+  "updatedAt": "2026-05-13T18:45:06.995Z",
+  "completedAt": "2026-05-13T18:45:06.764Z",
+  "expirationDate": "2026-05-27T18:15:25.306Z",
+  "isForIosSimulator": false,
+  "metrics": {
+    "buildWaitTime": 8753,
+    "buildQueueTime": 667728,
+    "buildDuration": 1105015
+  }
+}
+
