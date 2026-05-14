@@ -35,6 +35,40 @@ export type ClubTallyRow = {
   total: number;
 };
 
+export type VotingListItem = {
+  id: number;
+  voting_number: number;
+  title: string;
+  date: string;
+  sitting: number;
+  yes: number;
+  no: number;
+  abstain: number;
+};
+
+export async function getAllVotings(term = 10): Promise<VotingListItem[]> {
+  const sb = supabase();
+  const PAGE = 1000;
+  const rows: VotingListItem[] = [];
+  let from = 0;
+  // Term 10 has thousands of votings; PostgREST caps each request at ~1000 rows.
+  while (true) {
+    const { data, error } = await sb
+      .from("votings")
+      .select("id, voting_number, title, date, sitting, yes, no, abstain")
+      .eq("term", term)
+      .order("date", { ascending: false })
+      .order("voting_number", { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    const batch = (data ?? []) as VotingListItem[];
+    rows.push(...batch);
+    if (batch.length < PAGE) break;
+    from += PAGE;
+  }
+  return rows;
+}
+
 export async function getVotingHeader(votingId: number): Promise<VotingHeader | null> {
   const sb = supabase();
   const { data, error } = await sb
