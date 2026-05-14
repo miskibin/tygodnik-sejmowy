@@ -12,6 +12,7 @@ import {
   getTopicTrends,
   TOPICS_ENUM,
 } from "@/lib/db/atlas";
+import { getLastDataUpdate, formatDataUpdate } from "@/lib/db/freshness";
 import { MapaOkregow } from "./_components/MapaOkregow";
 import { HeatmapaKoalicji } from "./_components/HeatmapaKoalicji";
 import { SankeyKluby } from "./_components/SankeyKluby";
@@ -22,15 +23,6 @@ import { OCzymMowiSejm } from "./_components/OCzymMowiSejm";
 // Atlas is data-driven (Supabase) and we want it to recompute on each request
 // rather than freeze at build time.
 
-async function formatToday(): Promise<string> {
-  return new Date().toLocaleDateString("pl-PL", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
 // Vercel SSR can hit Supabase's PostgREST 8s ceiling on the voting_by_club
 // view (~250k votes re-aggregated per request). Don't 500 the page if one
 // module fails — render the rest and let the caller retry.
@@ -39,13 +31,14 @@ async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
 }
 
 export default async function AtlasPage() {
-  const [heatmap, discipline, topics, mapData, sankey, ministers] = await Promise.all([
+  const [heatmap, discipline, topics, mapData, sankey, ministers, lastUpdate] = await Promise.all([
     safe(getKlubHeatmap(), { klubs: [], cells: [], totalVotings: 0 }),
     safe(getPartyDiscipline(), []),
     safe(getTopicTrends(), { buckets: [], topics: TOPICS_ENUM, shares: [], totalsPerBucket: [] }),
     safe(getDistrictMap(), getMapPlaceholder()),
     safe(getKlubFlow(), getSankeyPlaceholder()),
     safe(getSlowMinisters(), getSlowMinistersPlaceholder()),
+    safe(getLastDataUpdate(), null),
   ]);
 
   return (
@@ -53,7 +46,7 @@ export default async function AtlasPage() {
       <div className="max-w-[1280px] mx-auto min-w-0 w-full">
         <PageBreadcrumb
           items={[{ label: "Atlas" }]}
-          subtitle={`Aktualizacja: ${await formatToday()} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: ETL sejmograf + API Sejmu RP`}
+          subtitle={`Aktualizacja: ${formatDataUpdate(lastUpdate)} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: ETL sejmograf + API Sejmu RP`}
         />
 
         <div className="grid gap-12 sm:gap-16 md:gap-20 min-w-0 [&>*]:min-w-0">

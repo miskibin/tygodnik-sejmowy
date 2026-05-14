@@ -20,6 +20,21 @@ const PROBES: Array<{ table: string; termFilter: boolean }> = [
 
 const DEFAULT_TERM = 10;
 
+// Shared formatter so /atlas, /sondaze, SiteFooter all render the same string
+// instead of each cooking up its own "today" pseudo-timestamp.
+const PL_DATETIME = new Intl.DateTimeFormat("pl-PL", {
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Warsaw",
+});
+
+export function formatDataUpdate(d: Date | null): string {
+  if (!d) return "brak danych";
+  return PL_DATETIME.format(d);
+}
+
 export async function getLastDataUpdate(term = DEFAULT_TERM): Promise<Date | null> {
   const sb = supabase();
   const results = await Promise.all(

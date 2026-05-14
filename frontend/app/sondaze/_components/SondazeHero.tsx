@@ -7,10 +7,6 @@ function fmtPct(n: number): string {
   return n.toLocaleString("pl-PL", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
-function formatToday(): string {
-  return new Date().toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
-}
-
 function daysAgo(iso: string): string {
   const d = new Date(iso + "T00:00:00Z");
   const now = new Date();
@@ -21,7 +17,7 @@ function daysAgo(iso: string): string {
   return `${Math.floor(diff / 7)} tyg. temu`;
 }
 
-export function SondazeHero({ rows }: { rows: PollAverageRow[] }) {
+export function SondazeHero({ rows, lastUpdateLabel }: { rows: PollAverageRow[]; lastUpdateLabel: string }) {
   const main = rows.filter((r) => !RESIDUAL_CODES.has(r.party_code));
   const latestPoll = main.reduce<string | null>((acc, r) => {
     if (!r.last_conducted_at) return acc;
@@ -93,7 +89,7 @@ export function SondazeHero({ rows }: { rows: PollAverageRow[] }) {
         </div>
 
         <div className="flex flex-wrap gap-x-3 gap-y-1.5 sm:gap-x-5 mt-6 sm:mt-7 font-mono text-[10px] sm:text-[11px] uppercase text-muted-foreground tracking-wide sm:tracking-wider">
-          <span>Aktualizacja: {formatToday()}</span>
+          <span>Aktualizacja: {lastUpdateLabel}</span>
           {latestPoll && (
             <>
               <span aria-hidden>·</span>
