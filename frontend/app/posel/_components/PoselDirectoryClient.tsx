@@ -6,6 +6,10 @@ import { useProfile } from "@/lib/profile";
 import type { MpListItem } from "@/lib/db/mps";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
+import { SearchHero } from "@/components/lists/SearchHero";
+import { FilterChipRow, type FilterChipOption } from "@/components/lists/FilterChipRow";
+import { SortButtons } from "@/components/lists/SortButtons";
+import { ViewToggle } from "@/components/lists/ViewToggle";
 
 type MpRow = MpListItem & {
   attendancePct: number | null;
@@ -82,81 +86,30 @@ export function PoselDirectoryClient({ mps }: { mps: MpRow[] }) {
     return arr.slice().sort(cmp[sortBy]);
   }, [mps, query, klubFilter, districtOnly, district, sortBy]);
 
+  const klubChipOptions: FilterChipOption[] = clubCounts.map(([k, n]) => ({
+    id: k,
+    label: KLUB_LABELS[k] ?? k,
+    count: n,
+    color: KLUB_COLORS[k] ?? "var(--muted-foreground)",
+    leading: <ClubBadge klub={k} size="xs" variant="logo" />,
+  }));
+
   return (
     <div className="min-w-0">
-      {/* Search hero */}
-      <div className="relative mb-5">
-        <span
-          aria-hidden
-          className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 font-serif text-destructive pointer-events-none"
-          style={{ fontSize: "clamp(20px, 5vw, 26px)" }}
-        >
-          ⌕
-        </span>
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Szukaj posła — nazwisko, klub, okręg…"
-          className="w-full bg-transparent outline-none font-serif text-foreground placeholder:italic placeholder:text-muted-foreground"
-          style={{
-            fontSize: "clamp(16px, 3.2vw, 22px)",
-            padding: "14px 96px 14px 40px",
-            borderBottom: "2px solid var(--foreground)",
-            fontStyle: query ? "normal" : "italic",
-          }}
-        />
-        <span
-          aria-hidden
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 font-mono text-[11px] tracking-wide text-muted-foreground"
-        >
-          {filtered.length} / {mps.length}
-        </span>
-      </div>
+      <SearchHero
+        value={query}
+        onChange={setQuery}
+        placeholder="Szukaj posła — nazwisko, klub, okręg…"
+        filteredCount={filtered.length}
+        totalCount={mps.length}
+      />
 
-      {/* Klub chips — horizontal scroll on mobile, wrap on desktop */}
-      <div
-        className="flex gap-1.5 mb-3 font-sans text-[12px] overflow-x-auto sm:overflow-visible sm:flex-wrap -mx-3 sm:mx-0 px-3 sm:px-0 [scrollbar-width:thin]"
-        style={{ scrollSnapType: "x proximity" }}
-      >
-        <button
-          type="button"
-          onClick={() => setKlubFilter("all")}
-          className="cursor-pointer rounded-full px-3 py-1.5 shrink-0"
-          style={{
-            border: `1px solid ${klubFilter === "all" ? "var(--foreground)" : "var(--border)"}`,
-            background: klubFilter === "all" ? "var(--foreground)" : "transparent",
-            color: klubFilter === "all" ? "var(--background)" : "var(--secondary-foreground)",
-            scrollSnapAlign: "start",
-          }}
-        >
-          Wszystkie
-        </button>
-        {clubCounts.map(([k, n]) => {
-          const on = klubFilter === k;
-          const color = KLUB_COLORS[k] ?? "var(--muted-foreground)";
-          return (
-            <button
-              key={k}
-              type="button"
-              onClick={() => setKlubFilter(on ? "all" : k)}
-              className="cursor-pointer rounded-full px-2.5 py-1.5 flex items-center gap-1.5 shrink-0"
-              style={{
-                border: `1px solid ${on ? color : "var(--border)"}`,
-                background: on ? `${color}1a` : "transparent",
-                color: on ? color : "var(--secondary-foreground)",
-                scrollSnapAlign: "start",
-              }}
-            >
-              <ClubBadge klub={k} size="xs" variant="logo" />
-              <span>{KLUB_LABELS[k] ?? k}</span>
-              <span className="font-mono text-[10px] opacity-70">{n}</span>
-            </button>
-          );
-        })}
-      </div>
+      <FilterChipRow
+        options={klubChipOptions}
+        selected={klubFilter}
+        onChange={setKlubFilter}
+      />
 
-      {/* Filters row */}
       <div className="flex flex-wrap items-center gap-3 mb-6 font-sans text-[12px]">
         {district ? (
           <button
@@ -180,47 +133,16 @@ export function PoselDirectoryClient({ mps }: { mps: MpRow[] }) {
 
         <span className="flex-1" aria-hidden />
 
-        <div className="flex items-center gap-0 flex-wrap">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground mr-2">
-            Sortuj
-          </span>
-          {SORT_OPTIONS.map((o) => {
-            const on = sortBy === o.id;
-            return (
-              <button
-                key={o.id}
-                type="button"
-                onClick={() => setSortBy(o.id)}
-                title={o.tip}
-                className="cursor-pointer px-2.5 py-1.5"
-                style={{
-                  color: on ? "var(--destructive)" : "var(--secondary-foreground)",
-                  borderBottom: on ? "2px solid var(--destructive)" : "2px solid transparent",
-                }}
-              >
-                {o.label}
-              </button>
-            );
-          })}
-        </div>
+        <SortButtons options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} />
 
-        <div className="flex border border-border ml-2">
-          {(["grid", "tabela"] as const).map((id) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setView(id)}
-              className="cursor-pointer px-3 py-1.5"
-              style={{
-                background: view === id ? "var(--foreground)" : "transparent",
-                color: view === id ? "var(--background)" : "var(--secondary-foreground)",
-              }}
-              aria-label={id === "grid" ? "Widok kafli" : "Widok tabeli"}
-            >
-              {id === "grid" ? "▦" : "☰"}
-            </button>
-          ))}
-        </div>
+        <ViewToggle<"grid" | "tabela">
+          options={[
+            { id: "grid", glyph: "▦", ariaLabel: "Widok kafli" },
+            { id: "tabela", glyph: "☰", ariaLabel: "Widok tabeli" },
+          ]}
+          value={view}
+          onChange={setView}
+        />
       </div>
 
       {filtered.length === 0 ? (
