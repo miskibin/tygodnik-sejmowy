@@ -1,5 +1,6 @@
 import { LandingHero } from "./_components/LandingHero";
 import { FeatureTileGrid } from "./_components/FeatureTileGrid";
+import { ElectionCountdown } from "./_components/ElectionCountdown";
 import { getTopViralStatements } from "@/lib/db/statements";
 
 async function safeTypewriter() {
@@ -22,6 +23,7 @@ export default async function Landing() {
   return (
     <main className="bg-background font-serif text-foreground">
       <LandingHero viralQuotes={quotes} />
+      <ElectionCountdown />
       <FeatureTileGrid />
     </main>
   );
