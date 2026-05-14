@@ -44,6 +44,10 @@ class AgendaFetchError(RuntimeError):
     """Transient HTTP/network failure (5xx or transport)."""
 
 
+class AgendaNotAvailable(Exception):
+    """Non-retryable client error (4xx). Caller logs + continues."""
+
+
 @dataclass
 class AgendaRefreshReport:
     listed: int = 0
@@ -57,6 +61,10 @@ class AgendaRefreshReport:
 
 
 @retry(
+    # Retry only on transient failures: 5xx, network timeouts, transport
+    # errors. 4xx (404 for a withdrawn sitting, 401/403 for auth drift)
+    # is non-retryable — burning ~16 s of exponential backoff on a
+    # certain failure is pure cost.
     retry=retry_if_exception_type((AgendaFetchError, httpx.TimeoutException)),
     stop=stop_after_attempt(4),
     wait=wait_exponential(multiplier=1, min=1, max=10),
@@ -72,7 +80,7 @@ def _http_get_json(client: httpx.Client, url: str):
     if 500 <= r.status_code < 600:
         raise AgendaFetchError(f"{r.status_code} {url}: {r.text[:200]}")
     if r.status_code >= 400:
-        raise AgendaFetchError(f"{r.status_code} {url}: {r.text[:200]}")
+        raise AgendaNotAvailable(f"{r.status_code} {url}: {r.text[:200]}")
     return r.json()
 
 

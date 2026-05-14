@@ -250,6 +250,11 @@ def cmd_backfill_prints(
 
     Idempotent: existing on-disk fixtures and prints rows aren't refetched
     (refresh=False). Cost: one HTTP GET per missing print + N upserts.
+
+    NOT SAFE TO RUN CONCURRENTLY with `daily` — both write to
+    `_stage_prints` and the loaders are not write-locked. Run this when
+    cron is off, or just accept that daily picks up what backfill misses
+    on the next pass.
     """
     import asyncio
 
@@ -416,6 +421,9 @@ def cmd_backfill_processes(
     Runs the same fetch path with `year=None`, then `load_processes` SQL
     function (idempotent — ON CONFLICT updates in-place, additional stages
     get re-derived from the fresh payload).
+
+    NOT SAFE TO RUN CONCURRENTLY with `daily` (same `_stage_processes`
+    table; the loaders don't take a write lock).
     """
     import asyncio
 

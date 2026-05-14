@@ -39,10 +39,13 @@ pytestmark = pytest.mark.skipif(
 TERM = 10
 UPSTREAM_LIST_URL = f"https://api.sejm.gov.pl/sejm/term{TERM}/prints?limit=5000"
 
-# Coverage tolerance — upstream listings can lag/disagree at the margins
-# (a print may be 404 from /prints/N detail while listed; we don't want to
-# alert on single-row drift). 1% gap is the threshold we'd act on.
-COVERAGE_THRESHOLD = 0.99
+# Absolute upper bound on `(upstream prints) − (local prints)`. Live state
+# at 2026-05-14 was 2 missing (both edge cases — upstream lists them but
+# detail JSON 404s or no `additionalPrints`). A percentage threshold (e.g.
+# 0.99) is too loose against ~5000 prints — 1% = ~50 — so a real regression
+# the size of one mis-loaded year (~840 prints) would still pass at 83%.
+# Absolute caps the slack at "a handful of rows can drift but no more".
+MAX_MISSING_PRINTS = 10
 
 # Two specific historical prints used as smoke tests. Both appear in the
 # opening sitting's agenda (`Wybór wicemarszałków... druki nr 1, 2, 3, 4,
@@ -97,12 +100,10 @@ def test_upstream_coverage(sb, upstream_prints: set[str]):
         offset += len(rows)
 
     missing = upstream_prints - have
-    coverage = 1.0 - (len(missing) / max(1, len(upstream_prints)))
     sample = sorted(missing, key=lambda x: int(x) if x.isdigit() else 0)[:15]
-    assert coverage >= COVERAGE_THRESHOLD, (
-        f"coverage {coverage:.3%} below threshold {COVERAGE_THRESHOLD:.0%}: "
-        f"{len(missing)} of {len(upstream_prints)} upstream prints missing. "
-        f"Sample missing: {sample}. "
+    assert len(missing) <= MAX_MISSING_PRINTS, (
+        f"{len(missing)} of {len(upstream_prints)} upstream prints missing "
+        f"(threshold: {MAX_MISSING_PRINTS}). Sample missing: {sample}. "
         f"Fix: `python -m supagraf backfill-prints --term {TERM}`"
     )
 

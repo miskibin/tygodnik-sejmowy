@@ -604,29 +604,20 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     .filter((x): x is ProceedingPoint => !!x);
 
   // Source B: process_stages with sitting_num set (what actually happened on
-  // the floor — I/II czytanie, głosowanie, sprawozdanie). Bucket per sitting.
+  // the floor — I/II czytanie, głosowanie, sprawozdanie). Reuse stagesRows
+  // already fetched above for the Timeline — same columns, same filter, no
+  // need for a second roundtrip.
   const stagesBySitting = new Map<number, ProceedingPointStage[]>();
-  if (processId !== -1) {
-    const { data: stageRows } = await sb
-      .from("process_stages")
-      .select("stage_type, stage_name, stage_date, sitting_num")
-      .eq("process_id", processId)
-      .not("sitting_num", "is", null);
-    for (const r of (stageRows ?? []) as Array<{
-      stage_type: string | null;
-      stage_name: string | null;
-      stage_date: string | null;
-      sitting_num: number | null;
-    }>) {
-      if (r.sitting_num == null) continue;
-      const list = stagesBySitting.get(r.sitting_num) ?? [];
-      list.push({
-        stageType: r.stage_type ?? "",
-        stageName: r.stage_name ?? "",
-        stageDate: r.stage_date ?? null,
-      });
-      stagesBySitting.set(r.sitting_num, list);
-    }
+  for (const r of stagesRows ?? []) {
+    const sittingNum = r.sitting_num as number | null;
+    if (sittingNum == null) continue;
+    const list = stagesBySitting.get(sittingNum) ?? [];
+    list.push({
+      stageType: (r.stage_type as string) ?? "",
+      stageName: (r.stage_name as string) ?? "",
+      stageDate: (r.stage_date as string) ?? null,
+    });
+    stagesBySitting.set(sittingNum, list);
   }
 
   // Backfill sitting metadata for stage-only sittings (no agenda anchor → no
