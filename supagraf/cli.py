@@ -400,6 +400,59 @@ def _resolve_unresolved_agenda_refs(*, term: int) -> None:
     )
 
 
+@app.command("backfill-processes")
+def cmd_backfill_processes(
+    term: int = typer.Option(10, "--term", "-t"),
+):
+    """Sweep ALL upstream processes regardless of year, stage + load them.
+
+    Same year-filter problem as `backfill-prints`: `capture_processes` filters
+    `list_data` by `in_year(year)`, so historical processes from earlier years
+    of the term get skipped on the daily path. Symptom: the
+    `process_stages.sitting_num` lookup on the print page returns nothing for
+    older prints, so the "Punkty obrad" badges (I/II czytanie, głosowanie)
+    don't render even when the print actually was procedowany.
+
+    Runs the same fetch path with `year=None`, then `load_processes` SQL
+    function (idempotent — ON CONFLICT updates in-place, additional stages
+    get re-derived from the fresh payload).
+    """
+    import asyncio
+
+    from supagraf.fixtures.client import SejmClient
+    from supagraf.fixtures.sources import sejm as sejm_src
+    from supagraf.fixtures.storage import fixtures_root
+    from supagraf.schema.processes import Process
+    from supagraf.stage.base import StreamingStager
+
+    out_root = fixtures_root()
+    staged_count = 0
+
+    async def _go() -> None:
+        nonlocal staged_count
+        async with SejmClient(concurrency=5) as client:
+            with StreamingStager(
+                resource="processes", table="_stage_processes", model=Process, term=term,
+            ) as stager:
+                ids = await sejm_src.capture_processes(
+                    client, out_root, term,
+                    year=None,
+                    refresh=False, no_binaries=True, limit=None,
+                    on_record=lambda nid, p, src: stager.push(
+                        natural_id=nid, payload=p, source_path=src,
+                    ),
+                )
+                staged_count = len(ids)
+
+    logger.info("backfill-processes: fetching all upstream processes (no year filter)…")
+    asyncio.run(_go())
+    logger.info("backfill-processes: staged {} processes", staged_count)
+
+    n = _rpc_int("load_processes", term)
+    logger.info("backfill-processes: load_processes affected={}", n)
+    logger.info("backfill-processes: done")
+
+
 def _run_direct_stage_captures(*, term: int, direct_staged: set[str]) -> None:
     """Run the bulk Sejm captures with StreamingStager callbacks attached.
 
