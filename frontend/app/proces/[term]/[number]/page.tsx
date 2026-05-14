@@ -97,8 +97,7 @@ export default async function DrukPage({
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9">
         <PageBreadcrumb
           items={[
-            { label: "Druki" },
-            { label: `Kadencja ${print.term}` },
+            { label: "Procesy", href: "/proces" },
             { label: print.shortTitle || print.title || `Druk ${print.number}` },
           ]}
           subtitle={

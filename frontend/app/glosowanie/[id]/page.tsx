@@ -45,7 +45,7 @@ export default async function VotingDetailPage({
       <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-6">
         <PageBreadcrumb
           items={[
-            { label: "Głosowania" },
+            { label: "Głosowania", href: "/glosowanie" },
             { label: header.title || `Głosowanie nr ${id}` },
           ]}
           subtitle={`Posiedzenie ${header.sitting} · ${new Date(header.date).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}`}
