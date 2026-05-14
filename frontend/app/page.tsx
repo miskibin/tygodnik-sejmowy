@@ -2,6 +2,7 @@ import { LandingHero } from "./_components/LandingHero";
 import { FeatureTileGrid } from "./_components/FeatureTileGrid";
 import { ElectionCountdown } from "./_components/ElectionCountdown";
 import { getTopViralStatements } from "@/lib/db/statements";
+import { getNextOrCurrentSitting } from "@/lib/db/events";
 
 async function safeTypewriter() {
   try {
@@ -18,12 +19,24 @@ async function safeTypewriter() {
   }
 }
 
+async function safeNextSitting() {
+  try {
+    return await getNextOrCurrentSitting(10);
+  } catch (err) {
+    console.error("[landing] getNextOrCurrentSitting failed", err);
+    return null;
+  }
+}
+
 export default async function Landing() {
-  const quotes = await safeTypewriter();
+  const [quotes, nextSitting] = await Promise.all([
+    safeTypewriter(),
+    safeNextSitting(),
+  ]);
   return (
     <main className="bg-background font-serif text-foreground">
       <LandingHero viralQuotes={quotes} />
-      <ElectionCountdown />
+      <ElectionCountdown nextSitting={nextSitting} />
       <FeatureTileGrid />
     </main>
   );

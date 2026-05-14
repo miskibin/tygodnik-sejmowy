@@ -225,6 +225,14 @@ export type SittingInfo = {
   topTopics: TopicId[];
 };
 
+export type NextSittingInfo = {
+  term: number;
+  sittingNum: number;
+  firstDate: string; // YYYY-MM-DD (Europe/Warsaw)
+  lastDate: string;
+  isActive: boolean;
+};
+
 const TOPIC_ALLOWED = new Set<string>([
   "sady-prawa", "bezpieczenstwo-obrona", "biznes-podatki",
   "praca-zus", "zdrowie", "edukacja-rodzina", "emerytury",

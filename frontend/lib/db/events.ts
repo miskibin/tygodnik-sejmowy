@@ -7,6 +7,7 @@ import {
   topicsFromDb,
   SECTION_LIMITS,
   type EventType,
+  type NextSittingInfo,
   type SittingInfo,
   type WeeklyEvent,
 } from "@/lib/events-types";
@@ -14,7 +15,7 @@ import {
 // Re-export for callers that hit this module — keeps import paths stable
 // while pure types live in lib/events-types.ts (so client components can
 // pull types without dragging in the server-only data layer).
-export type { SittingInfo, WeeklyEvent, EventType };
+export type { NextSittingInfo, SittingInfo, WeeklyEvent, EventType };
 
 // Batches PostgREST work; keeps prerender + ISR under budget and cuts warm latency.
 const EVENTS_REVALIDATE_SEC = 300;
@@ -75,6 +76,46 @@ export function getLatestSittingWithEvents(term = 10): Promise<SittingInfo | nul
   return unstable_cache(
     async () => loadLatestSittingWithEvents(term),
     ["tygodnik-latest-sitting", String(term)],
+    { revalidate: EVENTS_REVALIDATE_SEC },
+  )();
+}
+
+function warsawToday(): string {
+  // sv-SE locale formats as YYYY-MM-DD; timeZone pins to Warsaw so the
+  // "is sitting active today?" check doesn't drift on UTC-running servers.
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Warsaw" }).format(new Date());
+}
+
+async function loadNextOrCurrentSitting(term: number): Promise<NextSittingInfo | null> {
+  const today = warsawToday();
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("tygodnik_sittings")
+    .select("term, sitting_num, first_date, last_date")
+    .eq("term", term)
+    .gte("last_date", today)
+    .order("first_date", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const firstDate = (data.first_date as string) ?? "";
+  const lastDate = (data.last_date as string) ?? "";
+  return {
+    term: data.term as number,
+    sittingNum: data.sitting_num as number,
+    firstDate,
+    lastDate,
+    isActive: today >= firstDate && today <= lastDate,
+  };
+}
+
+export function getNextOrCurrentSitting(term = 10): Promise<NextSittingInfo | null> {
+  return unstable_cache(
+    async () => loadNextOrCurrentSitting(term),
+    ["tygodnik-next-sitting", String(term)],
+    // 5-minute cache: posiedzenie schedule doesn't churn intra-day, but
+    // we want the "trwają" flag to flip soon after first/last date crosses.
     { revalidate: EVENTS_REVALIDATE_SEC },
   )();
 }
