@@ -10,6 +10,7 @@ import { Timeline } from "./_components/Timeline";
 import { Summary } from "./_components/Summary";
 import { Votings } from "./_components/Votings";
 import { Committees } from "./_components/Committees";
+import { ProceedingPoints } from "./_components/ProceedingPoints";
 import { Sources } from "./_components/Sources";
 
 
@@ -88,6 +89,7 @@ export default async function DrukPage({
     matchedPromises,
     outcome,
     attachments,
+    proceedingPoints,
   } = data;
 
   const processStillOpen = !outcome?.passed && !print.currentStageType?.match(/^(End|Withdrawn|Rejected)$/);
@@ -145,6 +147,7 @@ export default async function DrukPage({
           processStillOpen={!!processStillOpen}
         />
         <Committees stages={stages} committeeSittings={committeeSittings} />
+        <ProceedingPoints points={proceedingPoints} />
 
         {/* Dz.U. publication banner — kept from old layout, repositioned here. */}
         {outcome?.passed && outcome.act && (

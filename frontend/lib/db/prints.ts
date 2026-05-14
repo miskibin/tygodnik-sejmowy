@@ -225,6 +225,21 @@ export type MainVotingSeat = {
   vote: string;
 };
 
+// Agenda point of a plenary sitting where this print was procedowany.
+// Sourced from agenda_item_prints (mig 0028); statement count from
+// statement_print_links (mig 0047) narrowed to source='agenda_item' so we
+// only count speeches anchored to the same agenda item, not stray druk
+// mentions elsewhere in the sitting.
+export type ProceedingPoint = {
+  agendaItemId: number;
+  sittingNum: number;
+  sittingTitle: string;
+  sittingDates: string[];
+  ord: number;
+  title: string;
+  statementCount: number;
+};
+
 export type PrintWithStages = {
   print: PrintDetail;
   stages: ProcessStage[];
@@ -247,6 +262,10 @@ export type PrintWithStages = {
   outcome: ProcessOutcome | null;
   // Attachments for the main print (ordered by ordinal).
   attachments: string[];
+  // Plenary sitting agenda points where this print appeared. Grouped per
+  // sitting in the UI. Empty when the print never made it to a plenary agenda
+  // (e.g. still in committee, or only mentioned indirectly).
+  proceedingPoints: ProceedingPoint[];
 };
 
 const SELECT_DETAIL =
@@ -517,6 +536,62 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     })
     .filter((x): x is MatchedPromise => !!x);
 
+  // Plenary agenda points (mig 0028) where this print is referenced. Joined
+  // up to proceedings for sitting num/title/dates. Statement counts pulled in
+  // a second pass keyed on agenda_item_id.
+  const { data: aipRows } = await sb
+    .from("agenda_item_prints")
+    .select(
+      "agenda_items:agenda_item_id(id, ord, title, proceedings:proceeding_id(number, title, dates))",
+    )
+    .eq("term", term)
+    .eq("print_number", number);
+
+  type AgendaItemJoined = {
+    id: number;
+    ord: number;
+    title: string;
+    proceedings: { number: number; title: string; dates: string[] } | { number: number; title: string; dates: string[] }[] | null;
+  };
+  const agendaItems: AgendaItemJoined[] = (aipRows ?? [])
+    .map((r) => {
+      const ai = (r as { agenda_items: AgendaItemJoined | AgendaItemJoined[] | null }).agenda_items;
+      return Array.isArray(ai) ? ai[0] : ai;
+    })
+    .filter((x): x is AgendaItemJoined => !!x);
+
+  const stmtCountByItem = new Map<number, number>();
+  if (agendaItems.length > 0) {
+    const { data: linkRows } = await sb
+      .from("statement_print_links")
+      .select("agenda_item_id")
+      .eq("print_id", printId)
+      .not("agenda_item_id", "is", null);
+    for (const r of (linkRows ?? []) as Array<{ agenda_item_id: number }>) {
+      stmtCountByItem.set(r.agenda_item_id, (stmtCountByItem.get(r.agenda_item_id) ?? 0) + 1);
+    }
+  }
+
+  const proceedingPoints: ProceedingPoint[] = agendaItems
+    .map((ai): ProceedingPoint | null => {
+      const proc = Array.isArray(ai.proceedings) ? ai.proceedings[0] : ai.proceedings;
+      if (!proc) return null;
+      return {
+        agendaItemId: ai.id,
+        sittingNum: proc.number,
+        sittingTitle: proc.title,
+        sittingDates: proc.dates ?? [],
+        ord: ai.ord,
+        title: ai.title,
+        statementCount: stmtCountByItem.get(ai.id) ?? 0,
+      };
+    })
+    .filter((x): x is ProceedingPoint => !!x)
+    .sort((a, b) => {
+      if (a.sittingNum !== b.sittingNum) return a.sittingNum - b.sittingNum;
+      return a.ord - b.ord;
+    });
+
   const sponsorMpsRaw = p.sponsor_mps as unknown;
   const sponsorMps: string[] = Array.isArray(sponsorMpsRaw)
     ? (sponsorMpsRaw.filter((x) => typeof x === "string") as string[])
@@ -565,6 +640,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     matchedPromises,
     outcome,
     attachments,
+    proceedingPoints,
   };
 }
 
