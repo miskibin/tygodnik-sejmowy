@@ -44,10 +44,12 @@ UPSTREAM_LIST_URL = f"https://api.sejm.gov.pl/sejm/term{TERM}/prints?limit=5000"
 # alert on single-row drift). 1% gap is the threshold we'd act on.
 COVERAGE_THRESHOLD = 0.99
 
-# Two specific historical prints used as smoke tests. Both were confirmed
-# missing on 2026-05-14 and present upstream. After backfill they must
-# show up in agenda_item_prints (both were referenced in sitting agendas).
-SMOKE_PRINT_NUMBERS = ("104", "609")
+# Two specific historical prints used as smoke tests. Both appear in the
+# opening sitting's agenda (`Wybór wicemarszałków... druki nr 1, 2, 3, 4,
+# 5, 6, 7 i 8`) and were stuck in unresolved_agenda_print_refs until
+# backfill-prints ran on 2026-05-14. After backfill they must show up in
+# agenda_item_prints — this is the canonical resolved-ref smoke test.
+SMOKE_PRINT_NUMBERS = ("1", "8")
 
 
 @pytest.fixture(scope="module")
