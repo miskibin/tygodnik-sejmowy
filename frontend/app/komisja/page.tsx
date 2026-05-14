@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   getCommitteeList,
   getCommitteeActivityStats,
@@ -7,6 +8,10 @@ import {
 } from "@/lib/db/committees";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { CommitteeRow } from "@/components/komisja/CommitteeRow";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/komisja" },
+};
 
 type GroupKey = "STANDING" | "EXTRAORDINARY" | "INVESTIGATIVE" | "OTHER";
 

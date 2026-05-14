@@ -27,7 +27,7 @@ function Bar({
 
 export function PageSkeleton() {
   return (
-    <div className="bg-background font-serif">
+    <div className="bg-background font-serif" style={{ minHeight: "100vh" }}>
       <span className="sr-only">Wczytywanie…</span>
       <div className="border-b border-rule">
         <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 pb-6">
@@ -37,15 +37,20 @@ export function PageSkeleton() {
           <Bar w="50%" h={14} />
         </div>
       </div>
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 py-8 md:py-12 flex flex-col gap-3">
-        <Bar w="35%" h={14} className="mb-2" />
-        <Bar w="100%" h={11} />
-        <Bar w="92%" h={11} />
-        <Bar w="80%" h={11} />
-        <Bar w="100%" h={11} className="mt-4" />
-        <Bar w="88%" h={11} />
-        <Bar w="95%" h={11} />
-        <Bar w="60%" h={11} />
+      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 py-8 md:py-12 flex flex-col gap-6">
+        <Bar w="35%" h={18} className="mb-1" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="border-t border-border/60 pt-5 flex flex-col gap-3"
+            style={{ minHeight: 140 }}
+          >
+            <Bar w="80%" h={20} />
+            <Bar w="100%" h={12} />
+            <Bar w="92%" h={12} />
+            <Bar w="50%" h={12} />
+          </div>
+        ))}
       </div>
     </div>
   );

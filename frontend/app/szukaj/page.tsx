@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Szukaj",
   description:
     "Pełnotekstowe wyszukiwanie po polsku w drukach, posłach, głosowaniach, komisjach, obietnicach i wystąpieniach.",
+  alternates: { canonical: "/szukaj" },
 };
 
 const GROUP_ORDER: FtsKind[] = ["mp", "voting", "print", "committee", "promise", "statement"];

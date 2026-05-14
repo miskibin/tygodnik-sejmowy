@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTopViralStatements } from "@/lib/db/statements";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/mowa" },
+};
 import { ComingSoonPage } from "@/components/chrome/ComingSoonPage";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";

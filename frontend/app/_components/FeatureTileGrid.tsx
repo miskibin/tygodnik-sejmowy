@@ -166,6 +166,10 @@ export async function FeatureTileGrid() {
                               src={logo}
                               alt={r.klub}
                               title={r.klub}
+                              width={20}
+                              height={20}
+                              loading="lazy"
+                              decoding="async"
                               className="w-5 h-5 rounded-full object-cover border border-border"
                             />
                           ) : (
@@ -219,6 +223,10 @@ export async function FeatureTileGrid() {
                               src={logo}
                               alt={partyLabel(r.party_code)}
                               title={partyLabel(r.party_code)}
+                              width={20}
+                              height={20}
+                              loading="lazy"
+                              decoding="async"
                               className="w-5 h-5 rounded-full object-cover border border-border shrink-0"
                             />
                           ) : (

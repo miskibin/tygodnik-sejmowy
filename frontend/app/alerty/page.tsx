@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { ComingSoonPage } from "@/components/chrome/ComingSoonPage";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/alerty" },
+};
 
 // Subskrypcje alertów wymagają działającego backendu auth-less
 // (insert_alert_subscription RPC + worker dostarczający e-mail/RSS/push).

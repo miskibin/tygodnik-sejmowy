@@ -629,7 +629,7 @@ export function BriefList({
   const lightWeek = totalEvents > 0 && totalEvents < 6;
 
   return (
-    <div className="bg-background font-serif text-foreground">
+    <main className="bg-background font-serif text-foreground">
       {/* Masthead — issue identity + volume stats read as one editorial strip */}
       <div className="border-b border-rule">
         <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-4 md:pt-8 md:pb-6">
@@ -653,6 +653,7 @@ export function BriefList({
                   href={`/tygodnik/p/${olderSitting.sittingNum}`}
                   className="text-muted-foreground hover:text-destructive transition-colors"
                   title={`Posiedzenie ${olderSitting.sittingNum} · ${formatDateRange(olderSitting.firstDate, olderSitting.lastDate)}`}
+                  aria-label={`Poprzednie posiedzenie nr ${olderSitting.sittingNum}`}
                 >
                   ← Nr {olderSitting.sittingNum}
                 </Link>
@@ -677,6 +678,7 @@ export function BriefList({
                   href={`/tygodnik/p/${newerSitting.sittingNum}`}
                   className="text-muted-foreground hover:text-destructive transition-colors"
                   title={`Posiedzenie ${newerSitting.sittingNum} · ${formatDateRange(newerSitting.firstDate, newerSitting.lastDate)}`}
+                  aria-label={`Następne posiedzenie nr ${newerSitting.sittingNum}`}
                 >
                   Nr {newerSitting.sittingNum} →
                 </Link>
@@ -728,9 +730,13 @@ export function BriefList({
         {filteredPrints.length > 0 && (
           <>
             <SectionHeader icon="📜" label="Nowe projekty" count={filteredPrints.length} />
-            {filteredPrints.map((it, i) => (
-              <ItemView key={it.id} item={it} idx={i} personas={personas} />
-            ))}
+            <ul role="list" className="contents">
+              {filteredPrints.map((it, i) => (
+                <li key={it.id} className="contents">
+                  <ItemView item={it} idx={i} personas={personas} />
+                </li>
+              ))}
+            </ul>
             {hydrated && filterActive && (
               // Mobile-only CTA — desktop has this inline next to the counter.
               <div className="md:hidden mt-2 mb-2 px-1 text-center">
@@ -748,32 +754,35 @@ export function BriefList({
         {unmergedVotes.length > 0 && (
           <>
             <SectionHeader icon="⚖" label="Pozostałe głosowania" count={unmergedVotes.length} />
-            {unmergedVotes.map((ev, i) => (
-              <VotingHemicycleCard
-                key={ev.payload.voting_id}
-                idx={i}
-                voting={{
-                  voting_id: ev.payload.voting_id,
-                  voting_number: ev.payload.voting_number,
-                  title: ev.payload.title,
-                  topic: ev.payload.topic,
-                  date: ev.payload.date,
-                  yes: ev.payload.yes,
-                  no: ev.payload.no,
-                  abstain: ev.payload.abstain,
-                  not_participating: ev.payload.not_participating,
-                  majority_votes: ev.payload.majority_votes ?? null,
-                  motion_polarity: ev.payload.motion_polarity ?? null,
-                  term: ev.term,
-                }}
-                clubs={ev.payload.club_tally ?? []}
-                linkedPrint={ev.payload.linked_prints?.[0] ? {
-                  number: ev.payload.linked_prints[0].number,
-                  short_title: ev.payload.linked_prints[0].short_title,
-                  impact_punch: ev.payload.linked_prints[0].impact_punch ?? null,
-                } : null}
-              />
-            ))}
+            <ul role="list" className="contents">
+              {unmergedVotes.map((ev, i) => (
+                <li key={ev.payload.voting_id} className="contents">
+                  <VotingHemicycleCard
+                    idx={i}
+                    voting={{
+                      voting_id: ev.payload.voting_id,
+                      voting_number: ev.payload.voting_number,
+                      title: ev.payload.title,
+                      topic: ev.payload.topic,
+                      date: ev.payload.date,
+                      yes: ev.payload.yes,
+                      no: ev.payload.no,
+                      abstain: ev.payload.abstain,
+                      not_participating: ev.payload.not_participating,
+                      majority_votes: ev.payload.majority_votes ?? null,
+                      motion_polarity: ev.payload.motion_polarity ?? null,
+                      term: ev.term,
+                    }}
+                    clubs={ev.payload.club_tally ?? []}
+                    linkedPrint={ev.payload.linked_prints?.[0] ? {
+                      number: ev.payload.linked_prints[0].number,
+                      short_title: ev.payload.linked_prints[0].short_title,
+                      impact_punch: ev.payload.linked_prints[0].impact_punch ?? null,
+                    } : null}
+                  />
+                </li>
+              ))}
+            </ul>
           </>
         )}
 
@@ -782,14 +791,26 @@ export function BriefList({
         {partitioned.lateInterpellations.length > 0 && (
           <>
             <SectionHeader icon="🔥" label="Opóźnione odpowiedzi ministrów" count={partitioned.lateInterpellations.length} />
-            {partitioned.lateInterpellations.map((ev, i) => <InterpellationCard key={ev.payload.question_id} ev={ev} idx={i} />)}
+            <ul role="list" className="contents">
+              {partitioned.lateInterpellations.map((ev, i) => (
+                <li key={ev.payload.question_id} className="contents">
+                  <InterpellationCard ev={ev} idx={i} />
+                </li>
+              ))}
+            </ul>
           </>
         )}
 
         {partitioned.viralQuotes.length > 0 && (
           <>
             <SectionHeader icon="📺" label="Powiedziane w Sejmie" count={partitioned.viralQuotes.length} />
-            {partitioned.viralQuotes.map((ev, i) => <ViralCard key={ev.payload.statement_id} ev={ev} idx={i} />)}
+            <ul role="list" className="contents">
+              {partitioned.viralQuotes.map((ev, i) => (
+                <li key={ev.payload.statement_id} className="contents">
+                  <ViralCard ev={ev} idx={i} />
+                </li>
+              ))}
+            </ul>
           </>
         )}
       </div>
@@ -831,6 +852,6 @@ export function BriefList({
           <span className="text-destructive">RSS · ICS · e-mail</span>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

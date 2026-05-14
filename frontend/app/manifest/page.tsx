@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { Ornament } from "@/components/chrome/Ornament";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/manifest" },
+};
 
 // Manifest is a static editorial page — no data, no force-dynamic.
 // Patronite tiers and the anti-feature list are the emotional contract

@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { Ornament } from "@/components/chrome/Ornament";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/budzet" },
+};
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
