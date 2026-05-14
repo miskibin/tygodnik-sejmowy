@@ -10,15 +10,6 @@ wzbogacają je modelami językowymi oraz embeddingami i pokazują, co naprawdę
 wydarzyło się w parlamencie w tym tygodniu — głosowania, druki, komisje,
 obietnice, wypowiedzi.
 
-[![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-orange.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
-[![Next.js](https://img.shields.io/badge/next.js-16-black.svg)](frontend/package.json)
-[![Expo](https://img.shields.io/badge/expo-mobile-000020.svg)](mobile/package.json)
-[![Supabase](https://img.shields.io/badge/supabase-postgres%20%2B%20pgvector-3ECF8E.svg)](supabase/)
-
-### 🔗 Linki
-
-[![Strona](https://img.shields.io/badge/🌐_Strona-tygodniksejmowy.pl-8B1A1A?style=for-the-badge)](https://tygodniksejmowy.pl)
 [![Wesprzyj](https://img.shields.io/badge/❤_Wesprzyj-Patronite-FF424D?style=for-the-badge)](https://patronite.pl/tygodniksejmowy)
 [![Zgłoś błąd](https://img.shields.io/badge/🐛_Zgłoś_błąd-GitHub_Issues-181717?style=for-the-badge&logo=github)](https://github.com/miskibin/tygodnik-sejmowy/issues/new)
 [![X](https://img.shields.io/badge/𝕏_Obserwuj-@sejmstats-000000?style=for-the-badge)](https://x.com/sejmstats)
