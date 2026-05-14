@@ -6,6 +6,7 @@ import {
   TREND_DEFAULT_PARTIES,
 } from "@/lib/db/polls";
 import { getKlubPairAgreement, DEFAULT_TERM as COHESION_TERM } from "@/lib/db/coalition_agreement";
+import { getLastDataUpdate, formatDataUpdate } from "@/lib/db/freshness";
 import { RESIDUAL_CODES } from "./_components/partyMeta";
 import { Average30dGrid } from "./_components/Average30dGrid";
 import { QuarterlyTrendChart } from "./_components/QuarterlyTrendChart";
@@ -43,11 +44,12 @@ export default async function SondazePage() {
     return eligible.length > 0 ? eligible : [...TREND_DEFAULT_PARTIES];
   })();
 
-  const [trend, recent, pollsters, agreement] = await Promise.all([
+  const [trend, recent, pollsters, agreement, lastUpdate] = await Promise.all([
     safe(getPollTrendQuarterly(trendParties), []),
     safe(getRecentPolls(20), []),
     safe(getPollsterSummary(), []),
     safe(getKlubPairAgreement(COHESION_TERM), { byPair: new Map() }),
+    safe(getLastDataUpdate(), null),
   ]);
 
   const mainCount = averages.filter((r) => !RESIDUAL_CODES.has(r.party_code)).length;
@@ -64,7 +66,7 @@ export default async function SondazePage() {
     <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-12 sm:pb-16 min-w-0">
       <div className="max-w-[1280px] mx-auto min-w-0">
         <PageBreadcrumb items={[{ label: "Sondaże" }]} />
-        <SondazeHero rows={averages} />
+        <SondazeHero rows={averages} lastUpdateLabel={formatDataUpdate(lastUpdate)} />
 
         <div className="mt-8 sm:mt-12">
           <SondazeTabsClient
