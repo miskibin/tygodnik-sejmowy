@@ -84,7 +84,7 @@ function rowsFromProcessStages(stages: ProcessStage[]): KomisjaRowData[] {
     });
 }
 
-export function Komisje({
+export function Committees({
   stages,
   committeeSittings,
 }: {

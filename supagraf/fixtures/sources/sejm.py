@@ -2,18 +2,65 @@
 
 Each public function here captures one resource group to disk and returns
 a list of captured IDs (string form). Functions are independent.
+
+Direct-to-DB streaming (Phase 2 of the daily ETL refactor): each capture
+function accepts an optional `on_record(natural_id, payload, source_path)`
+callback. When set, the callback fires AFTER each successful per-entity
+fixture save with the parsed payload — the daily wires this to a
+`StreamingStager` that upserts straight into `_stage_<resource>`, letting
+us skip the file-scan re-stage on every daily run. Callback exceptions are
+caught + logged here; they NEVER abort the fetch loop (the fixture remains
+the durable cache, regular `cmd_stage` re-reads catch any missed rows).
 """
 from __future__ import annotations
 
 import asyncio
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any, Callable, Iterable, Optional
 
 from loguru import logger
 
 from ..client import SejmClient
 from ..filters import first_date, in_year
 from ..storage import exists, update_index, write_binary, write_json, write_text
+
+# (natural_id, payload, source_path) → None. Same shape used by
+# supagraf/fetch/committees.py and committee_sittings.py.
+RecordCallback = Callable[[str, dict, str], None]
+
+
+def _fire(on_record: RecordCallback | None, natural_id: str, payload: Any, source_path: str) -> None:
+    """Invoke the streaming-stage callback, swallowing all exceptions.
+
+    The fixture write is the durable cache; the DB upsert is best-effort.
+    Any failure here is logged and the fetch loop continues.
+    """
+    if on_record is None or payload is None:
+        return
+    if not isinstance(payload, dict):
+        # Non-dict list payloads (e.g. a bare voting-stats array) don't fit
+        # the term/natural_id/payload jsonb shape. Skip silently — only the
+        # entity-detail dicts get streamed.
+        return
+    try:
+        on_record(natural_id, payload, source_path)
+    except Exception as e:  # noqa: BLE001
+        logger.warning("stage callback failed for {}: {!r}", natural_id, e)
+
+
+def _rel(dest: Path, out_root: Path) -> str:
+    """POSIX-style fixture path relative to the project root.
+
+    `out_root` here is the user-supplied output root (defaults to
+    `<repo>/fixtures`). The staged `source_path` column stores a path
+    rooted at the repo, so we strip one level above out_root and prefix
+    `fixtures/`.
+    """
+    try:
+        rel = dest.relative_to(out_root)
+        return f"fixtures/{rel.as_posix()}"
+    except ValueError:
+        return str(dest).replace("\\", "/")
 
 
 def _term_root(term: int) -> str:
@@ -132,6 +179,7 @@ async def capture_mps(
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
+    on_record: RecordCallback | None = None,
 ) -> list[str]:
     """Capture all MPs for the term. MPs aren't filtered by year."""
     base = _term_root(term)
@@ -153,9 +201,15 @@ async def capture_mps(
             continue
         captured.append(str(mp_id))
 
+    # _gather_limited runs up to 8 _one() tasks concurrently. The stage
+    # callback (sync supabase upsert) mutates a shared buffer, so guard
+    # with a lock so concurrent pushes don't race the batch flush.
+    lock = asyncio.Lock()
+
     async def _one(mp_id: int) -> None:
-        await _maybe_save_json(
-            client, f"{base}/MP/{mp_id}", dest_dir / f"{mp_id}.json", refresh
+        dest = dest_dir / f"{mp_id}.json"
+        payload = await _maybe_save_json(
+            client, f"{base}/MP/{mp_id}", dest, refresh
         )
         await _maybe_save_json(
             client,
@@ -176,6 +230,9 @@ async def capture_mps(
                 dest_dir / f"{mp_id}__photo-mini.jpg",
                 refresh,
             )
+        if payload is not None and on_record is not None:
+            async with lock:
+                _fire(on_record, str(mp_id), payload, _rel(dest, out_root))
 
     await _gather_limited((_one(int(i)) for i in captured), 8)
     update_index(dest_dir / "_index.json", captured)
@@ -189,6 +246,7 @@ async def capture_clubs(
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
+    on_record: RecordCallback | None = None,
 ) -> list[str]:
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "clubs"
@@ -206,9 +264,9 @@ async def capture_clubs(
         if cid is None:
             continue
         captured.append(str(cid))
-        await _maybe_save_json(
-            client, f"{base}/clubs/{cid}", dest_dir / f"{cid}.json", refresh
-        )
+        dest = dest_dir / f"{cid}.json"
+        payload = await _maybe_save_json(client, f"{base}/clubs/{cid}", dest, refresh)
+        _fire(on_record, str(cid), payload, _rel(dest, out_root))
         if not no_binaries:
             await _maybe_save_binary(
                 client,
@@ -368,6 +426,7 @@ async def capture_votings(
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
+    on_record: RecordCallback | None = None,
 ) -> list[str]:
     """Walk /votings groups, then per-proceeding list, then detail."""
     base = _term_root(term)
@@ -406,7 +465,10 @@ async def capture_votings(
             captured.append(sid)
             detail = await client.get_json(f"{base}/votings/{proc}/{num}")
             payload = detail if isinstance(detail, dict) else v
-            write_json(dest_dir / f"{sid}.json", payload)
+            dest = dest_dir / f"{sid}.json"
+            write_json(dest, payload)
+            # natural_id for _stage_votings: "{sitting}__{voting_number}".
+            _fire(on_record, sid, payload, _rel(dest, out_root))
             if not no_binaries:
                 await _maybe_save_binary(
                     client,
@@ -426,6 +488,7 @@ async def capture_prints(
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
+    on_record: RecordCallback | None = None,
 ) -> list[str]:
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "prints"
@@ -446,9 +509,10 @@ async def capture_prints(
             continue
         sid = _safe_id(num)
         captured.append(sid)
-        await _maybe_save_json(
-            client, f"{base}/prints/{num}", dest_dir / f"{sid}.json", refresh
-        )
+        dest = dest_dir / f"{sid}.json"
+        payload = await _maybe_save_json(client, f"{base}/prints/{num}", dest, refresh)
+        # natural_id for _stage_prints is `print.number` (slash form preserved).
+        _fire(on_record, str(num), payload, _rel(dest, out_root))
         if not no_binaries and _take("prints"):
             for att in p.get("attachments") or []:
                 if not isinstance(att, str):
@@ -472,6 +536,7 @@ async def capture_processes(
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
+    on_record: RecordCallback | None = None,
 ) -> list[str]:
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "processes"
@@ -492,9 +557,10 @@ async def capture_processes(
             continue
         sid = _safe_id(num)
         captured.append(sid)
-        detail = await _maybe_save_json(
-            client, f"{base}/processes/{num}", dest_dir / f"{sid}.json", refresh
-        )
+        dest = dest_dir / f"{sid}.json"
+        detail = await _maybe_save_json(client, f"{base}/processes/{num}", dest, refresh)
+        # natural_id for _stage_processes is `process.number`.
+        _fire(on_record, str(num), detail, _rel(dest, out_root))
         if not no_binaries and isinstance(detail, dict) and _take("processes"):
             for stage in detail.get("stages") or []:
                 for att in stage.get("attachments") or []:
@@ -519,6 +585,7 @@ async def capture_bills(
     year: int,
     refresh: bool,
     limit: Optional[int],
+    on_record: RecordCallback | None = None,
 ) -> list[str]:
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "bills"
@@ -539,7 +606,11 @@ async def capture_bills(
             continue
         sid = _safe_id(bid)
         captured.append(sid)
-        write_json(dest_dir / f"{sid}.json", b)
+        dest = dest_dir / f"{sid}.json"
+        write_json(dest, b)
+        # natural_id for _stage_bills is `bill.number` (slash form 'RPW/...').
+        natural_id = str(b.get("number") or bid)
+        _fire(on_record, natural_id, b, _rel(dest, out_root))
     update_index(dest_dir / "_index.json", captured)
     return captured
 
@@ -630,6 +701,7 @@ async def capture_videos(
     year: int,
     refresh: bool,
     limit: Optional[int],
+    on_record: RecordCallback | None = None,
 ) -> list[str]:
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "videos"
@@ -650,6 +722,9 @@ async def capture_videos(
             continue
         sid = _safe_id(unid)
         captured.append(sid)
-        write_json(dest_dir / f"{sid}.json", v)
+        dest = dest_dir / f"{sid}.json"
+        write_json(dest, v)
+        # natural_id for _stage_videos is `video.unid`.
+        _fire(on_record, str(unid), v, _rel(dest, out_root))
     update_index(dest_dir / "_index.json", captured)
     return captured

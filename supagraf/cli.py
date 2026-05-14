@@ -228,6 +228,150 @@ def cmd_run_all(term: int = 10):
     cmd_load(term=term)
 
 
+def _run_direct_stage_captures(*, term: int, direct_staged: set[str]) -> None:
+    """Run the bulk Sejm captures with StreamingStager callbacks attached.
+
+    Each capture writes its fixture (durable cache) AND streams the parsed
+    payload into `_stage_<resource>` so the daily skips the file-scan
+    re-stage for these resources. This is the only daily path — there's no
+    legacy fork. Manual `python -m supagraf fixtures capture <r>` still
+    works for bulk-snapshot operations because `on_record` defaults to None.
+
+    Resources covered: mps, clubs, prints, processes, votings, bills, videos.
+    Proceedings + interpellations + writtenQuestions stay on the file-scan
+    path (compound payload composition / `kind` column).
+
+    `direct_staged` is mutated to add each resource we actually streamed —
+    a per-resource try/except ensures one failed capture doesn't take down
+    the rest. Any resource that fails here falls through to Phase 2-3's
+    file-scan-stage recovery in cmd_daily.
+
+    `SUPAGRAF_CAPTURE_YEAR` overrides the year filter (default: current).
+    """
+    import asyncio
+    from datetime import datetime as _dt
+
+    from supagraf.fixtures.client import SejmClient
+    from supagraf.fixtures.sources import sejm as sejm_src
+    from supagraf.fixtures.storage import fixtures_root
+    from supagraf.schema.bills import Bill
+    from supagraf.schema.clubs import Club
+    from supagraf.schema.mps import MP
+    from supagraf.schema.prints import Print
+    from supagraf.schema.processes import Process
+    from supagraf.schema.videos import Video
+    from supagraf.schema.votings import Voting
+    from supagraf.stage.base import StreamingStager
+
+    year = int(os.environ.get("SUPAGRAF_CAPTURE_YEAR") or _dt.now().year)
+    out_root = fixtures_root()
+
+    async def _go() -> None:
+        async with SejmClient(concurrency=5) as client:
+
+            def _make_cb(stager: StreamingStager):
+                return lambda nid, p, src: stager.push(
+                    natural_id=nid, payload=p, source_path=src
+                )
+
+            # mps — term-only, no year. Set no_binaries=True so daily skips
+            # photo binaries; fetch_mp_photos handles the HEAD probe.
+            try:
+                with StreamingStager(
+                    resource="mps", table="_stage_mps", model=MP, term=term,
+                ) as st:
+                    await sejm_src.capture_mps(
+                        client, out_root, term,
+                        refresh=False, no_binaries=True, limit=None,
+                        on_record=_make_cb(st),
+                    )
+                direct_staged.add("mps")
+            except Exception as e:
+                logger.error("capture_mps direct-stage failed: {!r}", e)
+
+            try:
+                with StreamingStager(
+                    resource="clubs", table="_stage_clubs", model=Club, term=term,
+                ) as st:
+                    await sejm_src.capture_clubs(
+                        client, out_root, term,
+                        refresh=False, no_binaries=True, limit=None,
+                        on_record=_make_cb(st),
+                    )
+                direct_staged.add("clubs")
+            except Exception as e:
+                logger.error("capture_clubs direct-stage failed: {!r}", e)
+
+            try:
+                with StreamingStager(
+                    resource="prints", table="_stage_prints", model=Print, term=term,
+                ) as st:
+                    await sejm_src.capture_prints(
+                        client, out_root, term, year,
+                        refresh=False, no_binaries=True, limit=None,
+                        on_record=_make_cb(st),
+                    )
+                direct_staged.add("prints")
+            except Exception as e:
+                logger.error("capture_prints direct-stage failed: {!r}", e)
+
+            try:
+                with StreamingStager(
+                    resource="processes", table="_stage_processes", model=Process, term=term,
+                ) as st:
+                    await sejm_src.capture_processes(
+                        client, out_root, term, year,
+                        refresh=False, no_binaries=True, limit=None,
+                        on_record=_make_cb(st),
+                    )
+                direct_staged.add("processes")
+            except Exception as e:
+                logger.error("capture_processes direct-stage failed: {!r}", e)
+
+            try:
+                # Votings carry the largest per-row jsonb; StreamingStager
+                # batch_size default (10) keeps flush spikes manageable.
+                with StreamingStager(
+                    resource="votings", table="_stage_votings", model=Voting, term=term,
+                ) as st:
+                    await sejm_src.capture_votings(
+                        client, out_root, term, year,
+                        refresh=False, no_binaries=True, limit=None,
+                        on_record=_make_cb(st),
+                    )
+                direct_staged.add("votings")
+            except Exception as e:
+                logger.error("capture_votings direct-stage failed: {!r}", e)
+
+            try:
+                with StreamingStager(
+                    resource="bills", table="_stage_bills", model=Bill, term=term,
+                ) as st:
+                    await sejm_src.capture_bills(
+                        client, out_root, term, year,
+                        refresh=False, limit=None,
+                        on_record=_make_cb(st),
+                    )
+                direct_staged.add("bills")
+            except Exception as e:
+                logger.error("capture_bills direct-stage failed: {!r}", e)
+
+            try:
+                with StreamingStager(
+                    resource="videos", table="_stage_videos", model=Video, term=term,
+                ) as st:
+                    await sejm_src.capture_videos(
+                        client, out_root, term, year,
+                        refresh=False, limit=None,
+                        on_record=_make_cb(st),
+                    )
+                direct_staged.add("videos")
+            except Exception as e:
+                logger.error("capture_videos direct-stage failed: {!r}", e)
+
+    asyncio.run(_go())
+
+
 @app.command("daily")
 def cmd_daily(
     term: int = typer.Option(10, "--term", "-t"),
@@ -235,19 +379,23 @@ def cmd_daily(
     skip_enrich: bool = typer.Option(False, "--skip-enrich"),
     skip_embed: bool = typer.Option(False, "--skip-embed"),
 ):
-    """End-to-end daily incremental: fetch new Sejm data -> stage -> load
-    -> enrich (unified) -> embed (qwen) -> refresh aggregates.
+    """End-to-end daily incremental: fetch+stage -> load -> enrich -> embed
+    -> refresh aggregates.
 
     Designed for cron / GitHub Actions: idempotent (skips already-processed
     items via partial-index pending filters), bounded cost (LLM only on
     not-yet-summarized prints), and safe to interrupt at any phase.
 
     Phases (each independent — `--skip-*` flags re-run only what's needed):
-      1. fetch:  refresh fixtures from api.sejm.gov.pl (clubs/mps/votings/
-                 prints/processes/proceedings/statements + bodies + photos)
-      2. stage:  fixtures -> _stage_* tables
-      3. load:   _stage_* -> production tables
-      4. enrich: unified Gemini call on prints with no impact_punch yet
+      1. fetch:  pull new data from api.sejm.gov.pl AND stream it straight
+                 into `_stage_*` tables via StreamingStager. Covers
+                 mps/clubs/prints/processes/votings/bills/videos +
+                 committees/committee_sittings.
+      2. stage:  file-scan the remaining resources (proceedings/questions/
+                 districts/postcodes/promises/acts) that don't fit the
+                 JSON-payload-to-stage pattern.
+      3. load:   _stage_* -> production tables (SQL RPC orchestration)
+      4. enrich: unified LLM call on prints with no impact_punch yet
       5. embed:  qwen3 embeddings on prints/statements/promises with no
                  embedded_at marker yet
       6. refresh: matviews mp_discipline_summary + mp_attendance +
@@ -255,37 +403,103 @@ def cmd_daily(
 
     Exit code 0 only if every phase finished without unhandled exceptions.
     """
+    # Phase 1: fetch + stream straight into `_stage_*`. Every term-keyed
+    # JSON resource (mps/clubs/prints/processes/votings/bills/videos +
+    # committees/committee_sittings) goes through StreamingStager during
+    # fetch — no file-scan re-stage needed. Resources that don't fit the
+    # JSON-payload-to-stage pattern (proceedings — compound HTML body
+    # composition; questions — `kind` column; promises/districts/postcodes
+    # — non-Sejm origins; acts — single-key eli_id) stay on the legacy
+    # file-scan path in Phase 2 below.
+    direct_staged: set[str] = set()
+
     if not skip_fetch:
-        logger.info("=== daily phase 1/6: fetch ===")
-        # Sejm API base resources — incremental on the API side (each
-        # capture-then-cache fetcher only writes new fixture files).
-        from supagraf.fetch.proceedings_bodies import fetch_proceeding_bodies
-        from supagraf.fetch.mp_photos import fetch_mp_photos
+        logger.info("=== daily phase 1/6: fetch + direct-stage ===")
         from supagraf.fetch.committees import fetch_committees
+        from supagraf.fetch.committee_sittings import fetch_committee_sittings
+        from supagraf.fetch.mp_photos import fetch_mp_photos
+        from supagraf.fetch.proceedings_bodies import fetch_proceeding_bodies
+        from supagraf.schema.committee_sittings import CommitteeSittingsBundle
+        from supagraf.schema.committees import Committee
+        from supagraf.stage.base import StreamingStager
+
+        # HTML statement bodies — not a JSON-payload resource; bodies get
+        # picked up by stage_proceedings on its file-scan pass.
         try:
             fetch_proceeding_bodies(term=term)
         except Exception as e:
             logger.error("proceedings_bodies fetch failed: {!r}", e)
+
+        # MP photo URLs land directly on the `mps` table; no stage row.
         try:
             fetch_mp_photos(term=term)
         except Exception as e:
             logger.error("mp_photos fetch failed: {!r}", e)
-        # Committees roster: idempotent — skips already-cached fixtures.
-        # Always runs the list call so new committees mid-term are picked up.
+
+        # Committees roster — idempotent, skips already-cached fixtures.
         try:
-            fetch_committees(term=term)
+            with StreamingStager(
+                resource="committees",
+                table="_stage_committees",
+                model=Committee,
+                term=term,
+            ) as stager:
+                fetch_committees(
+                    term=term,
+                    on_record=lambda nid, p, src: stager.push(
+                        natural_id=nid, payload=p, source_path=src
+                    ),
+                )
+            direct_staged.add("committees")
         except Exception as e:
             logger.error("committees fetch failed: {!r}", e)
-        # Committee sittings: ALWAYS re-fetches (mutable: status PLANNED→
-        # ONGOING→FINISHED, agenda edits). ~31 GETs/day at 1s throttle.
+
+        # Committee sittings — ALWAYS re-fetches (status PLANNED → ONGOING
+        # → FINISHED, agenda edits mid-day).
         try:
-            from supagraf.fetch.committee_sittings import fetch_committee_sittings
-            fetch_committee_sittings(term=term)
+            with StreamingStager(
+                resource="committee_sittings",
+                table="_stage_committee_sittings",
+                model=CommitteeSittingsBundle,
+                term=term,
+            ) as stager:
+                fetch_committee_sittings(
+                    term=term,
+                    on_record=lambda nid, p, src: stager.push(
+                        natural_id=nid, payload=p, source_path=src
+                    ),
+                )
+            direct_staged.add("committee_sittings")
         except Exception as e:
             logger.error("committee_sittings fetch failed: {!r}", e)
 
-    logger.info("=== daily phase 2-3/6: stage + load ===")
-    cmd_stage(None, term=term)
+        # Bulk Sejm captures (mps / clubs / prints / processes / votings /
+        # bills / videos). Each opens its own StreamingStager keyed to the
+        # matching `_stage_<resource>` table; no_binaries=True skips photo /
+        # logo / attachment downloads (not needed for staging).
+        try:
+            _run_direct_stage_captures(term=term, direct_staged=direct_staged)
+        except Exception as e:
+            logger.error("direct-stage captures failed: {!r}", e)
+
+    # Phase 2-3: file-scan-stage only the resources that DIDN'T stream
+    # during fetch. Subtraction (rather than a hardcoded short list) means
+    # if a direct-stage capture failed earlier (logged + swallowed), the
+    # file-scan path still picks it up as a recovery — no resource silently
+    # falls through the cracks.
+    _all_resources = (
+        "clubs", "mps", "votings", "committees", "committee_sittings",
+        "processes", "bills",
+        "questions", "videos", "proceedings",
+        "districts", "postcodes", "promises",
+        "acts",
+    )
+    remaining_targets = [r for r in _all_resources if r not in direct_staged]
+    logger.info(
+        "=== daily phase 2-3/6: stage + load (direct-staged: {}; file-scanning: {}) ===",
+        sorted(direct_staged), remaining_targets,
+    )
+    cmd_stage(remaining_targets, term=term)
     cmd_load(term=term)
 
     # Keep print -> committee_sitting links fresh after every load.

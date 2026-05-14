@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
+    // Dev: skip immutable caching so HMR-rebuilt chunks reach the browser.
+    // Next.js itself warns about this on startup, and stale chunks make
+    // CSS/TSX edits invisible after a reload.
+    if (process.env.NODE_ENV !== "production") return [];
     return [
       {
         source: "/_next/static/:path*",

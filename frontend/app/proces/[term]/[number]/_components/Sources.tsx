@@ -6,7 +6,7 @@ type Source = {
   kind: string | null;
 };
 
-export function Zrodla({
+export function Sources({
   term,
   number,
   attachments,

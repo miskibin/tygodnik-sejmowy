@@ -1,6 +1,12 @@
 import { DropCap } from "@/components/chrome/DropCap";
+import { MarkdownText } from "@/components/text/MarkdownText";
 import { affectedGroupLabel, severityColor, severityLabel } from "@/lib/labels";
 import type { AffectedGroup, PrintDetail } from "@/lib/db/prints";
+
+// v7 prompt permits inline markdown in summary_plain (**bold**, _italic_, "- " lists).
+// Drop-cap only makes sense when the body opens with a letter, not a markdown
+// sigil. Detect: skip drop-cap if the first non-whitespace char isn't a letter.
+const LEADS_WITH_LETTER = /^\s*\p{L}/u;
 
 function SectionHead({ title, subtitle }: { title: string; subtitle?: string | null }) {
   return (
@@ -16,12 +22,17 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
   );
 }
 
-export function Streszczenie({ print }: { print: PrintDetail }) {
+export function Summary({ print }: { print: PrintDetail }) {
   const body = (print.summaryPlain ?? print.summary ?? "").trim();
   if (!body && print.affectedGroups.length === 0 && !print.impactPunch) return null;
 
-  const firstChar = body ? body.charAt(0) : "";
-  const rest = body ? body.slice(1) : "";
+  const canDropCap = LEADS_WITH_LETTER.test(body);
+  // When the body opens with a letter, peel off the first char for the
+  // DropCap and feed the remainder through MarkdownText. Otherwise render
+  // the whole body via MarkdownText with no drop cap (markdown sigils up
+  // front break the typographic effect anyway).
+  const firstChar = canDropCap ? body.charAt(0) : "";
+  const restBody = canDropCap ? body.slice(1) : body;
 
   return (
     <section className="py-12 border-b border-border">
@@ -32,7 +43,7 @@ export function Streszczenie({ print }: { print: PrintDetail }) {
           {/* LEFT — drop cap paragraph */}
           <div className="min-w-0">
             {body ? (
-              <p
+              <div
                 className="font-serif m-0"
                 style={{
                   fontSize: 21,
@@ -41,9 +52,9 @@ export function Streszczenie({ print }: { print: PrintDetail }) {
                   textWrap: "pretty" as never,
                 }}
               >
-                <DropCap>{firstChar}</DropCap>
-                {rest}
-              </p>
+                {canDropCap && <DropCap>{firstChar}</DropCap>}
+                <MarkdownText text={restBody} allowLists inline={false} />
+              </div>
             ) : (
               <p className="font-serif italic text-muted-foreground m-0">
                 Streszczenie nie jest jeszcze dostępne.

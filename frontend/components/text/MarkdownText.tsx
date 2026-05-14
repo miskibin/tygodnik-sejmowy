@@ -22,6 +22,11 @@ type MarkdownTextProps = {
   // When true (default) the outer <p> renders as a fragment so the caller
   // controls block wrapping. When false, paragraphs render as <p>.
   inline?: boolean;
+  // When true, render <ul>/<ol>/<li> as proper block lists instead of
+  // unwrapping them inline. Use for long-form fields (print summary_plain)
+  // where the LLM emits "- item" enumerations and visual list structure
+  // aids scanability. Default false preserves legacy inline-only contract.
+  allowLists?: boolean;
 };
 
 // Internal route prefixes used across sejmograf. External = anything else.
@@ -60,7 +65,7 @@ function asSpan({ children }: { children?: ReactNode }): ReactNode {
   return <span>{children}</span>;
 }
 
-function buildComponents(inline: boolean): Components {
+function buildComponents(inline: boolean, allowLists: boolean): Components {
   return {
     strong: ({ children }) => (
       <strong className="font-semibold text-foreground">{children}</strong>
@@ -103,9 +108,21 @@ function buildComponents(inline: boolean): Components {
     h4: asSpan,
     h5: asSpan,
     h6: asSpan,
-    ul: unwrap,
-    ol: unwrap,
-    li: unwrap,
+    ul: allowLists
+      ? ({ children }) => (
+          <ul className="my-3 pl-5 list-disc marker:text-muted-foreground space-y-1">
+            {children}
+          </ul>
+        )
+      : unwrap,
+    ol: allowLists
+      ? ({ children }) => (
+          <ol className="my-3 pl-5 list-decimal marker:text-muted-foreground space-y-1">
+            {children}
+          </ol>
+        )
+      : unwrap,
+    li: allowLists ? ({ children }) => <li>{children}</li> : unwrap,
     blockquote: unwrap,
     pre: unwrap,
     hr: () => null,
@@ -113,15 +130,23 @@ function buildComponents(inline: boolean): Components {
   };
 }
 
-const INLINE_COMPONENTS = buildComponents(true);
-const BLOCK_COMPONENTS = buildComponents(false);
+const INLINE_COMPONENTS = buildComponents(true, false);
+const BLOCK_COMPONENTS = buildComponents(false, false);
+const BLOCK_LIST_COMPONENTS = buildComponents(false, true);
+const INLINE_LIST_COMPONENTS = buildComponents(true, true);
 
-export function MarkdownText({ text, className, inline = true }: MarkdownTextProps) {
+export function MarkdownText({ text, className, inline = true, allowLists = false }: MarkdownTextProps) {
   if (!text) return null;
   const trimmed = text.trim();
   if (!trimmed) return null;
 
-  const components = inline ? INLINE_COMPONENTS : BLOCK_COMPONENTS;
+  const components = allowLists
+    ? inline
+      ? INLINE_LIST_COMPONENTS
+      : BLOCK_LIST_COMPONENTS
+    : inline
+      ? INLINE_COMPONENTS
+      : BLOCK_COMPONENTS;
   const node = (
     <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} skipHtml>
       {text}

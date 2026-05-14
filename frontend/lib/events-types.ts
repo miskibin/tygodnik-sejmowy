@@ -184,6 +184,11 @@ export type ViralQuoteEventPayload = {
   statement_num?: number | null;
   /** Official Sejm proceedings title for the sitting (`proceedings.title`). */
   proceeding_title?: string | null;
+  /** Agenda point being debated when the statement was spoken — resolved
+   * server-side via `viral_quote_events_v` lateral join to the next "Pkt. N ..."
+   * voting after `start_datetime`. NULL when no matching voting (debate-only
+   * agenda item or statement after the last vote of the day). */
+  agenda_point_title?: string | null;
   // Enriched in lib/db/events.ts after fetch.
   photo_url?: string | null;
   klub?: string | null;

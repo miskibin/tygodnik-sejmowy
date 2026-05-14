@@ -28,7 +28,7 @@ import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import httpx
 from loguru import logger
@@ -40,6 +40,11 @@ from tenacity import (
 )
 
 from supagraf.fixtures.storage import fixtures_root
+
+# Callback receives (natural_id, payload, source_path) after each successful
+# fixture write. Used by the direct-to-DB daily path (cmd_daily) to stream
+# fresh payloads into _stage_committees without a second fixture re-scan.
+RecordCallback = Callable[[str, dict, str], None]
 
 LIST_URL = "https://api.sejm.gov.pl/sejm/term{term}/committees"
 DETAIL_URL = "https://api.sejm.gov.pl/sejm/term{term}/committees/{code}"
@@ -128,6 +133,7 @@ def fetch_committees(
     term: int = 10,
     *,
     force: bool = False,
+    on_record: RecordCallback | None = None,
     throttle_s: float = DEFAULT_THROTTLE_S,
     timeout_s: float = DEFAULT_TIMEOUT_S,
 ) -> FetchReport:
@@ -136,6 +142,11 @@ def fetch_committees(
     Re-fetch is per-committee idempotent: a non-empty existing file is
     skipped unless `force=True`. Always reads the list endpoint (cheap)
     so newly-created committees mid-term are picked up.
+
+    `on_record(code, payload, source_path)` (optional) fires after each
+    fixture is written. Used by the direct-to-DB daily path; callback
+    exceptions are caught + logged here so a failing DB write never aborts
+    the fetch loop (the fixture is the durable cache).
     """
     report = FetchReport(term=term)
     dest_dir = _committees_dir()
@@ -178,6 +189,13 @@ def fetch_committees(
                 continue
             _atomic_write_json(target, payload)
             report.detail_fetched += 1
+            if on_record is not None:
+                try:
+                    rel_path = f"fixtures/sejm/committees/{code}.json"
+                    on_record(code, payload, rel_path)
+                except Exception as e:  # noqa: BLE001
+                    report.errors.append((code, f"stage callback: {e!r}"))
+                    logger.warning("stage callback failed for {}: {!r}", code, e)
             if throttle_s > 0:
                 time.sleep(throttle_s)
 

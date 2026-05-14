@@ -24,7 +24,7 @@ import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import httpx
 from loguru import logger
@@ -36,6 +36,8 @@ from tenacity import (
 )
 
 from supagraf.fixtures.storage import fixtures_root
+
+RecordCallback = Callable[[str, dict, str], None]
 
 LIST_URL = "https://api.sejm.gov.pl/sejm/term{term}/committees"
 SITTINGS_URL = "https://api.sejm.gov.pl/sejm/term{term}/committees/{code}/sittings"
@@ -122,6 +124,7 @@ def fetch_committee_sittings(
     term: int = 10,
     *,
     only_code: str | None = None,
+    on_record: RecordCallback | None = None,
     throttle_s: float = DEFAULT_THROTTLE_S,
     timeout_s: float = DEFAULT_TIMEOUT_S,
 ) -> FetchReport:
@@ -132,6 +135,11 @@ def fetch_committee_sittings(
 
     `only_code` (uppercase committee code) limits to a single committee — useful
     for the spot-verification step and CLI backfill.
+
+    `on_record(code, bundle, source_path)` (optional) fires after each fixture
+    is written. Bundle shape matches the staged payload: `{"code": ..., "sittings": [...]}`.
+    Callback exceptions are caught + logged here, never re-raised — the
+    fixture is the durable cache; the DB write is best-effort.
     """
     report = FetchReport(term=term)
     dest_dir = _sittings_dir()
@@ -192,6 +200,13 @@ def fetch_committee_sittings(
             _atomic_write_json(target, bundle)
             report.bundles_fetched += 1
             report.sittings_total += len(payload)
+            if on_record is not None:
+                try:
+                    rel_path = f"fixtures/sejm/committee_sittings/{code}.json"
+                    on_record(code, bundle, rel_path)
+                except Exception as e:  # noqa: BLE001
+                    report.errors.append((code, f"stage callback: {e!r}"))
+                    logger.warning("stage callback failed for {}: {!r}", code, e)
             if throttle_s > 0:
                 time.sleep(throttle_s)
 

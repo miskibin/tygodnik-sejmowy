@@ -135,6 +135,14 @@ BLACKLIST_RE = re.compile(
 # bans these but v4-Pro / v4-Flash slip through anyway. Post-parse
 # nullification: if action matches, set citizen_action=null (frontend
 # already hides the section when null). Better empty than weak.
+# v7 — summary_plain may carry inline markdown (**bold**, _italic_, `- ` list
+# bullets). Word-count validator strips these before counting so formatting
+# doesn't push a borderline summary over PLAIN_MAX_WORDS or under PLAIN_MIN_WORDS.
+# Multi-char `**` first so we don't leave a stray `*`; `_` and leading `- `
+# (list bullet at line start) replaced with space.
+_MARKDOWN_SIGIL_RE = re.compile(r"\*\*|\*|_|^\s*-\s+", re.MULTILINE)
+
+
 ACTION_BANLIST_RE = re.compile(
     r"zapoznaj\s+si[ęe]\s+z|"                 # "zapoznaj się z definicjami" — to read, not act
     r"(prze)?czyt[aa]j|"                       # "przeczytaj"/"czytaj projekt"
@@ -280,7 +288,11 @@ class PrintUnifiedOutput(BaseModel):
     @field_validator("summary_plain")
     @classmethod
     def _word_count_in_range(cls, v: str) -> str:
-        n = len(v.split())
+        # v7 allows inline markdown (**bold**, _italic_, `- ` list bullets).
+        # Strip those sigils before counting so the LLM isn't penalized for
+        # formatting; word count remains a content metric.
+        stripped = _MARKDOWN_SIGIL_RE.sub(" ", v)
+        n = len(stripped.split())
         if n < PLAIN_MIN_WORDS or n > PLAIN_MAX_WORDS:
             raise ValueError(
                 f"summary_plain word count {n} outside [{PLAIN_MIN_WORDS},{PLAIN_MAX_WORDS}]"

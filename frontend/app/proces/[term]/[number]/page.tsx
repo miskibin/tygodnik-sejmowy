@@ -7,10 +7,10 @@ import { NotFoundPage } from "@/components/chrome/NotFoundPage";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { Hero } from "./_components/Hero";
 import { Timeline } from "./_components/Timeline";
-import { Streszczenie } from "./_components/Streszczenie";
+import { Summary } from "./_components/Summary";
 import { Votings } from "./_components/Votings";
-import { Komisje } from "./_components/Komisje";
-import { Zrodla } from "./_components/Zrodla";
+import { Committees } from "./_components/Committees";
+import { Sources } from "./_components/Sources";
 
 
 export async function generateMetadata({
@@ -137,14 +137,14 @@ export default async function DrukPage({
       <Timeline stages={stages} votings={relatedVotings} processStillOpen={!!processStillOpen} />
 
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
-        <Streszczenie print={print} />
+        <Summary print={print} />
         <Votings
           votings={relatedVotings}
           mainVotingId={mainVoting?.votingId ?? null}
           votingByClub={votingByClub}
           processStillOpen={!!processStillOpen}
         />
-        <Komisje stages={stages} committeeSittings={committeeSittings} />
+        <Committees stages={stages} committeeSittings={committeeSittings} />
 
         {/* Dz.U. publication banner — kept from old layout, repositioned here. */}
         {outcome?.passed && outcome.act && (
@@ -243,7 +243,7 @@ export default async function DrukPage({
           </section>
         )}
 
-        <Zrodla
+        <Sources
           term={print.term}
           number={print.number}
           attachments={attachments}

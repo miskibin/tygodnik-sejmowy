@@ -384,37 +384,32 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
   const s = ev.payload;
   const quote = s.viral_quote?.trim() ?? "";
   const summary = s.summary_one_line?.trim() ?? "";
+  // Prefer the agenda point title ("Pkt. N ...") over the full sitting name —
+  // it's the specific topic being debated, not the redundant sitting label.
+  // Fall back to proceeding_title for statements during pure-debate items
+  // (no voting → no agenda_point_title from the view's lateral join).
+  const agendaPt = s.agenda_point_title?.trim() ?? "";
   const proceedingPt = s.proceeding_title?.trim() ?? "";
   const fallbackTitle =
     summary && summary !== quote ? summary : quote ? "Cytat z debaty sejmowej" : "Wypowiedź sejmowa";
-  const headline = proceedingPt || fallbackTitle;
+  const headline = agendaPt || proceedingPt || fallbackTitle;
   const role = s.function?.trim();
   const hideRole =
     !role ||
     role.localeCompare("poseł", "pl", { sensitivity: "accent" }) === 0;
 
-  const subtitle =
-    proceedingPt
-      ? summary && summary !== quote
-        ? (
-            <span className="font-sans not-italic normal-case tracking-normal text-muted-foreground">
-              {summary}
-            </span>
-          )
-        : s.viral_reason?.trim()
-          ? (
-              <span className="font-sans not-italic normal-case tracking-normal text-muted-foreground">
-                {s.viral_reason.trim()}
-              </span>
-            )
-          : null
-      : s.viral_reason?.trim()
-        ? (
-            <span className="font-sans not-italic normal-case tracking-normal text-muted-foreground">
-              {s.viral_reason.trim()}
-            </span>
-          )
-        : null;
+  // Subtitle prefers the LLM summary; falls back to viral_reason. Only shown
+  // when the headline is a real agenda/proceeding title (not the synthetic
+  // "Cytat z debaty sejmowej" fallback that would duplicate the quote).
+  const hasRealHeadline = Boolean(agendaPt || proceedingPt);
+  const subtitleText = summary && summary !== quote ? summary : s.viral_reason?.trim() || "";
+  const subtitle = hasRealHeadline && subtitleText
+    ? (
+        <span className="font-sans not-italic normal-case tracking-normal text-muted-foreground">
+          {subtitleText}
+        </span>
+      )
+    : null;
 
   return (
     <NumberedRow
