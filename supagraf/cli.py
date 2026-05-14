@@ -11,7 +11,7 @@ from loguru import logger
 
 from supagraf.db import supabase
 from supagraf.fixtures.storage import fixtures_root
-from supagraf.load import run_core_load
+from supagraf.load import _rpc_int, run_core_load
 from supagraf.stage import acts as stage_acts
 from supagraf.stage import bills as stage_bills
 from supagraf.stage import clubs as stage_clubs
@@ -226,6 +226,82 @@ def cmd_run_all(term: int = 10):
     """Stage everything, then load everything."""
     cmd_stage(None, term=term)
     cmd_load(term=term)
+
+
+@app.command("backfill-prints")
+def cmd_backfill_prints(
+    term: int = typer.Option(10, "--term", "-t"),
+    skip_relink: bool = typer.Option(
+        False, "--skip-relink",
+        help="skip re-running load_proceedings to resolve agenda refs",
+    ),
+):
+    """Sweep ALL upstream prints regardless of year, stage + load them.
+
+    `daily` filters `capture_prints` by `SUPAGRAF_CAPTURE_YEAR` (default:
+    current year) — historical prints from earlier years of the term get
+    skipped on the per-day path. Symptom: prints listed in agenda HTML as
+    `druki nr 1, 2, 3` end up in `unresolved_agenda_print_refs` because
+    the `prints` row never existed locally.
+
+    This command runs the same fetch path with `year=None`, then runs the
+    prints chain of SQL loaders. By default also re-runs `load_proceedings`
+    so previously-unresolved agenda refs resolve into `agenda_item_prints`.
+
+    Idempotent: existing on-disk fixtures and prints rows aren't refetched
+    (refresh=False). Cost: one HTTP GET per missing print + N upserts.
+    """
+    import asyncio
+
+    from supagraf.fixtures.client import SejmClient
+    from supagraf.fixtures.sources import sejm as sejm_src
+    from supagraf.fixtures.storage import fixtures_root
+    from supagraf.schema.prints import Print
+    from supagraf.stage.base import StreamingStager
+
+    out_root = fixtures_root()
+    staged_count = 0
+
+    async def _go() -> None:
+        nonlocal staged_count
+        async with SejmClient(concurrency=5) as client:
+            with StreamingStager(
+                resource="prints", table="_stage_prints", model=Print, term=term,
+            ) as stager:
+                ids = await sejm_src.capture_prints(
+                    client, out_root, term,
+                    year=None,  # NO year filter — that's the whole point.
+                    refresh=False, no_binaries=True, limit=None,
+                    on_record=lambda nid, p, src: stager.push(
+                        natural_id=nid, payload=p, source_path=src,
+                    ),
+                )
+                staged_count = len(ids)
+
+    logger.info("backfill-prints: fetching all upstream prints (no year filter)…")
+    asyncio.run(_go())
+    logger.info("backfill-prints: staged {} prints", staged_count)
+
+    # Prints chain — order matters (see supagraf/load/__init__.py:_PRE_STEPS).
+    # additional/relationships/attachments depend on prints existing first.
+    chain = (
+        "load_prints",
+        "load_prints_additional",
+        "load_print_relationships",
+        "load_print_attachments",
+    )
+    for fn in chain:
+        n = _rpc_int(fn, term)
+        logger.info("backfill-prints: {} affected={}", fn, n)
+
+    if not skip_relink:
+        # load_proceedings deletes + re-inserts agenda_items, re-resolving
+        # unresolved_agenda_print_refs against the now-larger prints set.
+        # Same loader the daily uses — no special-case code path.
+        n = _rpc_int("load_proceedings", term)
+        logger.info("backfill-prints: load_proceedings relink affected={}", n)
+
+    logger.info("backfill-prints: done")
 
 
 def _run_direct_stage_captures(*, term: int, direct_staged: set[str]) -> None:

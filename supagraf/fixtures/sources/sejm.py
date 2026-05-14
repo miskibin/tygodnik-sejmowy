@@ -484,12 +484,18 @@ async def capture_prints(
     client: SejmClient,
     out_root: Path,
     term: int,
-    year: int,
+    year: Optional[int],
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
     on_record: RecordCallback | None = None,
 ) -> list[str]:
+    """Fetch term-N prints, optionally filtered by year.
+
+    `year=None` disables year filtering — used by `backfill-prints` to
+    sweep historical prints that `daily` (year=current) would skip. Daily
+    keeps year filtering so it doesn't re-iterate ~3000+ entries per run.
+    """
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "prints"
 
@@ -498,7 +504,10 @@ async def capture_prints(
         return []
     write_json(dest_dir / "_list.json", list_data)
 
-    keep = [p for p in list_data if in_year(p, year)]
+    if year is None:
+        keep = list(list_data)
+    else:
+        keep = [p for p in list_data if in_year(p, year)]
     if limit is not None:
         keep = keep[:limit]
 
