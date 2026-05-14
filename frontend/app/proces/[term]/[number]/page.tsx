@@ -11,6 +11,7 @@ import { Streszczenie } from "./_components/Streszczenie";
 import { Votings } from "./_components/Votings";
 import { Komisje } from "./_components/Komisje";
 import { Zrodla } from "./_components/Zrodla";
+import { ProcesLegislacyjnyOnboarding } from "./_components/ProcesLegislacyjnyOnboarding";
 
 
 export async function generateMetadata({
@@ -106,6 +107,7 @@ export default async function DrukPage({
             (print.changeDate ? ` · ${formatDate(print.changeDate)}` : "")
           }
         />
+        <ProcesLegislacyjnyOnboarding />
         {(print.isMetaDocument || print.isProcedural) && (
           <div
             className="font-sans text-[12px] text-secondary-foreground mb-5 max-w-[760px] leading-[1.55] px-3 py-2 border-l-2"
