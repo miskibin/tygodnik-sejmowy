@@ -16,6 +16,13 @@ obietnice, wypowiedzi.
 [![Expo](https://img.shields.io/badge/expo-mobile-000020.svg)](mobile/package.json)
 [![Supabase](https://img.shields.io/badge/supabase-postgres%20%2B%20pgvector-3ECF8E.svg)](supabase/)
 
+### 🔗 Linki
+
+[![Strona](https://img.shields.io/badge/🌐_Strona-tygodniksejmowy.pl-8B1A1A?style=for-the-badge)](https://tygodniksejmowy.pl)
+[![Wesprzyj](https://img.shields.io/badge/❤_Wesprzyj-Patronite-FF424D?style=for-the-badge)](https://patronite.pl/tygodniksejmowy)
+[![Zgłoś błąd](https://img.shields.io/badge/🐛_Zgłoś_błąd-GitHub_Issues-181717?style=for-the-badge&logo=github)](https://github.com/miskibin/tygodnik-sejmowy/issues/new)
+[![X](https://img.shields.io/badge/𝕏_Obserwuj-@sejmstats-000000?style=for-the-badge)](https://x.com/sejmstats)
+
 </div>
 
 ---
