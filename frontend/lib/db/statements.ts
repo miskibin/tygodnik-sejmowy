@@ -60,9 +60,15 @@ type RawStatement = {
   } | null;
 };
 
+// Left-joined: a statement row may exist before its proceeding_day /
+// proceeding linkage is backfilled. getTopViralStatements / list views can
+// surface such rows; if we forced !inner here, /mowa/[id] would 404 on a
+// link the user just clicked. Downstream readers null-chain through
+// r.proceeding_day and day.proceeding, and buildTranscriptUrl returns
+// {url: null, dayIdx: null} when sitting/dayDate is absent.
 const SELECT_COLS =
   "id, term, num, mp_id, speaker_name, function, body_text, start_datetime, end_datetime, " +
-  "proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number, title, dates))";
+  "proceeding_day:proceeding_days(date, proceeding:proceedings(number, title, dates))";
 
 function buildTranscriptUrl(
   term: number,
