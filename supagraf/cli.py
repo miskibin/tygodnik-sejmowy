@@ -418,10 +418,21 @@ def cmd_daily(
         from supagraf.fetch.committees import fetch_committees
         from supagraf.fetch.committee_sittings import fetch_committee_sittings
         from supagraf.fetch.mp_photos import fetch_mp_photos
+        from supagraf.fetch.proceeding_agendas import fetch_current_proceeding_agendas
         from supagraf.fetch.proceedings_bodies import fetch_proceeding_bodies
         from supagraf.schema.committee_sittings import CommitteeSittingsBundle
         from supagraf.schema.committees import Committee
         from supagraf.stage.base import StreamingStager
+
+        # Plenary agendas for `current=true` sittings — Marshal edits the
+        # porządek obrad mid-sitting (new prints, sprawozdania, drugie czytania
+        # appended). The default `capture_proceedings` path skips cached files,
+        # so without this refresh `agenda_item_prints` stops gaining links the
+        # moment a sitting starts.
+        try:
+            fetch_current_proceeding_agendas(term=term)
+        except Exception as e:
+            logger.error("proceeding agendas refresh failed: {!r}", e)
 
         # HTML statement bodies — not a JSON-payload resource; bodies get
         # picked up by stage_proceedings on its file-scan pass.
