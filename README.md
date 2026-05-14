@@ -1,103 +1,109 @@
 <div align="center">
 
-<img src="frontend/public/logo.png" alt="Tygodnik Sejmowy" width="160" />
+<img src="frontend/public/logo-white.png" alt="Tygodnik Sejmowy" width="160" />
 
 # Tygodnik Sejmowy
 
-**Weekly digest of Polish parliamentary activity.**
-Open data pipeline + Next.js frontend that ingests Sejm + ELI sources,
-enriches them with LLM and embeddings, and surfaces what actually
-happened in parliament this week — votes, prints, committees, promises,
-statements.
+**Cotygodniowy przegląd działalności polskiego parlamentu.**
+Otwarty pipeline danych + aplikacje webowa i mobilna, które pobierają dane z Sejmu i ELI,
+wzbogacają je modelami językowymi oraz embeddingami i pokazują, co naprawdę
+wydarzyło się w parlamencie w tym tygodniu — głosowania, druki, komisje,
+obietnice, wypowiedzi.
 
 [![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-orange.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![Next.js](https://img.shields.io/badge/next.js-16-black.svg)](frontend/package.json)
+[![Expo](https://img.shields.io/badge/expo-mobile-000020.svg)](mobile/package.json)
 [![Supabase](https://img.shields.io/badge/supabase-postgres%20%2B%20pgvector-3ECF8E.svg)](supabase/)
 
 </div>
 
 ---
 
-## What's inside
+## Co znajdziesz w repo
 
-- **`supagraf/`** — Python ETL: fetches Sejm + ELI fixtures, stages, loads, enriches with Ollama (gemma4:e4b) + nomic embeddings, OCRs scanned prints (pymupdf + tesseract `pol`).
-- **`frontend/`** — Next.js 16 app reading directly from Supabase. Routes for atlas, druki, głosowania, komisje, obietnice, sondaże, tygodnik (weekly).
-- **`supabase/migrations/`** — sequential SQL migrations.
-- **`.agents/skills/polski-proces-legislacyjny/`** — in-repo Claude Code skill covering the Polish legislative process (auto-loads when working in this repo).
+<table>
+<tr>
+<td align="center" width="33%">
 
-## Setup
+### 🐍 supagraf
+**ETL i wzbogacanie**
 
-```bash
-cp .env.example .env       # fill in Supabase + LLM creds
-uv sync
-```
+Pythonowy pipeline: pobiera dane z API Sejmu i ELI, ładuje do Supabase,
+wzbogaca treści za pomocą LLM (DeepSeek) oraz embeddingów (qwen3),
+OCR-uje skany druków (pymupdf + tesseract `pol`).
 
-Frontend:
+[`supagraf/`](supagraf/)
 
-```bash
-cd frontend
-cp .env.local.example .env.local
-pnpm install
-pnpm dev
-```
+</td>
+<td align="center" width="33%">
 
-## Fixtures
+### 🌐 frontend
+**Tygodnik Sejmowy (web)**
 
-```bash
-# everything (term 10, year 2026), small binary samples per resource
-uv run python -m supagraf fixtures all --binary-cap 5
+Aplikacja Next.js 16 czytająca bezpośrednio z Supabase.
+Trasy: atlas, druki, głosowania, komisje, obietnice, sondaże, tygodnik.
 
-# JSON only
-uv run python -m supagraf fixtures all --no-binaries
+[`frontend/`](frontend/)
 
-# one resource
-uv run python -m supagraf fixtures votings --limit 50
-uv run python -m supagraf fixtures prints --binary-cap 3
-```
+</td>
+<td align="center" width="33%">
 
-JSON is git-tracked; PDFs / images / HTML transcripts are gitignored.
+### 📱 mobile
+**Aplikacja mobilna**
 
-## Ingest pipeline
+React Native + Expo. Onboarding, tygodniowy przegląd druków oraz
+widok szczegółów druku. Korzysta z tego samego backendu Supabase
+(klucz anon, tylko odczyt).
 
-```bash
-uv run python -m supagraf stage      # stage fixtures into _stage_* tables
-uv run python -m supagraf load       # SQL load functions (idempotent)
-uv run python -m supagraf run-all    # both
-uv run python -m supagraf daily      # full incremental: fetch -> stage -> load -> enrich -> embed
-```
+[`mobile/`](mobile/)
 
-Migrations live under `supabase/migrations/`, applied via Supabase CLI or
-MCP `apply_migration`.
+</td>
+</tr>
+</table>
 
-## Tests
+## Szybki start
+
+Instrukcje konfiguracji środowiska, kluczy i pierwszego uruchomienia
+każdego modułu znajdziesz w [docs/getting-started.md](docs/getting-started.md).
+
+## Struktura repo
+
+- **`supagraf/`** — pipeline ETL w Pythonie (fetch → stage → load → enrich → embed).
+- **`frontend/`** — webowy Next.js 16.
+- **`mobile/`** — mobilne Expo / React Native.
+- **`supabase/migrations/`** — sekwencyjne migracje SQL.
+- **`docs/`** — dokumentacja techniczna i raporty (m.in. `getting-started.md`, `v1-skeleton-findings.md`).
+- **`.agents/skills/polski-proces-legislacyjny/`** — wewnętrzna umiejętność Claude Code opisująca polski proces legislacyjny (auto-ładowana w tym repo).
+
+## Testy
 
 ```bash
 uv run pytest tests/supagraf -q --ignore=tests/supagraf/e2e
-RUN_E2E=1 uv run pytest tests/supagraf/e2e -q   # hits live Supabase
+RUN_E2E=1 uv run pytest tests/supagraf/e2e -q   # uderza w żywe Supabase
 ```
 
-See [docs/v1-skeleton-findings.md](docs/v1-skeleton-findings.md) for the
-v1 skeleton run report and data-quality findings.
+Raport z przebiegu szkieletu v1 i znalezisk jakości danych:
+[docs/v1-skeleton-findings.md](docs/v1-skeleton-findings.md).
 
-## Working with Claude Code
+## Praca z Claude Code
 
-The repo ships an in-repo skill at
+Repo zawiera wewnętrzną umiejętność w
 [`.agents/skills/polski-proces-legislacyjny/`](.agents/skills/polski-proces-legislacyjny/)
-covering initiative types, three readings, committee work, Senate stage,
-President decisions, and Dz.U. publication. Claude Code auto-loads it.
+opisującą typy inicjatyw, trzy czytania, prace komisji, etap senacki,
+decyzje Prezydenta i publikację w Dz.U. Claude Code ładuje ją automatycznie.
 
-To re-fetch optional Supabase/Postgres dev skills:
+Aby ponownie pobrać opcjonalne umiejętności dev-owe Supabase / Postgres:
 
 ```bash
 npx skills add supabase/agent-skills
 ```
 
-## License
+## Licencja
 
-[PolyForm Noncommercial License 1.0.0](LICENSE) — source-available, free
-for noncommercial, personal, research, and nonprofit use. Commercial use
-requires a separate agreement.
+[PolyForm Noncommercial License 1.0.0](LICENSE) — kod źródłowy dostępny,
+darmowy do użytku niekomercyjnego, osobistego, badawczego i non-profit.
+Użycie komercyjne wymaga osobnej umowy.
 
-Pre-OSS development history (340 commits) lives in the original private
-repository at `github.com/miskibin/sejmograf`.
+Historia rozwoju sprzed wydania jako open source (340 commitów) znajduje się
+w oryginalnym prywatnym repo `github.com/miskibin/sejmograf`.
