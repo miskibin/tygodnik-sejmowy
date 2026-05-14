@@ -226,18 +226,31 @@ export type MainVotingSeat = {
 };
 
 // Agenda point of a plenary sitting where this print was procedowany.
-// Sourced from agenda_item_prints (mig 0028); statement count from
-// statement_print_links (mig 0047) narrowed to source='agenda_item' so we
-// only count speeches anchored to the same agenda item, not stray druk
-// mentions elsewhere in the sitting.
+// Two source paths merge per sitting:
+//   * agenda_item_prints (mig 0028) — what Sejm scheduled in the porządek
+//     obrad. Carries ord + title.
+//   * process_stages.sitting_num — what actually happened (I/II/III czytanie,
+//     głosowanie, sprawozdanie). Useful when a print was procedowany at a
+//     sitting but Sejm never wrote it into the agenda HTML (e.g. druk 2530
+//     in sitting 57).
+// `agendaItemId` is null on stage-only rows; `stages` is empty on agenda-only.
+// statementCount only fires when there's an agenda anchor (statement_print_links
+// agenda_item_id key).
+export type ProceedingPointStage = {
+  stageType: string;
+  stageName: string;
+  stageDate: string | null;
+};
+
 export type ProceedingPoint = {
-  agendaItemId: number;
+  agendaItemId: number | null;
   sittingNum: number;
   sittingTitle: string;
   sittingDates: string[];
-  ord: number;
-  title: string;
+  ord: number | null;
+  title: string | null;
   statementCount: number;
+  stages: ProceedingPointStage[];
 };
 
 export type PrintWithStages = {
@@ -572,25 +585,99 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     }
   }
 
-  const proceedingPoints: ProceedingPoint[] = agendaItems
-    .map((ai): ProceedingPoint | null => {
+  // Source A: agenda_item_prints rows (what Sejm scheduled).
+  const agendaPoints = agendaItems
+    .map((ai) => {
       const proc = Array.isArray(ai.proceedings) ? ai.proceedings[0] : ai.proceedings;
       if (!proc) return null;
       return {
-        agendaItemId: ai.id,
+        agendaItemId: ai.id as number | null,
         sittingNum: proc.number,
         sittingTitle: proc.title,
         sittingDates: proc.dates ?? [],
-        ord: ai.ord,
-        title: ai.title,
+        ord: ai.ord as number | null,
+        title: ai.title as string | null,
         statementCount: stmtCountByItem.get(ai.id) ?? 0,
+        stages: [] as ProceedingPointStage[],
       };
     })
-    .filter((x): x is ProceedingPoint => !!x)
-    .sort((a, b) => {
-      if (a.sittingNum !== b.sittingNum) return a.sittingNum - b.sittingNum;
-      return a.ord - b.ord;
+    .filter((x): x is ProceedingPoint => !!x);
+
+  // Source B: process_stages with sitting_num set (what actually happened on
+  // the floor — I/II czytanie, głosowanie, sprawozdanie). Bucket per sitting.
+  const stagesBySitting = new Map<number, ProceedingPointStage[]>();
+  if (processId !== -1) {
+    const { data: stageRows } = await sb
+      .from("process_stages")
+      .select("stage_type, stage_name, stage_date, sitting_num")
+      .eq("process_id", processId)
+      .not("sitting_num", "is", null);
+    for (const r of (stageRows ?? []) as Array<{
+      stage_type: string | null;
+      stage_name: string | null;
+      stage_date: string | null;
+      sitting_num: number | null;
+    }>) {
+      if (r.sitting_num == null) continue;
+      const list = stagesBySitting.get(r.sitting_num) ?? [];
+      list.push({
+        stageType: r.stage_type ?? "",
+        stageName: r.stage_name ?? "",
+        stageDate: r.stage_date ?? null,
+      });
+      stagesBySitting.set(r.sitting_num, list);
+    }
+  }
+
+  // Backfill sitting metadata for stage-only sittings (no agenda anchor → no
+  // proceedings join available yet). One query scoped to the delta.
+  const haveSittingNums = new Set(agendaPoints.map((p) => p.sittingNum));
+  const sittingMeta = new Map<number, { title: string; dates: string[] }>();
+  const missingSittings = [...stagesBySitting.keys()].filter((n) => !haveSittingNums.has(n));
+  if (missingSittings.length > 0) {
+    const { data: procRows } = await sb
+      .from("proceedings")
+      .select("number, title, dates")
+      .eq("term", term)
+      .in("number", missingSittings);
+    for (const r of (procRows ?? []) as Array<{ number: number; title: string; dates: string[] }>) {
+      sittingMeta.set(r.number, { title: r.title, dates: r.dates ?? [] });
+    }
+  }
+
+  // Merge per sitting. When both sources hit the same sitting, stages attach
+  // to the FIRST agenda point of that sitting (typical: 1 agenda item → 1-2
+  // stages = czytanie + głosowanie). Stage-only sittings (e.g. Sejm proceduje
+  // bez wpisu do agenda_html, jak druk 2530 w 57.) get one synthetic row.
+  const seenSittings = new Set<number>();
+  const proceedingPoints: ProceedingPoint[] = [];
+  for (const ap of agendaPoints) {
+    const stages = !seenSittings.has(ap.sittingNum)
+      ? (stagesBySitting.get(ap.sittingNum) ?? [])
+      : [];
+    proceedingPoints.push({ ...ap, stages });
+    seenSittings.add(ap.sittingNum);
+  }
+  for (const sn of stagesBySitting.keys()) {
+    if (seenSittings.has(sn)) continue;
+    const meta = sittingMeta.get(sn);
+    if (!meta) continue;
+    proceedingPoints.push({
+      agendaItemId: null,
+      sittingNum: sn,
+      sittingTitle: meta.title,
+      sittingDates: meta.dates,
+      ord: null,
+      title: null,
+      statementCount: 0,
+      stages: stagesBySitting.get(sn) ?? [],
     });
+    seenSittings.add(sn);
+  }
+  proceedingPoints.sort((a, b) => {
+    if (a.sittingNum !== b.sittingNum) return a.sittingNum - b.sittingNum;
+    return (a.ord ?? Number.MAX_SAFE_INTEGER) - (b.ord ?? Number.MAX_SAFE_INTEGER);
+  });
 
   const sponsorMpsRaw = p.sponsor_mps as unknown;
   const sponsorMps: string[] = Array.isArray(sponsorMpsRaw)
