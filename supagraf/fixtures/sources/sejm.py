@@ -484,12 +484,18 @@ async def capture_prints(
     client: SejmClient,
     out_root: Path,
     term: int,
-    year: int,
+    year: Optional[int],
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
     on_record: RecordCallback | None = None,
 ) -> list[str]:
+    """Fetch term-N prints, optionally filtered by year.
+
+    `year=None` disables year filtering — used by `backfill-prints` to
+    sweep historical prints that `daily` (year=current) would skip. Daily
+    keeps year filtering so it doesn't re-iterate ~3000+ entries per run.
+    """
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "prints"
 
@@ -498,7 +504,10 @@ async def capture_prints(
         return []
     write_json(dest_dir / "_list.json", list_data)
 
-    keep = [p for p in list_data if in_year(p, year)]
+    if year is None:
+        keep = list(list_data)
+    else:
+        keep = [p for p in list_data if in_year(p, year)]
     if limit is not None:
         keep = keep[:limit]
 
@@ -532,12 +541,13 @@ async def capture_processes(
     client: SejmClient,
     out_root: Path,
     term: int,
-    year: int,
+    year: Optional[int],
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
     on_record: RecordCallback | None = None,
 ) -> list[str]:
+    """`year=None` disables filtering — used by backfill-resources."""
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "processes"
 
@@ -546,7 +556,7 @@ async def capture_processes(
         return []
     write_json(dest_dir / "_list.json", list_data)
 
-    keep = [p for p in list_data if in_year(p, year)]
+    keep = list(list_data) if year is None else [p for p in list_data if in_year(p, year)]
     if limit is not None:
         keep = keep[:limit]
 
@@ -582,11 +592,12 @@ async def capture_bills(
     client: SejmClient,
     out_root: Path,
     term: int,
-    year: int,
+    year: Optional[int],
     refresh: bool,
     limit: Optional[int],
     on_record: RecordCallback | None = None,
 ) -> list[str]:
+    """`year=None` disables filtering — used by backfill-resources."""
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "bills"
 
@@ -595,7 +606,7 @@ async def capture_bills(
         return []
     write_json(dest_dir / "_list.json", list_data)
 
-    keep = [b for b in list_data if in_year(b, year)]
+    keep = list(list_data) if year is None else [b for b in list_data if in_year(b, year)]
     if limit is not None:
         keep = keep[:limit]
 
@@ -619,7 +630,7 @@ async def _capture_qa(
     client: SejmClient,
     out_root: Path,
     term: int,
-    year: int,
+    year: Optional[int],
     refresh: bool,
     no_binaries: bool,
     limit: Optional[int],
@@ -633,7 +644,7 @@ async def _capture_qa(
         return []
     write_json(dest_dir / "_list.json", list_data)
 
-    keep = [i for i in list_data if in_year(i, year)]
+    keep = list(list_data) if year is None else [i for i in list_data if in_year(i, year)]
     if limit is not None:
         keep = keep[:limit]
 
@@ -698,11 +709,12 @@ async def capture_videos(
     client: SejmClient,
     out_root: Path,
     term: int,
-    year: int,
+    year: Optional[int],
     refresh: bool,
     limit: Optional[int],
     on_record: RecordCallback | None = None,
 ) -> list[str]:
+    """`year=None` disables filtering — used by backfill-resources."""
     base = _term_root(term)
     dest_dir = out_root / "sejm" / "videos"
 
@@ -711,7 +723,7 @@ async def capture_videos(
         return []
     write_json(dest_dir / "_list.json", list_data)
 
-    keep = [v for v in list_data if in_year(v, year)]
+    keep = list(list_data) if year is None else [v for v in list_data if in_year(v, year)]
     if limit is not None:
         keep = keep[:limit]
 

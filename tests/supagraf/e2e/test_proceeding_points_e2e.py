@@ -38,6 +38,28 @@ def sb():
     return supabase()
 
 
+def _paginate(query_builder_fn, page: int = 1000) -> list[dict]:
+    """Pull every row from a PostgREST query in 1000-row pages.
+
+    `query_builder_fn(offset, limit)` returns a NEW query for each chunk
+    (PostgREST clients are stateful; reusing the same builder across
+    `.range()` calls compounds the filters). Without this every query in
+    this file silently caps at 1000 rows and the invariant tests pass on
+    partial data — the exact failure mode they claim to catch.
+    """
+    out: list[dict] = []
+    offset = 0
+    while True:
+        rows = query_builder_fn(offset, page).execute().data or []
+        if not rows:
+            break
+        out.extend(rows)
+        if len(rows) < page:
+            break
+        offset += len(rows)
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Whole-table invariants — fast, no sampling.
 # ---------------------------------------------------------------------------
@@ -46,13 +68,23 @@ def test_agenda_item_prints_reference_real_prints(sb):
     """Every (term, print_number) in agenda_item_prints must resolve to a
     prints row. FK enforces this, but verifying covers DB drift / migration
     bugs that would silently drop frontend rows."""
-    aip = sb.table("agenda_item_prints").select("term, print_number").eq("term", TERM).execute().data or []
+    aip = _paginate(
+        lambda o, p: sb.table("agenda_item_prints")
+        .select("term, print_number")
+        .eq("term", TERM)
+        .order("agenda_item_id")
+        .range(o, o + p - 1)
+    )
     if not aip:
         pytest.skip("no agenda_item_prints rows for term — nothing to verify")
     pairs = {(r["term"], r["print_number"]) for r in aip}
-    # Pull just the keys we need; supabase select can't IN across composite keys
-    # easily, so fetch the whole term's prints index (cheap).
-    prints = sb.table("prints").select("term, number").eq("term", TERM).execute().data or []
+    prints = _paginate(
+        lambda o, p: sb.table("prints")
+        .select("term, number")
+        .eq("term", TERM)
+        .order("id")
+        .range(o, o + p - 1)
+    )
     real = {(r["term"], r["number"]) for r in prints}
     missing = pairs - real
     assert not missing, f"agenda_item_prints references {len(missing)} non-existent prints; sample: {list(missing)[:5]}"
@@ -62,7 +94,12 @@ def test_agenda_items_reference_real_proceedings(sb):
     """agenda_items.proceeding_id must point to a real proceedings row.
     A NULL/orphan here silently drops the entire sitting group on the
     frontend (proceedings join returns null → row filtered out)."""
-    items = sb.table("agenda_items").select("id, proceeding_id").execute().data or []
+    items = _paginate(
+        lambda o, p: sb.table("agenda_items")
+        .select("id, proceeding_id")
+        .order("id")
+        .range(o, o + p - 1)
+    )
     if not items:
         pytest.skip("no agenda_items rows")
     proc_ids = {r["proceeding_id"] for r in items}
@@ -77,21 +114,30 @@ def test_statement_print_links_agenda_item_consistent_with_aip(sb):
     agenda_item) must also appear in agenda_item_prints. Otherwise the count
     we display includes statements anchored to an agenda item that doesn't
     actually reference this print — a backfill bug we'd never notice in UI."""
-    links = (
-        sb.table("statement_print_links")
+    links = _paginate(
+        lambda o, p: sb.table("statement_print_links")
         .select("print_id, agenda_item_id")
         .not_.is_("agenda_item_id", "null")
-        .execute()
-        .data
-        or []
+        .order("statement_id")
+        .range(o, o + p - 1)
     )
     if not links:
         pytest.skip("no statement_print_links with agenda_item_id (backfill not run)")
 
-    # Build (agenda_item_id -> term, print_number) from prints + agenda_item_prints
-    aip = sb.table("agenda_item_prints").select("agenda_item_id, term, print_number").execute().data or []
-    # Map agenda_item_prints to print_id via prints
-    prints = sb.table("prints").select("id, term, number").eq("term", TERM).execute().data or []
+    aip = _paginate(
+        lambda o, p: sb.table("agenda_item_prints")
+        .select("agenda_item_id, term, print_number")
+        .eq("term", TERM)
+        .order("agenda_item_id")
+        .range(o, o + p - 1)
+    )
+    prints = _paginate(
+        lambda o, p: sb.table("prints")
+        .select("id, term, number")
+        .eq("term", TERM)
+        .order("id")
+        .range(o, o + p - 1)
+    )
     pid_by_key = {(r["term"], r["number"]): r["id"] for r in prints}
     valid_pairs: set[tuple[int, int]] = set()
     for r in aip:
@@ -119,7 +165,13 @@ def test_statement_print_links_agenda_item_consistent_with_aip(sb):
 def sampled_print_ids(sb):
     """Pick 20 random prints (by id) that have at least one agenda_item_prints
     row. Deterministic via RNG_SEED so failures reproduce."""
-    aip = sb.table("agenda_item_prints").select("term, print_number").eq("term", TERM).execute().data or []
+    aip = _paginate(
+        lambda o, p: sb.table("agenda_item_prints")
+        .select("term, print_number")
+        .eq("term", TERM)
+        .order("agenda_item_id")
+        .range(o, o + p - 1)
+    )
     if not aip:
         pytest.skip("no agenda_item_prints rows for term")
     distinct = sorted({(r["term"], r["print_number"]) for r in aip})
@@ -188,8 +240,15 @@ def test_sampled_prints_statement_counts_are_nonnegative(sb, sampled_print_ids):
     """statement_print_links agenda_item_id may resolve to a count. Verify
     counts are sane (>= 0) and that counts > 0 imply agenda_item is in this
     print's agenda_item_prints."""
-    # Resolve sample (term, number) -> print_id
-    prints = sb.table("prints").select("id, term, number").eq("term", TERM).execute().data or []
+    # Resolve sample (term, number) -> print_id. Full term table = >4000 rows
+    # so paginate — PostgREST default cap would silently truncate.
+    prints = _paginate(
+        lambda o, p: sb.table("prints")
+        .select("id, term, number")
+        .eq("term", TERM)
+        .order("id")
+        .range(o, o + p - 1)
+    )
     pid_by_key = {(r["term"], r["number"]): r["id"] for r in prints}
 
     failures: list[str] = []

@@ -11,7 +11,7 @@ from loguru import logger
 
 from supagraf.db import supabase
 from supagraf.fixtures.storage import fixtures_root
-from supagraf.load import run_core_load
+from supagraf.load import _rpc_int, run_core_load
 from supagraf.stage import acts as stage_acts
 from supagraf.stage import bills as stage_bills
 from supagraf.stage import clubs as stage_clubs
@@ -228,6 +228,239 @@ def cmd_run_all(term: int = 10):
     cmd_load(term=term)
 
 
+@app.command("backfill-prints")
+def cmd_backfill_prints(
+    term: int = typer.Option(10, "--term", "-t"),
+    skip_relink: bool = typer.Option(
+        False, "--skip-relink",
+        help="skip re-running load_proceedings to resolve agenda refs",
+    ),
+):
+    """Sweep ALL upstream prints regardless of year, stage + load them.
+
+    `daily` filters `capture_prints` by `SUPAGRAF_CAPTURE_YEAR` (default:
+    current year) — historical prints from earlier years of the term get
+    skipped on the per-day path. Symptom: prints listed in agenda HTML as
+    `druki nr 1, 2, 3` end up in `unresolved_agenda_print_refs` because
+    the `prints` row never existed locally.
+
+    This command runs the same fetch path with `year=None`, then runs the
+    prints chain of SQL loaders. By default also re-runs `load_proceedings`
+    so previously-unresolved agenda refs resolve into `agenda_item_prints`.
+
+    Idempotent: existing on-disk fixtures and prints rows aren't refetched
+    (refresh=False). Cost: one HTTP GET per missing print + N upserts.
+
+    NOT SAFE TO RUN CONCURRENTLY with `daily` — both write to
+    `_stage_prints` and the loaders are not write-locked. Run this when
+    cron is off, or just accept that daily picks up what backfill misses
+    on the next pass.
+    """
+    import asyncio
+
+    from supagraf.fixtures.client import SejmClient
+    from supagraf.fixtures.sources import sejm as sejm_src
+    from supagraf.fixtures.storage import fixtures_root
+    from supagraf.schema.prints import Print
+    from supagraf.stage.base import StreamingStager
+
+    out_root = fixtures_root()
+    staged_count = 0
+
+    async def _go() -> None:
+        nonlocal staged_count
+        async with SejmClient(concurrency=5) as client:
+            with StreamingStager(
+                resource="prints", table="_stage_prints", model=Print, term=term,
+            ) as stager:
+                ids = await sejm_src.capture_prints(
+                    client, out_root, term,
+                    year=None,  # NO year filter — that's the whole point.
+                    refresh=False, no_binaries=True, limit=None,
+                    on_record=lambda nid, p, src: stager.push(
+                        natural_id=nid, payload=p, source_path=src,
+                    ),
+                )
+                staged_count = len(ids)
+
+    logger.info("backfill-prints: fetching all upstream prints (no year filter)…")
+    asyncio.run(_go())
+    logger.info("backfill-prints: staged {} prints", staged_count)
+
+    # Prints chain — order matters (see supagraf/load/__init__.py:_PRE_STEPS).
+    # additional/relationships/attachments depend on prints existing first.
+    chain = (
+        "load_prints",
+        "load_prints_additional",
+        "load_print_relationships",
+        "load_print_attachments",
+    )
+    for fn in chain:
+        n = _rpc_int(fn, term)
+        logger.info("backfill-prints: {} affected={}", fn, n)
+
+    if not skip_relink:
+        _resolve_unresolved_agenda_refs(term=term)
+
+    logger.info("backfill-prints: done")
+
+
+def _resolve_unresolved_agenda_refs(*, term: int) -> None:
+    """Targeted relink: move `unresolved_agenda_print_refs` rows whose
+    print_number is now present in `prints` into `agenda_item_prints`.
+
+    Why not just call `load_proceedings` RPC: that function does a full
+    delete + re-insert of every agenda_item, statement, and link for every
+    proceeding in the term — too heavy for Cloudflare/Kong's nginx upstream
+    timeout (60s), times out as 504 on hosted PostgREST.
+
+    This function does the surgical version: only the rows where a previously
+    unresolved ref now has a matching print. All via PostgREST table ops so
+    each request is small (<8s) — no direct-DSN required.
+    """
+    client = supabase()
+
+    # 1. Pull all unresolved refs for the term — paginate since PostgREST
+    #    caps at 1000 rows per request.
+    unresolved: list[dict] = []
+    page = 1000
+    offset = 0
+    while True:
+        rows = (
+            client.table("unresolved_agenda_print_refs")
+            .select("id, agenda_item_id, term, print_number")
+            .eq("term", term)
+            .is_("resolved_at", "null")
+            .order("id")
+            .range(offset, offset + page - 1)
+            .execute()
+            .data
+            or []
+        )
+        if not rows:
+            break
+        unresolved.extend(rows)
+        if len(rows) < page:
+            break
+        offset += len(rows)
+    logger.info("backfill-prints: {} unresolved agenda refs to check", len(unresolved))
+
+    if not unresolved:
+        return
+
+    # 2. Which print_numbers now exist? Pull the set once.
+    refs = sorted({r["print_number"] for r in unresolved})
+    have: set[str] = set()
+    batch = 500  # in-clause length limit
+    for i in range(0, len(refs), batch):
+        chunk = refs[i:i + batch]
+        rows = (
+            client.table("prints")
+            .select("number")
+            .eq("term", term)
+            .in_("number", chunk)
+            .execute()
+            .data
+            or []
+        )
+        have.update(r["number"] for r in rows)
+
+    resolvable = [r for r in unresolved if r["print_number"] in have]
+    logger.info(
+        "backfill-prints: {} of {} unresolved refs now point to real prints",
+        len(resolvable), len(unresolved),
+    )
+
+    # 3. Upsert into agenda_item_prints with on-conflict ignore.
+    if resolvable:
+        rows_to_insert = [
+            {"agenda_item_id": r["agenda_item_id"], "term": r["term"], "print_number": r["print_number"]}
+            for r in resolvable
+        ]
+        for i in range(0, len(rows_to_insert), batch):
+            (
+                client.table("agenda_item_prints")
+                .upsert(rows_to_insert[i:i + batch], on_conflict="agenda_item_id,term,print_number")
+                .execute()
+            )
+
+    # 4. Mark resolved.
+    if resolvable:
+        from datetime import datetime, timezone
+
+        now = datetime.now(timezone.utc).isoformat()
+        ids = [r["id"] for r in resolvable]
+        for i in range(0, len(ids), batch):
+            (
+                client.table("unresolved_agenda_print_refs")
+                .update({"resolved_at": now})
+                .in_("id", ids[i:i + batch])
+                .execute()
+            )
+
+    logger.info(
+        "backfill-prints: relink done — agenda_item_prints +{} rows, "
+        "{} unresolved refs marked resolved",
+        len(resolvable), len(resolvable),
+    )
+
+
+@app.command("backfill-processes")
+def cmd_backfill_processes(
+    term: int = typer.Option(10, "--term", "-t"),
+):
+    """Sweep ALL upstream processes regardless of year, stage + load them.
+
+    Same year-filter problem as `backfill-prints`: `capture_processes` filters
+    `list_data` by `in_year(year)`, so historical processes from earlier years
+    of the term get skipped on the daily path. Symptom: the
+    `process_stages.sitting_num` lookup on the print page returns nothing for
+    older prints, so the "Punkty obrad" badges (I/II czytanie, głosowanie)
+    don't render even when the print actually was procedowany.
+
+    Runs the same fetch path with `year=None`, then `load_processes` SQL
+    function (idempotent — ON CONFLICT updates in-place, additional stages
+    get re-derived from the fresh payload).
+
+    NOT SAFE TO RUN CONCURRENTLY with `daily` (same `_stage_processes`
+    table; the loaders don't take a write lock).
+    """
+    import asyncio
+
+    from supagraf.fixtures.client import SejmClient
+    from supagraf.fixtures.sources import sejm as sejm_src
+    from supagraf.fixtures.storage import fixtures_root
+    from supagraf.schema.processes import Process
+    from supagraf.stage.base import StreamingStager
+
+    out_root = fixtures_root()
+    staged_count = 0
+
+    async def _go() -> None:
+        nonlocal staged_count
+        async with SejmClient(concurrency=5) as client:
+            with StreamingStager(
+                resource="processes", table="_stage_processes", model=Process, term=term,
+            ) as stager:
+                ids = await sejm_src.capture_processes(
+                    client, out_root, term,
+                    year=None,
+                    refresh=False, no_binaries=True, limit=None,
+                    on_record=lambda nid, p, src: stager.push(
+                        natural_id=nid, payload=p, source_path=src,
+                    ),
+                )
+                staged_count = len(ids)
+
+    logger.info("backfill-processes: fetching all upstream processes (no year filter)…")
+    asyncio.run(_go())
+    logger.info("backfill-processes: staged {} processes", staged_count)
+
+    n = _rpc_int("load_processes", term)
+    logger.info("backfill-processes: load_processes affected={}", n)
+    logger.info("backfill-processes: done")
+
+
 def _run_direct_stage_captures(*, term: int, direct_staged: set[str]) -> None:
     """Run the bulk Sejm captures with StreamingStager callbacks attached.
 
@@ -418,10 +651,21 @@ def cmd_daily(
         from supagraf.fetch.committees import fetch_committees
         from supagraf.fetch.committee_sittings import fetch_committee_sittings
         from supagraf.fetch.mp_photos import fetch_mp_photos
+        from supagraf.fetch.proceeding_agendas import fetch_current_proceeding_agendas
         from supagraf.fetch.proceedings_bodies import fetch_proceeding_bodies
         from supagraf.schema.committee_sittings import CommitteeSittingsBundle
         from supagraf.schema.committees import Committee
         from supagraf.stage.base import StreamingStager
+
+        # Plenary agendas for `current=true` sittings — Marshal edits the
+        # porządek obrad mid-sitting (new prints, sprawozdania, drugie czytania
+        # appended). The default `capture_proceedings` path skips cached files,
+        # so without this refresh `agenda_item_prints` stops gaining links the
+        # moment a sitting starts.
+        try:
+            fetch_current_proceeding_agendas(term=term)
+        except Exception as e:
+            logger.error("proceeding agendas refresh failed: {!r}", e)
 
         # HTML statement bodies — not a JSON-payload resource; bodies get
         # picked up by stage_proceedings on its file-scan pass.

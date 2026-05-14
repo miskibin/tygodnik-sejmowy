@@ -1,4 +1,5 @@
-import type { ProceedingPoint } from "@/lib/db/prints";
+import { stageLabel } from "@/lib/stages";
+import type { ProceedingPoint, ProceedingPointStage } from "@/lib/db/prints";
 
 function SectionHead({ title, subtitle }: { title: string; subtitle?: string | null }) {
   return (
@@ -24,19 +25,8 @@ function pluralPosiedzen(n: number): string {
   return `${n} posiedzeń`;
 }
 
-function pluralPunktow(n: number): string {
-  if (n === 1) return "1 punkt";
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} punkty`;
-  return `${n} punktów`;
-}
-
 function pluralWypowiedzi(n: number): string {
   if (n === 1) return "1 wypowiedź";
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} wypowiedzi`;
   return `${n} wypowiedzi`;
 }
 
@@ -53,6 +43,28 @@ function formatSittingDates(dates: string[]): string {
     return `${first.getDate()}–${last.getDate()} ${monthYear}`;
   }
   return `${fmt.format(first)} – ${fmt.format(last)}`;
+}
+
+// Collapse a stage row to a short badge string. stage_name carries the
+// czytanie ordinal ("I czytanie / II czytanie / III czytanie") that
+// stage_type alone loses, so we prefer it when the name disambiguates.
+function stageBadge(stage: ProceedingPointStage): string {
+  return stageLabel(stage.stageType, stage.stageName);
+}
+
+// Same stage_type often repeats per sitting (e.g. 2x "Voting" on different
+// votings within the same SejmReading). Collapse exact duplicates to keep
+// the badge row compact. Order preserved by first occurrence.
+function dedupBadges(stages: ProceedingPointStage[]): { label: string; date: string | null }[] {
+  const seen = new Set<string>();
+  const out: { label: string; date: string | null }[] = [];
+  for (const s of stages) {
+    const label = stageBadge(s);
+    if (seen.has(label)) continue;
+    seen.add(label);
+    out.push({ label, date: s.stageDate });
+  }
+  return out;
 }
 
 type SittingGroup = {
@@ -102,7 +114,33 @@ export function ProceedingPoints({ points }: { points: ProceedingPoint[] }) {
   );
 }
 
+function StageBadge({ label }: { label: string }) {
+  return (
+    <span
+      className="font-sans uppercase shrink-0"
+      style={{
+        fontSize: 10,
+        letterSpacing: "0.08em",
+        color: "var(--destructive-deep)",
+        background: "var(--muted)",
+        border: "1px solid var(--border)",
+        padding: "2px 6px",
+        borderRadius: 2,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
 function SittingGroupRow({ group }: { group: SittingGroup }) {
+  // All badges across all points in this sitting — stages attach to the
+  // first point of each sitting by the dataloader contract, but render at
+  // sitting level so they're visible even on stage-only rows (no agenda).
+  const allStages = group.points.flatMap((p) => p.stages);
+  const badges = dedupBadges(allStages);
+
   return (
     <li className="py-5 border-b border-border last:border-b-0">
       <div className="flex items-baseline gap-3 flex-wrap mb-3">
@@ -118,40 +156,59 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
         >
           {formatSittingDates(group.sittingDates)}
         </span>
-        <span className="font-sans text-[11px] text-muted-foreground ml-auto">
-          {pluralPunktow(group.points.length)}
-        </span>
+        {badges.length > 0 && (
+          <div className="flex gap-1.5 flex-wrap ml-auto">
+            {badges.map((b) => (
+              <StageBadge key={b.label} label={b.label} />
+            ))}
+          </div>
+        )}
       </div>
 
       <ul className="list-none p-0 m-0 space-y-2">
-        {group.points.map((p) => (
-          <li
-            key={p.agendaItemId}
-            className="flex items-baseline gap-3"
-            style={{ paddingLeft: 4 }}
-          >
-            <span
-              className="font-mono text-muted-foreground shrink-0"
-              style={{ fontSize: 12, minWidth: 28 }}
+        {group.points.map((p, i) => {
+          // Stage-only synthetic point: no ord, no title. Skip the row —
+          // the badges in the header already convey "był procedowany".
+          if (p.agendaItemId === null) return null;
+          return (
+            <li
+              key={p.agendaItemId ?? `stage-${i}`}
+              className="flex items-baseline gap-3"
+              style={{ paddingLeft: 4 }}
             >
-              pkt {p.ord}
-            </span>
-            <span
-              className="font-serif text-secondary-foreground flex-1"
-              style={{ fontSize: 14.5, lineHeight: 1.5, textWrap: "pretty" as never }}
-            >
-              {p.title}
-            </span>
-            {p.statementCount > 0 && (
+              {p.ord !== null && (
+                <span
+                  className="font-mono text-muted-foreground shrink-0"
+                  style={{ fontSize: 12, minWidth: 28 }}
+                >
+                  pkt {p.ord}
+                </span>
+              )}
               <span
-                className="font-sans text-muted-foreground shrink-0"
-                style={{ fontSize: 11, letterSpacing: "0.02em" }}
+                className="font-serif text-secondary-foreground flex-1"
+                style={{ fontSize: 14.5, lineHeight: 1.5, textWrap: "pretty" as never }}
               >
-                {pluralWypowiedzi(p.statementCount)}
+                {p.title}
               </span>
-            )}
+              {p.statementCount > 0 && (
+                <span
+                  className="font-sans text-muted-foreground shrink-0"
+                  style={{ fontSize: 11, letterSpacing: "0.02em" }}
+                >
+                  {pluralWypowiedzi(p.statementCount)}
+                </span>
+              )}
+            </li>
+          );
+        })}
+        {group.points.every((p) => p.agendaItemId === null) && (
+          <li
+            className="font-serif italic text-muted-foreground"
+            style={{ fontSize: 13, paddingLeft: 4 }}
+          >
+            Procedowany bez wpisu w porządku obrad — etapy procesu poniżej.
           </li>
-        ))}
+        )}
       </ul>
     </li>
   );
