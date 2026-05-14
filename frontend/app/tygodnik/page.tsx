@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getEventsBySitting,
@@ -8,6 +9,10 @@ import { BriefList } from "./_components/BriefList";
 
 // ISR: `unstable_cache` in `lib/db/events` bounds cold PostgREST work; 300s matches that layer.
 export const revalidate = 300;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/tygodnik" },
+};
 
 export default async function TygodnikPage() {
   const [latest, sittings] = await Promise.all([

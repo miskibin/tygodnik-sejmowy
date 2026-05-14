@@ -13,20 +13,20 @@ const UMAMI_WEBSITE_ID = "85d3ab78-6c6b-4d21-8552-351cd900cd71";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
   subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
 });
 
 const SITE_URL = "https://tygodniksejmowy.pl";
@@ -156,7 +156,7 @@ export default function RootLayout({
           defer
           src="https://cloud.umami.is/script.js"
           data-website-id={UMAMI_WEBSITE_ID}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <script
           type="application/ld+json"

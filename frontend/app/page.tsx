@@ -20,9 +20,9 @@ async function safeTypewriter() {
 export default async function Landing() {
   const quotes = await safeTypewriter();
   return (
-    <div className="bg-background font-serif text-foreground">
+    <main className="bg-background font-serif text-foreground">
       <LandingHero viralQuotes={quotes} />
       <FeatureTileGrid />
-    </div>
+    </main>
   );
 }

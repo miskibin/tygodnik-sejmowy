@@ -54,8 +54,8 @@ export function VoteResultBar({ result }: { result: VoteResult }) {
   const motionLabel = motionTypeLabel(result.motionPolarity);
 
   return (
-    <div className="my-5">
-      <div className="flex items-baseline justify-between mb-2 gap-2">
+    <div className="my-5" style={{ minHeight: 76 }}>
+      <div className="flex items-baseline justify-between mb-2 gap-2" style={{ minHeight: 20 }}>
         <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground">
           wynik głosowania nr {result.votingNumber}
           {motionLabel && (

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   getPromisesEnriched,
   isActivityFilter,
@@ -7,6 +8,10 @@ import { ObietniceClient } from "./_components/ObietniceClient";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 export const revalidate = 300;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/obietnice" },
+};
 
 function parseList(value: string | string[] | undefined): string[] {
   if (!value) return [];

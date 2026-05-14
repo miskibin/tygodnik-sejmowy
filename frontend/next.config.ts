@@ -7,6 +7,33 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // cacheComponents disabled — pages still hit dynamic APIs (Date(), useProfile)
   // without Suspense/use-cache wrappers. Re-enable after sweep.
+  productionBrowserSourceMaps: false,
+  images: { formats: ["image/avif", "image/webp"] },
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "radix-ui",
+      "@base-ui/react",
+      "date-fns",
+      "recharts",
+    ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/:path*\\.(png|jpg|jpeg|svg|webp|avif|ico|woff2)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, immutable" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -89,7 +89,7 @@ export function ProcessStageBar({
   const currentIdx = stepIndexFor(currentStageType, processPassed);
 
   return (
-    <div className="mb-4">
+    <div className="mb-4" style={{ minHeight: 32 }}>
       <div className="flex items-center gap-1 mb-1.5">
         {STEPS.map((step, i) => {
           const done = i < currentIdx;

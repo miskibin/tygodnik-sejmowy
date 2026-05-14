@@ -21,10 +21,11 @@ export function KpiStrip({ slots }: { slots: KpiSlot[] }) {
           filtered.length === 1
             ? "minmax(0, 1fr)"
             : `repeat(${filtered.length}, minmax(0, 1fr))`,
+        minHeight: 72,
       }}
     >
       {filtered.map((s, i) => (
-        <div key={i} className="min-w-0">
+        <div key={i} className="min-w-0" style={{ minHeight: 60 }}>
           <div className="font-mono text-[9px] tracking-[0.18em] uppercase text-muted-foreground mb-1">
             {s.kicker}
           </div>

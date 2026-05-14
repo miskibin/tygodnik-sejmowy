@@ -24,6 +24,7 @@ export const metadata = {
   title: "Sondaże — Tygodnik Sejmowy",
   description:
     "Co Polacy myślą o partiach. Średnia ważona z ostatnich 30 dni, projekcja mandatów i historyczne trendy kwartalne.",
+  alternates: { canonical: "/sondaze" },
 };
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {

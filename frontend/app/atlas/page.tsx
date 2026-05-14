@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { Ornament } from "@/components/chrome/Ornament";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/atlas" },
+};
+
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import {
   getDistrictMap,
