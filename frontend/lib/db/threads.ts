@@ -2,6 +2,9 @@ import "server-only";
 
 import { normalizeActSourceUrl } from "@/lib/isap";
 import { supabase } from "@/lib/supabase";
+import type { SponsorAuthority } from "@/lib/db/prints";
+
+export type { SponsorAuthority } from "@/lib/db/prints";
 
 // Voting tally rendered inline next to a stage row (yes/no/abstain pill).
 // May come either from process_stages.voting jsonb or from voting_print_links
@@ -60,6 +63,10 @@ export type ProcessSummary = {
   lastStageName: string | null;
   lastStageDate: string | null;
   lastRefreshedAt: string | null;
+  // Earliest top-level (depth=0) stage date — powers "N dni w procesie".
+  firstStageDate: string | null;
+  // From prints.sponsor_authority; coarse origin of the bill.
+  sponsorAuthority: SponsorAuthority;
 };
 
 // Threads currently moving through Sejm — passed=false AND a top-level stage
@@ -121,34 +128,49 @@ export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<P
   }>;
   if (rows.length === 0) return [];
 
-  // Hydrate short_title from prints (term, number). PostgREST has no
-  // composite-IN, so we filter the cartesian and dedupe client-side.
+  // Hydrate short_title + sponsor_authority from prints (term, number).
+  // PostgREST has no composite-IN, so we filter the cartesian and dedupe
+  // client-side.
   const { data: printRows } = await sb
     .from("prints")
-    .select("term, number, short_title")
+    .select("term, number, short_title, sponsor_authority")
     .in("term", Array.from(new Set(rows.map((r) => r.term))))
     .in("number", Array.from(new Set(rows.map((r) => r.number))));
   const shortByKey = new Map<string, string | null>();
+  const sponsorByKey = new Map<string, SponsorAuthority>();
   for (const r of (printRows ?? []) as Array<{
     term: number;
     number: string;
     short_title: string | null;
+    sponsor_authority: string | null;
   }>) {
     shortByKey.set(`${r.term}::${r.number}`, r.short_title ?? null);
+    sponsorByKey.set(
+      `${r.term}::${r.number}`,
+      (r.sponsor_authority as SponsorAuthority) ?? null,
+    );
   }
+
+  // Earliest depth=0 stage_date per process — powers "days in pipeline".
+  // No cutoff filter here: processes that have been around for years still
+  // need a real start date.
+  const firstStageByProc = await fetchFirstStageDates(sb, procIds);
 
   const summaries: ProcessSummary[] = rows.map((r) => {
     const latest = latestByProc.get(r.id)!; // guaranteed by procIds derivation
+    const key = `${r.term}::${r.number}`;
     return {
       processId: r.id,
       term: r.term,
       number: r.number,
       title: r.title ?? "",
-      shortTitle: shortByKey.get(`${r.term}::${r.number}`) ?? null,
+      shortTitle: shortByKey.get(key) ?? null,
       lastStageType: latest.stageType,
       lastStageName: latest.stageName,
       lastStageDate: latest.stageDate,
       lastRefreshedAt: r.last_refreshed_at ?? null,
+      firstStageDate: firstStageByProc.get(r.id) ?? null,
+      sponsorAuthority: sponsorByKey.get(key) ?? null,
     };
   });
 
@@ -193,29 +215,70 @@ export async function getPassedProcesses(limit = 30, cutoffDays = 90): Promise<P
 
   const { data: printRows } = await sb
     .from("prints")
-    .select("term, number, short_title")
+    .select("term, number, short_title, sponsor_authority")
     .in("term", Array.from(new Set(rows.map((r) => r.term))))
     .in("number", Array.from(new Set(rows.map((r) => r.number))));
   const shortByKey = new Map<string, string | null>();
+  const sponsorByKey = new Map<string, SponsorAuthority>();
   for (const r of (printRows ?? []) as Array<{
     term: number;
     number: string;
     short_title: string | null;
+    sponsor_authority: string | null;
   }>) {
     shortByKey.set(`${r.term}::${r.number}`, r.short_title ?? null);
+    sponsorByKey.set(
+      `${r.term}::${r.number}`,
+      (r.sponsor_authority as SponsorAuthority) ?? null,
+    );
   }
 
-  return rows.map((r) => ({
-    processId: r.id,
-    term: r.term,
-    number: r.number,
-    title: r.title ?? "",
-    shortTitle: shortByKey.get(`${r.term}::${r.number}`) ?? null,
-    lastStageType: "Promulgation",
-    lastStageName: "Uchwalono",
-    lastStageDate: r.closure_date,
-    lastRefreshedAt: r.last_refreshed_at ?? null,
-  }));
+  const firstStageByProc = await fetchFirstStageDates(
+    sb,
+    rows.map((r) => r.id),
+  );
+
+  return rows.map((r) => {
+    const key = `${r.term}::${r.number}`;
+    return {
+      processId: r.id,
+      term: r.term,
+      number: r.number,
+      title: r.title ?? "",
+      shortTitle: shortByKey.get(key) ?? null,
+      lastStageType: "Promulgation",
+      lastStageName: "Uchwalono",
+      lastStageDate: r.closure_date,
+      lastRefreshedAt: r.last_refreshed_at ?? null,
+      firstStageDate: firstStageByProc.get(r.id) ?? null,
+      sponsorAuthority: sponsorByKey.get(key) ?? null,
+    };
+  });
+}
+
+// PostgREST has no GROUP BY / aggregate, so over-fetch all depth=0 stages for
+// the given process_ids and reduce client-side to min(stage_date) per process.
+// Used by both list queries (in-flight + passed) to populate firstStageDate.
+async function fetchFirstStageDates(
+  sb: ReturnType<typeof supabase>,
+  procIds: number[],
+): Promise<Map<number, string>> {
+  const out = new Map<number, string>();
+  if (procIds.length === 0) return out;
+  const { data } = await sb
+    .from("process_stages")
+    .select("process_id, stage_date")
+    .eq("depth", 0)
+    .in("process_id", procIds)
+    .not("stage_date", "is", null)
+    .order("stage_date", { ascending: true })
+    .limit(5000);
+  for (const r of (data ?? []) as Array<{ process_id: number; stage_date: string | null }>) {
+    if (!r.stage_date) continue;
+    if (out.has(r.process_id)) continue; // first wins, already asc-sorted
+    out.set(r.process_id, r.stage_date);
+  }
+  return out;
 }
 
 // Pick a recently-active mid-pipeline thread — one whose latest stage is past
@@ -285,11 +348,17 @@ export async function getLatestThread(): Promise<ProcessSummary | null> {
 
   const { data: printRows } = await sb
     .from("prints")
-    .select("short_title")
+    .select("short_title, sponsor_authority")
     .eq("term", proc.term)
     .eq("number", proc.number)
     .limit(1);
-  const shortTitle = ((printRows ?? [])[0] as { short_title: string | null } | undefined)?.short_title ?? null;
+  const printRow = (printRows ?? [])[0] as
+    | { short_title: string | null; sponsor_authority: string | null }
+    | undefined;
+  const shortTitle = printRow?.short_title ?? null;
+  const sponsorAuthority = (printRow?.sponsor_authority as SponsorAuthority) ?? null;
+
+  const firstStageByProc = await fetchFirstStageDates(sb, [proc.id]);
 
   return {
     processId: proc.id,
@@ -301,6 +370,8 @@ export async function getLatestThread(): Promise<ProcessSummary | null> {
     lastStageName: latest?.stage_name ?? null,
     lastStageDate: latest?.stage_date ?? null,
     lastRefreshedAt: proc.last_refreshed_at ?? null,
+    firstStageDate: firstStageByProc.get(proc.id) ?? null,
+    sponsorAuthority,
   };
 }
 
