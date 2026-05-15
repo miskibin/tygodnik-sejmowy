@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPrint } from "@/lib/db/prints";
+import { getProcessCitations } from "@/lib/db/statements";
 import { documentCategoryLabel, opinionSourceLabel, opinionSourceShort, promiseStatusLabel } from "@/lib/labels";
 import { PrintCard } from "@/components/print/PrintCard";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
@@ -8,6 +9,7 @@ import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { Hero } from "./_components/Hero";
 import { Timeline } from "./_components/Timeline";
 import { Summary } from "./_components/Summary";
+import { Citations } from "./_components/Citations";
 import { Votings } from "./_components/Votings";
 import { Committees } from "./_components/Committees";
 import { ProceedingPoints } from "./_components/ProceedingPoints";
@@ -92,6 +94,16 @@ export default async function DrukPage({
     proceedingPoints,
   } = data;
 
+  // Top-viral citations from the most recent sitting that discussed this
+  // process. Tolerant: if enrichment hasn't run for the linked statements,
+  // returns [] and the section silently disappears.
+  let citations: Awaited<ReturnType<typeof getProcessCitations>> = [];
+  try {
+    citations = await getProcessCitations(term, number);
+  } catch (err) {
+    console.error("[/proces/[term]/[number]] getProcessCitations failed", { term, number, err });
+  }
+
   const processStillOpen = !outcome?.passed && !print.currentStageType?.match(/^(End|Withdrawn|Rejected)$/);
 
   return (
@@ -140,6 +152,7 @@ export default async function DrukPage({
 
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
         <Summary print={print} />
+        <Citations items={citations} />
         <Votings
           votings={relatedVotings}
           mainVotingId={mainVoting?.votingId ?? null}

@@ -840,6 +840,149 @@ async function getRecentStatementSnippets(
   });
 }
 
+// ─── Process-scoped citations ────────────────────────────────────────────
+//
+// Powers the "Cytaty z sali plenarnej" section on /proces/[term]/[number].
+// Pulls top-viral statements linked (via statement_print_links) to any
+// print in the process (main + sub_prints), restricted to the most-recent
+// sitting that actually discussed it. Random sample server-side per request
+// so the cards rotate on every reload.
+export type ProcessCitation = {
+  id: number;
+  mpId: number | null;
+  speakerName: string | null;
+  function: string | null;
+  clubRef: string | null;
+  photoUrl: string | null;
+  viralQuote: string;
+  viralReason: string | null;
+  tone: string | null;
+  date: string | null;
+  proceedingNumber: number | null;
+};
+
+export async function getProcessCitations(
+  term: number,
+  printNumber: string,
+  sampleSize = 4,
+): Promise<ProcessCitation[]> {
+  const sb = supabase();
+
+  // 1. All print IDs in this process: the main print + any forward-linked
+  //    sub-prints (autopoprawka, opinia, OSR). Statements may be tagged
+  //    against any of them via statement_print_links.
+  const { data: printRows, error: pErr } = await sb
+    .from("prints")
+    .select("id")
+    .eq("term", term)
+    .or(`number.eq.${printNumber},parent_number.eq.${printNumber}`);
+  if (pErr) throw pErr;
+  const printIds = (printRows ?? []).map((r) => (r as { id: number }).id);
+  if (printIds.length === 0) return [];
+
+  // 2. Statement IDs linked to any of those prints.
+  const { data: linkRows, error: lErr } = await sb
+    .from("statement_print_links")
+    .select("statement_id")
+    .in("print_id", printIds);
+  if (lErr) throw lErr;
+  const stmtIds = Array.from(
+    new Set((linkRows ?? []).map((r) => (r as { statement_id: number }).statement_id)),
+  );
+  if (stmtIds.length === 0) return [];
+
+  // 3. Top-viral candidates among the linked set. Grab a wider pool than
+  //    sampleSize so the "last sitting" filter + random sample still has
+  //    room to work.
+  type StmtRow = {
+    id: number;
+    mp_id: number | null;
+    speaker_name: string | null;
+    function: string | null;
+    viral_quote: string | null;
+    viral_reason: string | null;
+    viral_score: number | string | null;
+    tone: string | null;
+    start_datetime: string | null;
+    proceeding_day: { date: string | null; proceeding: { number: number | null } | null } | null;
+  };
+  const { data: stmtRows, error: sErr } = await sb
+    .from("proceeding_statements")
+    .select(
+      "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+    )
+    .in("id", stmtIds)
+    .eq("term", term)
+    .not("viral_quote", "is", null)
+    .order("viral_score", { ascending: false, nullsFirst: false })
+    .limit(40);
+  if (sErr) throw sErr;
+  const rows = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
+    (r) => r.viral_quote && r.viral_quote.trim().length > 0,
+  );
+  if (rows.length === 0) return [];
+
+  // 4. Keep only the most-recent sitting (highest proceeding.number) —
+  //    "z ostatniej dyskusji". Statements without a linked sitting fall out.
+  const latestSitting = rows.reduce<number | null>((max, r) => {
+    const n = r.proceeding_day?.proceeding?.number ?? null;
+    if (n == null) return max;
+    return max == null || n > max ? n : max;
+  }, null);
+  const pool = latestSitting == null
+    ? rows
+    : rows.filter((r) => r.proceeding_day?.proceeding?.number === latestSitting);
+
+  // 5. Random sample of sampleSize from the top-viral pool. Per-request
+  //    Math.random() — each page render shows a different selection.
+  const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, sampleSize);
+
+  // 6. Resolve speaker club + photo for the sampled rows only.
+  const mpIds = Array.from(
+    new Set(shuffled.map((r) => r.mp_id).filter((x): x is number => x != null)),
+  );
+  const [clubMap, photoMap] = await Promise.all([
+    resolveMpClubs(mpIds, term),
+    resolveMpPhotos(mpIds, term),
+  ]);
+
+  return shuffled.map((r): ProcessCitation => {
+    const club = r.mp_id != null ? clubMap.get(r.mp_id) ?? null : null;
+    return {
+      id: r.id,
+      mpId: r.mp_id,
+      speakerName: r.speaker_name,
+      function: r.function,
+      clubRef: club?.clubRef ?? null,
+      photoUrl: r.mp_id != null ? photoMap.get(r.mp_id) ?? null : null,
+      viralQuote: r.viral_quote!.trim(),
+      viralReason: r.viral_reason,
+      tone: r.tone,
+      date: r.start_datetime ?? r.proceeding_day?.date ?? null,
+      proceedingNumber: r.proceeding_day?.proceeding?.number ?? null,
+    };
+  });
+}
+
+async function resolveMpPhotos(
+  mpIds: number[],
+  term: number,
+): Promise<Map<number, string | null>> {
+  const out = new Map<number, string | null>();
+  if (mpIds.length === 0) return out;
+  const sb = supabase();
+  const { data, error } = await sb
+    .from("mps")
+    .select("mp_id, photo_url")
+    .eq("term", term)
+    .in("mp_id", mpIds);
+  if (error) throw error;
+  for (const r of (data ?? []) as { mp_id: number; photo_url: string | null }[]) {
+    out.set(r.mp_id, r.photo_url);
+  }
+  return out;
+}
+
 export async function getActiveClubs(term = DEFAULT_TERM): Promise<{ clubId: string; name: string }[]> {
   const sb = supabase();
   const { data, error } = await sb
