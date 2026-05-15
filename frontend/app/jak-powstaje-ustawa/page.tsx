@@ -969,7 +969,7 @@ export default function JakPowstajeUstawaPage() {
             </h2>
             <ol
               className="list-none p-0 m-0 grid gap-x-6 gap-y-1.5"
-              style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}
+              style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))" }}
             >
               {STAGES.map((s) => (
                 <li key={s.slug} className="flex gap-2 text-[13.5px]">
@@ -1108,7 +1108,10 @@ export default function JakPowstajeUstawaPage() {
             >
               Słowniczek pojęć
             </h2>
-            <dl className="grid gap-x-8 gap-y-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
+            <dl
+              className="grid gap-x-8 gap-y-5"
+              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))" }}
+            >
               {GLOSSARY.map((t) => (
                 <div key={t.term}>
                   <dt
