@@ -1,9 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft,
   ArrowRight,
+  CheckCircle2,
+  Crown,
+  FileSearch,
+  FileSignature,
+  HelpCircle,
   Info,
+  Landmark,
+  Megaphone,
+  PenTool,
+  ScrollText,
+  Users,
+  Vote,
   X,
 } from "lucide-react";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
@@ -67,11 +79,58 @@ type Branch = {
   detail: string;
 };
 
+// Phase groups the 11 stages into thematic blocks, each with its own accent
+// colour. Helps the reader see "where are we in the process" at a glance
+// without reading the full text. Colour values come from globals.css tokens.
+type PhaseKey = "wnioskodawca" | "komisja" | "plenum" | "senat" | "prezydent";
+
+type Phase = {
+  key: PhaseKey;
+  label: string;
+  accent: string; // CSS custom property reference
+  accentSoft: string; // for backgrounds
+};
+
+const PHASES: Record<PhaseKey, Phase> = {
+  wnioskodawca: {
+    key: "wnioskodawca",
+    label: "Wpłynięcie i I czytanie",
+    accent: "var(--muted-foreground)",
+    accentSoft: "color-mix(in srgb, var(--muted-foreground) 12%, var(--background))",
+  },
+  komisja: {
+    key: "komisja",
+    label: "Komisja",
+    accent: "var(--warning)",
+    accentSoft: "color-mix(in srgb, var(--warning) 14%, var(--background))",
+  },
+  plenum: {
+    key: "plenum",
+    label: "Plenum Sejmu",
+    accent: "var(--destructive)",
+    accentSoft: "color-mix(in srgb, var(--destructive) 10%, var(--background))",
+  },
+  senat: {
+    key: "senat",
+    label: "Senat",
+    accent: "var(--success)",
+    accentSoft: "color-mix(in srgb, var(--success) 13%, var(--background))",
+  },
+  prezydent: {
+    key: "prezydent",
+    label: "Prezydent",
+    accent: "var(--destructive-deep)",
+    accentSoft: "color-mix(in srgb, var(--destructive-deep) 12%, var(--background))",
+  },
+};
+
 type Stage = {
   slug: string;
   num: string;
   label: string;
   bucket: string;
+  phase: PhaseKey;
+  icon: LucideIcon;
   blurb: string;
   paragraphs: React.ReactNode[];
   branches: Branch[];
@@ -84,6 +143,8 @@ const STAGES: Stage[] = [
     num: "01",
     label: "Wpłynęło — projekt trafia do Sejmu",
     bucket: "WPŁYNĘŁO",
+    phase: "wnioskodawca",
+    icon: ScrollText,
     blurb: "Każda ustawa zaczyna się od kogoś, kto ma prawo wnieść projekt.",
     paragraphs: [
       <>
@@ -124,6 +185,8 @@ const STAGES: Stage[] = [
     num: "02",
     label: "I czytanie — pierwsze formalne omówienie",
     bucket: "I CZYTANIE",
+    phase: "wnioskodawca",
+    icon: Megaphone,
     blurb:
       "Marszałek decyduje, gdzie projekt trafi: na salę plenarną czy do komisji.",
     paragraphs: [
@@ -177,6 +240,8 @@ const STAGES: Stage[] = [
     num: "03",
     label: "Praca w komisji — szczegółowa analiza",
     bucket: "KOMISJA",
+    phase: "komisja",
+    icon: FileSearch,
     blurb:
       "Najdłuższy etap całego procesu. To tu zapadają konkretne decyzje.",
     paragraphs: [
@@ -225,6 +290,8 @@ const STAGES: Stage[] = [
     num: "04",
     label: "Sprawozdanie komisji — wynik prac",
     bucket: "KOMISJA",
+    phase: "komisja",
+    icon: FileSignature,
     blurb: "Komisja głosuje nad finalną wersją i wyznacza sprawozdawcę.",
     paragraphs: [
       <>
@@ -258,6 +325,8 @@ const STAGES: Stage[] = [
     num: "05",
     label: "II czytanie — debata plenarna",
     bucket: "PLENUM",
+    phase: "plenum",
+    icon: Users,
     blurb:
       "Cały Sejm debatuje nad projektem w wersji zaproponowanej przez komisję.",
     paragraphs: [
@@ -309,6 +378,8 @@ const STAGES: Stage[] = [
     num: "06",
     label: "III czytanie — głosowanie nad poprawkami",
     bucket: "PLENUM",
+    phase: "plenum",
+    icon: Vote,
     blurb: "Sejm głosuje nad pojedynczymi poprawkami, ustalając finalną treść.",
     paragraphs: [
       <>
@@ -339,6 +410,8 @@ const STAGES: Stage[] = [
     num: "07",
     label: "Głosowanie nad ustawą — finałowy głos",
     bucket: "GŁOSOWANIE",
+    phase: "plenum",
+    icon: CheckCircle2,
     blurb: "Cały Sejm głosuje nad pełną ustawą po wszystkich poprawkach.",
     paragraphs: [
       <>
@@ -381,6 +454,8 @@ const STAGES: Stage[] = [
     num: "08",
     label: "Senat — izba refleksji",
     bucket: "SENAT",
+    phase: "senat",
+    icon: Landmark,
     blurb:
       "Senat ma stanowisko co do ustawy. Trzy opcje, trzy różne terminy.",
     paragraphs: [
@@ -441,6 +516,8 @@ const STAGES: Stage[] = [
     num: "09",
     label: "Rozpatrzenie poprawek Senatu — drugi głos Sejmu",
     bucket: "SENAT",
+    phase: "senat",
+    icon: Users,
     blurb:
       "Sejm głosuje czy odrzucić senackie zmiany. Tu wchodzi bezwzględna większość.",
     paragraphs: [
@@ -483,6 +560,8 @@ const STAGES: Stage[] = [
     num: "10",
     label: "Prezydent — podpis, weto albo TK",
     bucket: "PREZYDENT",
+    phase: "prezydent",
+    icon: PenTool,
     blurb: "Głowa państwa ma trzy opcje i kilka różnych terminów.",
     paragraphs: [
       <>
@@ -559,6 +638,8 @@ const STAGES: Stage[] = [
     num: "11",
     label: "Publikacja w Dzienniku Ustaw — ustawa wchodzi w życie",
     bucket: "PREZYDENT",
+    phase: "prezydent",
+    icon: Crown,
     blurb: "Ostatni krok. Od tej chwili ustawa obowiązuje wszystkich.",
     paragraphs: [
       <>
@@ -801,8 +882,233 @@ const GLOSSARY: Term[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Subcomponents
+// Visual subcomponents — hero infographic, quick stats, phase badge.
 // ---------------------------------------------------------------------------
+
+// Inline SVG hero graphic — stylized "11 stones along a path" representing
+// the 11 legislative steps, with one diverging branch (II czytanie → komisja
+// → III czytanie) hinting at the non-linear nature explained in body text.
+// Pure CSS-variable colours so it picks up dark/light theme automatically.
+function HeroInfographic() {
+  // 11 dots positioned on an asymmetric curve. Coords picked manually for
+  // visual rhythm — not derived from the data array so the layout can
+  // emphasise key turning points (komisja loop at 4-5, Senate-back at 9).
+  const dots: Array<{ cx: number; cy: number; phase: PhaseKey }> = [
+    { cx: 30, cy: 175, phase: "wnioskodawca" },
+    { cx: 75, cy: 155, phase: "wnioskodawca" },
+    { cx: 120, cy: 130, phase: "komisja" },
+    { cx: 165, cy: 110, phase: "komisja" },
+    { cx: 210, cy: 88, phase: "plenum" },
+    { cx: 165, cy: 60, phase: "komisja" }, // loop-back illustration
+    { cx: 210, cy: 88, phase: "plenum" }, // hidden — same coord as #5
+    { cx: 255, cy: 66, phase: "plenum" },
+    { cx: 300, cy: 50, phase: "senat" },
+    { cx: 345, cy: 70, phase: "senat" },
+    { cx: 390, cy: 50, phase: "prezydent" },
+    { cx: 435, cy: 35, phase: "prezydent" },
+  ];
+  // We render only unique positions; index 6 overlaps with 4 for the loop-back.
+  return (
+    <svg
+      viewBox="0 0 480 220"
+      role="img"
+      aria-label="Wizualizacja 11 etapów procesu legislacyjnego"
+      className="w-full h-auto"
+      style={{ maxWidth: 480 }}
+    >
+      {/* Main path */}
+      <path
+        d="M 30 175 Q 90 165 120 130 T 210 88 Q 255 60 300 50 T 390 50 L 435 35"
+        fill="none"
+        stroke="var(--border)"
+        strokeWidth="1.5"
+        strokeDasharray="3 5"
+      />
+      {/* Loop-back curve (II czytanie → komisja → III czytanie) */}
+      <path
+        d="M 210 88 Q 180 60 165 60 Q 195 70 210 88"
+        fill="none"
+        stroke="var(--destructive)"
+        strokeWidth="1"
+        strokeDasharray="2 3"
+        opacity="0.6"
+      />
+      {dots.slice(0, 11).map((d, i) => {
+        const phase = PHASES[d.phase];
+        const r = i === 0 ? 5 : i === 10 ? 7 : 4;
+        return (
+          <g key={i}>
+            <circle cx={d.cx} cy={d.cy} r={r + 2} fill="var(--background)" />
+            <circle
+              cx={d.cx}
+              cy={d.cy}
+              r={r}
+              fill={phase.accent}
+              stroke="var(--background)"
+              strokeWidth="1.5"
+            />
+          </g>
+        );
+      })}
+      {/* End marker — "Dz.U." */}
+      <text
+        x="435"
+        y="20"
+        fontSize="9"
+        fill="var(--muted-foreground)"
+        fontFamily="var(--font-mono)"
+        textAnchor="middle"
+        letterSpacing="0.12em"
+      >
+        DZ.U.
+      </text>
+      <text
+        x="30"
+        y="200"
+        fontSize="9"
+        fill="var(--muted-foreground)"
+        fontFamily="var(--font-mono)"
+        textAnchor="middle"
+        letterSpacing="0.12em"
+      >
+        START
+      </text>
+    </svg>
+  );
+}
+
+// Quick-facts strip — five chunky stat cards rendered as a flex row that
+// wraps to grid on mobile. Numbers are the most-googled / most-quoted
+// constitutional thresholds, so seeing them up top primes the long read.
+function QuickStats() {
+  const stats: Array<{ num: string; unit?: string; label: string }> = [
+    { num: "11", label: "etapów procesu legislacyjnego" },
+    { num: "460", label: "posłów w Sejmie" },
+    { num: "100", label: "senatorów" },
+    { num: "230", label: "kworum — minimum na sali" },
+    { num: "30", unit: "dni", label: "Senat na stanowisko" },
+    { num: "21", unit: "dni", label: "Prezydent na podpis" },
+    { num: "3/5", label: "głosów obala weto Prezydenta" },
+    { num: "14", unit: "dni", label: "vacatio legis (domyślnie)" },
+  ];
+  return (
+    <div
+      className="grid gap-px my-10"
+      style={{
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(140px, 100%), 1fr))",
+        background: "var(--border)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      {stats.map((s) => (
+        <div
+          key={s.label}
+          className="p-4"
+          style={{ background: "var(--background)" }}
+        >
+          <div className="flex items-baseline gap-1">
+            <span
+              className="font-serif font-medium tabular-nums"
+              style={{
+                fontSize: 32,
+                lineHeight: 1,
+                color: "var(--destructive)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {s.num}
+            </span>
+            {s.unit && (
+              <span
+                className="font-sans text-muted-foreground"
+                style={{ fontSize: 12 }}
+              >
+                {s.unit}
+              </span>
+            )}
+          </div>
+          <div
+            className="font-sans text-muted-foreground mt-1.5"
+            style={{ fontSize: 11.5, lineHeight: 1.35 }}
+          >
+            {s.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Legend keyed to the phase colours used on stage cards.
+function PhaseLegend() {
+  return (
+    <div className="mt-8 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <span
+        className="font-mono uppercase tracking-[0.14em] text-muted-foreground"
+        style={{ fontSize: 10 }}
+      >
+        Fazy procesu
+      </span>
+      {Object.values(PHASES).map((p) => (
+        <span
+          key={p.key}
+          className="inline-flex items-center gap-1.5 font-sans text-[11.5px] text-secondary-foreground"
+        >
+          <span
+            aria-hidden
+            className="inline-block rounded-full"
+            style={{ width: 10, height: 10, background: p.accent }}
+          />
+          {p.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// Pill rendered next to each stage heading, colour-coded by phase.
+function PhasePill({ phase }: { phase: PhaseKey }) {
+  const p = PHASES[phase];
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.1em] shrink-0"
+      style={{
+        fontSize: 10,
+        color: p.accent,
+        background: p.accentSoft,
+        padding: "3px 8px",
+        borderRadius: 3,
+        fontWeight: 600,
+      }}
+    >
+      <span
+        aria-hidden
+        className="inline-block rounded-full"
+        style={{ width: 6, height: 6, background: p.accent }}
+      />
+      {p.label}
+    </span>
+  );
+}
+
+// Big icon disc shown on each stage card — phase-coloured ring.
+function StageIconDisc({ Icon, phase }: { Icon: LucideIcon; phase: PhaseKey }) {
+  const p = PHASES[phase];
+  return (
+    <div
+      className="flex items-center justify-center rounded-full shrink-0"
+      style={{
+        width: 64,
+        height: 64,
+        background: p.accentSoft,
+        color: p.accent,
+        boxShadow: `0 0 0 2px ${p.accent}`,
+      }}
+    >
+      <Icon size={26} strokeWidth={1.5} />
+    </div>
+  );
+}
 
 function BranchLine({ branch }: { branch: Branch }) {
   const color =
@@ -904,8 +1210,8 @@ export default function JakPowstajeUstawaPage() {
     <>
       <StructuredData />
 
-      <section className="py-10 px-3 md:px-4 lg:px-5 border-b border-border">
-        <div className="max-w-[820px] mx-auto">
+      <section className="py-8 px-3 md:px-4 lg:px-5 border-b border-border">
+        <div className="max-w-[1100px] mx-auto">
           <PageBreadcrumb
             items={[{ label: "Jak powstaje ustawa" }]}
             subtitle="11 etapów procesu legislacyjnego — od wpłynięcia projektu do publikacji w Dzienniku Ustaw."
@@ -914,30 +1220,59 @@ export default function JakPowstajeUstawaPage() {
       </section>
 
       <article className="py-10 px-3 md:px-4 lg:px-5">
-        <div className="max-w-[820px] mx-auto">
-          <h1
-            className="font-serif font-medium m-0 mb-4"
-            style={{ fontSize: "clamp(32px, 5vw, 48px)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
+        <div className="max-w-[1100px] mx-auto">
+          {/* Hero — two-column on desktop: text + inline SVG infographic */}
+          <div
+            className="grid gap-8 items-center mb-10"
+            style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 0.85fr)" }}
           >
-            Jak powstaje ustawa w Sejmie
-          </h1>
+            <div>
+              <span
+                className="font-mono uppercase tracking-[0.18em] text-destructive"
+                style={{ fontSize: 11, fontWeight: 600 }}
+              >
+                Przewodnik
+              </span>
+              <h1
+                className="font-serif font-medium m-0 mt-3 mb-5"
+                style={{ fontSize: "clamp(34px, 5.5vw, 56px)", letterSpacing: "-0.025em", lineHeight: 1.05 }}
+              >
+                Jak powstaje{" "}
+                <span className="italic text-destructive">ustawa</span> w Sejmie
+              </h1>
+              <p
+                className="font-serif text-secondary-foreground m-0 mb-5"
+                style={{ fontSize: 18, lineHeight: 1.6 }}
+              >
+                Każda ustawa w Polsce przechodzi przez{" "}
+                <strong>11 proceduralnych etapów</strong> — od wniesienia
+                projektu przez uprawniony podmiot, przez prace komisji i
+                głosowania w Sejmie i Senacie, aż po podpis Prezydenta i
+                publikację w Dzienniku Ustaw.
+              </p>
+              <p
+                className="font-sans text-muted-foreground m-0"
+                style={{ fontSize: 14, lineHeight: 1.55 }}
+              >
+                Ten przewodnik tłumaczy każdy etap{" "}
+                <strong className="text-foreground">prostym językiem</strong>{" "}
+                i wskazuje{" "}
+                <strong className="text-foreground">podstawę prawną</strong>{" "}
+                w Konstytucji RP albo Regulaminie Sejmu, żeby każde
+                stwierdzenie można było zweryfikować.
+              </p>
+            </div>
+            <div className="hidden md:block">
+              <HeroInfographic />
+            </div>
+          </div>
 
-          <p
-            className="font-serif text-secondary-foreground mb-8"
-            style={{ fontSize: 18, lineHeight: 1.55 }}
-          >
-            Każda ustawa w Polsce przechodzi przez{" "}
-            <strong>11 proceduralnych etapów</strong> — od wniesienia projektu
-            przez uprawniony podmiot, przez prace komisji i głosowania w Sejmie
-            i Senacie, aż po podpis Prezydenta i publikację w Dzienniku Ustaw.
-            Ten przewodnik tłumaczy każdy etap prostym językiem i wskazuje{" "}
-            <strong>podstawę prawną</strong> w Konstytucji RP albo Regulaminie
-            Sejmu, żeby każde stwierdzenie można było zweryfikować.
-          </p>
+          {/* Quick-facts strip — 8 chunky stat cells */}
+          <QuickStats />
 
           {/* Info callout — non-linearity */}
           <div
-            className="rounded-md flex items-start gap-3 p-4 mb-10"
+            className="rounded-md flex items-start gap-3 p-4 mb-6 mt-8"
             style={{ background: "var(--muted)" }}
           >
             <div
@@ -954,6 +1289,8 @@ export default function JakPowstajeUstawaPage() {
               ustawy — a nie porażka.
             </div>
           </div>
+
+          <PhaseLegend />
 
           {/* Table of contents */}
           <nav
@@ -1003,74 +1340,99 @@ export default function JakPowstajeUstawaPage() {
             </ol>
           </nav>
 
-          {/* Stages */}
-          {STAGES.map((stage) => (
-            <section
-              key={stage.slug}
-              id={stage.slug}
-              className="mb-14 scroll-mt-20"
-              aria-labelledby={`heading-${stage.slug}`}
-            >
-              <div className="flex items-baseline gap-3 mb-3 flex-wrap">
-                <span
-                  className="font-serif font-medium tabular-nums"
-                  style={{ fontSize: 32, color: "var(--destructive)", lineHeight: 1 }}
-                >
-                  {stage.num}
-                </span>
-                <h2
-                  id={`heading-${stage.slug}`}
-                  className="font-serif font-medium m-0"
-                  style={{ fontSize: "clamp(22px, 3vw, 28px)", letterSpacing: "-0.01em", lineHeight: 1.2 }}
-                >
-                  {stage.label}
-                </h2>
-                <span
-                  className="font-mono uppercase tracking-[0.12em] text-muted-foreground ml-auto"
-                  style={{ fontSize: 10 }}
-                >
-                  pasek: {stage.bucket}
-                </span>
-              </div>
-
-              <p
-                className="font-sans text-muted-foreground italic m-0 mb-4"
-                style={{ fontSize: 14.5 }}
+          {/* Stages — phase-coloured cards with icon disc + accent border */}
+          {STAGES.map((stage) => {
+            const phase = PHASES[stage.phase];
+            return (
+              <section
+                key={stage.slug}
+                id={stage.slug}
+                className="mb-10 scroll-mt-20 relative"
+                aria-labelledby={`heading-${stage.slug}`}
+                style={{
+                  borderLeft: `3px solid ${phase.accent}`,
+                  paddingLeft: 24,
+                  paddingTop: 6,
+                  paddingBottom: 6,
+                }}
               >
-                {stage.blurb}
-              </p>
-
-              <div
-                className="font-serif text-secondary-foreground space-y-4"
-                style={{ fontSize: 16, lineHeight: 1.65, textWrap: "pretty" as never }}
-              >
-                {stage.paragraphs.map((p, i) => (
-                  <div key={i}>{p}</div>
-                ))}
-              </div>
-
-              {stage.branches.length > 0 && (
-                <div
-                  className="mt-6 p-4 rounded-md"
-                  style={{ background: "var(--muted)" }}
-                >
-                  <h3
-                    className="font-mono uppercase tracking-[0.12em] m-0 mb-3 text-muted-foreground"
-                    style={{ fontSize: 11, fontWeight: 600 }}
-                  >
-                    Co dalej
-                  </h3>
-                  <ul className="list-none p-0 m-0">
-                    {stage.branches.map((b, i) => (
-                      <BranchLine key={i} branch={b} />
-                    ))}
-                  </ul>
+                <div className="flex items-start gap-5 mb-4 flex-wrap md:flex-nowrap">
+                  <StageIconDisc Icon={stage.icon} phase={stage.phase} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                      <span
+                        className="font-serif font-medium tabular-nums"
+                        style={{
+                          fontSize: 28,
+                          color: phase.accent,
+                          lineHeight: 1,
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        {stage.num}
+                      </span>
+                      <h2
+                        id={`heading-${stage.slug}`}
+                        className="font-serif font-medium m-0"
+                        style={{
+                          fontSize: "clamp(22px, 3vw, 28px)",
+                          letterSpacing: "-0.01em",
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {stage.label}
+                      </h2>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <PhasePill phase={stage.phase} />
+                      <span
+                        className="font-mono uppercase tracking-[0.12em] text-muted-foreground"
+                        style={{ fontSize: 9.5 }}
+                      >
+                        pasek: {stage.bucket}
+                      </span>
+                    </div>
+                    <p
+                      className="font-sans text-muted-foreground italic m-0 mt-2"
+                      style={{ fontSize: 14.5 }}
+                    >
+                      {stage.blurb}
+                    </p>
+                  </div>
                 </div>
-              )}
 
-              <SourcesLine items={stage.sources} />
-            </section>
-          ))}
+                <div
+                  className="font-serif text-secondary-foreground space-y-4"
+                  style={{ fontSize: 16, lineHeight: 1.65, textWrap: "pretty" as never }}
+                >
+                  {stage.paragraphs.map((p, i) => (
+                    <div key={i}>{p}</div>
+                  ))}
+                </div>
+
+                {stage.branches.length > 0 && (
+                  <div
+                    className="mt-6 p-4 rounded-md"
+                    style={{ background: phase.accentSoft, borderLeft: `2px solid ${phase.accent}` }}
+                  >
+                    <h3
+                      className="font-mono uppercase tracking-[0.12em] m-0 mb-3"
+                      style={{ fontSize: 11, fontWeight: 600, color: phase.accent }}
+                    >
+                      Co dalej
+                    </h3>
+                    <ul className="list-none p-0 m-0">
+                      {stage.branches.map((b, i) => (
+                        <BranchLine key={i} branch={b} />
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <SourcesLine items={stage.sources} />
+              </section>
+            );
+          })}
 
           {/* FAQ */}
           <section id="faq" className="mb-14 scroll-mt-20 mt-20 pt-10" style={{ borderTop: "1px solid var(--border)" }}>
