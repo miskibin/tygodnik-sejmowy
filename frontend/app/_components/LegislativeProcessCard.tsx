@@ -25,10 +25,7 @@ export function LegislativeProcessCard() {
           href="/jak-powstaje-ustawa"
           className="group block rounded-md p-6 md:p-8 transition-colors hover:bg-background border border-transparent hover:border-border"
         >
-          <div
-            className="grid gap-6 md:gap-10 items-center"
-            style={{ gridTemplateColumns: "minmax(0, 1.2fr) minmax(0, 1fr)" }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] gap-6 md:gap-10 items-center">
             {/* Left: copy */}
             <div>
               <span

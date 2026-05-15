@@ -890,24 +890,22 @@ const GLOSSARY: Term[] = [
 // → III czytanie) hinting at the non-linear nature explained in body text.
 // Pure CSS-variable colours so it picks up dark/light theme automatically.
 function HeroInfographic() {
-  // 11 dots positioned on an asymmetric curve. Coords picked manually for
-  // visual rhythm — not derived from the data array so the layout can
-  // emphasise key turning points (komisja loop at 4-5, Senate-back at 9).
+  // Each entry maps to one of the 11 STAGES rows. Index 5 (II czytanie
+  // → komisja loop-back) is rendered ABOVE the main path as a diverging
+  // bump; everything else stays on the main curve.
   const dots: Array<{ cx: number; cy: number; phase: PhaseKey }> = [
-    { cx: 30, cy: 175, phase: "wnioskodawca" },
-    { cx: 75, cy: 155, phase: "wnioskodawca" },
-    { cx: 120, cy: 130, phase: "komisja" },
-    { cx: 165, cy: 110, phase: "komisja" },
-    { cx: 210, cy: 88, phase: "plenum" },
-    { cx: 165, cy: 60, phase: "komisja" }, // loop-back illustration
-    { cx: 210, cy: 88, phase: "plenum" }, // hidden — same coord as #5
-    { cx: 255, cy: 66, phase: "plenum" },
-    { cx: 300, cy: 50, phase: "senat" },
-    { cx: 345, cy: 70, phase: "senat" },
-    { cx: 390, cy: 50, phase: "prezydent" },
-    { cx: 435, cy: 35, phase: "prezydent" },
+    { cx: 30, cy: 175, phase: "wnioskodawca" }, // 1 Wpłynęło
+    { cx: 75, cy: 155, phase: "wnioskodawca" }, // 2 I czytanie
+    { cx: 120, cy: 130, phase: "komisja" }, // 3 Praca w komisji
+    { cx: 165, cy: 110, phase: "komisja" }, // 4 Sprawozdanie komisji
+    { cx: 210, cy: 88, phase: "plenum" }, // 5 II czytanie
+    { cx: 195, cy: 60, phase: "komisja" }, // 6 loop-back illustration (decorative)
+    { cx: 255, cy: 75, phase: "plenum" }, // 7 III czytanie
+    { cx: 300, cy: 58, phase: "plenum" }, // 8 Głosowanie
+    { cx: 345, cy: 65, phase: "senat" }, // 9 Senat
+    { cx: 390, cy: 50, phase: "senat" }, // 10 Rozpatrzenie poprawek
+    { cx: 435, cy: 35, phase: "prezydent" }, // 11 Prezydent + Dz.U.
   ];
-  // We render only unique positions; index 6 overlaps with 4 for the loop-back.
   return (
     <svg
       viewBox="0 0 480 220"
@@ -918,7 +916,7 @@ function HeroInfographic() {
     >
       {/* Main path */}
       <path
-        d="M 30 175 Q 90 165 120 130 T 210 88 Q 255 60 300 50 T 390 50 L 435 35"
+        d="M 30 175 Q 90 165 120 130 T 210 88 Q 255 60 300 58 T 390 50 L 435 35"
         fill="none"
         stroke="var(--border)"
         strokeWidth="1.5"
@@ -926,16 +924,16 @@ function HeroInfographic() {
       />
       {/* Loop-back curve (II czytanie → komisja → III czytanie) */}
       <path
-        d="M 210 88 Q 180 60 165 60 Q 195 70 210 88"
+        d="M 210 88 Q 200 65 195 60 Q 215 70 255 75"
         fill="none"
         stroke="var(--destructive)"
         strokeWidth="1"
         strokeDasharray="2 3"
         opacity="0.6"
       />
-      {dots.slice(0, 11).map((d, i) => {
+      {dots.map((d, i) => {
         const phase = PHASES[d.phase];
-        const r = i === 0 ? 5 : i === 10 ? 7 : 4;
+        const r = i === 0 ? 5 : i === dots.length - 1 ? 7 : 4;
         return (
           <g key={i}>
             <circle cx={d.cx} cy={d.cy} r={r + 2} fill="var(--background)" />
@@ -977,10 +975,11 @@ function HeroInfographic() {
   );
 }
 
-// Quick-facts strip — chunky stat cells priming the reader. On desktop
-// all 8 stats are visible. On mobile we ship only the top 4 to keep the
-// hero compact; the rest live in the body where they're more contextual
-// anyway. `hidden md:block` on the secondary group.
+// Quick-facts strip — chunky stat cells priming the reader. Seven stats
+// (down from eight after user feedback) so the strip always sits on a
+// single row at the page's max width without wrapping. Mobile shows the
+// four primary stats in a 2×2 grid; the three secondary stats are
+// desktop-only.
 function QuickStats() {
   const primaryStats: Array<{ num: string; unit?: string; label: string }> = [
     { num: "11", label: "etapów" },
@@ -989,17 +988,15 @@ function QuickStats() {
     { num: "21", unit: "dni", label: "Prezydent" },
   ];
   const secondaryStats: Array<{ num: string; unit?: string; label: string }> = [
-    { num: "230", label: "kworum — minimum na sali" },
-    { num: "30", unit: "dni", label: "Senat na stanowisko" },
-    { num: "3/5", label: "głosów obala weto" },
-    { num: "14", unit: "dni", label: "vacatio legis" },
+    { num: "230", label: "kworum" },
+    { num: "30", unit: "dni", label: "Senat" },
+    { num: "3/5", label: "obala weto" },
   ];
   return (
     <div className="my-8 md:my-10">
       <div
-        className="grid gap-px"
+        className="grid gap-px grid-cols-2 md:grid-cols-7"
         style={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(120px, 50%), 1fr))",
           background: "var(--border)",
           border: "1px solid var(--border)",
         }}
@@ -1007,7 +1004,6 @@ function QuickStats() {
         {primaryStats.map((s) => (
           <StatCell key={s.label} s={s} />
         ))}
-        {/* Secondary stats — desktop only */}
         <div className="hidden md:contents">
           {secondaryStats.map((s) => (
             <StatCell key={s.label} s={s} />
@@ -1029,7 +1025,7 @@ function StatCell({
         <span
           className="font-serif font-medium tabular-nums"
           style={{
-            fontSize: "clamp(22px, 5vw, 32px)",
+            fontSize: "clamp(20px, 3.2vw, 30px)",
             lineHeight: 1,
             color: "var(--destructive)",
             letterSpacing: "-0.02em",
@@ -1113,6 +1109,7 @@ function StageIconDisc({ Icon, phase }: { Icon: LucideIcon; phase: PhaseKey }) {
   const p = PHASES[phase];
   return (
     <div
+      aria-hidden="true"
       className="flex items-center justify-center rounded-full shrink-0"
       style={{
         width: 64,
@@ -1122,7 +1119,7 @@ function StageIconDisc({ Icon, phase }: { Icon: LucideIcon; phase: PhaseKey }) {
         boxShadow: `0 0 0 2px ${p.accent}`,
       }}
     >
-      <Icon size={26} strokeWidth={1.5} />
+      <Icon size={26} strokeWidth={1.5} aria-hidden="true" focusable="false" />
     </div>
   );
 }
