@@ -322,51 +322,143 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
 
   const printId = p.id as number;
 
-  // Fetch the process row once; we need both its id (for stages) and
-  // outcome columns (passed / eli / display_address / eli_act_id / closure_date).
-  const { data: proc } = await sb
-    .from("processes")
-    .select("id, passed, eli, display_address, eli_act_id, closure_date, urgency_status, document_type")
-    .eq("term", term)
-    .eq("number", number)
-    .limit(1)
-    .maybeSingle();
-  const processId = (proc?.id as number | undefined) ?? -1;
+  // ---------------------------------------------------------------------
+  // Phase 1: fire all PostgREST reads that depend only on (term, number,
+  // printId) in parallel. Cuts /proces/[term]/[number] TTFB from ~10x RTT
+  // to ~3x RTT (worst-case dependent chains: proc -> stages + actRow;
+  // subRows -> attRows). All independent reads share one Promise.all.
+  //
+  // Dependency graph (read after `printId`):
+  //   - proc (processes)          — independent  -> drives stagesRows + actRow
+  //   - committeeSittingRows      — independent
+  //   - linkedRows (voting links) — independent  -> drives clubsRes + seatsRes
+  //   - subRows                   — independent  -> drives attRows
+  //   - matchRows (promises)      — independent
+  //   - aipRows (agenda items)    — independent
+  //   - linkRows (stmt prints)    — independent
+  //   - affectedMap               — independent (own helper, RPC)
+  // ---------------------------------------------------------------------
+  const [
+    procRes,
+    committeeSittingRowsRes,
+    linkedRowsRes,
+    subRowsRes,
+    matchRowsRes,
+    aipRowsRes,
+    stmtLinkRowsRes,
+    affectedMap,
+  ] = await Promise.all([
+    sb
+      .from("processes")
+      .select("id, passed, eli, display_address, eli_act_id, closure_date, urgency_status, document_type")
+      .eq("term", term)
+      .eq("number", number)
+      .limit(1)
+      .maybeSingle(),
+    sb
+      .from("print_committee_sittings_v")
+      .select(
+        "sitting_id, committee_id, committee_code, committee_name, sitting_num, date, start_at, end_at, room, status, matched_print_number, video_player_link",
+      )
+      .eq("print_id", printId)
+      .order("date", { ascending: false, nullsFirst: false })
+      .order("sitting_num", { ascending: false }),
+    sb
+      .from("voting_print_links")
+      .select("voting_id, role, votings:voting_id(id, term, sitting, sitting_day, voting_number, date, title, yes, no, abstain, not_participating, majority_votes, motion_polarity)")
+      .eq("print_id", printId),
+    sb
+      .from("prints")
+      .select("id, number, title, short_title, document_category, opinion_source, is_procedural")
+      .eq("term", term)
+      .eq("parent_number", number)
+      .order("number", { ascending: true }),
+    sb
+      .from("promise_print_candidates")
+      .select("promise_id, match_status, match_rationale, promises:promise_id(id, party_code, title, status)")
+      .eq("print_term", term)
+      .eq("print_number", number)
+      .eq("match_status", "confirmed"),
+    sb
+      .from("agenda_item_prints")
+      .select(
+        "agenda_items:agenda_item_id(id, ord, title, proceedings:proceeding_id(number, title, dates))",
+      )
+      .eq("term", term)
+      .eq("print_number", number),
+    sb
+      .from("statement_print_links")
+      .select("agenda_item_id")
+      .eq("print_id", printId)
+      .not("agenda_item_id", "is", null),
+    fetchAffected([printId]),
+  ]);
 
-  const { data: stagesRows, error: se } = await sb
-    .from("process_stages")
-    .select("ord, depth, stage_name, stage_type, stage_date, decision, sitting_num, voting, process_id")
-    .eq("process_id", processId)
-    .order("ord", { ascending: true });
-  if (se) throw se;
+  const proc = procRes.data;
+  const committeeSittingRows = committeeSittingRowsRes.data;
+  const linkedRows = linkedRowsRes.data;
+  const subRows = subRowsRes.data;
+  const matchRows = matchRowsRes.data;
+  const aipRows = aipRowsRes.data;
+  const stmtLinkRows = stmtLinkRowsRes.data;
+
+  // ---------------------------------------------------------------------
+  // Phase 2: dependent reads (chained after Phase 1 resolved).
+  //   - process_stages       depends on proc.id
+  //   - acts (actRow)        depends on proc.eli_act_id
+  //   - print_attachments    depends on subRows ids + printId
+  //   - voting_by_club/votes depends on mainVoting (computed from linkedRows)
+  // Run these in parallel where possible.
+  // ---------------------------------------------------------------------
+  const processId = (proc?.id as number | undefined) ?? -1;
+  const eliActId = (proc?.eli_act_id as number | null) ?? null;
+  const subIds = (subRows ?? []).map((r) => r.id as number);
+  const printIdsForAtt = [printId, ...subIds];
+
+  const [stagesResP2, actRowResP2, attRowsResP2] = await Promise.all([
+    sb
+      .from("process_stages")
+      .select("ord, depth, stage_name, stage_type, stage_date, decision, sitting_num, voting, process_id")
+      .eq("process_id", processId)
+      .order("ord", { ascending: true }),
+    eliActId
+      ? sb
+          .from("acts")
+          .select("eli_id, title, status, source_url, promulgation_date")
+          .eq("id", eliActId)
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    sb
+      .from("print_attachments")
+      .select("print_id, ordinal, filename")
+      .in("print_id", printIdsForAtt)
+      .order("ordinal", { ascending: true }),
+  ]);
+
+  const stagesRows = stagesResP2.data;
+  if (stagesResP2.error) throw stagesResP2.error;
+  const actRow = actRowResP2.data;
+  const attRows = attRowsResP2.data;
 
   // Build outcome — link the act row only when the backfill connected it.
   let outcome: ProcessOutcome | null = null;
   if (proc) {
-    const eliActId = (proc.eli_act_id as number | null) ?? null;
     let act: ProcessAct | null = null;
-    if (eliActId) {
+    if (actRow) {
       // Real column name is promulgation_date (date of publication in
       // Dz.U./M.P.). announcement_date is the dated upstream of that.
-      const { data: actRow } = await sb
-        .from("acts")
-        .select("eli_id, title, status, source_url, promulgation_date")
-        .eq("id", eliActId)
-        .limit(1)
-        .maybeSingle();
-      if (actRow) {
-        act = {
-          eliId: (actRow.eli_id as string) ?? "",
-          displayAddress: (proc.display_address as string) ?? "",
-          title: (actRow.title as string) ?? null,
-          status: (actRow.status as string) ?? null,
-          sourceUrl: normalizeActSourceUrl(
-            (actRow.source_url as string) ?? null,
-            (actRow.eli_id as string) ?? null,
-          ),
-          publishedAt: (actRow.promulgation_date as string) ?? null,
-        };
-      }
+      act = {
+        eliId: (actRow.eli_id as string) ?? "",
+        displayAddress: (proc.display_address as string) ?? "",
+        title: (actRow.title as string) ?? null,
+        status: (actRow.status as string) ?? null,
+        sourceUrl: normalizeActSourceUrl(
+          (actRow.source_url as string) ?? null,
+          (actRow.eli_id as string) ?? null,
+        ),
+        publishedAt: (actRow.promulgation_date as string) ?? null,
+      };
     }
     const us = (proc.urgency_status as string | null) ?? null;
     outcome = {
@@ -378,8 +470,6 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     };
   }
 
-  const affectedMap = await fetchAffected([printId]);
-
   const stages: ProcessStage[] = (stagesRows ?? []).map((r): ProcessStage => ({
     ord: r.ord as number,
     depth: r.depth as number,
@@ -390,15 +480,6 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     sittingNum: (r.sitting_num as number | null) ?? null,
     voting: (r.voting as ProcessStage["voting"]) ?? null,
   }));
-
-  const { data: committeeSittingRows } = await sb
-    .from("print_committee_sittings_v")
-    .select(
-      "sitting_id, committee_id, committee_code, committee_name, sitting_num, date, start_at, end_at, room, status, matched_print_number, video_player_link",
-    )
-    .eq("print_id", printId)
-    .order("date", { ascending: false, nullsFirst: false })
-    .order("sitting_num", { ascending: false });
   const committeeSittings: LinkedCommitteeSitting[] = (committeeSittingRows ?? []).map((r) => ({
     sittingId: (r.sitting_id as number) ?? 0,
     committeeId: (r.committee_id as number) ?? 0,
@@ -421,10 +502,6 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
   const ROLE_RANK: Record<string, number> = {
     main: 0, sprawozdanie: 1, autopoprawka: 2, poprawka: 3, joint: 4, other: 5,
   };
-  const { data: linkedRows } = await sb
-    .from("voting_print_links")
-    .select("voting_id, role, votings:voting_id(id, term, sitting, sitting_day, voting_number, date, title, yes, no, abstain, not_participating, majority_votes, motion_polarity)")
-    .eq("print_id", printId);
   let mainVoting: LinkedVoting | null = null;
   let relatedVotings: LinkedVoting[] = [];
   if (linkedRows && linkedRows.length > 0) {
@@ -492,20 +569,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
   }
 
   // Forward-link sub-prints (opinia/OSR/autopoprawka) — by parent_number FK.
-  const { data: subRows } = await sb
-    .from("prints")
-    .select("id, number, title, short_title, document_category, opinion_source, is_procedural")
-    .eq("term", term)
-    .eq("parent_number", number)
-    .order("number", { ascending: true });
-
-  const subIds = (subRows ?? []).map((r) => r.id as number);
-  const printIdsForAtt = [printId, ...subIds];
-  const { data: attRows } = await sb
-    .from("print_attachments")
-    .select("print_id, ordinal, filename")
-    .in("print_id", printIdsForAtt)
-    .order("ordinal", { ascending: true });
+  // subRows + attRows already fetched in Phase 1 / Phase 2 above.
   const attByPrint = new Map<number, string[]>();
   for (const r of (attRows ?? []) as Array<{ print_id: number; filename: string }>) {
     const list = attByPrint.get(r.print_id) ?? [];
@@ -526,13 +590,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
 
   // LLM-confirmed promise→print pairs (promise_print_candidates, mig 0046).
   // Show only confirmed; "candidate" rank stays in the matcher pool but
-  // would polluate the print page with weak hits.
-  const { data: matchRows } = await sb
-    .from("promise_print_candidates")
-    .select("promise_id, match_status, match_rationale, promises:promise_id(id, party_code, title, status)")
-    .eq("print_term", term)
-    .eq("print_number", number)
-    .eq("match_status", "confirmed");
+  // would polluate the print page with weak hits. matchRows fetched in Phase 1.
   const matchedPromises: MatchedPromise[] = (matchRows ?? [])
     .map((r): MatchedPromise | null => {
       const raw = (r as { promises: Record<string, unknown> | Record<string, unknown>[] | null }).promises;
@@ -550,16 +608,8 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     .filter((x): x is MatchedPromise => !!x);
 
   // Plenary agenda points (mig 0028) where this print is referenced. Joined
-  // up to proceedings for sitting num/title/dates. Statement counts pulled in
-  // a second pass keyed on agenda_item_id.
-  const { data: aipRows } = await sb
-    .from("agenda_item_prints")
-    .select(
-      "agenda_items:agenda_item_id(id, ord, title, proceedings:proceeding_id(number, title, dates))",
-    )
-    .eq("term", term)
-    .eq("print_number", number);
-
+  // up to proceedings for sitting num/title/dates. aipRows + stmtLinkRows
+  // already fetched in Phase 1.
   type AgendaItemJoined = {
     id: number;
     ord: number;
@@ -575,12 +625,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
 
   const stmtCountByItem = new Map<number, number>();
   if (agendaItems.length > 0) {
-    const { data: linkRows } = await sb
-      .from("statement_print_links")
-      .select("agenda_item_id")
-      .eq("print_id", printId)
-      .not("agenda_item_id", "is", null);
-    for (const r of (linkRows ?? []) as Array<{ agenda_item_id: number }>) {
+    for (const r of (stmtLinkRows ?? []) as Array<{ agenda_item_id: number }>) {
       stmtCountByItem.set(r.agenda_item_id, (stmtCountByItem.get(r.agenda_item_id) ?? 0) + 1);
     }
   }
