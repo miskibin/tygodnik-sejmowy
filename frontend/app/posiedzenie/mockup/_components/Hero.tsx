@@ -149,7 +149,10 @@ export function Hero({
           </h1>
 
           <div className="md:justify-self-end">
-            <Kicker className="mb-2">łącznie za 3 dni</Kicker>
+            <Kicker className="mb-2">
+              łącznie za {MOCK.days.length}{" "}
+              {MOCK.days.length === 1 ? "dzień" : "dni"}
+            </Kicker>
             <div className="flex gap-6 md:gap-8 justify-end items-baseline flex-wrap">
               <StatTile value={MOCK.totals.punkty} label="punktów" />
               <StatTile value={MOCK.totals.wypowiedzi} label="wypowiedzi" />
