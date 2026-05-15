@@ -461,6 +461,109 @@ def cmd_backfill_processes(
     logger.info("backfill-processes: done")
 
 
+@app.command("backfill-sponsor-authority")
+def cmd_backfill_sponsor_authority(
+    term: int = typer.Option(10, "--term", "-t"),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+):
+    """Derive `prints.sponsor_authority` from `prints.title`.
+
+    Sejm prints encode the sponsor in the title prefix:
+      "Rządowy projekt ustawy…"      → rzad
+      "Poselski projekt ustawy…"     → klub_poselski
+      "Senacki projekt ustawy…"      → senat
+      "Obywatelski projekt ustawy…"  → obywatele
+      "Prezydencki projekt ustawy…"  → prezydent
+      "Komisyjny projekt ustawy…"    → komisja
+      "Przedstawiony przez Prezydium Sejmu…" → prezydium
+
+    Deterministic — no LLM. Idempotent; only updates rows with NULL
+    sponsor_authority (skips already-set values, incl. the rare 'inne'
+    overrides written by `print_unified` for sub-prints with opinion_source).
+
+    Sub-prints (e.g. "Do druku nr 1650 - ocena skutków regulacji") inherit
+    parent sponsor_authority via processPrint; for now we skip them
+    (`print_unified.py` collapses them to 'inne' when opinion_source is
+    set, which is the correct behavior for meta-documents anyway).
+    """
+    import re
+    client = supabase()
+
+    # Title prefix → authority. Order matters: "Przedstawiony przez Prezydium"
+    # must be checked before generic catch-alls. All matches are case-
+    # sensitive on the first capitalized word (Sejm titles are stable).
+    PATTERNS: list[tuple[re.Pattern[str], str]] = [
+        (re.compile(r"^Rządowy\s+projekt"), "rzad"),
+        (re.compile(r"^Poselski\s+projekt"), "klub_poselski"),
+        (re.compile(r"^Senacki\s+projekt"), "senat"),
+        (re.compile(r"^Obywatelski\s+projekt"), "obywatele"),
+        (re.compile(r"^Prezydencki\s+projekt"), "prezydent"),
+        (re.compile(r"^Komisyjny\s+projekt"), "komisja"),
+        (re.compile(r"^Przedstawion[ya]\s+przez\s+Prezydium"), "prezydium"),
+    ]
+
+    # Pull all NULL-sponsor prints for the term, paginate (>4k rows).
+    rows: list[dict] = []
+    offset = 0
+    page = 1000
+    while True:
+        chunk = (
+            client.table("prints")
+            .select("id, term, number, title")
+            .eq("term", term)
+            .is_("sponsor_authority", "null")
+            .order("id")
+            .range(offset, offset + page - 1)
+            .execute()
+            .data or []
+        )
+        if not chunk:
+            break
+        rows.extend(chunk)
+        if len(chunk) < page:
+            break
+        offset += len(chunk)
+    logger.info("backfill-sponsor-authority: {} prints with NULL sponsor_authority", len(rows))
+
+    matches: dict[str, list[int]] = {}
+    unmatched: list[tuple[str, str]] = []
+    for r in rows:
+        t = r.get("title") or ""
+        authority: str | None = None
+        for pat, val in PATTERNS:
+            if pat.match(t):
+                authority = val
+                break
+        if authority:
+            matches.setdefault(authority, []).append(r["id"])
+        else:
+            unmatched.append((r["number"], t[:60]))
+
+    logger.info(
+        "backfill-sponsor-authority: matched {} prints across {} buckets, {} unmatched (sub-prints + meta-docs)",
+        sum(len(v) for v in matches.values()), len(matches), len(unmatched),
+    )
+    for auth, ids in matches.items():
+        logger.info("  {}: {} prints", auth, len(ids))
+    if unmatched[:5]:
+        logger.info("  unmatched sample: {}", unmatched[:5])
+
+    if dry_run:
+        logger.info("backfill-sponsor-authority: --dry-run, no writes")
+        return
+
+    # Batch update by authority. PostgREST has no SQL UPDATE WHERE id IN —
+    # we use the in_ filter via the supabase client; updates 1000 ids per call.
+    batch = 500
+    written = 0
+    for authority, ids in matches.items():
+        for i in range(0, len(ids), batch):
+            chunk = ids[i:i + batch]
+            client.table("prints").update({"sponsor_authority": authority}).in_("id", chunk).execute()
+            written += len(chunk)
+    logger.info("backfill-sponsor-authority: wrote {} updates", written)
+
+
 def _run_direct_stage_captures(*, term: int, direct_staged: set[str]) -> None:
     """Run the bulk Sejm captures with StreamingStager callbacks attached.
 
