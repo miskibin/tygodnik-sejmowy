@@ -95,14 +95,9 @@ export default async function DrukPage({
   } = data;
 
   // Top-viral citations from the most recent sitting that discussed this
-  // process. Tolerant: if enrichment hasn't run for the linked statements,
-  // returns [] and the section silently disappears.
-  let citations: Awaited<ReturnType<typeof getProcessCitations>> = [];
-  try {
-    citations = await getProcessCitations(term, number);
-  } catch (err) {
-    console.error("[/proces/[term]/[number]] getProcessCitations failed", { term, number, err });
-  }
+  // process. Returns [] when no enriched statements link to this print —
+  // the Citations component hides itself in that case.
+  const citations = await getProcessCitations(term, number);
 
   const processStillOpen = !outcome?.passed && !print.currentStageType?.match(/^(End|Withdrawn|Rejected)$/);
 
