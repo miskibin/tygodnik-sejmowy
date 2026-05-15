@@ -880,7 +880,10 @@ export async function getProcessCitations(
   const printIds = (printRows ?? []).map((r) => (r as { id: number }).id);
   if (printIds.length === 0) return [];
 
-  // 2. Statement IDs linked to any of those prints.
+  // 2. Statement IDs linked via the structured statement_print_links table
+  //    (mig 0060). Authoritative when populated, but the backfill lags
+  //    statement ingest — when it's empty we fall back to
+  //    mentioned_entities.prints (LLM enrichment) below.
   const { data: linkRows, error: lErr } = await sb
     .from("statement_print_links")
     .select("statement_id")
@@ -889,11 +892,7 @@ export async function getProcessCitations(
   const stmtIds = Array.from(
     new Set((linkRows ?? []).map((r) => (r as { statement_id: number }).statement_id)),
   );
-  if (stmtIds.length === 0) return [];
 
-  // 3. Top-viral candidates among the linked set. Grab a wider pool than
-  //    sampleSize so the "last sitting" filter + random sample still has
-  //    room to work.
   type StmtRow = {
     id: number;
     mp_id: number | null;
@@ -906,20 +905,46 @@ export async function getProcessCitations(
     start_datetime: string | null;
     proceeding_day: { date: string | null; proceeding: { number: number | null } | null } | null;
   };
-  const { data: stmtRows, error: sErr } = await sb
-    .from("proceeding_statements")
-    .select(
-      "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
-    )
-    .in("id", stmtIds)
-    .eq("term", term)
-    .not("viral_quote", "is", null)
-    .order("viral_score", { ascending: false, nullsFirst: false })
-    .limit(40);
-  if (sErr) throw sErr;
-  const rows = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
-    (r) => r.viral_quote && r.viral_quote.trim().length > 0,
-  );
+
+  // 3. Top-viral candidates. Two paths:
+  //    a) link table populated → filter by statement IDs.
+  //    b) link table empty (early-term, backfill pending) → match by
+  //       proceeding_statements.mentioned_entities->prints containing the
+  //       canonical "druk nr X" token the LLM emits during enrichment.
+  let rows: StmtRow[] = [];
+  if (stmtIds.length > 0) {
+    const { data: stmtRows, error: sErr } = await sb
+      .from("proceeding_statements")
+      .select(
+        "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+      )
+      .in("id", stmtIds)
+      .eq("term", term)
+      .not("viral_quote", "is", null)
+      .order("viral_score", { ascending: false, nullsFirst: false })
+      .limit(40);
+    if (sErr) throw sErr;
+    rows = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
+      (r) => r.viral_quote && r.viral_quote.trim().length > 0,
+    );
+  }
+  if (rows.length === 0) {
+    const token = `druk nr ${printNumber}`;
+    const { data: stmtRows, error: sErr } = await sb
+      .from("proceeding_statements")
+      .select(
+        "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+      )
+      .eq("term", term)
+      .not("viral_quote", "is", null)
+      .filter("mentioned_entities->prints", "cs", JSON.stringify([token]))
+      .order("viral_score", { ascending: false, nullsFirst: false })
+      .limit(40);
+    if (sErr) throw sErr;
+    rows = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
+      (r) => r.viral_quote && r.viral_quote.trim().length > 0,
+    );
+  }
   if (rows.length === 0) return [];
 
   // 4. Keep only the most-recent sitting (highest proceeding.number) —
