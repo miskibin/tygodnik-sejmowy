@@ -1,3 +1,4 @@
+import { ScrollText, FileSearch, Vote, Landmark, Crown } from "lucide-react";
 import { getPartyDiscipline } from "@/lib/db/atlas";
 import { getCommitteeList } from "@/lib/db/committees";
 import { getPollAverages30d } from "@/lib/db/polls";
@@ -9,6 +10,14 @@ import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
 import { partyColor, partyLabel, partyLogoSrc, RESIDUAL_CODES } from "../sondaze/_components/partyMeta";
 import { FeatureTile } from "./FeatureTile";
 import { FeatureTileCarousel } from "./FeatureTileCarousel";
+
+const LAW_PHASES = [
+  { icon: ScrollText, label: "wpłynęło" },
+  { icon: FileSearch, label: "komisja" },
+  { icon: Vote, label: "plenum" },
+  { icon: Landmark, label: "Senat" },
+  { icon: Crown, label: "Prezydent" },
+] as const;
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
   try { return await p; } catch { return fallback; }
@@ -121,7 +130,7 @@ export async function FeatureTileGrid() {
             Dalej <span className="italic text-destructive">w numerze</span>
           </h2>
           <p className="font-serif italic text-[14px] md:text-[15px] text-secondary-foreground m-0">
-            Siedem pozostałych działów.
+            Osiem pozostałych działów.
           </p>
         </div>
 
@@ -451,6 +460,61 @@ export async function FeatureTileGrid() {
             href="/alerty"
             ctaLabel="co planujemy →"
             comingSoon
+          />
+
+          ,
+          <FeatureTile
+            key="08"
+            num="08"
+            kicker="PRZEWODNIK"
+            title="Jak powstaje ustawa"
+            description="Od projektu do Dziennika Ustaw — 11 etapów prostym językiem. Z odwołaniami do Konstytucji i Regulaminu Sejmu."
+            preview={
+              <div className="flex items-center justify-between gap-1 relative">
+                <div
+                  aria-hidden
+                  className="absolute left-3 right-3 top-[14px] h-px"
+                  style={{
+                    background:
+                      "repeating-linear-gradient(to right, var(--border) 0 4px, transparent 4px 8px)",
+                  }}
+                />
+                {LAW_PHASES.map((p, i) => {
+                  const Icon = p.icon;
+                  const isActive = i === 2;
+                  return (
+                    <div
+                      key={p.label}
+                      className="flex flex-col items-center gap-1 relative z-10"
+                    >
+                      <div
+                        className="flex items-center justify-center rounded-full"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          background: isActive ? "var(--destructive)" : "var(--background)",
+                          color: isActive ? "var(--destructive-foreground)" : "var(--secondary-foreground)",
+                          boxShadow: `0 0 0 1px ${isActive ? "var(--destructive)" : "var(--border)"}`,
+                        }}
+                      >
+                        <Icon size={13} strokeWidth={1.75} />
+                      </div>
+                      <span
+                        className="font-mono text-[8.5px] tracking-tight uppercase"
+                        style={{
+                          color: isActive ? "var(--destructive)" : "var(--muted-foreground)",
+                          fontWeight: isActive ? 600 : 500,
+                        }}
+                      >
+                        {p.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            }
+            href="/jak-powstaje-ustawa"
+            ctaLabel="otwórz przewodnik →"
           />,
         ]} />
       </div>
