@@ -372,17 +372,21 @@ def _resolve_unresolved_agenda_refs(*, term: int) -> None:
     )
 
     # 3. Upsert into agenda_item_prints with on-conflict ignore.
+    #    Count actually-inserted rows from `.execute().data` length per batch —
+    #    PostgREST returns only the new/updated rows. Collisions silently drop.
+    inserted_rows = 0
     if resolvable:
         rows_to_insert = [
             {"agenda_item_id": r["agenda_item_id"], "term": r["term"], "print_number": r["print_number"]}
             for r in resolvable
         ]
         for i in range(0, len(rows_to_insert), batch):
-            (
+            res = (
                 client.table("agenda_item_prints")
                 .upsert(rows_to_insert[i:i + batch], on_conflict="agenda_item_id,term,print_number")
                 .execute()
             )
+            inserted_rows += len(res.data or [])
 
     # 4. Mark resolved.
     if resolvable:
@@ -398,10 +402,14 @@ def _resolve_unresolved_agenda_refs(*, term: int) -> None:
                 .execute()
             )
 
+    # Two distinct counts:
+    #   - inserted_rows: NEW rows in agenda_item_prints (may be < len(resolvable)
+    #     if links already existed from another code path).
+    #   - len(resolvable): unresolved refs we marked resolved this run.
     logger.info(
         "backfill-prints: relink done — agenda_item_prints +{} rows, "
         "{} unresolved refs marked resolved",
-        len(resolvable), len(resolvable),
+        inserted_rows, len(resolvable),
     )
 
 
