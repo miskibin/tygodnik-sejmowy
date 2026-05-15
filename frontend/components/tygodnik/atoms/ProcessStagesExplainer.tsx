@@ -52,7 +52,6 @@ type Branch = {
 };
 
 type StageRow = {
-  step: number;
   key: string;
   label: string;
   bucket: string;
@@ -65,7 +64,6 @@ type StageRow = {
 
 const ROWS: StageRow[] = [
   {
-    step: 1,
     key: "intake",
     label: "Wpłynęło",
     bucket: "WPŁYNĘŁO",
@@ -86,7 +84,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 118 Konstytucji RP", "Art. 32 ust. 2 Regulaminu Sejmu"],
   },
   {
-    step: 2,
     key: "first_reading",
     label: "I czytanie",
     bucket: "I CZYTANIE",
@@ -112,7 +109,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 37 ust. 2 i 4 Regulaminu Sejmu", "Art. 39 Regulaminu Sejmu"],
   },
   {
-    step: 3,
     key: "committee_work",
     label: "Praca w komisji",
     bucket: "KOMISJA",
@@ -135,7 +131,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 41-46 Regulaminu Sejmu", "Art. 119 ust. 4 Konstytucji RP"],
   },
   {
-    step: 4,
     key: "committee_report",
     label: "Sprawozdanie komisji",
     bucket: "KOMISJA",
@@ -156,7 +151,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 43 Regulaminu Sejmu"],
   },
   {
-    step: 5,
     key: "second_reading",
     label: "II czytanie",
     bucket: "PLENUM",
@@ -182,7 +176,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 44 i 47 Regulaminu Sejmu", "Art. 119 ust. 4 Konstytucji RP"],
   },
   {
-    step: 6,
     key: "third_reading",
     label: "III czytanie",
     bucket: "PLENUM",
@@ -202,7 +195,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 48-50 Regulaminu Sejmu"],
   },
   {
-    step: 7,
     key: "final_vote",
     label: "Głosowanie nad ustawą",
     bucket: "GŁOSOWANIE",
@@ -225,7 +217,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 120 Konstytucji RP"],
   },
   {
-    step: 8,
     key: "senate",
     label: "Senat",
     bucket: "SENAT",
@@ -254,7 +245,6 @@ const ROWS: StageRow[] = [
     ],
   },
   {
-    step: 9,
     key: "senate_consideration",
     label: "Rozpatrzenie poprawek Senatu",
     bucket: "SENAT",
@@ -276,7 +266,6 @@ const ROWS: StageRow[] = [
     sources: ["Art. 121 ust. 3 Konstytucji RP"],
   },
   {
-    step: 10,
     key: "president",
     label: "Prezydent",
     bucket: "PREZYDENT",
@@ -307,7 +296,6 @@ const ROWS: StageRow[] = [
     ],
   },
   {
-    step: 11,
     key: "promulgation",
     label: "Publikacja w Dz.U.",
     bucket: "PREZYDENT",
@@ -361,33 +349,18 @@ function BranchPill({ branch }: { branch: Branch }) {
 function StageIcon({ Icon }: { Icon: LucideIcon }) {
   return (
     <div
-      className="flex items-center justify-center rounded-full shrink-0"
+      className="flex items-center justify-center rounded-full shrink-0 relative"
       style={{
         width: 72,
         height: 72,
         background: "var(--muted)",
         color: "var(--secondary-foreground)",
+        // Sits above the timeline line — without an explicit z-index the
+        // dashed line shows through the disc and breaks the visual.
+        zIndex: 1,
       }}
     >
       <Icon size={32} strokeWidth={1.5} />
-    </div>
-  );
-}
-
-function StepBadge({ n }: { n: number }) {
-  return (
-    <div
-      className="flex items-center justify-center rounded-full shrink-0 font-mono font-medium"
-      style={{
-        width: 28,
-        height: 28,
-        background: "var(--destructive)",
-        color: "white",
-        fontSize: 12,
-      }}
-      aria-hidden
-    >
-      {n}
     </div>
   );
 }
@@ -429,7 +402,7 @@ export function ProcessStagesExplainer() {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-5xl max-h-[92vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-6xl lg:max-w-[1280px] max-h-[92vh] overflow-y-auto p-0">
         <div className="px-8 pt-8 pb-5 text-center border-b border-border">
           <DialogHeader className="items-center">
             <DialogTitle
@@ -470,19 +443,14 @@ export function ProcessStagesExplainer() {
             </div>
           </div>
 
-          <ol
-            className="list-none p-0 m-0 relative"
-            style={
-              {
-                "--timeline-x": "14px",
-              } as React.CSSProperties
-            }
-          >
+          <ol className="list-none p-0 m-0 relative">
+            {/* Vertical timeline runs through the centre of each icon disc.
+                Icon column is 88px wide → centre at 44px from left edge. */}
             <div
               aria-hidden
-              className="absolute top-0 bottom-0"
+              className="absolute top-10 bottom-10"
               style={{
-                left: "var(--timeline-x)",
+                left: 44,
                 width: 1,
                 background: "var(--border)",
               }}
@@ -493,16 +461,12 @@ export function ProcessStagesExplainer() {
               return (
                 <li
                   key={row.key}
-                  className="relative grid gap-5 pl-0 pr-0 mb-6 last:mb-0"
+                  className="relative grid gap-6 pl-0 pr-0 mb-7 last:mb-0"
                   style={{
-                    gridTemplateColumns: "28px 88px 1fr 260px",
+                    gridTemplateColumns: "88px 1fr 300px",
                     alignItems: "start",
                   }}
                 >
-                  <div className="flex items-center justify-center" style={{ zIndex: 1 }}>
-                    <StepBadge n={row.step} />
-                  </div>
-
                   <StageIcon Icon={Icon} />
 
                   <div className="min-w-0">
