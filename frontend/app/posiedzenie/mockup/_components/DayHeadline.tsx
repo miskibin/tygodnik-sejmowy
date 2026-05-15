@@ -7,6 +7,7 @@ import type { Day } from "../data";
 import { Kicker } from "./SectionHead";
 
 export function DayHeadline({ day }: { day: Day }) {
+  const year = day.date ? new Date(day.date).getFullYear() : "";
   return (
     <section
       className="border-b border-border"
@@ -29,7 +30,7 @@ export function DayHeadline({ day }: { day: Day }) {
             >
               {day.weekday}
               <br />
-              {day.short}.2026
+              {day.short}.{year}
               <br />
               {day.status === "live" && (
                 <span style={{ color: "var(--destructive-deep)" }}>

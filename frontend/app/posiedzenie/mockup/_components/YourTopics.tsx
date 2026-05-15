@@ -22,13 +22,27 @@ function topicsAggregate(): Record<TopicId, AgendaPoint[]> {
   return out;
 }
 
+const PUNKT_PLURAL = new Intl.PluralRules("pl-PL");
+function punktLabel(count: number): string {
+  switch (PUNKT_PLURAL.select(count)) {
+    case "one":
+      return "punkt";
+    case "few":
+      return "punkty";
+    default:
+      return "punktów";
+  }
+}
+
 export function YourTopics() {
   const agg = topicsAggregate();
-  const firstWithContent = (Object.keys(TOPICS) as TopicId[]).find(
-    (t) => agg[t].length > 0,
-  )!;
+  const topicIds = Object.keys(TOPICS) as TopicId[];
+  // Force-unwrap would crash on an all-empty taxonomy. Fall back to the
+  // first topic key so `selected` is always a valid TopicId.
+  const firstWithContent =
+    topicIds.find((t) => agg[t].length > 0) ?? topicIds[0];
   const [selected, setSelected] = useState<TopicId>(firstWithContent);
-  const current = agg[selected];
+  const current = agg[selected] ?? [];
 
   return (
     <section className="border-b border-border">
@@ -150,7 +164,7 @@ export function YourTopics() {
                   letterSpacing: "0.12em",
                 }}
               >
-                {current.length} {current.length === 1 ? "punkt" : "punktów"} dziś
+                {current.length} {punktLabel(current.length)} dziś
               </span>
             </div>
 
@@ -229,7 +243,7 @@ export function YourTopics() {
                       {p.vote && (
                         <span
                           style={{
-                            color: verdictInk(p.vote.result),
+                            color: verdictInk(p.vote.result, p.vote.motionPolarity),
                             fontWeight: 700,
                           }}
                         >

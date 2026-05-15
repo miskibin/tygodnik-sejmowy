@@ -162,14 +162,13 @@ export function Hero({
         <div
           className="mt-10 flex gap-6 md:gap-10 overflow-x-auto"
           style={{ borderBottom: "2px solid var(--rule)" }}
-          role="tablist"
         >
-          {MOCK.days.map((d) => (
+          {MOCK.days.map((d, i) => (
             <DayTab
               key={d.idx}
               day={d}
-              active={d.idx === activeDay}
-              onSelect={() => setActiveDay(d.idx)}
+              active={i === activeDay}
+              onSelect={() => setActiveDay(i)}
             />
           ))}
         </div>

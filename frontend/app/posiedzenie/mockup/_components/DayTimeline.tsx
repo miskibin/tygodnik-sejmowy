@@ -40,6 +40,7 @@ const TONES_IN_LEGEND: Tone[] = [
 
 export function DayTimeline({ activeDay }: { activeDay: number }) {
   const day = MOCK.days[activeDay];
+  if (!day) return null;
   const points = MOCK.punkty.filter((p) => p.date === day.date);
   if (points.length === 0) {
     return null;
@@ -154,6 +155,20 @@ export function DayTimeline({ activeDay }: { activeDay: number }) {
             // approximate min pixel width at common viewports to decide whether to render title
             // (we don't know runtime width here; fall back to widthPct threshold)
             const narrow = widthPct < 4.2;
+            // Vote-marker offset inside the block. Guard against zero duration
+            // and clamp to the [0, 100] range so a stale time never paints
+            // the marker outside its parent.
+            const voteLeftPct = p.vote && p.durMin > 0
+              ? Math.max(
+                  0,
+                  Math.min(
+                    100,
+                    ((timeToMin(p.vote.time) - timeToMin(p.timeStart)) /
+                      p.durMin) *
+                      100,
+                  ),
+                )
+              : 0;
             return (
               <div
                 key={p.ord}
@@ -204,11 +219,7 @@ export function DayTimeline({ activeDay }: { activeDay: number }) {
                     className="absolute"
                     style={{
                       top: -10,
-                      left: `${
-                        ((timeToMin(p.vote.time) - timeToMin(p.timeStart)) /
-                          p.durMin) *
-                        100
-                      }%`,
+                      left: `${voteLeftPct}%`,
                       width: 2,
                       height: 12,
                       background: "var(--destructive-deep)",

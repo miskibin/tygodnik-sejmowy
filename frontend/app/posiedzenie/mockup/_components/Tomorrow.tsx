@@ -1,11 +1,13 @@
 // "Jutro w Sejmie" — next-day preview. Drops the inspiration's full-bleed
 // black panel for a muted warm-paper surface with destructive accents.
 
-import { TOPICS, type TopicId } from "@/lib/topics";
+import { TOPICS } from "@/lib/topics";
 import { MOCK, type PlannedCard } from "../data";
 import { Kicker, SectionHead } from "./SectionHead";
 
 function PlanCardTile({ p }: { p: PlannedCard }) {
+  // Resolve once so an unknown topic key doesn't crash the render path.
+  const topic = p.topic ? TOPICS[p.topic] : null;
   return (
     <div
       style={{
@@ -55,7 +57,7 @@ function PlanCardTile({ p }: { p: PlannedCard }) {
       >
         {p.subtitle}
       </p>
-      {p.topic && (
+      {topic && (
         <div className="mt-3.5">
           <span
             className="font-sans inline-flex items-center gap-1.5 rounded-full"
@@ -67,10 +69,10 @@ function PlanCardTile({ p }: { p: PlannedCard }) {
               border: "1px solid var(--border)",
             }}
           >
-            <span style={{ color: TOPICS[p.topic as TopicId].color }} aria-hidden>
-              {TOPICS[p.topic as TopicId].icon}
+            <span style={{ color: topic.color }} aria-hidden>
+              {topic.icon}
             </span>
-            {TOPICS[p.topic as TopicId].label.toLowerCase()}
+            {topic.label.toLowerCase()}
           </span>
         </div>
       )}
@@ -80,13 +82,16 @@ function PlanCardTile({ p }: { p: PlannedCard }) {
 
 export function Tomorrow() {
   const planned = MOCK.jutro;
+  const plannedDate = planned.date
+    ? planned.date.split("-").reverse().join(".")
+    : "—";
   return (
     <section className="border-b border-border" style={{ background: "var(--muted)" }}>
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-14 md:py-16">
         <SectionHead
           num={9}
           title="Jutro w Sejmie"
-          sub={`${planned.weekday} · 15.05.2026 · od 09:00`}
+          sub={`${planned.weekday} · ${plannedDate} · od 09:00`}
           anchor="jutro"
         />
 

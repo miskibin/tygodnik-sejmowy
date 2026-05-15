@@ -111,7 +111,7 @@ function ToneBar({ tones }: { tones: Partial<Record<Tone, number>> }) {
 }
 
 function VoteMini({ v }: { v: VoteType }) {
-  const accent = verdictInk(v.result);
+  const accent = verdictInk(v.result, v.motionPolarity);
   return (
     <div
       className="block no-underline text-inherit"
@@ -225,7 +225,7 @@ function QuoteMini({ q }: { q: ViralQuote }) {
           textWrap: "pretty",
         }}
       >
-        „{q.text}"
+        „{q.text}”
       </p>
       <div className="flex items-center gap-2 flex-wrap">
         <MPAvatarPhoto name={q.speaker} size={28} />
@@ -424,10 +424,10 @@ function PunktCenter({ p }: { p: AgendaPoint }) {
           <StageBadge key={s} label={s} />
         ))}
         {p.prints.map((d) => (
-          <PrintRef key={d.number} term={d.term} number={d.number} />
+          <PrintRef key={`${d.term}-${d.number}`} term={d.term} number={d.number} />
         ))}
         {p.procesy.map((pr) => (
-          <ProcessRef key={pr.number} term={pr.term} number={pr.number} />
+          <ProcessRef key={`${pr.term}-${pr.number}`} term={pr.term} number={pr.number} />
         ))}
       </div>
 
@@ -476,7 +476,7 @@ function PunktCenter({ p }: { p: AgendaPoint }) {
             maxWidth: 720,
           }}
         >
-          „{p.title}"
+          „{p.title}”
         </p>
       </details>
 

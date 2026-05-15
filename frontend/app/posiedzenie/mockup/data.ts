@@ -518,7 +518,7 @@ export const MOCK: ProceedingMock = {
       timeEnd: "10:00",
       durMin: 60,
       title:
-        "Pierwsze czytanie rządowego projektu ustawy o e-doręczeniach administracyjnych — ciąg dalszy",
+        "Trzecie czytanie rządowego projektu ustawy o e-doręczeniach administracyjnych — ciąg dalszy",
       shortTitle: "E-doręczenia administracyjne — III czytanie",
       plainSummary:
         "Cyfryzacja korespondencji urzędowej. Po negatywnej opinii Senatu rząd wprowadza autopoprawkę wydłużającą okres przejściowy do 18 mies.",

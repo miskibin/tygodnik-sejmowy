@@ -10,7 +10,8 @@ import { MOCK } from "../data";
 import { Kicker, SectionHead } from "./SectionHead";
 
 export function TopSpeakers() {
-  const maxMin = Math.max(...MOCK.topSpeakers.map((s) => s.minutes));
+  // Guard against an all-zero dataset; the bars use this as a denominator.
+  const maxMin = Math.max(1, ...MOCK.topSpeakers.map((s) => s.minutes));
 
   return (
     <section className="border-b border-border">
@@ -132,7 +133,7 @@ export function TopSpeakers() {
                 textWrap: "pretty",
               }}
             >
-              „{s.bestQuote}"
+              „{s.bestQuote}”
             </div>
           </div>
         ))}
@@ -213,7 +214,7 @@ export function TopSpeakers() {
                   lineHeight: 1.45,
                 }}
               >
-                „{s.bestQuote}"
+                „{s.bestQuote}”
               </p>
             </div>
           ))}

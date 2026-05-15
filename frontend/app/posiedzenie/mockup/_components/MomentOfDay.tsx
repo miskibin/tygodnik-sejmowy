@@ -11,8 +11,10 @@ import { Kicker, SectionHead } from "./SectionHead";
 import { verdictInk } from "../tokens";
 
 export function MomentOfDay() {
-  const top = MOCK.topQuotes[0];
-  const punkt = MOCK.punkty.find((p) => p.ord === top.punktOrd);
+  const top =
+    MOCK.topQuotes.find((q) => q.rank === 1) ?? MOCK.topQuotes[0];
+  if (!top) return null;
+  const punkt = MOCK.punkty.find((p) => p.ord === top.punktOrd) ?? null;
 
   return (
     <section className="border-b border-border">
@@ -183,7 +185,7 @@ export function MomentOfDay() {
                       className="font-serif italic font-medium"
                       style={{
                         fontSize: 24,
-                        color: verdictInk(punkt.vote.result),
+                        color: verdictInk(punkt.vote.result, punkt.vote.motionPolarity),
                         lineHeight: 1,
                       }}
                     >

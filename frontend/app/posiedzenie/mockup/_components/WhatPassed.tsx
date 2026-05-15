@@ -11,7 +11,7 @@ import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
 function DecisionCard({ p }: { p: AgendaPoint }) {
   if (!p.vote) return null;
   const v = p.vote;
-  const accent = verdictInk(v.result);
+  const accent = verdictInk(v.result, v.motionPolarity);
 
   return (
     <a
@@ -149,9 +149,11 @@ function VoteBar({ v }: { v: Vote }) {
 
 export function WhatPassed({ activeDay }: { activeDay: number }) {
   const dayDate = MOCK.days[activeDay]?.date;
-  const decisive = MOCK.punkty.filter(
-    (p) => p.vote && (!dayDate || p.date === dayDate),
-  );
+  // Bounds-check: out-of-range activeDay used to fall through to "all days"
+  // because of the `!dayDate ||` short-circuit. Require the day to exist.
+  const decisive = dayDate
+    ? MOCK.punkty.filter((p) => !!p.vote && p.date === dayDate)
+    : [];
   if (decisive.length === 0) {
     return (
       <section

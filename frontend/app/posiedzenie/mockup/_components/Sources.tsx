@@ -5,6 +5,10 @@ import { Kicker } from "./SectionHead";
 import { MOCK } from "../data";
 
 export function Sources() {
+  // 2026-05-14 → 14.05.2026 — derived rather than hardcoded.
+  const lastUpdateDate = MOCK.dates[1]
+    ? MOCK.dates[1].split("-").reverse().join(".")
+    : "—";
   return (
     <section
       className="border-t border-border"
@@ -92,7 +96,7 @@ export function Sources() {
               letterSpacing: "0.12em",
             }}
           >
-            Posiedzenie {MOCK.number} · ostatnia aktualizacja {MOCK.dates[1].slice(8)}.05.2026, {MOCK.liveAt}
+            Posiedzenie {MOCK.number} · ostatnia aktualizacja {lastUpdateDate}, {MOCK.liveAt}
           </span>
         </div>
       </div>

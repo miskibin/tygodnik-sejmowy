@@ -52,7 +52,7 @@ function QuoteRow({ q }: { q: TopQuote }) {
                 fontWeight: 400,
               }}
             >
-              „{q.text}"
+              „{q.text}”
             </p>
             <div className="mt-4 flex items-center gap-3 flex-wrap">
               <MPAvatarPhoto name={q.speaker} size={36} />
