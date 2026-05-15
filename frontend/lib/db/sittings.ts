@@ -95,6 +95,18 @@ function diffMinutes(start: string | null, end: string | null): number {
   return Math.round((b - a) / 60000);
 }
 
+// Stable identity for a speaker across statements. Ministers / guests /
+// non-MPs have `mp_id = null` but still produce a `speaker_name`; counting
+// only by mp_id under-counts them and also disagrees with topSpeakers
+// (which already keys by mp_id|name).
+function speakerKey(s: { mp_id: number | null; speaker_name: string | null }): string | null {
+  if (s.mp_id != null) return `mp:${s.mp_id}`;
+  if (s.speaker_name && s.speaker_name.trim().length > 0) {
+    return `name:${s.speaker_name.trim().toLowerCase()}`;
+  }
+  return null;
+}
+
 function shortenTitle(title: string, max = 100): string {
   if (title.length <= max) return title.replace(/\.$/, "");
   const slice = title.slice(0, max);
@@ -431,13 +443,16 @@ async function loadSitting(
     votesByVoting.set(v.voting_id, list);
   }
 
-  // Statement → agenda_item_id (collapsed). First non-null wins.
-  const stmtAgendaId = new Map<number, number>();
+  // Statement → agenda_item_ids. statement_print_links is a many-to-many
+  // junction (PK is (statement_id, print_id, source)) so a single statement
+  // can be linked to multiple agenda items. Keep them all so per-point
+  // counts and tone/topic tallies cover every linked point.
+  const stmtAgendaIds = new Map<number, Set<number>>();
   for (const l of links) {
     if (l.agenda_item_id == null) continue;
-    if (!stmtAgendaId.has(l.statement_id)) {
-      stmtAgendaId.set(l.statement_id, l.agenda_item_id);
-    }
+    const ids = stmtAgendaIds.get(l.statement_id) ?? new Set<number>();
+    ids.add(l.agenda_item_id);
+    stmtAgendaIds.set(l.statement_id, ids);
   }
 
   // 6. Day-level aggregates.
@@ -487,14 +502,16 @@ async function loadSitting(
   });
 
   // 7. Per-agenda-point aggregates.
-  // Group statements by agenda_item_id (via statement_print_links).
+  // Group statements by agenda_item_id (via statement_print_links). Each
+  // statement is counted under every agenda item it links to — see
+  // stmtAgendaIds above.
   const stmtsByAgendaId = new Map<number, StatementRow[]>();
   for (const s of statements) {
-    const aid = stmtAgendaId.get(s.id);
-    if (aid == null) continue;
-    const list = stmtsByAgendaId.get(aid) ?? [];
-    list.push(s);
-    stmtsByAgendaId.set(aid, list);
+    for (const aid of stmtAgendaIds.get(s.id) ?? []) {
+      const list = stmtsByAgendaId.get(aid) ?? [];
+      list.push(s);
+      stmtsByAgendaId.set(aid, list);
+    }
   }
   const printsByAgendaId = new Map<number, { term: number; number: string }[]>();
   for (const p of agendaPrints) {
@@ -570,12 +587,13 @@ async function loadSitting(
 
     const tones: Partial<Record<Tone, number>> = {};
     const topicSet = new Set<string>();
-    const speakerSet = new Set<number>();
+    const speakerSet = new Set<string>();
     for (const s of stmts) {
       const t = mapTone(s.tone);
       if (t) tones[t] = (tones[t] ?? 0) + 1;
       for (const tag of s.topic_tags ?? []) topicSet.add(tag);
-      if (s.mp_id != null) speakerSet.add(s.mp_id);
+      const key = speakerKey(s);
+      if (key) speakerSet.add(key);
     }
 
     const primaryVoting = matchingVotings[0] ?? null;
@@ -792,8 +810,8 @@ async function loadSitting(
     votes: votings.length,
     speakers: new Set(
       statements
-        .map((s) => s.mp_id)
-        .filter((x): x is number => x != null),
+        .map((s) => speakerKey(s))
+        .filter((x): x is string => x != null),
     ).size,
   };
 
@@ -829,7 +847,7 @@ export function getSittingView(
 ): Promise<SittingView | null> {
   return unstable_cache(
     () => loadSitting(term, sittingNum),
-    ["sitting-view", "v2", String(term), String(sittingNum)],
+    ["sitting-view", "v3", String(term), String(sittingNum)],
     { revalidate: SITTING_REVALIDATE_SEC },
   )();
 }
