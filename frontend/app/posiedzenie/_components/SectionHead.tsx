@@ -1,6 +1,4 @@
-// Roman-numeral section markers used across the proceeding-points narrative.
-// The italic serif numeral + serif h2 + optional sans subtitle echoes the
-// styling already used inside ProceedingPoints.tsx and BriefList atoms.
+// Roman-numeral section markers used across the sitting view.
 
 import type { ReactNode } from "react";
 
@@ -17,7 +15,6 @@ export function SectionHead({
   title: string;
   sub?: ReactNode;
   anchor?: string;
-  /** "inverted" swaps colours for sections that sit on muted/secondary surfaces. */
   tone?: "default" | "muted" | "inverted";
 }) {
   const numColor =

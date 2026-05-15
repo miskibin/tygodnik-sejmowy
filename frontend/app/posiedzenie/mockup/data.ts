@@ -1,4 +1,4 @@
-// Mockup data for /posiedzenie/mockup. Mirrors the shape a real loader
+// Hardcoded MOCK for /posiedzenie/mockup. Mirrors the shape a real loader
 // would produce by joining proceedings + proceeding_days + agenda_items +
 // agenda_item_processes + agenda_item_prints + proceeding_statements
 // (with utterance enrichment from migration 0061) + votings (with the
@@ -7,172 +7,20 @@
 // No DB access — all values hardcoded so designer & user can iterate on
 // layout without infra in the way.
 
-import type { TopicId } from "@/lib/topics";
-
-export type Club =
-  | "KO"
-  | "PiS"
-  | "Lewica"
-  | "PSL-TD"
-  | "Konfederacja"
-  | "Polska2050"
-  | "Razem"
-  | "niez.";
-
-export type Tone =
-  | "konfrontacyjny"
-  | "techniczny"
-  | "argumentowy"
-  | "emocjonalny"
-  | "apel"
-  | "neutralny";
-
-export type ViralQuote = {
-  text: string;
-  speaker: string;
-  mpId?: number | null;
-  photoUrl?: string | null;
-  club: Club | null;
-  function: string | null;
-  tone: Tone;
-  reason: string;
-};
-
-export type Vote = {
-  time: string;
-  votingNumber: number;
-  result: "PRZYJĘTA" | "ODRZUCONA" | "WNIOSEK PRZYJĘTY" | "WNIOSEK ODRZUCONY";
-  subtitle?: string | null;
-  za: number;
-  przeciw: number;
-  wstrzym: number;
-  nieob: number;
-  margin: number;
-  motionPolarity?: "pass" | "reject" | "amendment" | "minority" | "procedural" | null;
-  byClub?: Partial<Record<Club, { za: number; pr: number; ws: number; nb: number }>>;
-  plainNote?: string | null;
-};
-
-export type AgendaPoint = {
-  ord: number;
-  date: string;
-  timeStart: string;
-  timeEnd: string;
-  durMin: number;
-  title: string;
-  shortTitle: string;
-  plainSummary: string;
-  stages: string[];
-  prints: { term: number; number: string }[];
-  procesy: { term: number; number: string }[];
-  stats: { wypowiedzi: number; mowcy: number; glosowania: number };
-  tones: Partial<Record<Tone, number>>;
-  topics: TopicId[];
-  importance: "flagship" | "normal";
-  ongoing: boolean;
-  planned: boolean;
-  viralQuote: ViralQuote | null;
-  vote: Vote | null;
-};
-
-export type Day = {
-  idx: number;
-  date: string;
-  weekday: string;
-  short: string;
-  status: "done" | "live" | "planned";
-  open: string | null;
-  close: string | null;
-  headline: string;
-  stats: { punkty: number; wypowiedzi: number; glosowania: number };
-};
-
-export type TopQuote = {
-  rank: number;
-  text: string;
-  speaker: string;
-  mpId?: number | null;
-  photoUrl?: string | null;
-  club: Club;
-  function: string;
-  tone: Tone;
-  reason: string;
-  punktOrd: number;
-  punktShort: string;
-  punktTime: string;
-};
-
-export type TopSpeaker = {
-  name: string;
-  mpId?: number | null;
-  photoUrl?: string | null;
-  club: Club;
-  function: string;
-  minutes: number;
-  wypowiedzi: number;
-  dominantTone: Tone;
-  bestQuote: string;
-};
-
-export type Starcie = {
-  a: string;
-  aClub: Club;
-  b: string;
-  bClub: Club;
-  punktOrd: number;
-  punktShort: string;
-  exchanges: number;
-  snippet: string;
-};
-
-export type Rebel = {
-  name: string;
-  mpId?: number | null;
-  club: Club;
-  expectedClub: Club;
-  actual: "ZA" | "PR" | "WS";
-  punktOrd: number;
-  punktShort: string;
-  note: string;
-};
-
-export type PlannedCard = {
-  ord: number;
-  title: string;
-  subtitle: string;
-  topic: TopicId | null;
-  flag?: boolean;
-};
-
-export type ProceedingMock = {
-  term: number;
-  number: number;
-  title: string;
-  dates: string[];
-  current: boolean;
-  liveAt: string;
-  totals: { punkty: number; wypowiedzi: number; glosowania: number; mowcy: number };
-  days: Day[];
-  punkty: AgendaPoint[];
-  topQuotes: TopQuote[];
-  topSpeakers: TopSpeaker[];
-  starcia: Starcie[];
-  renegaci: Rebel[];
-  jutro: { date: string; weekday: string; headline: string; plannedPoints: PlannedCard[] };
-};
+import type { SittingView } from "../_components/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Polish typographic quotes throughout: opening „ (U+201E) and closing " (U+201D).
 // Plain ASCII " is reserved for string delimiters only.
 
-export const MOCK: ProceedingMock = {
+export const MOCK: SittingView = {
   term: 10,
   number: 19,
   title: "19. posiedzenie Sejmu Rzeczypospolitej Polskiej X kadencji",
   dates: ["2026-05-13", "2026-05-14", "2026-05-15"],
   current: true,
   liveAt: "16:42",
-  totals: { punkty: 24, wypowiedzi: 612, glosowania: 47, mowcy: 218 },
+  totals: { points: 24, statements: 612, votes: 47, speakers: 218 },
 
   days: [
     {
@@ -185,7 +33,7 @@ export const MOCK: ProceedingMock = {
       close: "21:48",
       headline:
         "Sejm przyjął w II czytaniu projekt podnoszący kwotę wolną do 60 tys. zł — rekordowo długa debata podatkowa zakończona poprawkami rządowymi.",
-      stats: { punkty: 8, wypowiedzi: 224, glosowania: 18 },
+      stats: { points: 8, statements: 224, votes: 18 },
     },
     {
       idx: 1,
@@ -197,7 +45,7 @@ export const MOCK: ProceedingMock = {
       close: null,
       headline:
         "Trzecie czytanie PIT — ustawa przeszła stosunkiem 248–198. Wniosek o odwołanie Marszałka odrzucony.",
-      stats: { punkty: 11, wypowiedzi: 296, glosowania: 23 },
+      stats: { points: 11, statements: 296, votes: 23 },
     },
     {
       idx: 2,
@@ -209,11 +57,11 @@ export const MOCK: ProceedingMock = {
       close: null,
       headline:
         "Zaplanowany blok głosowań końcowych — m.in. e-doręczenia (III czytanie) i pakiet onkologiczny.",
-      stats: { punkty: 5, wypowiedzi: 92, glosowania: 6 },
+      stats: { points: 5, statements: 92, votes: 6 },
     },
   ],
 
-  punkty: [
+  agendaPoints: [
     {
       ord: 1,
       date: "2026-05-14",
@@ -231,8 +79,8 @@ export const MOCK: ProceedingMock = {
         { term: 10, number: "892" },
         { term: 10, number: "892-A" },
       ],
-      procesy: [{ term: 10, number: "841" }],
-      stats: { wypowiedzi: 41, mowcy: 28, glosowania: 12 },
+      processes: [{ term: 10, number: "841" }],
+      stats: { statements: 41, speakers: 28, votes: 12 },
       tones: { konfrontacyjny: 18, emocjonalny: 7, argumentowy: 9, techniczny: 5, neutralny: 2 },
       topics: ["biznes-podatki", "edukacja-rodzina"],
       importance: "flagship",
@@ -251,21 +99,21 @@ export const MOCK: ProceedingMock = {
         time: "10:54",
         votingNumber: 84,
         result: "PRZYJĘTA",
-        za: 248,
-        przeciw: 198,
-        wstrzym: 12,
-        nieob: 2,
+        yes: 248,
+        no: 198,
+        abstain: 12,
+        absent: 2,
         margin: 50,
         motionPolarity: "pass",
         byClub: {
-          KO: { za: 142, pr: 0, ws: 1, nb: 0 },
-          Lewica: { za: 26, pr: 0, ws: 0, nb: 0 },
-          "PSL-TD": { za: 32, pr: 0, ws: 0, nb: 0 },
-          Polska2050: { za: 32, pr: 0, ws: 0, nb: 0 },
-          PiS: { za: 3, pr: 167, ws: 8, nb: 1 },
-          Konfederacja: { za: 0, pr: 14, ws: 3, nb: 0 },
-          Razem: { za: 8, pr: 0, ws: 0, nb: 0 },
-          "niez.": { za: 5, pr: 17, ws: 0, nb: 1 },
+          KO: { yes: 142, no: 0, abstain: 1, absent: 0 },
+          Lewica: { yes: 26, no: 0, abstain: 0, absent: 0 },
+          "PSL-TD": { yes: 32, no: 0, abstain: 0, absent: 0 },
+          Polska2050: { yes: 32, no: 0, abstain: 0, absent: 0 },
+          PiS: { yes: 3, no: 167, abstain: 8, absent: 1 },
+          Konfederacja: { yes: 0, no: 14, abstain: 3, absent: 0 },
+          Razem: { yes: 8, no: 0, abstain: 0, absent: 0 },
+          "niez.": { yes: 5, no: 17, abstain: 0, absent: 1 },
         },
         plainNote:
           "Większością 50 głosów. Trzech posłów PiS (Suski, Mularczyk, Czartoryski) złamało dyscyplinę i zagłosowało ZA.",
@@ -284,8 +132,8 @@ export const MOCK: ProceedingMock = {
         "Wniosek klubu PiS o odwołanie Marszałka odrzucony: 162 ZA, 281 PRZECIW. Zarzut: jednostronne stosowanie regulaminu w sprawie immunitetów.",
       stages: ["Wniosek formalny", "Głosowanie"],
       prints: [{ term: 10, number: "918" }],
-      procesy: [],
-      stats: { wypowiedzi: 22, mowcy: 18, glosowania: 1 },
+      processes: [],
+      stats: { statements: 22, speakers: 18, votes: 1 },
       tones: { konfrontacyjny: 14, emocjonalny: 5, neutralny: 3 },
       topics: ["sady-prawa"],
       importance: "flagship",
@@ -304,21 +152,21 @@ export const MOCK: ProceedingMock = {
         time: "12:42",
         votingNumber: 85,
         result: "WNIOSEK ODRZUCONY",
-        za: 162,
-        przeciw: 281,
-        wstrzym: 4,
-        nieob: 13,
+        yes: 162,
+        no: 281,
+        abstain: 4,
+        absent: 13,
         margin: 119,
         motionPolarity: "procedural",
         byClub: {
-          PiS: { za: 162, pr: 0, ws: 1, nb: 7 },
-          Konfederacja: { za: 0, pr: 14, ws: 3, nb: 0 },
-          KO: { za: 0, pr: 142, ws: 0, nb: 1 },
-          Lewica: { za: 0, pr: 26, ws: 0, nb: 0 },
-          "PSL-TD": { za: 0, pr: 32, ws: 0, nb: 0 },
-          Polska2050: { za: 0, pr: 32, ws: 0, nb: 0 },
-          Razem: { za: 0, pr: 8, ws: 0, nb: 0 },
-          "niez.": { za: 0, pr: 27, ws: 0, nb: 0 },
+          PiS: { yes: 162, no: 0, abstain: 1, absent: 7 },
+          Konfederacja: { yes: 0, no: 14, abstain: 3, absent: 0 },
+          KO: { yes: 0, no: 142, abstain: 0, absent: 1 },
+          Lewica: { yes: 0, no: 26, abstain: 0, absent: 0 },
+          "PSL-TD": { yes: 0, no: 32, abstain: 0, absent: 0 },
+          Polska2050: { yes: 0, no: 32, abstain: 0, absent: 0 },
+          Razem: { yes: 0, no: 8, abstain: 0, absent: 0 },
+          "niez.": { yes: 0, no: 27, abstain: 0, absent: 0 },
         },
       },
     },
@@ -334,8 +182,8 @@ export const MOCK: ProceedingMock = {
         "15 pytań od opozycji i koalicji. Dominujące tematy: ceny energii (4 pytania), CPK (3), sytuacja w służbie zdrowia (3).",
       stages: ["Pytania w sprawach bieżących"],
       prints: [],
-      procesy: [],
-      stats: { wypowiedzi: 30, mowcy: 30, glosowania: 0 },
+      processes: [],
+      stats: { statements: 30, speakers: 30, votes: 0 },
       tones: { argumentowy: 10, konfrontacyjny: 8, neutralny: 12 },
       topics: ["zdrowie", "transport"],
       importance: "normal",
@@ -360,8 +208,8 @@ export const MOCK: ProceedingMock = {
         { term: 10, number: "763" },
         { term: 10, number: "871" },
       ],
-      procesy: [{ term: 10, number: "763" }],
-      stats: { wypowiedzi: 51, mowcy: 29, glosowania: 4 },
+      processes: [{ term: 10, number: "763" }],
+      stats: { statements: 51, speakers: 29, votes: 4 },
       tones: { argumentowy: 24, emocjonalny: 11, neutralny: 8, techniczny: 6, apel: 2 },
       topics: ["zdrowie", "emerytury"],
       importance: "flagship",
@@ -380,10 +228,10 @@ export const MOCK: ProceedingMock = {
         time: "16:30",
         votingNumber: 88,
         result: "PRZYJĘTA",
-        za: 412,
-        przeciw: 24,
-        wstrzym: 18,
-        nieob: 6,
+        yes: 412,
+        no: 24,
+        abstain: 18,
+        absent: 6,
         margin: 388,
         motionPolarity: "pass",
         plainNote:
@@ -403,8 +251,8 @@ export const MOCK: ProceedingMock = {
         "Aktualizacja harmonogramu: pierwsza fala wywłaszczeń przesunięta na II połowę 2027. Brak rozstrzygnięcia w sprawie finansowania linii dużych prędkości.",
       stages: ["Informacja"],
       prints: [],
-      procesy: [],
-      stats: { wypowiedzi: 28, mowcy: 22, glosowania: 0 },
+      processes: [],
+      stats: { statements: 28, speakers: 22, votes: 0 },
       tones: { techniczny: 14, argumentowy: 8, konfrontacyjny: 4, neutralny: 2 },
       topics: ["transport", "biznes-podatki"],
       importance: "normal",
@@ -438,8 +286,8 @@ export const MOCK: ProceedingMock = {
         { term: 10, number: "812-A" },
         { term: 10, number: "812-B" },
       ],
-      procesy: [{ term: 10, number: "812" }],
-      stats: { wypowiedzi: 38, mowcy: 24, glosowania: 0 },
+      processes: [{ term: 10, number: "812" }],
+      stats: { statements: 38, speakers: 24, votes: 0 },
       tones: { argumentowy: 16, techniczny: 11, konfrontacyjny: 7, neutralny: 4 },
       topics: ["mieszkanie-media", "srodowisko-klimat"],
       importance: "normal",
@@ -469,8 +317,8 @@ export const MOCK: ProceedingMock = {
         "Stanowisko poparte przez koalicję — odrzucone poprawki PiS dot. mechanizmu warunkowości. Konfederacja: przeciw całemu stanowisku.",
       stages: ["II czytanie", "Głosowanie"],
       prints: [{ term: 10, number: "901" }],
-      procesy: [{ term: 10, number: "901" }],
-      stats: { wypowiedzi: 22, mowcy: 16, glosowania: 6 },
+      processes: [{ term: 10, number: "901" }],
+      stats: { statements: 22, speakers: 16, votes: 6 },
       tones: { konfrontacyjny: 9, argumentowy: 7, neutralny: 4, techniczny: 2 },
       topics: ["sady-prawa", "bezpieczenstwo-obrona"],
       importance: "normal",
@@ -481,10 +329,10 @@ export const MOCK: ProceedingMock = {
         time: "21:10",
         votingNumber: 91,
         result: "PRZYJĘTA",
-        za: 294,
-        przeciw: 132,
-        wstrzym: 28,
-        nieob: 6,
+        yes: 294,
+        no: 132,
+        abstain: 28,
+        absent: 6,
         margin: 162,
         motionPolarity: "pass",
       },
@@ -501,8 +349,8 @@ export const MOCK: ProceedingMock = {
         "Komunikaty proceduralne i ogłoszenie planu jutrzejszego dnia. 5 zaplanowanych głosowań końcowych.",
       stages: ["Informacja"],
       prints: [],
-      procesy: [],
-      stats: { wypowiedzi: 4, mowcy: 4, glosowania: 0 },
+      processes: [],
+      stats: { statements: 4, speakers: 4, votes: 0 },
       tones: { neutralny: 4 },
       topics: [],
       importance: "normal",
@@ -524,8 +372,8 @@ export const MOCK: ProceedingMock = {
         "Cyfryzacja korespondencji urzędowej. Po negatywnej opinii Senatu rząd wprowadza autopoprawkę wydłużającą okres przejściowy do 18 mies.",
       stages: ["III czytanie", "Głosowanie"],
       prints: [{ term: 10, number: "856" }],
-      procesy: [{ term: 10, number: "856" }],
-      stats: { wypowiedzi: 0, mowcy: 0, glosowania: 0 },
+      processes: [{ term: 10, number: "856" }],
+      stats: { statements: 0, speakers: 0, votes: 0 },
       tones: {},
       topics: ["biznes-podatki"],
       importance: "normal",
@@ -547,8 +395,8 @@ export const MOCK: ProceedingMock = {
         "Coroczny raport. Zwiększona kwota refundacji terapii CAR-T; rozszerzenie programu badań przesiewowych do 16 województw.",
       stages: ["Informacja"],
       prints: [],
-      procesy: [],
-      stats: { wypowiedzi: 0, mowcy: 0, glosowania: 0 },
+      processes: [],
+      stats: { statements: 0, speakers: 0, votes: 0 },
       tones: {},
       topics: ["zdrowie", "edukacja-rodzina"],
       importance: "normal",
@@ -569,8 +417,8 @@ export const MOCK: ProceedingMock = {
         "Zaplanowano łącznie 14 głosowań końcowych: pakiet onkologiczny, e-doręczenia, prawo budowlane, sprawa Marszałka — wszystkie do rozstrzygnięcia.",
       stages: ["Głosowanie"],
       prints: [],
-      procesy: [],
-      stats: { wypowiedzi: 0, mowcy: 0, glosowania: 0 },
+      processes: [],
+      stats: { statements: 0, speakers: 0, votes: 0 },
       tones: {},
       topics: [],
       importance: "flagship",
@@ -591,9 +439,9 @@ export const MOCK: ProceedingMock = {
       tone: "konfrontacyjny",
       reason:
         "Mocna metafora („sześć złotych dziennie”) sprowadza abstrakcyjną liczbę 60 tys. do codziennego doświadczenia. „Alibi” zamiast „ulga” odwraca framing przeciwnika.",
-      punktOrd: 1,
-      punktShort: "Trzecie czytanie ustawy PIT",
-      punktTime: "10:48",
+      pointOrd: 1,
+      pointShort: "Trzecie czytanie ustawy PIT",
+      pointTime: "10:48",
     },
     {
       rank: 2,
@@ -604,9 +452,9 @@ export const MOCK: ProceedingMock = {
       tone: "konfrontacyjny",
       reason:
         "Porównanie Marszałka do prezesa spółki to wprost zarzut o instrumentalizację. Krótka pointa, mocna typografia mentalna — idealna na cytat.",
-      punktOrd: 2,
-      punktShort: "Wniosek o odwołanie Marszałka",
-      punktTime: "11:42",
+      pointOrd: 2,
+      pointShort: "Wniosek o odwołanie Marszałka",
+      pointTime: "11:42",
     },
     {
       rank: 3,
@@ -617,9 +465,9 @@ export const MOCK: ProceedingMock = {
       tone: "argumentowy",
       reason:
         "Rzadkie cytowanie z PSL — partia nieprzyzwyczajona do mocnych pointów. Słowo „spłacać” przesuwa narrację z „dawania” na „oddawania należnego”.",
-      punktOrd: 4,
-      punktShort: "Bezpłatne leki 75+",
-      punktTime: "15:12",
+      pointOrd: 4,
+      pointShort: "Bezpłatne leki 75+",
+      pointTime: "15:12",
     },
     {
       rank: 4,
@@ -630,9 +478,9 @@ export const MOCK: ProceedingMock = {
       tone: "argumentowy",
       reason:
         "Eleganckie odwrócenie populizmu („biurokracja”) w stronę praw obywatelskich. „Pisana ołówkiem” — wizualna, pamięciowa metafora.",
-      punktOrd: 6,
-      punktShort: "Reforma planowania przestrzennego",
-      punktTime: "19:23",
+      pointOrd: 6,
+      pointShort: "Reforma planowania przestrzennego",
+      pointTime: "19:23",
     },
     {
       rank: 5,
@@ -643,9 +491,9 @@ export const MOCK: ProceedingMock = {
       tone: "emocjonalny",
       reason:
         "Personalizacja zarzutu („moja wnuczka”) plus suchy żart polityczny — łatwo udostępniać.",
-      punktOrd: 5,
-      punktShort: "Informacja MI o stanie CPK",
-      punktTime: "18:02",
+      pointOrd: 5,
+      pointShort: "Informacja MI o stanie CPK",
+      pointTime: "18:02",
     },
   ],
 
@@ -655,7 +503,7 @@ export const MOCK: ProceedingMock = {
       club: "KO",
       function: "Minister Finansów",
       minutes: 78,
-      wypowiedzi: 9,
+      statements: 9,
       dominantTone: "techniczny",
       bestQuote:
         "Skala redystrybucji w tym pakiecie jest największa od czasu wprowadzenia 500+. Liczby są publiczne — każdy może sprawdzić.",
@@ -665,7 +513,7 @@ export const MOCK: ProceedingMock = {
       club: "Konfederacja",
       function: "poseł",
       minutes: 64,
-      wypowiedzi: 14,
+      statements: 14,
       dominantTone: "konfrontacyjny",
       bestQuote:
         "Zwiększacie kwotę wolną o sześć złotych dziennie i nazywacie to ulgą dla rodzin. To nie ulga — to alibi.",
@@ -675,7 +523,7 @@ export const MOCK: ProceedingMock = {
       club: "PiS",
       function: "przewodniczący klubu",
       minutes: 52,
-      wypowiedzi: 11,
+      statements: 11,
       dominantTone: "konfrontacyjny",
       bestQuote:
         "Pan marszałek prowadzi obrady jak prezes spółki z o.o. — tylko z większościowym pakietem.",
@@ -685,7 +533,7 @@ export const MOCK: ProceedingMock = {
       club: "PiS",
       function: "posłanka",
       minutes: 38,
-      wypowiedzi: 7,
+      statements: 7,
       dominantTone: "emocjonalny",
       bestQuote:
         "Trzy lata mówicie „za chwilę”. W tym tempie pierwszego pociągu doczeka się moja wnuczka.",
@@ -695,7 +543,7 @@ export const MOCK: ProceedingMock = {
       club: "KO",
       function: "sprawozdawca",
       minutes: 34,
-      wypowiedzi: 5,
+      statements: 5,
       dominantTone: "argumentowy",
       bestQuote:
         "Plan miejscowy to nie biurokracja. To umowa między mieszkańcami a deweloperem.",
@@ -705,7 +553,7 @@ export const MOCK: ProceedingMock = {
       club: "PSL-TD",
       function: "poseł",
       minutes: 29,
-      wypowiedzi: 6,
+      statements: 6,
       dominantTone: "argumentowy",
       bestQuote:
         "Lek za złotówkę to nie jałmużna. To umowa pokoleniowa, którą państwo wreszcie zaczyna spłacać.",
@@ -715,7 +563,7 @@ export const MOCK: ProceedingMock = {
       club: "Lewica",
       function: "wicemarszałek Sejmu",
       minutes: 24,
-      wypowiedzi: 4,
+      statements: 4,
       dominantTone: "argumentowy",
       bestQuote:
         "Jeśli mówimy „rodzina”, musimy mówić też o opiece — bo bez niej praca jest złudzeniem.",
@@ -725,21 +573,21 @@ export const MOCK: ProceedingMock = {
       club: "Lewica",
       function: "Marszałek Sejmu",
       minutes: 21,
-      wypowiedzi: 8,
+      statements: 8,
       dominantTone: "neutralny",
       bestQuote:
         "Proszę nie przerywać. Pan poseł skończy myśl i wtedy będzie czas na repliki.",
     },
   ],
 
-  starcia: [
+  clashes: [
     {
       a: "Bosak",
       aClub: "Konfederacja",
       b: "Domański",
       bClub: "KO",
-      punktOrd: 1,
-      punktShort: "Trzecie czytanie ustawy PIT",
+      pointOrd: 1,
+      pointShort: "Trzecie czytanie ustawy PIT",
       exchanges: 6,
       snippet:
         "Bosak: „Liczby są fałszywe, bo zakłada się stałą inflację 2,5%.” Domański: „Pan poseł czyta jeden slajd, a w drugim jest waloryzacja kwartalna.”",
@@ -749,8 +597,8 @@ export const MOCK: ProceedingMock = {
       aClub: "PiS",
       b: "Czarzasty",
       bClub: "Lewica",
-      punktOrd: 2,
-      punktShort: "Wniosek o odwołanie Marszałka",
+      pointOrd: 2,
+      pointShort: "Wniosek o odwołanie Marszałka",
       exchanges: 4,
       snippet:
         "Błaszczak: „Pan marszałek nie udziela głosu posłom opozycji.” Czarzasty: „Udzielam głosu kolejno z listy, panie pośle — proszę się z nią zapoznać.”",
@@ -760,22 +608,22 @@ export const MOCK: ProceedingMock = {
       aClub: "PiS",
       b: "Klimczak",
       bClub: "Polska2050",
-      punktOrd: 5,
-      punktShort: "Informacja MI o CPK",
+      pointOrd: 5,
+      pointShort: "Informacja MI o CPK",
       exchanges: 3,
       snippet:
         "Siarkowska: „Trzy lata i ani jednej łopaty.” Klimczak: „Pani posłanka mówi o łopatach — my mówimy o procedurach środowiskowych, których wasi nie chcieli zacząć.”",
     },
   ],
 
-  renegaci: [
+  rebels: [
     {
       name: "Marek Suski",
       club: "PiS",
       expectedClub: "PiS",
       actual: "ZA",
-      punktOrd: 1,
-      punktShort: "PIT — kwota wolna 60 tys.",
+      pointOrd: 1,
+      pointShort: "PIT — kwota wolna 60 tys.",
       note: "Trzeci raz w tej kadencji wyłamuje się klubowi w głosowaniu podatkowym. Powołuje się na okręg radomski.",
     },
     {
@@ -783,8 +631,8 @@ export const MOCK: ProceedingMock = {
       club: "PiS",
       expectedClub: "PiS",
       actual: "ZA",
-      punktOrd: 1,
-      punktShort: "PIT — kwota wolna 60 tys.",
+      pointOrd: 1,
+      pointShort: "PIT — kwota wolna 60 tys.",
       note: "Były wiceminister sprawiedliwości — pierwszy raz głosuje za projektem koalicji.",
     },
     {
@@ -792,8 +640,8 @@ export const MOCK: ProceedingMock = {
       club: "Konfederacja",
       expectedClub: "Konfederacja",
       actual: "WS",
-      punktOrd: 4,
-      punktShort: "Bezpłatne leki 75+",
+      pointOrd: 4,
+      pointShort: "Bezpłatne leki 75+",
       note: "Klub Konfederacji ZA, Hoffmann WSTRZ. — sygnalizuje sceptycyzm wobec dalszej rozbudowy programów osłonowych.",
     },
     {
@@ -801,13 +649,13 @@ export const MOCK: ProceedingMock = {
       club: "Polska2050",
       expectedClub: "Polska2050",
       actual: "PR",
-      punktOrd: 7,
-      punktShort: "Stanowisko Sejmu wobec polityki UE",
+      pointOrd: 7,
+      pointShort: "Stanowisko Sejmu wobec polityki UE",
       note: "Klub ZA, Mucha PRZECIW — uzasadnia dystansem wobec mechanizmu warunkowości w obecnej formie.",
     },
   ],
 
-  jutro: {
+  tomorrow: {
     date: "2026-05-15",
     weekday: "piątek",
     headline:

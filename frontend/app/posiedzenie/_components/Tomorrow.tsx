@@ -1,12 +1,10 @@
-// "Jutro w Sejmie" — next-day preview. Drops the inspiration's full-bleed
-// black panel for a muted warm-paper surface with destructive accents.
+// "Jutro w Sejmie" — next-day preview.
 
 import { TOPICS } from "@/lib/topics";
-import { MOCK, type PlannedCard } from "../data";
+import type { PlannedAgendaPoint, SittingView } from "./types";
 import { Kicker, SectionHead } from "./SectionHead";
 
-function PlanCardTile({ p }: { p: PlannedCard }) {
-  // Resolve once so an unknown topic key doesn't crash the render path.
+function PlanCardTile({ p }: { p: PlannedAgendaPoint }) {
   const topic = p.topic ? TOPICS[p.topic] : null;
   return (
     <div
@@ -80,8 +78,33 @@ function PlanCardTile({ p }: { p: PlannedCard }) {
   );
 }
 
-export function Tomorrow() {
-  const planned = MOCK.jutro;
+export function Tomorrow({ data }: { data: SittingView }) {
+  const planned = data.tomorrow;
+  if (!planned) {
+    return (
+      <section className="border-b border-border" style={{ background: "var(--muted)" }}>
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-14 md:py-16">
+          <SectionHead
+            num={9}
+            title="Jutro w Sejmie"
+            sub="Brak zaplanowanego kolejnego dnia."
+            anchor="jutro"
+          />
+          <p
+            className="font-serif italic"
+            style={{
+              fontSize: 15,
+              color: "var(--muted-foreground)",
+              maxWidth: 720,
+            }}
+          >
+            To posiedzenie nie ma dalszych zaplanowanych dni. Następne posiedzenie
+            zostanie ogłoszone przez Marszałka Sejmu.
+          </p>
+        </div>
+      </section>
+    );
+  }
   const plannedDate = planned.date
     ? planned.date.split("-").reverse().join(".")
     : "—";
@@ -95,54 +118,38 @@ export function Tomorrow() {
           anchor="jutro"
         />
 
-        <p
-          className="font-serif m-0 mb-9"
-          style={{
-            fontSize: 22,
-            lineHeight: 1.35,
-            color: "var(--foreground)",
-            maxWidth: 880,
-            textWrap: "balance",
-          }}
-        >
-          {planned.headline}
-        </p>
+        {planned.headline && (
+          <p
+            className="font-serif m-0 mb-9"
+            style={{
+              fontSize: 22,
+              lineHeight: 1.35,
+              color: "var(--foreground)",
+              maxWidth: 880,
+              textWrap: "balance",
+            }}
+          >
+            {planned.headline}
+          </p>
+        )}
 
-        <div className="grid gap-4 md:gap-5 grid-cols-1 md:grid-cols-3">
-          {planned.plannedPoints.map((p) => (
-            <PlanCardTile key={p.ord} p={p} />
-          ))}
-        </div>
-
-        <div
-          className="mt-10 pt-6 flex justify-between items-baseline flex-wrap gap-3"
-          style={{ borderTop: "1px solid var(--border)" }}
-        >
-          <span
+        {planned.plannedPoints.length > 0 ? (
+          <div className="grid gap-4 md:gap-5 grid-cols-1 md:grid-cols-3">
+            {planned.plannedPoints.map((p) => (
+              <PlanCardTile key={p.ord} p={p} />
+            ))}
+          </div>
+        ) : (
+          <p
             className="font-serif italic"
             style={{
               fontSize: 14,
               color: "var(--muted-foreground)",
-              maxWidth: 720,
             }}
           >
-            Po piątku 19. posiedzenie zostanie zamknięte. Najbliższe — 20. posiedzenie — planowane w dn. 27–29 maja.
-          </span>
-          <button
-            type="button"
-            className="cursor-pointer hover:opacity-80 transition-opacity"
-            style={{
-              padding: "9px 18px",
-              background: "var(--destructive-deep)",
-              color: "var(--background)",
-              fontSize: 13,
-              fontWeight: 500,
-              border: "none",
-            }}
-          >
-            ✦ obserwuj posiedzenie 20
-          </button>
-        </div>
+            Porządek obrad na kolejny dzień jeszcze nieopublikowany.
+          </p>
+        )}
       </div>
     </section>
   );
