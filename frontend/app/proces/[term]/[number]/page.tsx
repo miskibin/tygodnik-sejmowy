@@ -16,6 +16,13 @@ import { ProceedingPoints } from "./_components/ProceedingPoints";
 import { Sources } from "./_components/Sources";
 
 
+// Dynamic rendering: getProcessCitations samples a random subset of
+// viral quotes (Fisher-Yates) per request, and the "rotate on reload"
+// experience depends on no cached HTML. Without this, ISR/static could
+// freeze the sample. Build manifest confirmed this route stays "ƒ"
+// (dynamic).
+export const revalidate = 0;
+
 export async function generateMetadata({
   params,
 }: { params: Promise<{ term: string; number: string }> }): Promise<Metadata> {

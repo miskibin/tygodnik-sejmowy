@@ -861,6 +861,20 @@ export type ProcessCitation = {
   proceedingNumber: number | null;
 };
 
+// Unbiased Fisher-Yates shuffle. Array.prototype.sort with a random
+// comparator (`Math.random() - 0.5`) is NOT uniform — early elements are
+// over-represented because the comparator must be transitive for sort to
+// produce a uniform result, which a random one isn't. For sampleSize=4 out
+// of ~40, the bias is measurable. This is the standard textbook shuffle.
+function fisherYates<T>(arr: T[]): T[] {
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 export async function getProcessCitations(
   term: number,
   printNumber: string,
@@ -960,7 +974,10 @@ export async function getProcessCitations(
 
   // 5. Random sample of sampleSize from the top-viral pool. Per-request
   //    Math.random() — each page render shows a different selection.
-  const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, sampleSize);
+  //    Uses Fisher-Yates (uniform); see helper above re: sort+random bias.
+  //    Callers MUST render dynamically — see /proces/[term]/[number]/page.tsx
+  //    which pins `export const revalidate = 0` for this reason.
+  const shuffled = fisherYates(pool).slice(0, sampleSize);
 
   // 6. Resolve speaker club + photo for the sampled rows only.
   const mpIds = Array.from(
