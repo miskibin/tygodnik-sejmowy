@@ -42,6 +42,7 @@ const SITEMAP = [
   { href: "/alerty", label: "Alerty" },
   { href: "/manifest", label: "Manifest" },
   { href: "/o-projekcie", label: "O projekcie" },
+  { href: "/jak-powstaje-ustawa", label: "Jak powstaje ustawa" },
 ] as const;
 
 export async function SiteFooter() {
