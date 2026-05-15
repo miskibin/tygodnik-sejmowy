@@ -1,20 +1,18 @@
-// "Twoje sprawy" — topic rail (11 categories from lib/topics.ts) on the
-// left; selected topic's punkty on the right. Personalisation entry point.
-// Not sticky — that caused empty-tail layouts in the inspiration.
+// "Twoje sprawy" — topic rail + selected topic's agenda points.
 
 "use client";
 
 import { useState } from "react";
 import { TOPICS, type TopicId } from "@/lib/topics";
-import { MOCK, type AgendaPoint } from "../data";
+import type { AgendaPoint, SittingView } from "./types";
 import { Kicker, SectionHead } from "./SectionHead";
-import { verdictInk } from "../tokens";
+import { verdictInk } from "./tokens";
 
-function topicsAggregate(): Record<TopicId, AgendaPoint[]> {
+function topicsAggregate(data: SittingView): Record<TopicId, AgendaPoint[]> {
   const out: Record<TopicId, AgendaPoint[]> = Object.fromEntries(
     (Object.keys(TOPICS) as TopicId[]).map((t) => [t, []]),
   ) as Record<TopicId, AgendaPoint[]>;
-  for (const p of MOCK.punkty) {
+  for (const p of data.agendaPoints) {
     for (const t of p.topics) {
       out[t]?.push(p);
     }
@@ -22,9 +20,9 @@ function topicsAggregate(): Record<TopicId, AgendaPoint[]> {
   return out;
 }
 
-const PUNKT_PLURAL = new Intl.PluralRules("pl-PL");
-function punktLabel(count: number): string {
-  switch (PUNKT_PLURAL.select(count)) {
+const POINT_PLURAL = new Intl.PluralRules("pl-PL");
+function pointLabel(count: number): string {
+  switch (POINT_PLURAL.select(count)) {
     case "one":
       return "punkt";
     case "few":
@@ -34,11 +32,9 @@ function punktLabel(count: number): string {
   }
 }
 
-export function YourTopics() {
-  const agg = topicsAggregate();
+export function YourTopics({ data }: { data: SittingView }) {
+  const agg = topicsAggregate(data);
   const topicIds = Object.keys(TOPICS) as TopicId[];
-  // Force-unwrap would crash on an all-empty taxonomy. Fall back to the
-  // first topic key so `selected` is always a valid TopicId.
   const firstWithContent =
     topicIds.find((t) => agg[t].length > 0) ?? topicIds[0];
   const [selected, setSelected] = useState<TopicId>(firstWithContent);
@@ -55,14 +51,13 @@ export function YourTopics() {
         />
 
         <div className="grid gap-8 md:gap-12 md:grid-cols-[300px_1fr]">
-          {/* Topic rail */}
           <div>
             <div className="flex flex-col">
               {(Object.keys(TOPICS) as TopicId[]).map((id) => {
                 const meta = TOPICS[id];
-                const punkty = agg[id];
+                const points = agg[id];
                 const on = id === selected;
-                const has = punkty.length > 0;
+                const has = points.length > 0;
                 return (
                   <button
                     key={id}
@@ -113,7 +108,7 @@ export function YourTopics() {
                         letterSpacing: "0.1em",
                       }}
                     >
-                      {has ? `${punkty.length}` : "—"}
+                      {has ? `${points.length}` : "—"}
                     </span>
                   </button>
                 );
@@ -132,7 +127,6 @@ export function YourTopics() {
             </div>
           </div>
 
-          {/* Content */}
           <div style={{ minHeight: 360 }}>
             <div className="flex items-baseline gap-4 mb-5 flex-wrap">
               <span
@@ -164,7 +158,7 @@ export function YourTopics() {
                   letterSpacing: "0.12em",
                 }}
               >
-                {current.length} {punktLabel(current.length)} dziś
+                {current.length} {pointLabel(current.length)} dziś
               </span>
             </div>
 
@@ -214,16 +208,18 @@ export function YourTopics() {
                     >
                       {p.shortTitle}.
                     </h4>
-                    <p
-                      className="font-serif m-0 mb-2.5"
-                      style={{
-                        fontSize: 13.5,
-                        lineHeight: 1.5,
-                        color: "var(--secondary-foreground)",
-                      }}
-                    >
-                      {p.plainSummary}
-                    </p>
+                    {p.plainSummary && (
+                      <p
+                        className="font-serif m-0 mb-2.5"
+                        style={{
+                          fontSize: 13.5,
+                          lineHeight: 1.5,
+                          color: "var(--secondary-foreground)",
+                        }}
+                      >
+                        {p.plainSummary}
+                      </p>
+                    )}
                     <div
                       className="flex items-center gap-x-4 gap-y-1 flex-wrap font-mono uppercase"
                       style={{
@@ -254,7 +250,7 @@ export function YourTopics() {
                         className="ml-auto"
                         style={{ color: "var(--secondary-foreground)" }}
                       >
-                        {p.stats.wypowiedzi} wypow. · {p.stats.mowcy} mówców
+                        {p.stats.statements} wypow. · {p.stats.speakers} mówców
                       </span>
                     </div>
                   </div>

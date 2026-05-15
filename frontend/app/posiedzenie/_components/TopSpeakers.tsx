@@ -1,17 +1,33 @@
-// "Kto najdłużej mówił" — ranking of top speakers by minutes on the
-// rostrum, paired with their dominant tone and best quote (replaces the
-// inspiration's "viral ø 0.71" decimal — we surface an actual quote
-// excerpt instead, which carries more editorial signal anyway).
+// "Kto najdłużej mówił" — ranking of top speakers by minutes on the rostrum.
 
 import { MPAvatarPhoto } from "@/components/tygodnik/MPAvatar";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { ToneBadge } from "@/components/statement/ToneBadge";
-import { MOCK } from "../data";
+import type { SittingView } from "./types";
 import { Kicker, SectionHead } from "./SectionHead";
 
-export function TopSpeakers() {
-  // Guard against an all-zero dataset; the bars use this as a denominator.
-  const maxMin = Math.max(1, ...MOCK.topSpeakers.map((s) => s.minutes));
+export function TopSpeakers({ data }: { data: SittingView }) {
+  if (data.topSpeakers.length === 0) {
+    return (
+      <section className="border-b border-border">
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-14 md:py-16">
+          <SectionHead
+            num={7}
+            title="Kto najdłużej mówił"
+            sub="Brak danych o czasie wypowiedzi dla tego posiedzenia."
+            anchor="mowcy"
+          />
+          <p
+            className="font-serif italic"
+            style={{ fontSize: 14.5, color: "var(--muted-foreground)" }}
+          >
+            Ranking mówców pojawi się po zaindeksowaniu stenogramów.
+          </p>
+        </div>
+      </section>
+    );
+  }
+  const maxMin = Math.max(1, ...data.topSpeakers.map((s) => s.minutes));
 
   return (
     <section className="border-b border-border">
@@ -42,9 +58,9 @@ export function TopSpeakers() {
           <span>Najlepszy fragment</span>
         </div>
 
-        {MOCK.topSpeakers.map((s, i) => (
+        {data.topSpeakers.map((s, i) => (
           <div
-            key={i}
+            key={`${s.name}-${i}`}
             className="hidden md:grid items-center py-4"
             style={{
               gridTemplateColumns: "40px minmax(220px, 1fr) minmax(240px, 1.2fr) 80px 160px minmax(220px, 1.4fr)",
@@ -117,7 +133,7 @@ export function TopSpeakers() {
               className="text-right font-mono"
               style={{ fontSize: 13, color: "var(--secondary-foreground)" }}
             >
-              {s.wypowiedzi}
+              {s.statements}
             </div>
 
             <div>
@@ -138,11 +154,10 @@ export function TopSpeakers() {
           </div>
         ))}
 
-        {/* Mobile: stacked card list */}
         <div className="md:hidden flex flex-col">
-          {MOCK.topSpeakers.map((s, i) => (
+          {data.topSpeakers.map((s, i) => (
             <div
-              key={i}
+              key={`${s.name}-${i}`}
               className="py-4"
               style={{
                 borderBottom: "1px solid var(--border)",
@@ -189,7 +204,7 @@ export function TopSpeakers() {
                   >
                     {s.minutes}
                   </div>
-                  <Kicker>min · {s.wypowiedzi} wyp.</Kicker>
+                  <Kicker>min · {s.statements} wyp.</Kicker>
                 </div>
               </div>
               <div className="mt-2 mb-2 flex">

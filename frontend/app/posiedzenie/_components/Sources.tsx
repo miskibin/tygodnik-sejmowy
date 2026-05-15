@@ -1,13 +1,12 @@
 // Editorial footer — primary sources, how-we-read note, share row.
-// Pure typography, no decorative surfaces.
 
+import type { SittingView } from "./types";
 import { Kicker } from "./SectionHead";
-import { MOCK } from "../data";
 
-export function Sources() {
-  // 2026-05-14 → 14.05.2026 — derived rather than hardcoded.
-  const lastUpdateDate = MOCK.dates[1]
-    ? MOCK.dates[1].split("-").reverse().join(".")
+export function Sources({ data }: { data: SittingView }) {
+  const referenceDate = data.dates.at(-1) ?? null;
+  const lastUpdateDate = referenceDate
+    ? referenceDate.split("-").reverse().join(".")
     : "—";
   return (
     <section
@@ -26,7 +25,6 @@ export function Sources() {
               <li>↗ Stenogramy dnia (PDF, ok. 14:00 i ~22:00)</li>
               <li>↗ Wyniki głosowań — sejm.gov.pl</li>
               <li>↗ Transmisja archiwalna — Sejm TV</li>
-              <li>↗ Druki sejmowe 763, 812, 841, 856…</li>
             </ul>
           </div>
           <div>
@@ -55,7 +53,7 @@ export function Sources() {
                 border: "1px solid var(--border)",
               }}
             >
-              tygodniksejmowy.pl/posiedzenie/10/{MOCK.number}
+              tygodniksejmowy.pl/posiedzenie/{data.number}
             </div>
             <div className="flex gap-2 flex-wrap">
               {["kopiuj link", "pdf dnia", "newsletter", "rss"].map((b) => (
@@ -96,7 +94,8 @@ export function Sources() {
               letterSpacing: "0.12em",
             }}
           >
-            Posiedzenie {MOCK.number} · ostatnia aktualizacja {lastUpdateDate}, {MOCK.liveAt}
+            Posiedzenie {data.number} · ostatnia aktualizacja {lastUpdateDate}
+            {data.liveAt ? `, ${data.liveAt}` : ""}
           </span>
         </div>
       </div>

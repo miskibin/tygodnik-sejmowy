@@ -1,8 +1,6 @@
 // Hero: full sitting headline + 4 KPI tiles + day-tabs row.
-// Day-tab underline uses border-b on the active button only (no negative
-// margins) to avoid the alignment glitch from the inspiration.
 
-import { MOCK, type Day } from "../data";
+import type { Day, SittingView } from "./types";
 import { Kicker } from "./SectionHead";
 
 function StatTile({ value, label }: { value: number; label: string }) {
@@ -90,19 +88,19 @@ function DayTab({
       <div className="font-sans flex gap-4 mt-2" style={{ fontSize: 11.5 }}>
         <span>
           <b className={active ? "text-foreground" : "text-secondary-foreground"}>
-            {day.stats.punkty}
+            {day.stats.points}
           </b>{" "}
           pkt
         </span>
         <span>
           <b className={active ? "text-foreground" : "text-secondary-foreground"}>
-            {day.stats.glosowania}
+            {day.stats.votes}
           </b>{" "}
           głos.
         </span>
         <span>
           <b className={active ? "text-foreground" : "text-secondary-foreground"}>
-            {day.stats.wypowiedzi}
+            {day.stats.statements}
           </b>{" "}
           wypow.
         </span>
@@ -112,9 +110,11 @@ function DayTab({
 }
 
 export function Hero({
+  data,
   activeDay,
   setActiveDay,
 }: {
+  data: SittingView;
   activeDay: number;
   setActiveDay: (i: number) => void;
 }) {
@@ -122,7 +122,7 @@ export function Hero({
     <section className="border-b border-border">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-12 md:py-16">
         <Kicker className="mb-4">
-          X kadencja Sejmu &nbsp;·&nbsp; {MOCK.dates.length}-dniowe posiedzenie
+          X kadencja Sejmu &nbsp;·&nbsp; {data.dates.length}-dniowe posiedzenie
         </Kicker>
 
         <div className="grid gap-x-14 gap-y-10 md:grid-cols-[1.5fr_1fr] items-end">
@@ -140,7 +140,7 @@ export function Hero({
               className="italic"
               style={{ color: "var(--destructive-deep)" }}
             >
-              {MOCK.number}.
+              {data.number}.
             </span>{" "}
             posiedzenie
             <br />
@@ -150,14 +150,14 @@ export function Hero({
 
           <div className="md:justify-self-end">
             <Kicker className="mb-2">
-              łącznie za {MOCK.days.length}{" "}
-              {MOCK.days.length === 1 ? "dzień" : "dni"}
+              łącznie za {data.days.length}{" "}
+              {data.days.length === 1 ? "dzień" : "dni"}
             </Kicker>
             <div className="flex gap-6 md:gap-8 justify-end items-baseline flex-wrap">
-              <StatTile value={MOCK.totals.punkty} label="punktów" />
-              <StatTile value={MOCK.totals.wypowiedzi} label="wypowiedzi" />
-              <StatTile value={MOCK.totals.glosowania} label="głosowań" />
-              <StatTile value={MOCK.totals.mowcy} label="mówców" />
+              <StatTile value={data.totals.points} label="punktów" />
+              <StatTile value={data.totals.statements} label="wypowiedzi" />
+              <StatTile value={data.totals.votes} label="głosowań" />
+              <StatTile value={data.totals.speakers} label="mówców" />
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ export function Hero({
           className="mt-10 flex gap-6 md:gap-10 overflow-x-auto"
           style={{ borderBottom: "2px solid var(--rule)" }}
         >
-          {MOCK.days.map((d, i) => (
+          {data.days.map((d, i) => (
             <DayTab
               key={d.idx}
               day={d}

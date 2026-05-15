@@ -1,13 +1,11 @@
-// "Iskry i renegaci" — three biggest verbal clashes + four MPs who voted
-// against their klub. Both sides use the same warm-paper palette and the
-// destructive accent as the friction-marker.
+// "Iskry i renegaci" — verbal clashes + rebels (voted against own klub).
 
 import { MPAvatarPhoto } from "@/components/tygodnik/MPAvatar";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
-import { MOCK, type Starcie, type Rebel } from "../data";
+import type { Clash, Rebel, SittingView } from "./types";
 import { Kicker, SectionHead } from "./SectionHead";
 
-function StarcieCard({ s }: { s: Starcie }) {
+function ClashCard({ s }: { s: Clash }) {
   return (
     <div
       style={{
@@ -25,7 +23,7 @@ function StarcieCard({ s }: { s: Starcie }) {
             letterSpacing: "0.14em",
           }}
         >
-          pkt {s.punktOrd} · {s.punktShort}
+          pkt {s.pointOrd} · {s.pointShort}
         </span>
         <span
           className="font-mono uppercase"
@@ -123,7 +121,7 @@ function RebelRow({ r, first }: { r: Rebel; first: boolean }) {
             style={{ fontSize: 11.5, color: "var(--muted-foreground)" }}
           >
             <ClubBadge klub={r.club} size="xs" />
-            <span>· pkt {r.punktOrd} — {r.punktShort}</span>
+            <span>· pkt {r.pointOrd} — {r.pointShort}</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5 font-mono" style={{ fontSize: 10 }}>
@@ -165,7 +163,8 @@ function RebelRow({ r, first }: { r: Rebel; first: boolean }) {
   );
 }
 
-export function Friction() {
+export function Friction({ data }: { data: SittingView }) {
+  const empty = data.clashes.length === 0 && data.rebels.length === 0;
   return (
     <section className="border-b border-border">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-14 md:py-16">
@@ -176,35 +175,67 @@ export function Friction() {
           anchor="iskry"
         />
 
-        <div className="grid gap-10 md:gap-14 md:grid-cols-[1.1fr_1fr]">
-          <div>
-            <Kicker
-              color="var(--destructive-deep)"
-              className="mb-3.5"
-            >
-              trzy największe starcia
-            </Kicker>
-            <div className="flex flex-col gap-4">
-              {MOCK.starcia.map((s, i) => (
-                <StarcieCard key={i} s={s} />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Kicker
-              color="var(--destructive-deep)"
-              className="mb-3.5"
-            >
-              głosowali wbrew klubowi
-            </Kicker>
+        {empty ? (
+          <p
+            className="font-serif italic"
+            style={{
+              fontSize: 15,
+              color: "var(--muted-foreground)",
+              maxWidth: 720,
+            }}
+          >
+            Brak danych o starciach i głosach wbrew klubowi dla tego posiedzenia.
+            Sekcja zapełni się po wzbogaceniu wypowiedzi i analizie głosowań.
+          </p>
+        ) : (
+          <div className="grid gap-10 md:gap-14 md:grid-cols-[1.1fr_1fr]">
             <div>
-              {MOCK.renegaci.map((r, i) => (
-                <RebelRow key={i} r={r} first={i === 0} />
-              ))}
+              <Kicker
+                color="var(--destructive-deep)"
+                className="mb-3.5"
+              >
+                trzy największe starcia
+              </Kicker>
+              {data.clashes.length === 0 ? (
+                <p
+                  className="font-serif italic"
+                  style={{ fontSize: 14, color: "var(--muted-foreground)" }}
+                >
+                  Brak danych o starciach.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {data.clashes.map((s, i) => (
+                    <ClashCard key={i} s={s} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Kicker
+                color="var(--destructive-deep)"
+                className="mb-3.5"
+              >
+                głosowali wbrew klubowi
+              </Kicker>
+              {data.rebels.length === 0 ? (
+                <p
+                  className="font-serif italic"
+                  style={{ fontSize: 14, color: "var(--muted-foreground)" }}
+                >
+                  Wszyscy posłowie głosowali z klubem.
+                </p>
+              ) : (
+                <div>
+                  {data.rebels.map((r, i) => (
+                    <RebelRow key={i} r={r} first={i === 0} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
