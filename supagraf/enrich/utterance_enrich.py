@@ -14,6 +14,7 @@ versioned prompt provenance via @with_model_run.
 from __future__ import annotations
 
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Literal
 
 from loguru import logger
@@ -257,25 +258,50 @@ def enrich_statements(
         logger.info("no pending statements (term={}, sitting={})", term, sitting_num)
         return 0, 0
 
-    n_ok = 0
-    n_failed = 0
-    for r in pending:
-        sid = r["id"]
+    concurrency = max(1, int(os.environ.get("SUPAGRAF_UTTERANCE_CONCURRENCY", "1")))
+
+    def _run_one(row: dict) -> tuple[int, BaseException | None]:
+        sid = row["id"]
         try:
             enrich_one_statement(
                 entity_type="proceeding_statement",
                 entity_id=str(sid),
-                body_text=r["body_text"] or "",
+                body_text=row["body_text"] or "",
                 prompt_version=prompt.version,
                 prompt_sha256=prompt.sha256,
                 llm_model=llm_model,
             )
-            n_ok += 1
-            if n_ok % 20 == 0:
-                logger.info("enriched {}/{} statements", n_ok, len(pending))
+            return sid, None
         except Exception as e:
-            n_failed += 1
-            logger.error("statement {} failed: {!r}", sid, e)
+            return sid, e
+
+    n_ok = 0
+    n_failed = 0
+    if concurrency == 1:
+        for r in pending:
+            sid, err = _run_one(r)
+            if err is None:
+                n_ok += 1
+                if n_ok % 20 == 0:
+                    logger.info("enriched {}/{} statements", n_ok, len(pending))
+            else:
+                n_failed += 1
+                logger.error("statement {} failed: {!r}", sid, err)
+    else:
+        # LLM call is the only meaningful latency; httpx releases the GIL on
+        # network IO, and supabase-py is thread-safe for independent row writes.
+        logger.info("enriching {} statements with concurrency={}", len(pending), concurrency)
+        with ThreadPoolExecutor(max_workers=concurrency) as ex:
+            futures = [ex.submit(_run_one, r) for r in pending]
+            for fut in as_completed(futures):
+                sid, err = fut.result()
+                if err is None:
+                    n_ok += 1
+                    if n_ok % 20 == 0:
+                        logger.info("enriched {}/{} statements", n_ok, len(pending))
+                else:
+                    n_failed += 1
+                    logger.error("statement {} failed: {!r}", sid, err)
     logger.info("done: ok={} failed={}", n_ok, n_failed)
     return n_ok, n_failed
 
