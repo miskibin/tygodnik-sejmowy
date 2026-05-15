@@ -464,7 +464,7 @@ const STAGES: Stage[] = [
         Jeśli Sejm nie zbierze bezwzględnej większości — stanowisko Senatu
         wchodzi do ustawy. To oznacza, że senackie poprawki (lub odrzucenie
         całej ustawy) stają się skuteczne, mimo że Sejm tego nie chciał.
-        Wymagana próg bezwzględnej większości daje Senatowi realną siłę
+        Wymagany próg bezwzględnej większości daje Senatowi realną siłę
         veta — w praktyce mniejszościowy rząd często nie ma głosów, żeby
         senackie poprawki obalić.
       </>,
