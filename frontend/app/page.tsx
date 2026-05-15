@@ -1,7 +1,6 @@
 import { LandingHero } from "./_components/LandingHero";
 import { FeatureTileGrid } from "./_components/FeatureTileGrid";
 import { ElectionCountdown } from "./_components/ElectionCountdown";
-import { LegislativeProcessCard } from "./_components/LegislativeProcessCard";
 import { getTopViralStatements } from "@/lib/db/statements";
 import { getNextOrCurrentSitting } from "@/lib/db/events";
 
@@ -38,7 +37,6 @@ export default async function Landing() {
     <main className="bg-background font-serif text-foreground">
       <LandingHero viralQuotes={quotes} />
       <ElectionCountdown nextSitting={nextSitting} />
-      <LegislativeProcessCard />
       <FeatureTileGrid />
     </main>
   );
