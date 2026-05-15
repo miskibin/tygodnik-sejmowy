@@ -80,3 +80,13 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
 
 - `main` is the only branch. Push per logical commit; rebase on conflict; **never** `--force-push`.
 - Push permission may require manual confirmation — surface to user, don't bypass.
+
+## No fallbacks
+
+Don't add fallbacks anywhere — not in fetchers, not in components, not in
+backfills. If the primary path is missing data, treat that as a real
+issue with a real root cause (backfill not run, schema mismatch, ingest
+gap) and ask the user how to resolve it before writing any "tolerant"
+branch. "Tolerant degrade silently" code is banned by default. This
+includes `try/except → []`, `if not data: use_other_source`, env-flag
+escape hatches, etc.
