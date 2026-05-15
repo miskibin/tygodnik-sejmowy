@@ -1,12 +1,8 @@
-// "Co Sejm dziś zrobił" — only the punkty with a decisive vote.
-// 3-column grid of decision cards. No hard sticker shadow (it was
-// clipping outside the container on the inspiration); subtle border +
-// hover translate is enough.
+// "Co Sejm dziś zrobił" — only the agenda points with a decisive vote.
 
-import { MOCK, type AgendaPoint, type Club, type Vote } from "../data";
+import type { AgendaPoint, SittingView, Vote } from "./types";
 import { Kicker, SectionHead } from "./SectionHead";
-import { verdictInk } from "../tokens";
-import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
+import { verdictInk } from "./tokens";
 
 function DecisionCard({ p }: { p: AgendaPoint }) {
   if (!p.vote) return null;
@@ -83,17 +79,19 @@ function DecisionCard({ p }: { p: AgendaPoint }) {
       >
         {p.shortTitle}.
       </h3>
-      <p
-        className="font-serif m-0 mb-4"
-        style={{
-          fontSize: 13.5,
-          lineHeight: 1.5,
-          color: "var(--secondary-foreground)",
-          textWrap: "pretty",
-        }}
-      >
-        {v.plainNote ?? p.plainSummary}
-      </p>
+      {(v.plainNote || p.plainSummary) && (
+        <p
+          className="font-serif m-0 mb-4"
+          style={{
+            fontSize: 13.5,
+            lineHeight: 1.5,
+            color: "var(--secondary-foreground)",
+            textWrap: "pretty",
+          }}
+        >
+          {v.plainNote ?? p.plainSummary}
+        </p>
+      )}
 
       <VoteBar v={v} />
     </a>
@@ -108,18 +106,18 @@ function VoteBar({ v }: { v: Vote }) {
         style={{ height: 16, border: "1px solid var(--border)" }}
         aria-hidden
       >
-        <div style={{ width: `${(v.za / 460) * 100}%`, background: "var(--success)" }} />
-        <div style={{ width: `${(v.przeciw / 460) * 100}%`, background: "var(--destructive)" }} />
+        <div style={{ width: `${(v.yes / 460) * 100}%`, background: "var(--success)" }} />
+        <div style={{ width: `${(v.no / 460) * 100}%`, background: "var(--destructive)" }} />
         <div
           style={{
-            width: `${(v.wstrzym / 460) * 100}%`,
+            width: `${(v.abstain / 460) * 100}%`,
             background: "var(--warning)",
             opacity: 0.85,
           }}
         />
         <div
           style={{
-            width: `${(v.nieob / 460) * 100}%`,
+            width: `${(v.absent / 460) * 100}%`,
             background: "var(--border)",
           }}
         />
@@ -133,26 +131,30 @@ function VoteBar({ v }: { v: Vote }) {
         }}
       >
         <span>
-          <b style={{ color: "var(--success)" }}>ZA {v.za}</b>
+          <b style={{ color: "var(--success)" }}>ZA {v.yes}</b>
         </span>
         <span>
-          <b style={{ color: "var(--destructive)" }}>PRZ {v.przeciw}</b>
+          <b style={{ color: "var(--destructive)" }}>PRZ {v.no}</b>
         </span>
         <span>
-          <b style={{ color: "var(--warning)" }}>WS {v.wstrzym}</b>
+          <b style={{ color: "var(--warning)" }}>WS {v.abstain}</b>
         </span>
-        <span>NB {v.nieob}</span>
+        <span>NB {v.absent}</span>
       </div>
     </>
   );
 }
 
-export function WhatPassed({ activeDay }: { activeDay: number }) {
-  const dayDate = MOCK.days[activeDay]?.date;
-  // Bounds-check: out-of-range activeDay used to fall through to "all days"
-  // because of the `!dayDate ||` short-circuit. Require the day to exist.
+export function WhatPassed({
+  data,
+  activeDay,
+}: {
+  data: SittingView;
+  activeDay: number;
+}) {
+  const dayDate = data.days[activeDay]?.date;
   const decisive = dayDate
-    ? MOCK.punkty.filter((p) => !!p.vote && p.date === dayDate)
+    ? data.agendaPoints.filter((p) => !!p.vote && p.date === dayDate)
     : [];
   if (decisive.length === 0) {
     return (

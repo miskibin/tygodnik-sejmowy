@@ -1,13 +1,11 @@
-// Newsroom-style 3-sentence summary of a single day. Sits on a warm
-// secondary surface (no inverted black panel) and uses the destructive
-// accent for the kicker rule, mirroring the editorial voice elsewhere
-// in the site (BriefList atoms, ViralQuote card).
+// Newsroom-style 3-sentence summary of a single day.
 
-import type { Day } from "../data";
+import type { Day } from "./types";
 import { Kicker } from "./SectionHead";
 
 export function DayHeadline({ day }: { day: Day }) {
   const year = day.date ? new Date(day.date).getFullYear() : "";
+  const hasHeadline = !!day.headline && day.headline.trim().length > 0;
   return (
     <section
       className="border-b border-border"
@@ -51,19 +49,33 @@ export function DayHeadline({ day }: { day: Day }) {
           </div>
 
           <div>
-            <p
-              className="font-serif m-0"
-              style={{
-                fontSize: 28,
-                lineHeight: 1.25,
-                letterSpacing: "-0.012em",
-                color: "var(--foreground)",
-                textWrap: "balance",
-                fontWeight: 400,
-              }}
-            >
-              {day.headline}
-            </p>
+            {hasHeadline ? (
+              <p
+                className="font-serif m-0"
+                style={{
+                  fontSize: 28,
+                  lineHeight: 1.25,
+                  letterSpacing: "-0.012em",
+                  color: "var(--foreground)",
+                  textWrap: "balance",
+                  fontWeight: 400,
+                }}
+              >
+                {day.headline}
+              </p>
+            ) : (
+              <p
+                className="font-serif italic m-0"
+                style={{
+                  fontSize: 18,
+                  lineHeight: 1.4,
+                  color: "var(--muted-foreground)",
+                }}
+              >
+                Redaktorska syntéza tego dnia jeszcze niegotowa — patrz statystyki
+                obok i pełny porządek obrad poniżej.
+              </p>
+            )}
 
             <div
               className="mt-5 flex gap-x-9 gap-y-2 flex-wrap font-sans text-secondary-foreground"
@@ -71,17 +83,17 @@ export function DayHeadline({ day }: { day: Day }) {
             >
               <span>
                 <b style={{ color: "var(--success)" }}>
-                  {day.stats.glosowania} głosowań
+                  {day.stats.votes} głosowań
                 </b>
                 {" "}rozstrzygających
               </span>
               <span>
-                <b style={{ color: "var(--foreground)" }}>{day.stats.punkty}</b>{" "}
+                <b style={{ color: "var(--foreground)" }}>{day.stats.points}</b>{" "}
                 punktów porządku obrad
               </span>
               <span>
                 <b style={{ color: "var(--foreground)" }}>
-                  {day.stats.wypowiedzi}
+                  {day.stats.statements}
                 </b>{" "}
                 wypowiedzi z mównicy
               </span>

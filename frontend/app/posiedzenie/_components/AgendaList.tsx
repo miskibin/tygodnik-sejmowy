@@ -1,7 +1,4 @@
 // "Porządek obrad" — the main agenda list. Filterable, chronological.
-// Each row: ord+time rail / title+summary+stats / vote OR quote OR planned.
-// On mobile the 3-column grid stacks; the rail collapses to a horizontal
-// "PKT N · HH:MM" strip.
 
 "use client";
 
@@ -11,15 +8,8 @@ import { MPAvatarPhoto } from "@/components/tygodnik/MPAvatar";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { TopicChips } from "@/components/tygodnik/atoms/TopicChips";
 import { ToneBadge } from "@/components/statement/ToneBadge";
-import { TOPICS } from "@/lib/topics";
-import {
-  MOCK,
-  type AgendaPoint,
-  type Vote as VoteType,
-  type ViralQuote,
-  type Tone,
-} from "../data";
-import { TONE_INK, TONE_LABEL, verdictInk } from "../tokens";
+import type { AgendaPoint, SittingView, Tone, ViralQuote, Vote as VoteType } from "./types";
+import { TONE_INK, TONE_LABEL, verdictInk } from "./tokens";
 import { Kicker, SectionHead } from "./SectionHead";
 
 type FilterId = "all" | "done" | "planned" | "vote" | "flagship";
@@ -150,7 +140,7 @@ function VoteMini({ v }: { v: VoteType }) {
         className="font-sans"
         style={{ fontSize: 12, color: "var(--secondary-foreground)", marginBottom: 10 }}
       >
-        większością <b>{v.za}–{v.przeciw}</b>, różnica {v.margin}
+        większością <b>{v.yes}–{v.no}</b>, różnica {v.margin}
       </div>
 
       <div
@@ -158,18 +148,19 @@ function VoteMini({ v }: { v: VoteType }) {
         style={{ height: 8, border: "1px solid var(--border)" }}
         aria-hidden
       >
-        <div style={{ width: `${(v.za / 460) * 100}%`, background: "var(--success)" }} />
-        <div style={{ width: `${(v.przeciw / 460) * 100}%`, background: "var(--destructive)" }} />
-        <div style={{ width: `${(v.wstrzym / 460) * 100}%`, background: "var(--warning)" }} />
-        <div style={{ width: `${(v.nieob / 460) * 100}%`, background: "var(--border)" }} />
+        <div style={{ width: `${(v.yes / 460) * 100}%`, background: "var(--success)" }} />
+        <div style={{ width: `${(v.no / 460) * 100}%`, background: "var(--destructive)" }} />
+        <div style={{ width: `${(v.abstain / 460) * 100}%`, background: "var(--warning)" }} />
+        <div style={{ width: `${(v.absent / 460) * 100}%`, background: "var(--border)" }} />
       </div>
 
       {v.byClub && (
         <div className="mt-3 grid gap-1.5" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
           {Object.entries(v.byClub).map(([club, cb]) => {
-            const total = (cb.za + cb.pr + cb.ws + Math.max(0, cb.nb)) || 1;
+            if (!cb) return null;
+            const total = (cb.yes + cb.no + cb.abstain + Math.max(0, cb.absent)) || 1;
             return (
-              <div key={club} title={`${club}: ZA ${cb.za}, PR ${cb.pr}, WS ${cb.ws}`}>
+              <div key={club} title={`${club}: ZA ${cb.yes}, PR ${cb.no}, WS ${cb.abstain}`}>
                 <div
                   className="font-mono"
                   style={{
@@ -182,9 +173,9 @@ function VoteMini({ v }: { v: VoteType }) {
                   {club.slice(0, 4)}
                 </div>
                 <div className="flex" style={{ height: 4 }} aria-hidden>
-                  <div style={{ width: `${(cb.za / total) * 100}%`, background: "var(--success)" }} />
-                  <div style={{ width: `${(cb.pr / total) * 100}%`, background: "var(--destructive)" }} />
-                  <div style={{ width: `${(cb.ws / total) * 100}%`, background: "var(--warning)" }} />
+                  <div style={{ width: `${(cb.yes / total) * 100}%`, background: "var(--success)" }} />
+                  <div style={{ width: `${(cb.no / total) * 100}%`, background: "var(--destructive)" }} />
+                  <div style={{ width: `${(cb.abstain / total) * 100}%`, background: "var(--warning)" }} />
                 </div>
               </div>
             );
@@ -266,7 +257,7 @@ function PlannedMini({ p }: { p: AgendaPoint }) {
   );
 }
 
-function PunktRow({ p }: { p: AgendaPoint }) {
+function AgendaRow({ p }: { p: AgendaPoint }) {
   const isFlag = p.importance === "flagship";
   return (
     <li
@@ -285,7 +276,6 @@ function PunktRow({ p }: { p: AgendaPoint }) {
           gap: 32,
         }}
       >
-        {/* Rail */}
         <div>
           <div
             className="font-serif italic font-medium"
@@ -339,10 +329,8 @@ function PunktRow({ p }: { p: AgendaPoint }) {
           )}
         </div>
 
-        {/* Center */}
-        <PunktCenter p={p} />
+        <AgendaCenter p={p} />
 
-        {/* Right */}
         <div>
           {p.vote ? (
             <VoteMini v={p.vote} />
@@ -354,7 +342,6 @@ function PunktRow({ p }: { p: AgendaPoint }) {
         </div>
       </div>
 
-      {/* Mobile stacked */}
       <div className="md:hidden">
         <div className="flex items-baseline gap-3 mb-3">
           <span
@@ -401,7 +388,7 @@ function PunktRow({ p }: { p: AgendaPoint }) {
             )}
           </div>
         </div>
-        <PunktCenter p={p} />
+        <AgendaCenter p={p} />
         <div className="mt-5">
           {p.vote ? (
             <VoteMini v={p.vote} />
@@ -416,7 +403,7 @@ function PunktRow({ p }: { p: AgendaPoint }) {
   );
 }
 
-function PunktCenter({ p }: { p: AgendaPoint }) {
+function AgendaCenter({ p }: { p: AgendaPoint }) {
   return (
     <div className="min-w-0">
       <div className="flex gap-1.5 mb-2.5 flex-wrap">
@@ -426,7 +413,7 @@ function PunktCenter({ p }: { p: AgendaPoint }) {
         {p.prints.map((d) => (
           <PrintRef key={`${d.term}-${d.number}`} term={d.term} number={d.number} />
         ))}
-        {p.procesy.map((pr) => (
+        {p.processes.map((pr) => (
           <ProcessRef key={`${pr.term}-${pr.number}`} term={pr.term} number={pr.number} />
         ))}
       </div>
@@ -443,17 +430,19 @@ function PunktCenter({ p }: { p: AgendaPoint }) {
       >
         {p.shortTitle}.
       </h3>
-      <p
-        className="font-serif m-0 mb-3.5"
-        style={{
-          fontSize: 14.5,
-          lineHeight: 1.55,
-          color: "var(--secondary-foreground)",
-          textWrap: "pretty",
-        }}
-      >
-        {p.plainSummary}
-      </p>
+      {p.plainSummary && (
+        <p
+          className="font-serif m-0 mb-3.5"
+          style={{
+            fontSize: 14.5,
+            lineHeight: 1.55,
+            color: "var(--secondary-foreground)",
+            textWrap: "pretty",
+          }}
+        >
+          {p.plainSummary}
+        </p>
+      )}
 
       <details className="mb-4">
         <summary
@@ -491,20 +480,20 @@ function PunktCenter({ p }: { p: AgendaPoint }) {
         >
           <span>
             <b style={{ color: "var(--foreground)", fontWeight: 700 }}>
-              {p.stats.wypowiedzi}
+              {p.stats.statements}
             </b>{" "}
             wypowiedzi
           </span>
           <span>
             <b style={{ color: "var(--foreground)", fontWeight: 700 }}>
-              {p.stats.mowcy}
+              {p.stats.speakers}
             </b>{" "}
             mówców
           </span>
-          {p.stats.glosowania > 0 && (
+          {p.stats.votes > 0 && (
             <span>
               <b style={{ color: "var(--foreground)", fontWeight: 700 }}>
-                {p.stats.glosowania}
+                {p.stats.votes}
               </b>{" "}
               głosowań
             </span>
@@ -522,18 +511,18 @@ function PunktCenter({ p }: { p: AgendaPoint }) {
   );
 }
 
-export function AgendaList() {
+export function AgendaList({ data }: { data: SittingView }) {
   const [filter, setFilter] = useState<FilterId>("all");
 
   const counts: Record<FilterId, number> = {
-    all: MOCK.punkty.length,
-    done: MOCK.punkty.filter((p) => !p.planned).length,
-    planned: MOCK.punkty.filter((p) => p.planned).length,
-    vote: MOCK.punkty.filter((p) => !!p.vote).length,
-    flagship: MOCK.punkty.filter((p) => p.importance === "flagship").length,
+    all: data.agendaPoints.length,
+    done: data.agendaPoints.filter((p) => !p.planned).length,
+    planned: data.agendaPoints.filter((p) => p.planned).length,
+    vote: data.agendaPoints.filter((p) => !!p.vote).length,
+    flagship: data.agendaPoints.filter((p) => p.importance === "flagship").length,
   };
 
-  const visible = MOCK.punkty.filter(FILTERS.find((f) => f.id === filter)!.pred);
+  const visible = data.agendaPoints.filter(FILTERS.find((f) => f.id === filter)!.pred);
 
   return (
     <section className="border-b border-border">
@@ -580,7 +569,7 @@ export function AgendaList() {
 
         <ol className="list-none p-0 m-0">
           {visible.map((p) => (
-            <PunktRow key={p.ord} p={p} />
+            <AgendaRow key={p.ord} p={p} />
           ))}
         </ol>
       </div>

@@ -1,11 +1,8 @@
-// Hourly horizontal timeline. Each punkt = a block; block height = number
-// of speakers; block fill colour = dominant tone (uses ToneBadge palette
-// via tokens.ts). Live cursor label sits BELOW the hour ruler in its own
-// row so it never overlaps hour ticks. Narrow blocks (<60px) hide the
-// title text — only "PKT N" remains visible, full title appears on hover.
+// Hourly horizontal timeline. Each agenda point = a block; block height =
+// number of speakers; block fill colour = dominant tone.
 
-import { MOCK, type AgendaPoint, type Tone } from "../data";
-import { TONE_INK, TONE_LABEL } from "../tokens";
+import type { SittingView, Tone } from "./types";
+import { TONE_INK, TONE_LABEL } from "./tokens";
 import { Kicker, SectionHead } from "./SectionHead";
 
 function timeToMin(t: string): number {
@@ -38,19 +35,26 @@ const TONES_IN_LEGEND: Tone[] = [
   "neutralny",
 ];
 
-export function DayTimeline({ activeDay }: { activeDay: number }) {
-  const day = MOCK.days[activeDay];
+export function DayTimeline({
+  data,
+  activeDay,
+}: {
+  data: SittingView;
+  activeDay: number;
+}) {
+  const day = data.days[activeDay];
   if (!day) return null;
-  const points = MOCK.punkty.filter((p) => p.date === day.date);
+  const points = data.agendaPoints.filter((p) => p.date === day.date);
   if (points.length === 0) {
     return null;
   }
-  // Pick a comfortable window covering all blocks + a little margin.
   const startMin = 9 * 60;
   const endMin = 22 * 60;
   const span = endMin - startMin;
 
-  const liveMin = day.status === "live" ? timeToMin(MOCK.liveAt) - startMin : null;
+  const liveMin = day.status === "live" && data.liveAt
+    ? timeToMin(data.liveAt) - startMin
+    : null;
   const toPct = (t: string) => ((timeToMin(t) - startMin) / span) * 100;
 
   const hours: number[] = [];
@@ -66,7 +70,6 @@ export function DayTimeline({ activeDay }: { activeDay: number }) {
           anchor="os"
         />
 
-        {/* Live-cursor label row — separate row to avoid overlapping hour ticks */}
         {liveMin !== null && (
           <div className="relative mb-2" style={{ height: 18 }}>
             <span
@@ -79,12 +82,11 @@ export function DayTimeline({ activeDay }: { activeDay: number }) {
                 letterSpacing: "0.14em",
               }}
             >
-              ▼ {MOCK.liveAt} na żywo
+              ▼ {data.liveAt} na żywo
             </span>
           </div>
         )}
 
-        {/* Hour ruler */}
         <div className="relative mb-1" style={{ height: 18 }}>
           {hours.map((h) => (
             <span
@@ -103,7 +105,6 @@ export function DayTimeline({ activeDay }: { activeDay: number }) {
           ))}
         </div>
 
-        {/* Track */}
         <div
           className="relative"
           style={{
@@ -145,19 +146,15 @@ export function DayTimeline({ activeDay }: { activeDay: number }) {
             const left = toPct(p.timeStart);
             const widthPct = (p.durMin / span) * 100;
             const tones = sumTones(p.tones);
+            void tones;
             const dom = dominantTone(p.tones);
             const fill = p.planned
               ? "var(--muted)"
               : dom
                 ? TONE_INK[dom]
                 : "var(--muted-foreground)";
-            const height = Math.max(38, Math.min(170, p.stats.mowcy * 5 + 28));
-            // approximate min pixel width at common viewports to decide whether to render title
-            // (we don't know runtime width here; fall back to widthPct threshold)
+            const height = Math.max(38, Math.min(170, p.stats.speakers * 5 + 28));
             const narrow = widthPct < 4.2;
-            // Vote-marker offset inside the block. Guard against zero duration
-            // and clamp to the [0, 100] range so a stale time never paints
-            // the marker outside its parent.
             const voteLeftPct = p.vote && p.durMin > 0
               ? Math.max(
                   0,
@@ -234,7 +231,6 @@ export function DayTimeline({ activeDay }: { activeDay: number }) {
           })}
         </div>
 
-        {/* Legend */}
         <div
           className="mt-4 flex flex-wrap items-center justify-between gap-3 font-sans"
           style={{ fontSize: 11.5, color: "var(--muted-foreground)" }}

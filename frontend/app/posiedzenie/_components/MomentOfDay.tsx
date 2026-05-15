@@ -1,20 +1,40 @@
-// "Moment dnia" — the highest-ranked viral quote of the day. Replaces the
-// inspiration's pure-black aside with a warm secondary panel + destructive
-// accent, and drops every visible reference to "viral_score". The reader
-// gets the quote, the speaker, the agenda-point context, and a short
-// editorial note about why it landed.
+// "Moment dnia" — the highest-ranked viral quote of the day.
 
 import { MPAvatarPhoto } from "@/components/tygodnik/MPAvatar";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
-import { MOCK } from "../data";
+import type { SittingView } from "./types";
 import { Kicker, SectionHead } from "./SectionHead";
-import { verdictInk } from "../tokens";
+import { verdictInk } from "./tokens";
 
-export function MomentOfDay() {
+export function MomentOfDay({ data }: { data: SittingView }) {
   const top =
-    MOCK.topQuotes.find((q) => q.rank === 1) ?? MOCK.topQuotes[0];
-  if (!top) return null;
-  const punkt = MOCK.punkty.find((p) => p.ord === top.punktOrd) ?? null;
+    data.topQuotes.find((q) => q.rank === 1) ?? data.topQuotes[0];
+  if (!top) {
+    return (
+      <section className="border-b border-border">
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-14 md:py-16">
+          <SectionHead
+            num={1}
+            title="Moment dnia"
+            sub="Brak wybranego cytatu dla tego posiedzenia — wracaj po wzbogaceniu danych."
+            anchor="moment"
+          />
+          <p
+            className="font-serif italic"
+            style={{
+              fontSize: 16,
+              color: "var(--muted-foreground)",
+              maxWidth: 720,
+            }}
+          >
+            Redaktor-AI nie wybrał jeszcze cytatu dnia. Pojawi się tu po
+            zakończeniu wzbogacania wypowiedzi.
+          </p>
+        </div>
+      </section>
+    );
+  }
+  const point = data.agendaPoints.find((p) => p.ord === top.pointOrd) ?? null;
 
   return (
     <section className="border-b border-border">
@@ -22,7 +42,7 @@ export function MomentOfDay() {
         <SectionHead
           num={1}
           title="Moment dnia"
-          sub="Najmocniejszy cytat z dziewiętnastego posiedzenia — wybrany przez redaktora-AI z 612 wypowiedzi."
+          sub={`Najmocniejszy cytat z ${data.number}. posiedzenia — wybrany przez redaktora-AI z ${data.totals.statements} wypowiedzi.`}
           anchor="moment"
         />
 
@@ -117,7 +137,7 @@ export function MomentOfDay() {
           </div>
 
           {/* Agenda-point context aside — warm beige, NOT inverted black */}
-          {punkt && (
+          {point && (
             <aside
               className="p-7 md:p-8"
               style={{
@@ -135,7 +155,7 @@ export function MomentOfDay() {
                     color: "var(--destructive-deep)",
                   }}
                 >
-                  {punkt.ord}
+                  {point.ord}
                 </span>
                 <div
                   className="font-mono uppercase"
@@ -146,9 +166,9 @@ export function MomentOfDay() {
                     lineHeight: 1.5,
                   }}
                 >
-                  {punkt.timeStart}—{punkt.timeEnd}
+                  {point.timeStart}—{point.timeEnd}
                   <br />
-                  {punkt.durMin} min
+                  {point.durMin} min
                 </div>
               </div>
               <h3
@@ -160,21 +180,23 @@ export function MomentOfDay() {
                   textWrap: "balance",
                 }}
               >
-                {punkt.shortTitle}.
+                {point.shortTitle}.
               </h3>
-              <p
-                className="font-serif m-0"
-                style={{
-                  fontSize: 14.5,
-                  lineHeight: 1.55,
-                  color: "var(--secondary-foreground)",
-                  textWrap: "pretty",
-                }}
-              >
-                {punkt.plainSummary}
-              </p>
+              {point.plainSummary && (
+                <p
+                  className="font-serif m-0"
+                  style={{
+                    fontSize: 14.5,
+                    lineHeight: 1.55,
+                    color: "var(--secondary-foreground)",
+                    textWrap: "pretty",
+                  }}
+                >
+                  {point.plainSummary}
+                </p>
+              )}
 
-              {punkt.vote && (
+              {point.vote && (
                 <div
                   className="mt-5 pt-4"
                   style={{ borderTop: "1px solid var(--border)" }}
@@ -185,11 +207,11 @@ export function MomentOfDay() {
                       className="font-serif italic font-medium"
                       style={{
                         fontSize: 24,
-                        color: verdictInk(punkt.vote.result, punkt.vote.motionPolarity),
+                        color: verdictInk(point.vote.result, point.vote.motionPolarity),
                         lineHeight: 1,
                       }}
                     >
-                      {punkt.vote.result}
+                      {point.vote.result}
                     </span>
                     <span
                       className="font-mono"
@@ -199,8 +221,8 @@ export function MomentOfDay() {
                         letterSpacing: "0.1em",
                       }}
                     >
-                      {punkt.vote.za}–{punkt.vote.przeciw} · różnica{" "}
-                      {punkt.vote.margin}
+                      {point.vote.yes}–{point.vote.no} · różnica{" "}
+                      {point.vote.margin}
                     </span>
                   </div>
                 </div>

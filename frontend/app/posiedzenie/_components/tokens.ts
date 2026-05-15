@@ -1,10 +1,9 @@
-// Shared semantic colour resolution for the proceeding-points mockup.
-// All values are CSS-var references — no hex codes leak into JSX. This
-// mirrors the convention in components/statement/ToneBadge.tsx (where the
-// tone palette lives) and components/tygodnik/atoms/VoteResultBar.tsx
-// (verdict colours).
+// Shared semantic colour resolution for the sitting view.
+// All values are CSS-var references — no hex codes leak into JSX. Mirrors
+// the convention in components/statement/ToneBadge.tsx (tone palette) and
+// components/tygodnik/atoms/VoteResultBar.tsx (verdict colours).
 
-import type { Tone, Vote } from "./data";
+import type { Tone, Vote } from "./types";
 
 // Tones use the same six-value palette as ToneBadge — see
 // components/statement/ToneBadge.tsx. Two values still resolve to hex
@@ -32,12 +31,6 @@ export const TONE_LABEL: Record<Tone, string> = {
 // components/tygodnik/atoms/VoteResultBar.tsx (computeBillOutcome): the
 // final colour depends on the motion's polarity, not just whether
 // "PRZYJĘTA" or "ODRZUCONA" appears in the verdict text.
-//
-// - "reject"/"minority" motions invert: a passed reject motion = bill
-//   killed = destructive; a rejected reject motion = bill survives = success.
-// - "procedural" motions are not bill-level decisions (e.g. odwołanie
-//   marszałka). Render warm/neutral instead of red/green.
-// - "pass"/"amendment" and missing polarity fall back to the verdict text.
 export function verdictInk(
   result: Vote["result"],
   motionPolarity?: Vote["motionPolarity"],

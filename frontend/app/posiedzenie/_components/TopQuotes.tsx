@@ -1,11 +1,9 @@
-// Ranking of the 5 most-shareable quotes. Rank position replaces the
-// numeric score from the inspiration ("№1 cytat dnia" instead of
-// "viral 0.87"). The reason explainer lives in the right column.
+// Ranking of the 5 most-shareable quotes.
 
 import { MPAvatarPhoto } from "@/components/tygodnik/MPAvatar";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { ToneBadge } from "@/components/statement/ToneBadge";
-import { MOCK, type TopQuote } from "../data";
+import type { SittingView, TopQuote } from "./types";
 import { Kicker, SectionHead } from "./SectionHead";
 
 function QuoteRow({ q }: { q: TopQuote }) {
@@ -86,16 +84,16 @@ function QuoteRow({ q }: { q: TopQuote }) {
                 className="font-mono"
                 style={{ color: "var(--foreground)", fontSize: 12 }}
               >
-                PKT {q.punktOrd}
+                PKT {q.pointOrd}
               </b>{" "}
               <span
                 className="font-mono"
                 style={{ fontSize: 10, color: "var(--muted-foreground)" }}
               >
-                {q.punktTime}
+                {q.pointTime}
               </span>
               <br />
-              {q.punktShort}.
+              {q.pointShort}.
             </div>
             <Kicker className="mb-1.5">tonacja</Kicker>
             <div className="mb-3">
@@ -119,7 +117,31 @@ function QuoteRow({ q }: { q: TopQuote }) {
   );
 }
 
-export function TopQuotes() {
+export function TopQuotes({ data }: { data: SittingView }) {
+  if (data.topQuotes.length === 0) {
+    return (
+      <section
+        className="border-b border-border"
+        style={{ background: "var(--secondary)" }}
+      >
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-14 md:py-16">
+          <SectionHead
+            num={5}
+            title="Pięć cytatów dnia"
+            sub="Brak wybranych cytatów dla tego posiedzenia."
+            anchor="cytaty"
+          />
+          <p
+            className="font-serif italic"
+            style={{ fontSize: 15, color: "var(--muted-foreground)" }}
+          >
+            Wypowiedzi z tego posiedzenia czekają na wzbogacenie — ranking
+            cytatów pojawi się tutaj automatycznie.
+          </p>
+        </div>
+      </section>
+    );
+  }
   return (
     <section
       className="border-b border-border"
@@ -133,7 +155,7 @@ export function TopQuotes() {
           anchor="cytaty"
         />
         <ol className="list-none p-0 m-0">
-          {MOCK.topQuotes.map((q) => (
+          {data.topQuotes.map((q) => (
             <QuoteRow key={q.rank} q={q} />
           ))}
         </ol>
