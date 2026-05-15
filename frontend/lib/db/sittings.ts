@@ -34,7 +34,7 @@ const TONE_MAP: Record<string, Tone> = {
 
 function mapTone(raw: string | null | undefined): Tone | null {
   if (!raw) return null;
-  return TONE_MAP[raw] ?? null;
+  return TONE_MAP[raw] ?? "neutralny";
 }
 
 function warsawTodayDate(): string {
@@ -277,9 +277,9 @@ async function loadSitting(
   const proc = procRes.data as ProceedingRow | null;
   if (!proc) return null;
 
-  const dates = (proc.dates ?? []).slice().sort();
-
-  // 2. proceeding_days
+  // 2. proceeding_days — used as fallback for `dates` when proceedings.dates
+  //    is empty (early-load state where the array column hasn't been backfilled
+  //    yet) so the page still produces a day timeline.
   const daysRes = await sb
     .from("proceeding_days")
     .select("id, date")
@@ -287,6 +287,11 @@ async function loadSitting(
     .order("date", { ascending: true });
   if (daysRes.error) throw daysRes.error;
   const dayRows = (daysRes.data ?? []) as ProceedingDayRow[];
+  const procDates = (proc.dates ?? []).slice().sort();
+  const dates =
+    procDates.length > 0
+      ? procDates
+      : dayRows.map((d) => d.date).slice().sort();
   const dayIdsByDate = new Map<string, number>();
   for (const d of dayRows) dayIdsByDate.set(d.date, d.id);
   const dayIds = dayRows.map((d) => d.id);

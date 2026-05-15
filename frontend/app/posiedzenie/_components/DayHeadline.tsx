@@ -72,7 +72,7 @@ export function DayHeadline({ day }: { day: Day }) {
                   color: "var(--muted-foreground)",
                 }}
               >
-                Redaktorska syntéza tego dnia jeszcze niegotowa — patrz statystyki
+                Redaktorska synteza tego dnia jeszcze niegotowa — patrz statystyki
                 obok i pełny porządek obrad poniżej.
               </p>
             )}

@@ -4,7 +4,7 @@ import type { SittingView } from "./types";
 import { Kicker } from "./SectionHead";
 
 export function Sources({ data }: { data: SittingView }) {
-  const referenceDate = data.dates[Math.min(1, data.dates.length - 1)] ?? data.dates[0] ?? null;
+  const referenceDate = data.dates.at(-1) ?? null;
   const lastUpdateDate = referenceDate
     ? referenceDate.split("-").reverse().join(".")
     : "—";
