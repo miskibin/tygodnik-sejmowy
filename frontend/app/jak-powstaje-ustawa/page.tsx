@@ -160,6 +160,14 @@ const STAGES: Stage[] = [
         1999 roku.
       </>,
       <>
+        <strong>WYJĄTEK — zmiana Konstytucji.</strong> Przy projektach
+        zmieniających Konstytucję krąg uprawnionych jest węższy: tylko{" "}
+        <strong>1/5 ustawowej liczby posłów</strong> (92 posłów),{" "}
+        <strong>Senat</strong> albo <strong>Prezydent</strong>. Rada Ministrów
+        ani obywatele <strong>nie mogą</strong> wnieść projektu zmiany
+        Konstytucji (art. 235 ust. 1 Konstytucji RP).
+      </>,
+      <>
         W praktyce po stronie posłów projekt może wnieść <strong>klub poselski</strong>{" "}
         (każdy poseł zrzeszony w klubie automatycznie podpisuje) albo{" "}
         <strong>grupa co najmniej 15 posłów</strong> niezależnie od przynależności.
@@ -577,17 +585,32 @@ const STAGES: Stage[] = [
           <strong>ZAWETOWAĆ</strong> — odmówić podpisania i przekazać ustawę
           Sejmowi do ponownego rozpatrzenia z uzasadnieniem (tzw.{" "}
           <em>weto zawieszające</em>). Sejm może obalić weto większością{" "}
-          <strong>3/5 głosów</strong> przy obecności co najmniej połowy posłów.
-          Jeśli się to uda — Prezydent ma obowiązek podpisać w ciągu{" "}
-          <strong>7 dni</strong> i nie może już ponownie wetować ani kierować
-          do TK.
+          <strong>3/5 oddanych głosów</strong> przy obecności co najmniej
+          połowy ustawowej liczby posłów (kworum 230). Jeśli się to uda —
+          Prezydent ma obowiązek podpisać w ciągu <strong>7 dni</strong> i nie
+          może już ponownie wetować ani kierować do TK.
         </li>
         <li>
           <strong>Skierować do Trybunału Konstytucyjnego</strong> — żądać
           zbadania zgodności ustawy z Konstytucją. <strong>Bieg 21-dniowego
           terminu jest wstrzymany</strong> do orzeczenia TK. Po wyroku TK
-          Prezydent musi podpisać (jeśli TK potwierdził zgodność) albo odmówić
-          (jeśli TK uznał za niezgodną).
+          możliwe są trzy ścieżki:
+          <ul className="list-disc pl-6 space-y-1 mt-2">
+            <li>
+              TK uznał ustawę za zgodną → Prezydent <strong>podpisuje</strong>.
+            </li>
+            <li>
+              TK uznał ustawę za niezgodną w całości → Prezydent
+              <strong> odmawia podpisania</strong>.
+            </li>
+            <li>
+              TK uznał za niezgodne tylko niektóre przepisy i nie są one
+              nierozerwalnie związane z całą ustawą → Prezydent może{" "}
+              <strong>podpisać ustawę z pominięciem</strong> wadliwych
+              przepisów albo <strong>zwrócić ją Sejmowi</strong> w celu
+              usunięcia wad (art. 122 ust. 4 Konstytucji).
+            </li>
+          </ul>
         </li>
       </ol>,
       <>
@@ -605,10 +628,28 @@ const STAGES: Stage[] = [
         </li>
       </ul>,
       <>
+        <strong>UWAGA — wyjątki od prawa weta:</strong>
+        <ul className="list-disc pl-6 space-y-1 my-3">
+          <li>
+            <strong>Ustawa budżetowa</strong> (i ustawa o prowizorium
+            budżetowym) — Prezydent <strong>nie może zawetować</strong>. Może
+            ją tylko podpisać albo skierować do TK, który ma na orzeczenie
+            jedynie <strong>2 miesiące</strong> (art. 224 Konstytucji).
+          </li>
+          <li>
+            <strong>Zmiana Konstytucji</strong> — Prezydent
+            <strong> nie ma prawa weta ani prawa kierowania do TK</strong>.
+            Musi podpisać w ciągu 21 dni (art. 235 ust. 7 Konstytucji).
+          </li>
+        </ul>
+      </>,
+      <>
         Weto jest najmocniejszą bronią Prezydenta wobec parlamentu. Skutecznie
-        zatrzymuje ustawę, jeśli rząd nie ma większości 3/5 (276 posłów).
-        Skierowanie do TK jest narzędziem subtelniejszym — pozwala Prezydentowi
-        nie blokować ustawy w pełni, ale poddać ją niezależnej kontroli.
+        zatrzymuje ustawę, jeśli koalicja rządząca nie zbierze 3/5 oddanych
+        głosów (przy pełnej frekwencji 460 to 276 posłów; przy minimalnym
+        kworum 230 — 138). Skierowanie do TK jest narzędziem subtelniejszym —
+        pozwala Prezydentowi nie blokować ustawy w pełni, ale poddać ją
+        niezależnej kontroli.
       </>,
     ],
     branches: [
@@ -631,6 +672,8 @@ const STAGES: Stage[] = [
     sources: [
       "Art. 122 Konstytucji RP",
       "Art. 123 ust. 3 Konstytucji RP (tryb pilny)",
+      "Art. 224 Konstytucji RP (ustawa budżetowa — brak weta)",
+      "Art. 235 ust. 7 Konstytucji RP (zmiana Konstytucji — brak weta i TK)",
     ],
   },
   {

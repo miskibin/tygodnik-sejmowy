@@ -394,6 +394,18 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     fetchAffected([printId]),
   ]);
 
+  // Surface PostgREST errors from Phase 1. Without these, transient 503 /
+  // RLS failures silently produce a partial page (empty relatedVotings,
+  // empty subPrints, missing proceedingPoints) that revalidate then caches
+  // for 5 minutes. Better to fail the request and let the next hit retry.
+  if (procRes.error) throw procRes.error;
+  if (committeeSittingRowsRes.error) throw committeeSittingRowsRes.error;
+  if (linkedRowsRes.error) throw linkedRowsRes.error;
+  if (subRowsRes.error) throw subRowsRes.error;
+  if (matchRowsRes.error) throw matchRowsRes.error;
+  if (aipRowsRes.error) throw aipRowsRes.error;
+  if (stmtLinkRowsRes.error) throw stmtLinkRowsRes.error;
+
   const proc = procRes.data;
   const committeeSittingRows = committeeSittingRowsRes.data;
   const linkedRows = linkedRowsRes.data;
@@ -428,7 +440,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
           .eq("id", eliActId)
           .limit(1)
           .maybeSingle()
-      : Promise.resolve({ data: null }),
+      : Promise.resolve({ data: null, error: null }),
     sb
       .from("print_attachments")
       .select("print_id, ordinal, filename")
@@ -436,8 +448,10 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
       .order("ordinal", { ascending: true }),
   ]);
 
-  const stagesRows = stagesResP2.data;
   if (stagesResP2.error) throw stagesResP2.error;
+  if (actRowResP2.error) throw actRowResP2.error;
+  if (attRowsResP2.error) throw attRowsResP2.error;
+  const stagesRows = stagesResP2.data;
   const actRow = actRowResP2.data;
   const attRows = attRowsResP2.data;
 

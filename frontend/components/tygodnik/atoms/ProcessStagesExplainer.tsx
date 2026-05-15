@@ -278,25 +278,36 @@ const ROWS: StageRow[] = [
       <>
         Prezydent ma trzy opcje: <strong>PODPISAĆ</strong> (ustawa po publikacji
         w Dzienniku Ustaw zaczyna obowiązywać), <strong>ZAWETOWAĆ</strong>{" "}
-        (Sejm może obalić weto większością <strong>3/5 głosów</strong> przy
-        obecności co najmniej połowy posłów), albo{" "}
+        (Sejm może obalić weto większością <strong>3/5 oddanych głosów</strong>{" "}
+        przy obecności co najmniej połowy posłów), albo{" "}
         <strong>skierować do Trybunału Konstytucyjnego</strong> — wtedy bieg
-        terminu jest <strong>wstrzymany</strong> do orzeczenia TK. Standardowy
-        termin to <strong>21 dni</strong>, ale tylko <strong>7 dni</strong> w
-        trybie pilnym i również <strong>7 dni</strong> po obaleniu weta przez
-        Sejm. Po wcześniejszym wecie Prezydent nie może już ponownie wetować ani
+        terminu jest <strong>wstrzymany</strong> do orzeczenia TK. Po wyroku TK
+        Prezydent podpisuje (zgodność), odmawia (pełna niezgodność) albo —
+        przy niezgodności części przepisów nie związanych nierozerwalnie z całą
+        ustawą — podpisuje z pominięciem wadliwych przepisów lub zwraca ustawę
+        Sejmowi (art. 122 ust. 4 Konstytucji). Standardowy termin to{" "}
+        <strong>21 dni</strong>, ale tylko <strong>7 dni</strong> w trybie
+        pilnym i również <strong>7 dni</strong> po obaleniu weta przez Sejm. Po
+        wcześniejszym wecie Prezydent nie może już ponownie wetować ani
         kierować ustawy do TK.
+        <br /><br />
+        <strong>Wyjątki:</strong> dla <strong>ustawy budżetowej</strong>{" "}
+        Prezydent <strong>nie ma prawa weta</strong> — może ją tylko podpisać
+        albo skierować do TK (art. 224). Dla <strong>zmiany Konstytucji</strong>{" "}
+        nie ma ani prawa weta, ani prawa kierowania do TK (art. 235 ust. 7).
       </>
     ),
     icon: PenTool,
     branches: [
       { kind: "forward", label: "Dziennik Ustaw", detail: "Po podpisie ustawa wchodzi w życie." },
-      { kind: "back", label: "Sejm obala weto", detail: "Większością 3/5 głosów Sejm odrzuca weto Prezydenta." },
+      { kind: "back", label: "Sejm obala weto", detail: "Większością 3/5 oddanych głosów Sejm odrzuca weto Prezydenta." },
       { kind: "terminal", label: "Trybunał Konstytucyjny", detail: "Prezydent kieruje ustawę do oceny zgodności z konstytucją." },
     ],
     sources: [
       "Art. 122 Konstytucji RP",
       "Art. 123 ust. 3 Konstytucji RP (tryb pilny)",
+      "Art. 224 Konstytucji RP (ustawa budżetowa — brak weta)",
+      "Art. 235 ust. 7 Konstytucji RP (zmiana Konstytucji — brak weta i TK)",
     ],
   },
   {

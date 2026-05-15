@@ -42,7 +42,7 @@ function StageBadge({ label }: { label: string }) {
 function PrintRef({ number, term }: { term: number; number: string }) {
   return (
     <Link
-      href={`/druk/${term}/${number}`}
+      href={`/proces/${term}/${number}`}
       className="font-mono uppercase no-underline hover:bg-muted transition-colors"
       style={{
         fontSize: 9.5,

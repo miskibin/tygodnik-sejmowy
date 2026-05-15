@@ -8,6 +8,18 @@ export function Sources({ data }: { data: SittingView }) {
   const lastUpdateDate = referenceDate
     ? referenceDate.split("-").reverse().join(".")
     : "—";
+  const term = data.term;
+  const num = data.number;
+  const sejmBase = `https://www.sejm.gov.pl/Sejm${term}.nsf`;
+  const agendaUrl = `${sejmBase}/posiedzenie.xsp?view=1&posiedzenie=${num}`;
+  const stenoUrl = `${sejmBase}/stenogramy.xsp`;
+  const glosUrl = `${sejmBase}/agent.xsp?symbol=glosowania&NrKadencji=${term}&NrPosiedzenia=${num}`;
+  const tvUrl = `${sejmBase}/transmisje_arch.xsp`;
+  const srcLinkClass =
+    "no-underline hover:underline transition-colors";
+  const srcLinkStyle: React.CSSProperties = {
+    color: "var(--secondary-foreground)",
+  };
   return (
     <section
       className="border-t border-border"
@@ -21,10 +33,50 @@ export function Sources({ data }: { data: SittingView }) {
               className="list-none p-0 m-0 font-sans"
               style={{ fontSize: 13, lineHeight: 1.85, color: "var(--secondary-foreground)" }}
             >
-              <li>↗ Porządek obrad — sejm.gov.pl</li>
-              <li>↗ Stenogramy dnia (PDF, ok. 14:00 i ~22:00)</li>
-              <li>↗ Wyniki głosowań — sejm.gov.pl</li>
-              <li>↗ Transmisja archiwalna — Sejm TV</li>
+              <li>
+                <a
+                  href={agendaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={srcLinkClass}
+                  style={srcLinkStyle}
+                >
+                  ↗ Porządek obrad — sejm.gov.pl
+                </a>
+              </li>
+              <li>
+                <a
+                  href={stenoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={srcLinkClass}
+                  style={srcLinkStyle}
+                >
+                  ↗ Stenogramy dnia (PDF, ok. 14:00 i ~22:00)
+                </a>
+              </li>
+              <li>
+                <a
+                  href={glosUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={srcLinkClass}
+                  style={srcLinkStyle}
+                >
+                  ↗ Wyniki głosowań — sejm.gov.pl
+                </a>
+              </li>
+              <li>
+                <a
+                  href={tvUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={srcLinkClass}
+                  style={srcLinkStyle}
+                >
+                  ↗ Transmisja archiwalna — Sejm TV
+                </a>
+              </li>
             </ul>
           </div>
           <div>
