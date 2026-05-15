@@ -10,8 +10,8 @@ import { verdictInk } from "./tokens";
 
 function topicsAggregate(data: SittingView): Record<TopicId, AgendaPoint[]> {
   const out: Record<TopicId, AgendaPoint[]> = Object.fromEntries(
-    (Object.keys(TOPICS) as TopicId[]).map((t) => [t, []]),
-  ) as Record<TopicId, AgendaPoint[]>;
+    (Object.keys(TOPICS) as TopicId[]).map((t) => [t, [] as AgendaPoint[]]),
+  ) as unknown as Record<TopicId, AgendaPoint[]>;
   for (const p of data.agendaPoints) {
     for (const t of p.topics) {
       out[t]?.push(p);
