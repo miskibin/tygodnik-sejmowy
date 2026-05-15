@@ -1,18 +1,26 @@
-// 6-step pipeline visualization for a Sejm legislative process. Maps the
-// many stage_type enum values from process_stages onto 6 broad buckets so
+// 7-step pipeline visualization for a Sejm legislative process. Maps the
+// many stage_type enum values from process_stages onto 7 broad buckets so
 // the bar reads at a glance without needing to know parliamentary procedure.
 //
 // Termination: when `process_state.End` is reached without `processPassed`,
 // the project died mid-flow (rejected in I czytanie, withdrawn, etc.).
-// The full 6-step bar implies the project is moving toward Prezydent —
+// The full 7-step bar implies the project is moving toward Prezydent —
 // citizen review caught this contradiction (#4: "Zakończono" badge +
-// progressing 6-step bar on /proces/10/2197). Terminated processes now
+// progressing bar on /proces/10/2197). Terminated processes now
 // render a compact "Proces zakończony" badge instead.
+//
+// Why "plenum" is its own step (split from "głosowanie"):
+//   `SejmReading` is "I/II/III czytanie na posiedzeniu Sejmu" — a debate
+//   on the floor, NOT a vote. Lumping it with `Voting` (the actual roll
+//   call) labelled the bar GŁOSOWANIE for prints that were still in
+//   II czytanie, misleading citizens into thinking the vote already
+//   happened. PLENUM is the dedicated step for floor debate before vote.
 
 const STEPS = [
   { key: "intake", label: "wpłynęło" },
   { key: "first_reading", label: "I czytanie" },
   { key: "committee", label: "komisja" },
+  { key: "plenum", label: "plenum" },
   { key: "vote", label: "głosowanie" },
   { key: "senate", label: "senat" },
   { key: "president", label: "prezydent" },
@@ -33,13 +41,15 @@ const STAGE_TO_STEP: Record<string, StepKey> = {
   Reading: "first_reading",
   CommitteeWork: "committee",
   CommitteeReport: "committee",
-  SejmReading: "vote",
+  SejmReading: "plenum",
   Voting: "vote",
   SenatePosition: "senate",
   SenateAmendments: "senate",
+  SenatePositionConsideration: "senate",
   ToPresident: "president",
   PresidentSignature: "president",
   PresidentVeto: "president",
+  PresidentMotionConsideration: "president",
   ConstitutionalTribunal: "president",
   Promulgation: "president",
 };
