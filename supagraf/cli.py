@@ -493,8 +493,45 @@ def cmd_backfill_sponsor_authority(
     parent sponsor_authority via processPrint; for now we skip them
     (`print_unified.py` collapses them to 'inne' when opinion_source is
     set, which is the correct behavior for meta-documents anyway).
+
+    SAFETY / WHERE TO RUN:
+    Must run inside the mixvm container (with `SUPAGRAF_RUN_LOCATION=vm`),
+    NOT from a laptop pointed at `db.msulawiak.pl`. The Cloudflare front
+    silently swallows PATCH writes during transient 503 events, and this
+    command issues batched chunked PATCHes via PostgREST `update().in_(...)`
+    — exactly the failure mode the project memory rule flags. The function
+    refuses to run when it detects an off-VM environment.
     """
+    import os
     import re
+    from urllib.parse import urlparse
+
+    # ---- Location guard: refuse off-VM execution ----------------------
+    # Two signals; either disqualifies:
+    #   - SUPAGRAF_RUN_LOCATION env not 'vm' (set inside the daily container)
+    #   - SUPABASE_URL host is the public Cloudflare endpoint db.msulawiak.pl
+    # The VM path uses internal Kong (http://kong:8000 or http://mixvm...:8000)
+    # which is direct nginx -> PostgREST, no Cloudflare in the middle.
+    run_location = os.environ.get("SUPAGRAF_RUN_LOCATION", "").lower()
+    supabase_url = os.environ.get("SUPABASE_URL", "")
+    cloudflare_host = "db.msulawiak.pl"
+    parsed_host = urlparse(supabase_url).hostname or ""
+
+    is_via_cloudflare = parsed_host == cloudflare_host
+    is_vm = run_location == "vm"
+
+    if is_via_cloudflare or not is_vm:
+        raise typer.BadParameter(
+            "backfill-sponsor-authority refuses to run outside the mixvm "
+            "container. The Cloudflare front (db.msulawiak.pl) silently drops "
+            "PATCH writes during 503 events, and this command issues batched "
+            "chunked PATCHes against `prints`. Run inside the daily container:\n"
+            "  ssh sejm@mixvm.bison-fort.ts.net\n"
+            "  docker compose exec supagraf uv run python -m supagraf backfill-sponsor-authority --term {term}\n"
+            f"(detected: SUPABASE_URL host={parsed_host or '<unset>'}, "
+            f"SUPAGRAF_RUN_LOCATION={run_location or '<unset>'})"
+        )
+
     client = supabase()
 
     # Title prefix → authority. Order matters: "Przedstawiony przez Prezydium"
