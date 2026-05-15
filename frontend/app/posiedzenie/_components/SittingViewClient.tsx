@@ -35,7 +35,7 @@ export function SittingViewClient({ data }: { data: SittingView }) {
         <PageBreadcrumb
           items={[
             { label: "Tygodnik", href: "/tygodnik" },
-            { label: "Posiedzenia", href: "/tygodnik" },
+            { label: "Posiedzenia", href: "/posiedzenie" },
             {
               label: `X kadencja, posiedzenie nr ${data.number}`,
             },

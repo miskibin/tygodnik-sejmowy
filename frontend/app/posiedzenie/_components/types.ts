@@ -2,9 +2,7 @@
 // of proceedings + proceeding_days + agenda_items + agenda_item_processes +
 // agenda_item_prints + proceeding_statements (with enrichment from
 // migration 0061) + votings (with the "Pkt. N ..." title heuristic from
-// migration 0092). The hardcoded MOCK in mockup/data.ts feeds the same
-// shape so the route at /posiedzenie/mockup keeps working as a design
-// control.
+// migration 0092).
 
 import type { TopicId } from "@/lib/topics";
 

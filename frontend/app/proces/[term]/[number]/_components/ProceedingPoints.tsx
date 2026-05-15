@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { stageLabel } from "@/lib/stages";
 import type { ProceedingPoint, ProceedingPointStage } from "@/lib/db/prints";
 
@@ -148,7 +149,12 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
           className="font-serif font-medium m-0 text-foreground"
           style={{ fontSize: 18, letterSpacing: "-0.005em" }}
         >
-          Posiedzenie nr {group.sittingNum}
+          <Link
+            href={`/posiedzenie/${group.sittingNum}`}
+            className="hover:text-destructive hover:underline decoration-dotted underline-offset-4"
+          >
+            Posiedzenie nr {group.sittingNum}
+          </Link>
         </h3>
         <span
           className="font-mono uppercase"
@@ -177,12 +183,13 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
               style={{ paddingLeft: 4 }}
             >
               {p.ord !== null && (
-                <span
-                  className="font-mono text-muted-foreground shrink-0"
+                <Link
+                  href={`/posiedzenie/${group.sittingNum}#punkt-${p.ord}`}
+                  className="font-mono text-muted-foreground shrink-0 hover:text-destructive hover:underline decoration-dotted underline-offset-4"
                   style={{ fontSize: 12, minWidth: 28 }}
                 >
                   pkt {p.ord}
-                </span>
+                </Link>
               )}
               <span
                 className="font-serif text-secondary-foreground flex-1"
