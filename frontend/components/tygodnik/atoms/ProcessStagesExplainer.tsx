@@ -27,23 +27,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 // Citizen-facing explainer of the Polish legislative pipeline. Text was
 // cross-checked against the Constitution (art. 118-123) and the Sejm
 // Standing Orders (Regulamin Sejmu, art. 32, 37, 41-50). Each row carries
 // a `sources` field with legal citations so a sceptical reader can verify.
 //
-// Common corrections from the legal review:
-//   - "Bezwzględna większość" is NOT "50% obecnych + 1" — that's quorum.
-//     It's "więcej ZA niż PRZECIW + WSTRZYMUJĄCYCH razem" (art. 121 ust. 3).
-//   - Senate deadline is NOT one number: 30 dni (standard) / 20 dni
-//     (budget — can only amend, can't reject) / 14 dni (urgent).
-//   - First-reading-on-plenum list is closed and specific (art. 37 ust. 2
-//     Reg.): konstytucja, budżet, podatki, wyborcze, ustrojowe, kodeksy.
-//   - Presidential 21-day clock STOPS when the bill is referred to the
-//     Constitutional Tribunal; resumes on judgment. Urgent track: 7 dni.
-//   - Withdrawal is allowed up to the END OF SECOND READING, not only in
-//     committee (art. 119 ust. 4 Konstytucji).
+// Two-surface rendering:
+//   - Desktop (sm+): Dialog with icon-timeline 3-column layout.
+//   - Mobile: vaul Drawer sliding up from bottom, simplified single-column
+//     flow (no icons, branches inline). Triggered by the same "?" button
+//     but rendered as a separate Drawer instance because Dialog and Drawer
+//     each need their own trigger context. Duplication of one icon button
+//     is cheap; sharing content via `<ExplainerBody mobile />`.
 
 type Branch = {
   kind: "forward" | "back" | "terminal";
@@ -318,6 +322,10 @@ const ROWS: StageRow[] = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// Shared atoms
+// ---------------------------------------------------------------------------
+
 function BranchPill({ branch }: { branch: Branch }) {
   const color =
     branch.kind === "forward"
@@ -346,30 +354,11 @@ function BranchPill({ branch }: { branch: Branch }) {
   );
 }
 
-function StageIcon({ Icon }: { Icon: LucideIcon }) {
-  return (
-    <div
-      className="flex items-center justify-center rounded-full shrink-0 relative"
-      style={{
-        width: 72,
-        height: 72,
-        background: "var(--muted)",
-        color: "var(--secondary-foreground)",
-        // Sits above the timeline line — without an explicit z-index the
-        // dashed line shows through the disc and breaks the visual.
-        zIndex: 1,
-      }}
-    >
-      <Icon size={32} strokeWidth={1.5} />
-    </div>
-  );
-}
-
-function LegalSources({ items }: { items: string[] }) {
+function LegalSources({ items, compact }: { items: string[]; compact?: boolean }) {
   if (items.length === 0) return null;
   return (
     <div
-      className="mt-3 pt-2 font-mono text-[10px] text-muted-foreground leading-snug"
+      className={`${compact ? "mt-2 pt-1.5" : "mt-3 pt-2"} font-mono text-[10px] text-muted-foreground leading-snug`}
       style={{ borderTop: "1px dashed var(--border)", letterSpacing: "0.02em" }}
     >
       <span
@@ -388,190 +377,410 @@ function LegalSources({ items }: { items: string[] }) {
   );
 }
 
+function StageIcon({ Icon, accent }: { Icon: LucideIcon; accent?: boolean }) {
+  return (
+    <div
+      className="flex items-center justify-center rounded-full shrink-0 relative justify-self-center"
+      style={{
+        width: 72,
+        height: 72,
+        background: "var(--popover)",
+        color: "var(--secondary-foreground)",
+        // The ring is the visual "step" marker — replaces what the
+        // numbered badge used to do. Accent-coloured so the eye picks
+        // out the timeline at a glance.
+        boxShadow: accent
+          ? "0 0 0 2px var(--destructive), inset 0 0 0 8px var(--muted)"
+          : "0 0 0 1px var(--border), inset 0 0 0 8px var(--muted)",
+        zIndex: 1,
+      }}
+    >
+      <Icon size={28} strokeWidth={1.5} />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Desktop body (Dialog content)
+// ---------------------------------------------------------------------------
+
+function DesktopBody() {
+  return (
+    <>
+      <div className="px-8 pt-8 pb-5 text-center border-b border-border">
+        <DialogHeader className="items-center">
+          <DialogTitle
+            className="font-serif font-medium"
+            style={{ fontSize: 32, letterSpacing: "-0.02em", lineHeight: 1.1 }}
+          >
+            Jak powstaje ustawa w Sejmie
+          </DialogTitle>
+          <DialogDescription
+            className="text-sm max-w-2xl mx-auto mt-2"
+            style={{ lineHeight: 1.55 }}
+          >
+            Jedenaście etapów, przez które przechodzi każdy projekt — od
+            wpłynięcia do publikacji w Dzienniku Ustaw. Pasek nad ustawą
+            pokazuje, na którym etapie jest konkretna sprawa. Pod każdym etapem
+            podana jest <strong>podstawa prawna</strong> z Konstytucji RP albo
+            Regulaminu Sejmu.
+          </DialogDescription>
+        </DialogHeader>
+      </div>
+
+      <div className="px-8 py-6">
+        <div
+          className="rounded-md flex items-start gap-3 p-4 mb-6"
+          style={{ background: "var(--muted)" }}
+        >
+          <div
+            className="rounded-full flex items-center justify-center shrink-0"
+            style={{ width: 36, height: 36, background: "var(--destructive)" }}
+          >
+            <Info size={18} color="white" strokeWidth={2} />
+          </div>
+          <div className="text-[13.5px] leading-relaxed pt-1">
+            <strong className="font-medium">Proces nie zawsze idzie do przodu.</strong>{" "}
+            Projekt może wrócić do komisji po poprawkach, Senat może zawrócić
+            ustawę, Sejm może odrzucić prezydenckie weto. Każde &quot;cofnięcie&quot;
+            to szansa na dopracowanie albo zatrzymanie ustawy — a nie porażka.
+          </div>
+        </div>
+
+        <ol className="list-none p-0 m-0 relative">
+          {/* Timeline line — runs through the centre of each icon disc.
+              The icon column is 88px wide and the icon is centred via
+              `justify-self-center` so the line at left:44px lines up
+              exactly. Top/bottom inset 44px so the line doesn't poke
+              past the first/last icon. */}
+          <div
+            aria-hidden
+            className="absolute"
+            style={{
+              left: 44,
+              top: 44,
+              bottom: 44,
+              width: 1,
+              background:
+                "repeating-linear-gradient(to bottom, var(--border) 0 4px, transparent 4px 8px)",
+            }}
+          />
+
+          {ROWS.map((row) => {
+            const Icon = row.icon;
+            return (
+              <li
+                key={row.key}
+                className="relative grid gap-6 pl-0 pr-0 mb-7 last:mb-0"
+                style={{
+                  gridTemplateColumns: "88px 1fr 300px",
+                  alignItems: "start",
+                }}
+              >
+                <StageIcon Icon={Icon} accent />
+
+                <div className="min-w-0">
+                  <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+                    <h3
+                      className="font-serif font-medium m-0"
+                      style={{ fontSize: 19, letterSpacing: "-0.005em" }}
+                    >
+                      {row.label}
+                    </h3>
+                    <span
+                      className="font-mono uppercase tracking-[0.1em] text-muted-foreground"
+                      style={{ fontSize: 9.5 }}
+                    >
+                      pasek: {row.bucket}
+                    </span>
+                  </div>
+                  <p className="font-sans text-[13px] text-muted-foreground italic m-0 mb-2">
+                    {row.blurb}
+                  </p>
+                  <div
+                    className="font-serif text-secondary-foreground m-0"
+                    style={{
+                      fontSize: 14,
+                      lineHeight: 1.6,
+                      textWrap: "pretty" as never,
+                    }}
+                  >
+                    {row.detail}
+                  </div>
+                  <LegalSources items={row.sources} />
+                </div>
+
+                {row.branches.length > 0 ? (
+                  <div
+                    className="rounded-md p-4 self-start"
+                    style={{ background: "var(--muted)" }}
+                  >
+                    <div
+                      className="font-mono uppercase tracking-[0.12em] text-muted-foreground mb-3"
+                      style={{ fontSize: 10, fontWeight: 600 }}
+                    >
+                      Co dalej
+                    </div>
+                    {row.branches.map((b, i) => (
+                      <BranchPill key={i} branch={b} />
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    className="rounded-md p-4 self-start text-[12px] italic text-muted-foreground"
+                    style={{ background: "var(--muted)" }}
+                  >
+                    Koniec drogi ustawy — od tej chwili obowiązuje.
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+
+        <div
+          className="mt-8 pt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11.5px] text-muted-foreground font-sans"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
+          <span className="font-mono uppercase tracking-[0.12em]" style={{ fontSize: 10 }}>
+            Legenda
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <ArrowRight size={12} style={{ color: "var(--secondary-foreground)" }} />
+            następny krok
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <ArrowLeft size={12} style={{ color: "var(--destructive)" }} />
+            możliwość cofnięcia
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <X size={12} />
+            możliwe zakończenie procesu
+          </span>
+          <span className="ml-auto">
+            Źródła:{" "}
+            <a
+              href="https://www.sejm.gov.pl/prawo/konst/polski/4.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              Konstytucja RP
+            </a>
+            {" · "}
+            <a
+              href="https://www.sejm.gov.pl/prawo/regulamin/kon7.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              Regulamin Sejmu
+            </a>
+          </span>
+        </div>
+      </div>
+
+      <DialogClose className="sr-only">Zamknij</DialogClose>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Mobile body (Drawer content) — single-column flow, no icons, branches
+// inline. The drawer is height-capped at ~90vh and scrolls internally.
+// ---------------------------------------------------------------------------
+
+function MobileBranchLine({ branch }: { branch: Branch }) {
+  const color =
+    branch.kind === "forward"
+      ? "var(--secondary-foreground)"
+      : branch.kind === "back"
+      ? "var(--destructive)"
+      : "var(--muted-foreground)";
+  const Icon = branch.kind === "back" ? ArrowLeft : branch.kind === "terminal" ? X : ArrowRight;
+  return (
+    <div className="flex items-start gap-2 mb-1.5 last:mb-0 text-[12px] leading-snug">
+      <Icon size={12} strokeWidth={2.5} style={{ color, marginTop: 3, flexShrink: 0 }} />
+      <div>
+        <span className="font-medium" style={{ color }}>
+          {branch.label}
+        </span>
+        {branch.detail && (
+          <span className="text-muted-foreground"> — {branch.detail}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MobileBody() {
+  return (
+    <>
+      <DrawerHeader className="text-left px-4 pt-2 pb-3">
+        <DrawerTitle
+          className="font-serif font-medium"
+          style={{ fontSize: 22, letterSpacing: "-0.01em", lineHeight: 1.15 }}
+        >
+          Jak powstaje ustawa w Sejmie
+        </DrawerTitle>
+        <DrawerDescription className="text-[13px] leading-snug">
+          Jedenaście etapów — od wpłynięcia do publikacji w Dzienniku Ustaw.
+        </DrawerDescription>
+      </DrawerHeader>
+
+      <div className="overflow-y-auto px-4 pb-6" style={{ maxHeight: "calc(90vh - 80px)" }}>
+        <div
+          className="rounded-md p-3 mb-4 text-[12.5px] leading-relaxed"
+          style={{
+            background: "var(--muted)",
+            borderLeft: "3px solid var(--destructive)",
+          }}
+        >
+          <strong className="font-medium">Proces nie zawsze idzie do przodu.</strong>{" "}
+          Cofnięcie się ustawy do komisji albo do Sejmu po Senacie to NORMALNE
+          i nie oznacza porażki.
+        </div>
+
+        <ol className="list-none p-0 m-0 space-y-4">
+          {ROWS.map((row) => (
+            <li
+              key={row.key}
+              className="border-l-2 pl-3 py-1"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+                <h3
+                  className="font-serif font-medium m-0"
+                  style={{ fontSize: 16, letterSpacing: "-0.005em" }}
+                >
+                  {row.label}
+                </h3>
+                <span
+                  className="font-mono uppercase tracking-[0.1em] text-muted-foreground"
+                  style={{ fontSize: 9 }}
+                >
+                  {row.bucket}
+                </span>
+              </div>
+              <p className="font-sans text-[11.5px] text-muted-foreground italic m-0 mb-1.5">
+                {row.blurb}
+              </p>
+              <div
+                className="font-serif text-secondary-foreground"
+                style={{ fontSize: 13, lineHeight: 1.55 }}
+              >
+                {row.detail}
+              </div>
+
+              {row.branches.length > 0 && (
+                <div
+                  className="mt-2 pt-2 pl-2"
+                  style={{ borderTop: "1px dashed var(--border)" }}
+                >
+                  <div
+                    className="font-mono uppercase tracking-[0.12em] text-muted-foreground mb-1.5"
+                    style={{ fontSize: 9, fontWeight: 600 }}
+                  >
+                    Co dalej
+                  </div>
+                  {row.branches.map((b, i) => (
+                    <MobileBranchLine key={i} branch={b} />
+                  ))}
+                </div>
+              )}
+
+              <LegalSources items={row.sources} compact />
+            </li>
+          ))}
+        </ol>
+
+        <div
+          className="mt-5 pt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
+          <span className="inline-flex items-center gap-1">
+            <ArrowRight size={11} style={{ color: "var(--secondary-foreground)" }} />
+            dalej
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <ArrowLeft size={11} style={{ color: "var(--destructive)" }} />
+            cofnięcie
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <X size={11} />
+            zakończenie
+          </span>
+          <span className="w-full pt-1">
+            Źródła:{" "}
+            <a
+              href="https://www.sejm.gov.pl/prawo/konst/polski/4.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              Konstytucja RP
+            </a>
+            {" · "}
+            <a
+              href="https://www.sejm.gov.pl/prawo/regulamin/kon7.htm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              Regulamin Sejmu
+            </a>
+          </span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Trigger button (shared shape, two instances — one per surface)
+// ---------------------------------------------------------------------------
+
+function TriggerButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      aria-label="Jak działa proces legislacyjny — wyjaśnienie"
+      className="inline-flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors shrink-0"
+      style={{ width: 18, height: 18 }}
+      {...props}
+    >
+      <HelpCircle size={14} strokeWidth={1.75} />
+    </button>
+  );
+}
+
 export function ProcessStagesExplainer() {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          aria-label="Jak działa proces legislacyjny — wyjaśnienie"
-          className="inline-flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors shrink-0"
-          style={{ width: 18, height: 18 }}
-        >
-          <HelpCircle size={14} strokeWidth={1.75} />
-        </button>
-      </DialogTrigger>
+    <>
+      {/* Desktop / tablet: Dialog overlay. */}
+      <div className="hidden sm:inline-flex">
+        <Dialog>
+          <DialogTrigger asChild>
+            <TriggerButton />
+          </DialogTrigger>
+          <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-6xl lg:max-w-[1280px] max-h-[92vh] overflow-y-auto p-0">
+            <DesktopBody />
+          </DialogContent>
+        </Dialog>
+      </div>
 
-      <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-6xl lg:max-w-[1280px] max-h-[92vh] overflow-y-auto p-0">
-        <div className="px-8 pt-8 pb-5 text-center border-b border-border">
-          <DialogHeader className="items-center">
-            <DialogTitle
-              className="font-serif font-medium"
-              style={{ fontSize: 32, letterSpacing: "-0.02em", lineHeight: 1.1 }}
-            >
-              Jak powstaje ustawa w Sejmie
-            </DialogTitle>
-            <DialogDescription
-              className="text-sm max-w-2xl mx-auto mt-2"
-              style={{ lineHeight: 1.55 }}
-            >
-              Jedenaście etapów, przez które przechodzi każdy projekt — od
-              wpłynięcia do publikacji w Dzienniku Ustaw. Pasek nad ustawą
-              pokazuje, na którym etapie jest konkretna sprawa. Pod każdym
-              etapem podana jest <strong>podstawa prawna</strong> z Konstytucji
-              RP albo Regulaminu Sejmu.
-            </DialogDescription>
-          </DialogHeader>
-        </div>
-
-        <div className="px-8 py-6">
-          <div
-            className="rounded-md flex items-start gap-3 p-4 mb-6"
-            style={{ background: "var(--muted)" }}
-          >
-            <div
-              className="rounded-full flex items-center justify-center shrink-0"
-              style={{ width: 36, height: 36, background: "var(--destructive)" }}
-            >
-              <Info size={18} color="white" strokeWidth={2} />
-            </div>
-            <div className="text-[13.5px] leading-relaxed pt-1">
-              <strong className="font-medium">Proces nie zawsze idzie do przodu.</strong>{" "}
-              Projekt może wrócić do komisji po poprawkach, Senat może zawrócić
-              ustawę, Sejm może odrzucić prezydenckie weto. Każde &quot;cofnięcie&quot;
-              to szansa na dopracowanie albo zatrzymanie ustawy — a nie porażka.
-            </div>
-          </div>
-
-          <ol className="list-none p-0 m-0 relative">
-            {/* Vertical timeline runs through the centre of each icon disc.
-                Icon column is 88px wide → centre at 44px from left edge. */}
-            <div
-              aria-hidden
-              className="absolute top-10 bottom-10"
-              style={{
-                left: 44,
-                width: 1,
-                background: "var(--border)",
-              }}
-            />
-
-            {ROWS.map((row) => {
-              const Icon = row.icon;
-              return (
-                <li
-                  key={row.key}
-                  className="relative grid gap-6 pl-0 pr-0 mb-7 last:mb-0"
-                  style={{
-                    gridTemplateColumns: "88px 1fr 300px",
-                    alignItems: "start",
-                  }}
-                >
-                  <StageIcon Icon={Icon} />
-
-                  <div className="min-w-0">
-                    <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-                      <h3
-                        className="font-serif font-medium m-0"
-                        style={{ fontSize: 19, letterSpacing: "-0.005em" }}
-                      >
-                        {row.label}
-                      </h3>
-                      <span
-                        className="font-mono uppercase tracking-[0.1em] text-muted-foreground"
-                        style={{ fontSize: 9.5 }}
-                      >
-                        pasek: {row.bucket}
-                      </span>
-                    </div>
-                    <p className="font-sans text-[13px] text-muted-foreground italic m-0 mb-2">
-                      {row.blurb}
-                    </p>
-                    <div
-                      className="font-serif text-secondary-foreground m-0"
-                      style={{
-                        fontSize: 14,
-                        lineHeight: 1.6,
-                        textWrap: "pretty" as never,
-                      }}
-                    >
-                      {row.detail}
-                    </div>
-                    <LegalSources items={row.sources} />
-                  </div>
-
-                  {row.branches.length > 0 ? (
-                    <div
-                      className="rounded-md p-4 self-start"
-                      style={{ background: "var(--muted)" }}
-                    >
-                      <div
-                        className="font-mono uppercase tracking-[0.12em] text-muted-foreground mb-3"
-                        style={{ fontSize: 10, fontWeight: 600 }}
-                      >
-                        Co dalej
-                      </div>
-                      {row.branches.map((b, i) => (
-                        <BranchPill key={i} branch={b} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div
-                      className="rounded-md p-4 self-start text-[12px] italic text-muted-foreground"
-                      style={{ background: "var(--muted)" }}
-                    >
-                      Koniec drogi ustawy — od tej chwili obowiązuje.
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-
-          <div
-            className="mt-8 pt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11.5px] text-muted-foreground font-sans"
-            style={{ borderTop: "1px solid var(--border)" }}
-          >
-            <span className="font-mono uppercase tracking-[0.12em]" style={{ fontSize: 10 }}>
-              Legenda
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <ArrowRight size={12} style={{ color: "var(--secondary-foreground)" }} />
-              następny krok
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <ArrowLeft size={12} style={{ color: "var(--destructive)" }} />
-              możliwość cofnięcia
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <X size={12} />
-              możliwe zakończenie procesu
-            </span>
-            <span className="ml-auto">
-              Źródła:{" "}
-              <a
-                href="https://www.sejm.gov.pl/prawo/konst/polski/4.htm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline underline-offset-2 hover:text-foreground"
-              >
-                Konstytucja RP
-              </a>
-              {" · "}
-              <a
-                href="https://www.sejm.gov.pl/prawo/regulamin/kon7.htm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline underline-offset-2 hover:text-foreground"
-              >
-                Regulamin Sejmu
-              </a>
-            </span>
-          </div>
-        </div>
-
-        <DialogClose className="sr-only">Zamknij</DialogClose>
-      </DialogContent>
-    </Dialog>
+      {/* Mobile: bottom-sheet Drawer (vaul). Avoids Dialog's cramped
+          centred box on narrow viewports. */}
+      <div className="sm:hidden inline-flex">
+        <Drawer>
+          <DrawerTrigger asChild>
+            <TriggerButton />
+          </DrawerTrigger>
+          <DrawerContent className="max-h-[92vh]">
+            <MobileBody />
+          </DrawerContent>
+        </Drawer>
+      </div>
+    </>
   );
 }
