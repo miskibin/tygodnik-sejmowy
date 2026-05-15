@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { MarkdownText } from "@/components/text/MarkdownText";
 
 // Patterns we detect inline:
 //   - "druk nr 2180" / "druku 2180" / "druki 2180, 2199" → /proces/{term}/{n}
@@ -94,7 +95,7 @@ export function CitationText({
   return (
     <span className={className} style={style}>
       {tokens.map((tok, i) => {
-        if (tok.kind === "text") return <Fragment key={i}>{tok.value}</Fragment>;
+        if (tok.kind === "text") return <MarkdownText key={i} text={tok.value} inline />;
         if (tok.kind === "druk") {
           if (tok.numbers.length === 1) {
             return (
