@@ -977,64 +977,81 @@ function HeroInfographic() {
   );
 }
 
-// Quick-facts strip — five chunky stat cards rendered as a flex row that
-// wraps to grid on mobile. Numbers are the most-googled / most-quoted
-// constitutional thresholds, so seeing them up top primes the long read.
+// Quick-facts strip — chunky stat cells priming the reader. On desktop
+// all 8 stats are visible. On mobile we ship only the top 4 to keep the
+// hero compact; the rest live in the body where they're more contextual
+// anyway. `hidden md:block` on the secondary group.
 function QuickStats() {
-  const stats: Array<{ num: string; unit?: string; label: string }> = [
-    { num: "11", label: "etapów procesu legislacyjnego" },
-    { num: "460", label: "posłów w Sejmie" },
+  const primaryStats: Array<{ num: string; unit?: string; label: string }> = [
+    { num: "11", label: "etapów" },
+    { num: "460", label: "posłów" },
     { num: "100", label: "senatorów" },
+    { num: "21", unit: "dni", label: "Prezydent" },
+  ];
+  const secondaryStats: Array<{ num: string; unit?: string; label: string }> = [
     { num: "230", label: "kworum — minimum na sali" },
     { num: "30", unit: "dni", label: "Senat na stanowisko" },
-    { num: "21", unit: "dni", label: "Prezydent na podpis" },
-    { num: "3/5", label: "głosów obala weto Prezydenta" },
-    { num: "14", unit: "dni", label: "vacatio legis (domyślnie)" },
+    { num: "3/5", label: "głosów obala weto" },
+    { num: "14", unit: "dni", label: "vacatio legis" },
   ];
   return (
-    <div
-      className="grid gap-px my-10"
-      style={{
-        gridTemplateColumns: "repeat(auto-fit, minmax(min(140px, 100%), 1fr))",
-        background: "var(--border)",
-        border: "1px solid var(--border)",
-      }}
-    >
-      {stats.map((s) => (
-        <div
-          key={s.label}
-          className="p-4"
-          style={{ background: "var(--background)" }}
-        >
-          <div className="flex items-baseline gap-1">
-            <span
-              className="font-serif font-medium tabular-nums"
-              style={{
-                fontSize: 32,
-                lineHeight: 1,
-                color: "var(--destructive)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              {s.num}
-            </span>
-            {s.unit && (
-              <span
-                className="font-sans text-muted-foreground"
-                style={{ fontSize: 12 }}
-              >
-                {s.unit}
-              </span>
-            )}
-          </div>
-          <div
-            className="font-sans text-muted-foreground mt-1.5"
-            style={{ fontSize: 11.5, lineHeight: 1.35 }}
-          >
-            {s.label}
-          </div>
+    <div className="my-8 md:my-10">
+      <div
+        className="grid gap-px"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(120px, 50%), 1fr))",
+          background: "var(--border)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        {primaryStats.map((s) => (
+          <StatCell key={s.label} s={s} />
+        ))}
+        {/* Secondary stats — desktop only */}
+        <div className="hidden md:contents">
+          {secondaryStats.map((s) => (
+            <StatCell key={s.label} s={s} />
+          ))}
         </div>
-      ))}
+      </div>
+    </div>
+  );
+}
+
+function StatCell({
+  s,
+}: {
+  s: { num: string; unit?: string; label: string };
+}) {
+  return (
+    <div className="p-3 md:p-4" style={{ background: "var(--background)" }}>
+      <div className="flex items-baseline gap-1">
+        <span
+          className="font-serif font-medium tabular-nums"
+          style={{
+            fontSize: "clamp(22px, 5vw, 32px)",
+            lineHeight: 1,
+            color: "var(--destructive)",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {s.num}
+        </span>
+        {s.unit && (
+          <span
+            className="font-sans text-muted-foreground"
+            style={{ fontSize: 11 }}
+          >
+            {s.unit}
+          </span>
+        )}
+      </div>
+      <div
+        className="font-sans text-muted-foreground mt-1"
+        style={{ fontSize: 11, lineHeight: 1.35 }}
+      >
+        {s.label}
+      </div>
     </div>
   );
 }
@@ -1042,7 +1059,7 @@ function QuickStats() {
 // Legend keyed to the phase colours used on stage cards.
 function PhaseLegend() {
   return (
-    <div className="mt-8 mb-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+    <div className="mt-8 mb-2 hidden md:flex flex-wrap items-center gap-x-4 gap-y-2">
       <span
         className="font-mono uppercase tracking-[0.14em] text-muted-foreground"
         style={{ fontSize: 10 }}
@@ -1221,11 +1238,9 @@ export default function JakPowstajeUstawaPage() {
 
       <article className="py-10 px-3 md:px-4 lg:px-5">
         <div className="max-w-[1100px] mx-auto">
-          {/* Hero — two-column on desktop: text + inline SVG infographic */}
-          <div
-            className="grid gap-8 items-center mb-10"
-            style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 0.85fr)" }}
-          >
+          {/* Hero — single column on mobile, two-column on desktop with
+              the inline SVG infographic on the right. */}
+          <div className="grid gap-6 md:gap-8 items-center mb-8 md:mb-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
             <div>
               <span
                 className="font-mono uppercase tracking-[0.18em] text-destructive"
@@ -1234,15 +1249,15 @@ export default function JakPowstajeUstawaPage() {
                 Przewodnik
               </span>
               <h1
-                className="font-serif font-medium m-0 mt-3 mb-5"
-                style={{ fontSize: "clamp(34px, 5.5vw, 56px)", letterSpacing: "-0.025em", lineHeight: 1.05 }}
+                className="font-serif font-medium m-0 mt-3 mb-4 md:mb-5"
+                style={{ fontSize: "clamp(28px, 6vw, 56px)", letterSpacing: "-0.025em", lineHeight: 1.05 }}
               >
                 Jak powstaje{" "}
                 <span className="italic text-destructive">ustawa</span> w Sejmie
               </h1>
               <p
-                className="font-serif text-secondary-foreground m-0 mb-5"
-                style={{ fontSize: 18, lineHeight: 1.6 }}
+                className="font-serif text-secondary-foreground m-0 mb-4 md:mb-5"
+                style={{ fontSize: "clamp(15px, 4vw, 18px)", lineHeight: 1.55 }}
               >
                 Każda ustawa w Polsce przechodzi przez{" "}
                 <strong>11 proceduralnych etapów</strong> — od wniesienia
@@ -1250,8 +1265,11 @@ export default function JakPowstajeUstawaPage() {
                 głosowania w Sejmie i Senacie, aż po podpis Prezydenta i
                 publikację w Dzienniku Ustaw.
               </p>
+              {/* Secondary lead — desktop only. On mobile the first paragraph
+                  carries enough; meta-commentary about citations would push
+                  the user-facing stats too far down. */}
               <p
-                className="font-sans text-muted-foreground m-0"
+                className="hidden md:block font-sans text-muted-foreground m-0"
                 style={{ fontSize: 14, lineHeight: 1.55 }}
               >
                 Ten przewodnik tłumaczy każdy etap{" "}
@@ -1347,23 +1365,23 @@ export default function JakPowstajeUstawaPage() {
               <section
                 key={stage.slug}
                 id={stage.slug}
-                className="mb-10 scroll-mt-20 relative"
+                className="mb-8 md:mb-10 scroll-mt-20 relative pl-4 md:pl-6 py-1"
                 aria-labelledby={`heading-${stage.slug}`}
-                style={{
-                  borderLeft: `3px solid ${phase.accent}`,
-                  paddingLeft: 24,
-                  paddingTop: 6,
-                  paddingBottom: 6,
-                }}
+                style={{ borderLeft: `3px solid ${phase.accent}` }}
               >
-                <div className="flex items-start gap-5 mb-4 flex-wrap md:flex-nowrap">
-                  <StageIconDisc Icon={stage.icon} phase={stage.phase} />
+                <div className="flex items-start gap-3 md:gap-5 mb-3 md:mb-4">
+                  {/* Icon disc — desktop only. On mobile the phase colour
+                      lives on the left border + PhasePill so the disc would
+                      duplicate signal at the cost of vertical space. */}
+                  <div className="hidden md:block">
+                    <StageIconDisc Icon={stage.icon} phase={stage.phase} />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                    <div className="flex items-baseline gap-2 md:gap-3 mb-1.5 md:mb-2 flex-wrap">
                       <span
                         className="font-serif font-medium tabular-nums"
                         style={{
-                          fontSize: 28,
+                          fontSize: "clamp(22px, 4vw, 28px)",
                           color: phase.accent,
                           lineHeight: 1,
                           letterSpacing: "-0.02em",
@@ -1375,7 +1393,7 @@ export default function JakPowstajeUstawaPage() {
                         id={`heading-${stage.slug}`}
                         className="font-serif font-medium m-0"
                         style={{
-                          fontSize: "clamp(22px, 3vw, 28px)",
+                          fontSize: "clamp(18px, 4.5vw, 28px)",
                           letterSpacing: "-0.01em",
                           lineHeight: 1.2,
                         }}
@@ -1383,10 +1401,10 @@ export default function JakPowstajeUstawaPage() {
                         {stage.label}
                       </h2>
                     </div>
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                       <PhasePill phase={stage.phase} />
                       <span
-                        className="font-mono uppercase tracking-[0.12em] text-muted-foreground"
+                        className="hidden md:inline font-mono uppercase tracking-[0.12em] text-muted-foreground"
                         style={{ fontSize: 9.5 }}
                       >
                         pasek: {stage.bucket}
@@ -1394,7 +1412,7 @@ export default function JakPowstajeUstawaPage() {
                     </div>
                     <p
                       className="font-sans text-muted-foreground italic m-0 mt-2"
-                      style={{ fontSize: 14.5 }}
+                      style={{ fontSize: "clamp(13px, 3.5vw, 14.5px)" }}
                     >
                       {stage.blurb}
                     </p>
