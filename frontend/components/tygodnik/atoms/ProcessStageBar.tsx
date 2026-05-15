@@ -2,6 +2,13 @@
 // many stage_type enum values from process_stages onto 7 broad buckets so
 // the bar reads at a glance without needing to know parliamentary procedure.
 //
+// "?" affordance — ProcessStagesExplainer dialog. The bar's labels read as
+// buzzwords to anyone outside parliamentary procedure (citizen feedback:
+// "skąd mam wiedzieć co to PLENUM"), so we anchor a plain-language
+// explainer right where the bar is shown.
+
+import { ProcessStagesExplainer } from "./ProcessStagesExplainer";
+//
 // Termination: when `process_state.End` is reached without `processPassed`,
 // the project died mid-flow (rejected in I czytanie, withdrawn, etc.).
 // The full 7-step bar implies the project is moving toward Prezydent —
@@ -99,43 +106,48 @@ export function ProcessStageBar({
   const currentIdx = stepIndexFor(currentStageType, processPassed);
 
   return (
-    <div className="mb-4" style={{ minHeight: 32 }}>
-      <div className="flex items-center gap-1 mb-1.5">
-        {STEPS.map((step, i) => {
-          const done = i < currentIdx;
-          const current = i === currentIdx;
-          const bg = done
-            ? "var(--secondary-foreground)"
-            : current
-            ? "var(--destructive)"
-            : "var(--border)";
-          return (
-            <div
-              key={step.key}
-              className="flex-1 h-[3px] rounded-full"
-              style={{ background: bg }}
-              aria-hidden
-            />
-          );
-        })}
+    <div className="mb-4 flex items-start gap-2" style={{ minHeight: 32 }}>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1 mb-1.5">
+          {STEPS.map((step, i) => {
+            const done = i < currentIdx;
+            const current = i === currentIdx;
+            const bg = done
+              ? "var(--secondary-foreground)"
+              : current
+              ? "var(--destructive)"
+              : "var(--border)";
+            return (
+              <div
+                key={step.key}
+                className="flex-1 h-[3px] rounded-full"
+                style={{ background: bg }}
+                aria-hidden
+              />
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-between font-mono text-[9px] tracking-[0.12em] uppercase text-muted-foreground">
+          {STEPS.map((step, i) => {
+            const current = i === currentIdx;
+            return (
+              <span
+                key={step.key}
+                className="truncate"
+                style={{
+                  color: current ? "var(--destructive)" : undefined,
+                  fontWeight: current ? 600 : undefined,
+                  maxWidth: `${100 / STEPS.length}%`,
+                }}
+              >
+                {step.label}
+              </span>
+            );
+          })}
+        </div>
       </div>
-      <div className="flex items-center justify-between font-mono text-[9px] tracking-[0.12em] uppercase text-muted-foreground">
-        {STEPS.map((step, i) => {
-          const current = i === currentIdx;
-          return (
-            <span
-              key={step.key}
-              className="truncate"
-              style={{
-                color: current ? "var(--destructive)" : undefined,
-                fontWeight: current ? 600 : undefined,
-                maxWidth: `${100 / STEPS.length}%`,
-              }}
-            >
-              {step.label}
-            </span>
-          );
-        })}
+      <div className="mt-[-2px]">
+        <ProcessStagesExplainer />
       </div>
     </div>
   );
