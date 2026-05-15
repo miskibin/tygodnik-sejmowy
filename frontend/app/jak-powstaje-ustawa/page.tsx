@@ -717,7 +717,7 @@ const FAQ: FaqItem[] = [
   {
     q: "Co się stanie, jeśli Prezydent zignoruje termin?",
     aText:
-      "Konstytucja nie przewiduje tej sytuacji. W praktyce: Marszałek Sejmu publikuje ustawę w zastępstwie.",
+      "Konstytucja nie reguluje tej sytuacji wprost. W doktrynie są różne interpretacje, a w praktyce taki przypadek nie wystąpił.",
     a: (
       <>
         Konstytucja nie reguluje wprost sytuacji, w której Prezydent nie
@@ -883,10 +883,14 @@ function StructuredData() {
       },
     ],
   };
+  // Escape `<` to `<` so a future writer who adds dynamic text to
+  // any FAQ answer can't accidentally inject `</script>` and break out
+  // of the JSON-LD block. Content is static today; this is defensive.
+  const serialized = JSON.stringify(ld).replace(/</g, "\\u003c");
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+      dangerouslySetInnerHTML={{ __html: serialized }}
     />
   );
 }
@@ -923,7 +927,7 @@ export default function JakPowstajeUstawaPage() {
             style={{ fontSize: 18, lineHeight: 1.55 }}
           >
             Każda ustawa w Polsce przechodzi przez{" "}
-            <strong>11 procedualnych etapów</strong> — od wniesienia projektu
+            <strong>11 proceduralnych etapów</strong> — od wniesienia projektu
             przez uprawniony podmiot, przez prace komisji i głosowania w Sejmie
             i Senacie, aż po podpis Prezydenta i publikację w Dzienniku Ustaw.
             Ten przewodnik tłumaczy każdy etap prostym językiem i wskazuje{" "}
