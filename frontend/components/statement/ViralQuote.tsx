@@ -3,15 +3,28 @@
 // scroll-into-view (CSS-only, respects prefers-reduced-motion).
 
 import { toneInk } from "./ToneBadge";
+import { QuoteShareButton } from "./QuoteShareButton";
 
 export function ViralQuote({
   quote,
   reason,
   tone,
+  speakerName = null,
+  photoUrl = null,
+  clubRef = null,
+  proceedingNumber = null,
+  dayIdx = null,
+  dayDate = null,
 }: {
   quote: string;
   reason?: string | null;
   tone?: string | null;
+  speakerName?: string | null;
+  photoUrl?: string | null;
+  clubRef?: string | null;
+  proceedingNumber?: number | null;
+  dayIdx?: number | null;
+  dayDate?: string | null;
 }) {
   const accent = toneInk(tone ?? null);
   return (
@@ -48,6 +61,15 @@ export function ViralQuote({
           {reason}
         </figcaption>
       )}
+      <QuoteShareButton
+        quote={quote}
+        speakerName={speakerName}
+        photoUrl={photoUrl}
+        clubRef={clubRef}
+        proceedingNumber={proceedingNumber}
+        dayIdx={dayIdx}
+        dayDate={dayDate}
+      />
       <style>{`
         @keyframes vqu-draw {
           from { transform: scaleX(0); transform-origin: left; }

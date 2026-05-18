@@ -94,7 +94,17 @@ export default async function StatementPage({
           />
 
           {s.viralQuote ? (
-            <ViralQuote quote={s.viralQuote} reason={s.viralReason} tone={s.tone} />
+            <ViralQuote
+              quote={s.viralQuote}
+              reason={s.viralReason}
+              tone={s.tone}
+              speakerName={s.speakerName}
+              photoUrl={s.mpPhotoUrl}
+              clubRef={s.clubRef}
+              proceedingNumber={s.proceedingNumber}
+              dayIdx={s.dayIdx}
+              dayDate={s.dayDate}
+            />
           ) : (
             s.summaryOneLine && (
               <p className="my-10 max-w-[720px] mx-auto font-serif italic text-secondary-foreground leading-snug" style={{ fontSize: 22, textWrap: "pretty" }}>
