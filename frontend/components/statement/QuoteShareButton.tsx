@@ -33,12 +33,14 @@ function initials(name: string | null): string {
 }
 
 function quoteFontSize(len: number): number {
-  if (len < 50) return 64;
-  if (len < 100) return 56;
-  if (len < 160) return 48;
-  if (len < 220) return 40;
-  if (len < 300) return 34;
-  return 28;
+  // Bumped up across the board — quote is the hero element on a 1080² card,
+  // it should fill the canvas instead of floating in whitespace.
+  if (len < 50) return 84;
+  if (len < 100) return 72;
+  if (len < 160) return 60;
+  if (len < 220) return 50;
+  if (len < 300) return 42;
+  return 34;
 }
 
 type Props = {
@@ -166,7 +168,7 @@ export function QuoteShareButton({
             width: 1080,
             height: 1080,
             background: "#f4efe4",
-            padding: "80px 100px",
+            padding: "56px 72px 48px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -227,13 +229,13 @@ export function QuoteShareButton({
           <div
             style={{
               borderTop: "1px solid #cdc4b1",
-              marginTop: 32,
-              marginBottom: 32,
+              marginTop: 16,
+              marginBottom: 20,
             }}
           />
 
           {/* Attribution row */}
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
             {photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -241,8 +243,8 @@ export function QuoteShareButton({
                 alt=""
                 crossOrigin="anonymous"
                 style={{
-                  width: 72,
-                  height: 72,
+                  width: 104,
+                  height: 104,
                   borderRadius: "50%",
                   objectFit: "cover",
                   border: "1px solid #cdc4b1",
@@ -252,8 +254,8 @@ export function QuoteShareButton({
             ) : (
               <div
                 style={{
-                  width: 72,
-                  height: 72,
+                  width: 104,
+                  height: 104,
                   borderRadius: "50%",
                   background: typeof clubColor === "string" ? clubColor : "#6e6356",
                   color: "#f4efe4",
@@ -261,7 +263,7 @@ export function QuoteShareButton({
                   alignItems: "center",
                   justifyContent: "center",
                   fontFamily: "var(--font-source-serif), Georgia, serif",
-                  fontSize: 26,
+                  fontSize: 36,
                   fontWeight: 600,
                   flexShrink: 0,
                 }}
@@ -274,16 +276,17 @@ export function QuoteShareButton({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 12,
+                  gap: 14,
                   flexWrap: "wrap",
                 }}
               >
                 <span
                   style={{
-                    fontSize: 26,
+                    fontSize: 36,
                     fontWeight: 600,
                     color: "#161310",
                     fontFamily: "var(--font-source-serif), Georgia, serif",
+                    lineHeight: 1.1,
                   }}
                 >
                   {speakerName ?? "—"}
@@ -292,10 +295,10 @@ export function QuoteShareButton({
                   <span
                     style={{
                       fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace",
-                      fontSize: 12,
+                      fontSize: 14,
                       letterSpacing: "0.12em",
                       textTransform: "uppercase",
-                      padding: "3px 9px",
+                      padding: "4px 11px",
                       borderRadius: 4,
                       background: `${clubColor}1f`,
                       color: clubColor,
@@ -309,9 +312,9 @@ export function QuoteShareButton({
               {(proceedingLine || dateLabel) && (
                 <div
                   style={{
-                    marginTop: 6,
+                    marginTop: 8,
                     fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace",
-                    fontSize: 12,
+                    fontSize: 14,
                     color: "#6e6356",
                     letterSpacing: "0.04em",
                   }}
@@ -323,7 +326,7 @@ export function QuoteShareButton({
             <div
               style={{
                 fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace",
-                fontSize: 11,
+                fontSize: 12,
                 color: "#6e6356",
                 opacity: 0.6,
                 letterSpacing: "0.08em",
