@@ -282,11 +282,12 @@ export function QuoteShareButton({
               >
                 <span
                   style={{
-                    fontSize: 36,
+                    fontSize: 48,
                     fontWeight: 600,
                     color: "#161310",
                     fontFamily: "var(--font-source-serif), Georgia, serif",
-                    lineHeight: 1.1,
+                    lineHeight: 1.05,
+                    letterSpacing: "-0.01em",
                   }}
                 >
                   {speakerName ?? "—"}
@@ -295,11 +296,11 @@ export function QuoteShareButton({
                   <span
                     style={{
                       fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace",
-                      fontSize: 14,
+                      fontSize: 16,
                       letterSpacing: "0.12em",
                       textTransform: "uppercase",
-                      padding: "4px 11px",
-                      borderRadius: 4,
+                      padding: "5px 13px",
+                      borderRadius: 5,
                       background: `${clubColor}1f`,
                       color: clubColor,
                       border: `1px solid ${clubColor}55`,
