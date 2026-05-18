@@ -100,6 +100,7 @@ export default async function StatementPage({
               tone={s.tone}
               speakerName={s.speakerName}
               photoUrl={s.mpPhotoUrl}
+              mpId={s.mpId}
               clubRef={s.clubRef}
               proceedingNumber={s.proceedingNumber}
               dayIdx={s.dayIdx}

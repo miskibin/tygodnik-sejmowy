@@ -47,6 +47,7 @@ type Props = {
   quote: string;
   speakerName: string | null;
   photoUrl: string | null;
+  mpId: number | null;
   clubRef: string | null;
   proceedingNumber: number | null;
   dayIdx: number | null;
@@ -57,11 +58,17 @@ export function QuoteShareButton({
   quote,
   speakerName,
   photoUrl,
+  mpId,
   clubRef,
   proceedingNumber,
   dayIdx,
   dayDate,
 }: Props) {
+  // html-to-image fetches the avatar to embed it. api.sejm.gov.pl has no
+  // ACAO header → CORS-blocks the embed and the PNG ships with a broken
+  // avatar. Route through our same-origin /api/avatar/[mpId] proxy when we
+  // know the mpId; fall back to raw photoUrl only if mpId is missing.
+  const avatarSrc = mpId ? `/api/avatar/${mpId}` : photoUrl;
   const cardRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"idle" | "working" | "copied" | "downloaded" | "fail">("idle");
 
@@ -236,10 +243,10 @@ export function QuoteShareButton({
 
           {/* Attribution row */}
           <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-            {photoUrl ? (
+            {avatarSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={photoUrl}
+                src={avatarSrc}
                 alt=""
                 crossOrigin="anonymous"
                 style={{

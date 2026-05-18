@@ -11,6 +11,7 @@ export function ViralQuote({
   tone,
   speakerName = null,
   photoUrl = null,
+  mpId = null,
   clubRef = null,
   proceedingNumber = null,
   dayIdx = null,
@@ -21,6 +22,7 @@ export function ViralQuote({
   tone?: string | null;
   speakerName?: string | null;
   photoUrl?: string | null;
+  mpId?: number | null;
   clubRef?: string | null;
   proceedingNumber?: number | null;
   dayIdx?: number | null;
@@ -65,6 +67,7 @@ export function ViralQuote({
         quote={quote}
         speakerName={speakerName}
         photoUrl={photoUrl}
+        mpId={mpId}
         clubRef={clubRef}
         proceedingNumber={proceedingNumber}
         dayIdx={dayIdx}
