@@ -21,6 +21,7 @@ import { MPAvatar } from "@/components/tygodnik/MPAvatar";
 import { CitationText } from "@/components/tygodnik/CitationLink";
 import { VotingHemicycleCard } from "@/components/tygodnik/VotingHemicycleCard";
 import { NumberedRow } from "@/components/tygodnik/NumberedRow";
+import { QuoteShareButton } from "@/components/statement/QuoteShareButton";
 import {
   CardTitle,
   StanceSponsorChip,
@@ -475,6 +476,18 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
           </span>
           <CitationText term={ev.term}>{s.viral_quote}</CitationText>
         </blockquote>
+      )}
+      {s.viral_quote && (
+        <QuoteShareButton
+          quote={s.viral_quote}
+          speakerName={s.speaker_name}
+          photoUrl={s.photo_url ?? null}
+          mpId={s.mp_id}
+          clubRef={s.klub ?? null}
+          proceedingNumber={ev.sittingNum}
+          dayIdx={null}
+          dayDate={ev.eventDate}
+        />
       )}
       <TopicChips
         topicIds={dbTagsToTopics(s.topic_tags ?? null).slice(0, 3)}
