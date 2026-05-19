@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { stageLabel } from "@/lib/stages";
 import type { LinkedVoting, ProcessStage } from "@/lib/db/prints";
@@ -18,7 +19,7 @@ type Station = {
   actor: string | null;
   note: string;
   status: StationStatus;
-  branch: { vote: number; label: string; result: string } | null;
+  branch: { vote: number; votingId: number; date: string | null; label: string; result: string } | null;
 };
 
 function shortDate(iso: string | null): string {
@@ -99,7 +100,7 @@ function pickBranch(date: string | null, votings: LinkedVoting[]): Station["bran
       ? "poprawki"
       : "wniosek mniejszości";
   const result = passed ? "przyjęty" : "odrzucony";
-  return { vote: hit.votingNumber, label, result };
+  return { vote: hit.votingNumber, votingId: hit.votingId, date: hit.date, label, result };
 }
 
 function buildStations(stages: ProcessStage[], votings: LinkedVoting[]): Station[] {
@@ -402,8 +403,12 @@ function StationCell({
               className="absolute top-[48px] left-1/2 -translate-x-1/2 w-2.5 h-2.5"
               style={{ background: "var(--destructive)" }}
             />
-            <div
-              className="absolute top-0 left-1/2 -translate-x-1/2 font-mono uppercase px-2 py-1 leading-[1.2] text-center"
+            <Link
+              href={`/glosowanie/${s.branch.votingId}`}
+              aria-label={`Przejdź do głosowania nr ${s.branch.vote}${
+                s.branch.date ? ` z dnia ${shortDate(s.branch.date)}` : ""
+              }`}
+              className="absolute top-0 left-1/2 -translate-x-1/2 font-mono uppercase px-2 py-1 leading-[1.2] text-center hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-1"
               style={{
                 fontSize: 9.5,
                 color: "var(--destructive-deep)",
@@ -413,10 +418,16 @@ function StationCell({
                 maxWidth: 180,
                 whiteSpace: "normal",
                 textWrap: "pretty" as never,
+                minHeight: 44,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              głos. {s.branch.vote} · {s.branch.label} → <strong>{s.branch.result}</strong>
-            </div>
+              <span>
+                głos. {s.branch.vote} · {s.branch.label} → <strong>{s.branch.result}</strong>
+              </span>
+            </Link>
           </>
         )}
       </div>
@@ -623,17 +634,22 @@ function ActiveDetail({ s }: { s: Station }) {
         {s.note}
       </p>
       {s.branch && (
-        <div
-          className="mt-3 inline-flex items-center gap-2.5 font-mono uppercase px-2.5 py-1.5"
+        <Link
+          href={`/glosowanie/${s.branch.votingId}`}
+          aria-label={`Przejdź do głosowania nr ${s.branch.vote}${
+            s.branch.date ? ` z dnia ${shortDate(s.branch.date)}` : ""
+          }`}
+          className="mt-3 inline-flex items-center gap-2.5 font-mono uppercase px-2.5 py-1.5 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-2"
           style={{
             fontSize: 11,
             color: "var(--destructive-deep)",
             letterSpacing: "0.1em",
             background: "var(--highlight)",
+            minHeight: 44,
           }}
         >
           ⇩ głosowanie nr {s.branch.vote} · {s.branch.label} → {s.branch.result}
-        </div>
+        </Link>
       )}
     </div>
   );

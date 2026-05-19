@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { isUnaffiliated } from "@/lib/clubs/filter";
 import { computeBillOutcome, verdictChipLabel } from "@/lib/voting/bill_outcome";
@@ -112,33 +113,44 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
     >
       {/* Left — title + verdict */}
       <div>
-        <div
-          className="font-mono uppercase mb-2.5"
-          style={{
-            fontSize: 11,
-            color: "var(--muted-foreground)",
-            letterSpacing: "0.16em",
-          }}
+        <Link
+          href={`/glosowanie/${v.votingId}`}
+          aria-label={`Przejdź do głosowania nr ${v.votingNumber} z dnia ${shortDate(v.date)}`}
+          className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-2"
         >
-          {shortDate(v.date)} &nbsp;·&nbsp; pos. {v.sitting} &nbsp;·&nbsp; głos. nr {v.votingNumber}
-        </div>
-        <div
-          className="font-serif font-medium mb-2 text-foreground"
-          style={{
-            fontSize: emphasizedChip ? 30 : 22,
-            lineHeight: 1.05,
-            letterSpacing: "-0.014em",
-            textTransform: "uppercase",
-          }}
-        >
-          {chip}
-        </div>
-        <h3
-          className="font-sans m-0 mb-5 text-muted-foreground"
-          style={{ fontSize: 16, lineHeight: 1.35, letterSpacing: "0" }}
-        >
-          {v.title || `Głosowanie nr ${v.votingNumber}`}.
-        </h3>
+          <div
+            className="font-mono uppercase mb-2.5 group-hover:text-destructive transition-colors"
+            style={{
+              fontSize: 11,
+              color: "var(--muted-foreground)",
+              letterSpacing: "0.16em",
+              minHeight: 44,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <span>
+              {shortDate(v.date)} &nbsp;·&nbsp; pos. {v.sitting} &nbsp;·&nbsp; głos. nr {v.votingNumber} →
+            </span>
+          </div>
+          <div
+            className="font-serif font-medium mb-2 text-foreground group-hover:underline decoration-dotted underline-offset-4"
+            style={{
+              fontSize: emphasizedChip ? 30 : 22,
+              lineHeight: 1.05,
+              letterSpacing: "-0.014em",
+              textTransform: "uppercase",
+            }}
+          >
+            {chip}
+          </div>
+          <h3
+            className="font-sans m-0 mb-5 text-muted-foreground"
+            style={{ fontSize: 16, lineHeight: 1.35, letterSpacing: "0" }}
+          >
+            {v.title || `Głosowanie nr ${v.votingNumber}`}.
+          </h3>
+        </Link>
         <div
           className="font-serif italic font-medium whitespace-nowrap mb-2.5"
           style={{
