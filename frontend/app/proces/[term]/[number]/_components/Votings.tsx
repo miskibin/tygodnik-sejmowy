@@ -152,12 +152,16 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
           </h3>
         </Link>
         <div
-          className="font-serif italic font-medium whitespace-nowrap mb-2.5"
+          className="font-serif italic font-medium mb-2.5"
           style={{
-            fontSize: 40,
+            // clamp prevents the longer labels (e.g. "WNIOSEK O ODRZUCENIE
+            // PRZYJĘTY", "AUTOPOPRAWKA PRZYJĘTA") from overflowing the card
+            // on narrow viewports — was a fixed 40px with whitespace-nowrap.
+            fontSize: "clamp(1.5rem, 6.5vw, 2.5rem)",
             lineHeight: 0.95,
             color: verdictColor,
             letterSpacing: "-0.025em",
+            overflowWrap: "anywhere",
           }}
         >
           {verdictLabel}
