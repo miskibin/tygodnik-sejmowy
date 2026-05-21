@@ -1,0 +1,130 @@
+{
+  "funds_allocated": "279720.00",
+  "funds_carryover": "16988.62",
+  "funds_interest": "0.00",
+  "funds_remaining": "26725.81",
+  "funds_spent": "269982.81",
+  "funds_total": "296708.62",
+  "items": [
+    {
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "1230.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "330.00",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "14196.05",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "48233.20",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "50825.10",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "1958.15",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "1819.00",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "48.80",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "6600.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "144742.51",
+      "category_code": 23,
+      "notes": "obsługa administracyjna biura; zakup kwiatów; zakup kart świątecznych; zakup statuetek; usługa dorobienia kluczy; przygotowanie filii w Prudniku; przejazdy autostradą; zakup biletów przejazdowych"
+    }
+  ],
+  "mp_id": 466,
+  "source_sha256": "15dcb49b6e87eb8b13bc844afa28db777c23602e4e959d8b8b063bbb7911e415",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025466/$File/2025ryczalt_466.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

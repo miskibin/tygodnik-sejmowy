@@ -1,6 +1,61 @@
+import {
+  Users,
+  GraduationCap,
+  ScrollText,
+  Scale,
+  Phone,
+  PhoneCall,
+  Mail,
+  CalendarDays,
+  Car,
+  CarTaxiFront,
+  Building2,
+  Wrench,
+  Hammer,
+  Newspaper,
+  Package,
+  Plane,
+  PiggyBank,
+  Sun,
+  Calculator,
+  ShieldCheck,
+  Tv,
+  Globe,
+  MoreHorizontal,
+  type LucideIcon,
+} from "lucide-react";
+
 import type { MpOfficeExpenseReport } from "@/lib/db/posel-tabs";
 
-const PLN = new Intl.NumberFormat("pl-PL", {
+// Lp. → lucide icon for the 23 standardized BOP categories (Załącznik nr 1
+// do zarządzenia nr 2 Marszałka Sejmu z 31 III 2017 r.).
+const CATEGORY_ICONS: Record<number, LucideIcon> = {
+  1: Users,            // Wynagrodzenia pracowników (UoP)
+  2: GraduationCap,    // Badania i szkolenia
+  3: ScrollText,       // Umowy zlecenia / o dzieło
+  4: Scale,            // Ekspertyzy, opinie, tłumaczenia
+  5: Phone,            // Telekomunikacja (mandat)
+  6: PhoneCall,        // Telekomunikacja (Dom Poselski)
+  7: Mail,             // Korespondencja i ogłoszenia
+  8: CalendarDays,     // Wynajem sal na spotkania
+  9: Car,              // Przejazdy posła (samochód)
+  10: CarTaxiFront,    // Przejazdy posła (taxi)
+  11: Building2,       // Najem lokalu biura
+  12: Wrench,          // Konserwacja sprzętu
+  13: Hammer,          // Naprawy i remonty lokalu
+  14: Newspaper,       // Materiały biurowe i prasa
+  15: Package,         // Środki trwałe (wyposażenie)
+  16: Plane,           // Podróże pracowników
+  17: PiggyBank,       // ZFŚS
+  18: Sun,             // Świadczenia urlopowe
+  19: Calculator,      // Księgowość i bank
+  20: ShieldCheck,     // Polisa OC biura
+  21: Tv,              // Abonament RTV
+  22: Globe,           // Strona internetowa biura
+  23: MoreHorizontal,  // Inne wydatki
+};
+
+const PLN_INT = new Intl.NumberFormat("pl-PL", {
   style: "currency",
   currency: "PLN",
   maximumFractionDigits: 0,
@@ -14,7 +69,15 @@ const PLN_FRAC = new Intl.NumberFormat("pl-PL", {
 
 function fmtPLN(v: number | null, opts: { precise?: boolean } = {}): string {
   if (v == null) return "—";
-  return (opts.precise ? PLN_FRAC : PLN).format(v);
+  return (opts.precise ? PLN_FRAC : PLN_INT).format(v);
+}
+
+function fmtPct(v: number | null, opts: { decimals?: number } = {}): string {
+  if (v == null) return "—";
+  return `${v.toLocaleString("pl-PL", {
+    minimumFractionDigits: opts.decimals ?? 1,
+    maximumFractionDigits: opts.decimals ?? 1,
+  })}%`;
 }
 
 function fmtDate(iso: string | null): string {
@@ -65,6 +128,85 @@ function KpiTile({
   );
 }
 
+function CategoryRow({
+  code,
+  shortLabel,
+  namePl,
+  amount,
+  notes,
+  spentTotal,
+  maxAmount,
+  precise,
+}: {
+  code: number;
+  shortLabel: string;
+  namePl: string;
+  amount: number;
+  notes: string | null;
+  spentTotal: number;
+  maxAmount: number;
+  precise: boolean;
+}) {
+  const Icon = CATEGORY_ICONS[code] ?? MoreHorizontal;
+  const barPct = maxAmount > 0 ? (amount / maxAmount) * 100 : 0;
+  const sharePct = spentTotal > 0 ? (amount / spentTotal) * 100 : null;
+  return (
+    <div
+      className="grid items-center gap-3 sm:gap-4 py-3 px-3 sm:px-4 border-b border-border last:border-b-0"
+      style={{
+        gridTemplateColumns:
+          "minmax(0, 1.6fr) minmax(0, 1.4fr) auto auto",
+      }}
+    >
+      {/* Icon + name */}
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <span
+          className="shrink-0 text-muted-foreground"
+          aria-hidden
+        >
+          <Icon size={18} strokeWidth={1.5} />
+        </span>
+        <span
+          className="font-serif text-[14px] sm:text-[15px] leading-snug truncate"
+          title={namePl}
+        >
+          {shortLabel}
+        </span>
+      </div>
+
+      {/* Bar */}
+      <div className="min-w-0">
+        <div className="h-2 sm:h-2.5 rounded-full bg-muted/60 overflow-hidden">
+          <div
+            className="h-full rounded-full"
+            style={{
+              width: `${barPct}%`,
+              background:
+                "linear-gradient(90deg, var(--destructive) 0%, color-mix(in oklab, var(--destructive) 70%, black) 100%)",
+            }}
+            aria-hidden
+          />
+        </div>
+        {notes && (
+          <div className="font-sans text-[10.5px] text-muted-foreground leading-snug break-words mt-1">
+            {notes}
+          </div>
+        )}
+      </div>
+
+      {/* Amount */}
+      <div className="font-mono tabular-nums text-[13px] sm:text-[14px] text-right whitespace-nowrap">
+        {fmtPLN(amount, { precise })}
+      </div>
+
+      {/* Share */}
+      <div className="font-mono tabular-nums text-[11px] sm:text-[12px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem]">
+        {sharePct != null ? fmtPct(sharePct) : "—"}
+      </div>
+    </div>
+  );
+}
+
 export function Tab5OfficeExpensesPanel({
   report,
 }: {
@@ -90,20 +232,22 @@ export function Tab5OfficeExpensesPanel({
   const remaining = report.fundsRemaining ?? null;
   const utilizationPct =
     spent != null && total != null && total > 0 ? (spent / total) * 100 : null;
-  const maxItem = report.items.reduce((acc, it) => Math.max(acc, it.amount), 0);
 
   const nonZero = report.items.filter((it) => it.amount > 0);
-  const sortedItems = [...report.items].sort((a, b) => b.amount - a.amount);
+  const sortedNonZero = [...nonZero].sort((a, b) => b.amount - a.amount);
+  const zeroItems = report.items.filter((it) => it.amount === 0);
+
+  // Bars are sized relative to the largest non-zero amount so the biggest
+  // row fills the bar column and smaller rows show their relative weight.
+  const maxAmount = sortedNonZero[0]?.amount ?? 0;
+  const spentTotal = spent ?? sortedNonZero.reduce((a, it) => a + it.amount, 0);
+
+  // Detect precision mode: jakglosuja-derived rows are all integers (no .NN),
+  // OCR+LLM-derived rows carry decimals. Render decimals only when present.
+  const hasFraction = sortedNonZero.some((it) => Math.round(it.amount) !== it.amount);
 
   return (
     <div className="min-w-0">
-      <p className="font-sans text-[12px] text-muted-foreground leading-snug m-0 mb-5 max-w-[720px] break-words">
-        Sprawozdanie z wydatkowania ryczałtu na prowadzenie biura poselskiego za{" "}
-        <strong className="text-foreground">{report.year}</strong> rok. Dane z formularza
-        zatwierdzonego przez Prezydium Sejmu (Załącznik nr 1 do zarządzenia nr 2
-        Marszałka Sejmu z 31 III 2017 r.).
-      </p>
-
       {/* KPI strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <KpiTile
@@ -120,7 +264,9 @@ export function Tab5OfficeExpensesPanel({
           value={fmtPLN(spent)}
           sub={
             utilizationPct != null
-              ? `${utilizationPct.toLocaleString("pl-PL", { maximumFractionDigits: 1 })}% ryczałtu`
+              ? `${utilizationPct.toLocaleString("pl-PL", {
+                  maximumFractionDigits: 1,
+                })}% ryczałtu`
               : "wg sprawozdania"
           }
           emphasis={
@@ -139,80 +285,95 @@ export function Tab5OfficeExpensesPanel({
         />
       </div>
 
-      {/* Items table */}
-      <div className="border border-border bg-background mb-4 overflow-x-auto">
-        <table className="w-full font-sans text-[13px] min-w-[520px]">
-          <thead>
-            <tr className="border-b border-border bg-muted">
-              <th
-                scope="col"
-                className="text-left font-mono uppercase tracking-[0.12em] text-[10px] text-muted-foreground py-2 px-3 w-[2.5rem]"
-              >
-                Lp.
-              </th>
-              <th
-                scope="col"
-                className="text-left font-mono uppercase tracking-[0.12em] text-[10px] text-muted-foreground py-2 px-3"
-              >
-                Kategoria
-              </th>
-              <th
-                scope="col"
-                className="text-right font-mono uppercase tracking-[0.12em] text-[10px] text-muted-foreground py-2 px-3 whitespace-nowrap"
-              >
-                Kwota
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedItems.map((it) => {
-              const pct = maxItem > 0 ? (it.amount / maxItem) * 100 : 0;
-              return (
-                <tr
+      {/* Expense table */}
+      <div className="border border-border bg-background">
+        {/* Table header */}
+        <div className="border-b border-border bg-muted/40 px-3 sm:px-4 py-3">
+          <h3 className="font-serif text-[16px] sm:text-[18px] font-medium text-foreground m-0">
+            Wydatki biura w {report.year} roku
+          </h3>
+        </div>
+        <div
+          className="grid items-center gap-3 sm:gap-4 px-3 sm:px-4 py-2 border-b border-border bg-muted/20"
+          style={{
+            gridTemplateColumns:
+              "minmax(0, 1.6fr) minmax(0, 1.4fr) auto auto",
+          }}
+        >
+          <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground">
+            Kategoria wydatku
+          </div>
+          <div aria-hidden />
+          <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground text-right whitespace-nowrap">
+            Kwota
+          </div>
+          <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem]">
+            Udział
+          </div>
+        </div>
+
+        {sortedNonZero.length === 0 ? (
+          <div className="py-8 text-center font-serif italic text-muted-foreground">
+            Brak wykazanych wydatków.
+          </div>
+        ) : (
+          sortedNonZero.map((it) => (
+            <CategoryRow
+              key={it.categoryCode}
+              code={it.categoryCode}
+              shortLabel={it.shortLabel}
+              namePl={it.namePl}
+              amount={it.amount}
+              notes={it.notes}
+              spentTotal={spentTotal}
+              maxAmount={maxAmount}
+              precise={hasFraction}
+            />
+          ))
+        )}
+
+        {/* Zero-amount categories — collapsed, no JS */}
+        {zeroItems.length > 0 && (
+          <details className="border-t border-border">
+            <summary className="cursor-pointer list-none px-3 sm:px-4 py-3 font-sans text-[12px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+              <span className="font-mono uppercase tracking-[0.12em] text-[10px]">
+                Pokaż {zeroItems.length} kategorii bez wydatków
+              </span>
+              <span className="text-[10px] opacity-50" aria-hidden>▾</span>
+            </summary>
+            {zeroItems
+              .sort((a, b) => a.categoryCode - b.categoryCode)
+              .map((it) => (
+                <CategoryRow
                   key={it.categoryCode}
-                  className="border-b border-border last:border-b-0"
-                  style={{
-                    background:
-                      it.amount > 0
-                        ? `linear-gradient(to right, var(--muted) ${pct}%, transparent ${pct}%)`
-                        : undefined,
-                  }}
-                >
-                  <td className="font-mono text-[11px] text-muted-foreground py-2 px-3 align-top">
-                    {it.categoryCode}
-                  </td>
-                  <td className="py-2 px-3 align-top">
-                    <div className="font-serif text-[14px] leading-snug" title={it.namePl}>
-                      {it.shortLabel}
-                    </div>
-                    {it.notes && (
-                      <div className="font-sans text-[11px] text-muted-foreground mt-0.5 leading-snug break-words">
-                        {it.notes}
-                      </div>
-                    )}
-                  </td>
-                  <td className="text-right font-mono tabular-nums py-2 px-3 align-top whitespace-nowrap">
-                    {it.amount > 0 ? fmtPLN(it.amount, { precise: true }) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  code={it.categoryCode}
+                  shortLabel={it.shortLabel}
+                  namePl={it.namePl}
+                  amount={it.amount}
+                  notes={it.notes}
+                  spentTotal={spentTotal}
+                  maxAmount={maxAmount}
+                  precise={hasFraction}
+                />
+              ))}
+          </details>
+        )}
       </div>
 
-      <p className="font-sans text-[11px] text-muted-foreground leading-snug mb-4">
-        Wykazano {nonZero.length} z 23 kategorii. Pozostałe były zerowe w okresie
-        sprawozdawczym.
+      <p className="font-sans text-[11px] text-muted-foreground leading-snug mt-3 mb-4">
+        {hasFraction
+          ? "Dane z formularza zatwierdzonego przez Prezydium Sejmu (Załącznik nr 1 do zarz. nr 2 Marsz. Sejmu z 31 III 2017 r.). Pełne dane w sprawozdaniu PDF."
+          : "Kwoty zaokrąglone do złotówek. Pełne dane w sprawozdaniu PDF."}
       </p>
 
       {/* Footer: provenance */}
       <div className="border-t border-border pt-3 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between font-sans text-[11px] text-muted-foreground">
         <div>
           {report.publishedAt && (
-            <>Opublikowane: <span className="text-foreground">{fmtDate(report.publishedAt)}</span></>
+            <>
+              Opublikowane:{" "}
+              <span className="text-foreground">{fmtDate(report.publishedAt)}</span>
+            </>
           )}
           {report.approvedByPresidiumAt && (
             <>
