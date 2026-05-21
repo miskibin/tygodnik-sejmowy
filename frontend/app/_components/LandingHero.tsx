@@ -78,10 +78,11 @@ export function LandingHero({
             ✶ tygodnik obywatelski
           </div>
           <h1
-            className="font-medium tracking-[-0.04em] leading-[0.95] m-0 mb-4"
-            style={{ fontSize: "clamp(2.5rem, 7vw, 4.75rem)", textWrap: "balance" }}
+            className="font-medium tracking-[-0.04em] leading-none m-0 mb-4 text-nowrap"
+            style={{ fontSize: "clamp(2rem, 5vw, 3.25rem)" }}
           >
-            Sejm — <span className="italic text-destructive">co&nbsp;tydzień.</span>
+            Sejm{" - "}
+            <span className="italic text-destructive">co tydzień.</span>
           </h1>
           <p className="font-serif italic text-[15px] md:text-[17px] text-secondary-foreground leading-[1.5] m-0 max-w-[480px]">
             Krótko, jasno. Wydanie piątkowe na&nbsp;stronie i&nbsp;przez{" "}
@@ -173,9 +174,6 @@ export function LandingHero({
                 );
               })}
             </div>
-            <div className="mt-1.5 font-sans text-[10.5px] italic text-muted-foreground">
-              opcjonalnie — zaznacz tematy, które Cię interesują
-            </div>
           </div>
 
           {/* Secondary chip row — "I am X" personas behind a toggle. The
@@ -232,9 +230,6 @@ export function LandingHero({
 
           <div className="mt-3 font-sans text-[10.5px] text-muted-foreground tracking-wide text-center">
             Bez konta · Profil zostaje na Twoim urządzeniu
-          </div>
-          <div className="mt-2 font-serif text-[12.5px] leading-[1.55] text-secondary-foreground text-center max-w-[34rem] mx-auto">
-            Źródła publiczne. Przetwarzanie jawne. Każdy skrót da się sprawdzić u podstaw.
           </div>
         </div>
       </div>

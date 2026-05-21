@@ -53,3 +53,4 @@ export const CLUB_LOGOS: Record<string, ClubLogoEntry> = ${JSON.stringify(manife
 `;
 writeFileSync(tsOut, ts);
 console.log(`\nwrote ${tsOut} with ${Object.keys(manifest).length} clubs`);
+console.log("Run: uv run python scripts/trim_club_logos.py  (Sejm logos ship with excess margins)");

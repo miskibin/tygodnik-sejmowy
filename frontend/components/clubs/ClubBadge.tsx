@@ -16,9 +16,9 @@ import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
 //            (tygodnik table style — colored chip when no logo).
 //   "auto" — logo when CLUB_LOGOS has an entry, otherwise chip with label.
 
-type Size = "xs" | "sm" | "md" | "lg";
+type Size = "xs" | "sm" | "md" | "lg" | "xl";
 
-const SIZE_PX: Record<Size, number> = { xs: 12, sm: 16, md: 20, lg: 28 };
+const SIZE_PX: Record<Size, number> = { xs: 12, sm: 16, md: 20, lg: 28, xl: 40 };
 
 const PLACEHOLDER_INITIALS: Record<string, string> = {
   "niez.": "NI",
@@ -63,8 +63,17 @@ export function ClubBadge({
     // No logo on file (or caller asked for chip explicitly). Colored pill
     // with the klub short label so identity stays legible.
     const padding =
-      size === "xs" ? "1px 5px" : size === "lg" ? "4px 11px" : size === "md" ? "3px 9px" : "2px 7px";
-    const fontSize = size === "xs" ? 9 : size === "lg" ? 13 : size === "md" ? 12 : 10.5;
+      size === "xs" ? "1px 5px"
+      : size === "xl" ? "5px 12px"
+      : size === "lg" ? "4px 11px"
+      : size === "md" ? "3px 9px"
+      : "2px 7px";
+    const fontSize =
+      size === "xs" ? 9
+      : size === "xl" ? 14
+      : size === "lg" ? 13
+      : size === "md" ? 12
+      : 10.5;
     return (
       <span
         title={title}

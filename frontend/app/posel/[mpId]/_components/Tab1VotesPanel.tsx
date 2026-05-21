@@ -55,7 +55,7 @@ function KpiTile({
 }) {
   const pct = total > 0 ? (count / total) * 100 : 0;
   return (
-    <div className="py-4 px-4 border border-border" style={{ background: "var(--muted)" }}>
+    <div className="py-4 px-4 border border-border min-w-0" style={{ background: "var(--muted)" }}>
       <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1.5 flex items-center gap-1.5">
         <span className="inline-block w-2 h-2 rounded-sm" style={{ background: color }} />
         {label}
@@ -95,14 +95,14 @@ function MonthlyChart({
   const ticks = [0, niceMax / 2, niceMax];
 
   return (
-    <div className="border border-border p-5" style={{ background: "var(--muted)" }}>
+    <div className="border border-border p-5 min-w-0 overflow-hidden" style={{ background: "var(--muted)" }}>
       <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
         Rozkład głosów w czasie
       </div>
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full block"
-        style={{ overflow: "visible" }}
+        className="w-full block max-w-full"
+        style={{ overflow: "hidden" }}
       >
         {ticks.map((t) => {
           const y = H - padB - yScale(t);
@@ -209,8 +209,8 @@ export function Tab1VotesPanel({
   const events = getEventsForMp({ klubRef });
 
   return (
-    <div className="grid gap-7">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid gap-7 min-w-0">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 min-w-0">
         <KpiTile label="Za" count={data.totals.yes} total={total} color="var(--success)" />
         <KpiTile label="Przeciw" count={data.totals.no} total={total} color="var(--destructive)" />
         <KpiTile label="Wstrzymał się" count={data.totals.abstain} total={total} color="var(--warning)" />

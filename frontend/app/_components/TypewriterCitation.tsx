@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { CLUB_LOGOS } from "@/lib/atlas/club-logos";
 import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
 
 export type TypewriterQuote = {
@@ -90,7 +91,6 @@ export function TypewriterCitation({
   const visible = reduce ? full : full.slice(0, chars);
   const klub = current.clubRef;
   const klubColor = klub ? KLUB_COLORS[klub] ?? "var(--muted-foreground)" : "var(--muted-foreground)";
-  const klubLabel = klub ? KLUB_LABELS[klub] ?? klub : null;
 
   return (
     <div className="mt-6 max-w-[560px]" aria-live="polite" aria-atomic="true">
@@ -157,33 +157,31 @@ export function TypewriterCitation({
             )}
           </span>
         </blockquote>
-        <figcaption className="mt-4 flex items-center gap-3 flex-wrap min-h-[1.8em]">
-          <span
-            className="font-serif text-[16px] md:text-[17px] text-foreground/90 transition-opacity"
-            style={{ opacity: fading ? 0 : 1, transitionDuration: `${fadeMs}ms` }}
-          >
+        <figcaption
+          className="mt-4 flex items-baseline justify-between gap-x-4 gap-y-1 flex-wrap min-h-[1.5em]"
+          style={{
+            opacity: fading ? 0 : 1,
+            transition: `opacity ${fadeMs}ms ease`,
+          }}
+        >
+          <p className="m-0 font-serif text-[16px] md:text-[17px] leading-snug text-foreground/90">
             — {current.speaker ?? "anonim"}
-          </span>
-          {klubLabel && (
-            <span
-              className="inline-flex items-center gap-1.5 font-mono text-[12px] tracking-[0.08em] uppercase px-2 py-0.5 rounded-full transition-opacity"
-              style={{
-                color: klubColor,
-                background: `color-mix(in oklab, ${klubColor} 12%, transparent)`,
-                border: `1px solid color-mix(in oklab, ${klubColor} 30%, transparent)`,
-                opacity: fading ? 0 : 1,
-                transitionDuration: `${fadeMs}ms`,
-              }}
-            >
-              <span
-                className="inline-block rounded-full"
-                style={{ width: 7, height: 7, background: klubColor }}
-                aria-hidden
-              />
-              {klubLabel}
-            </span>
-          )}
-          <span className="ml-auto font-mono text-[10px] text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity">
+            {klub && (
+              <>
+                <span aria-hidden className="mx-2 text-border">
+                  ·
+                </span>
+                <span
+                  className="font-mono text-[11px] font-semibold tracking-wide not-italic"
+                  style={{ color: klubColor }}
+                  title={CLUB_LOGOS[klub]?.name ?? klub}
+                >
+                  {KLUB_LABELS[klub] ?? klub}
+                </span>
+              </>
+            )}
+          </p>
+          <span className="font-mono text-[10px] text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             otwórz →
           </span>
         </figcaption>

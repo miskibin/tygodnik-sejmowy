@@ -190,7 +190,7 @@ function GridView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
                   {m.firstLastName}
                 </div>
                 <div className="font-sans text-[11.5px] text-secondary-foreground mt-1 flex items-center gap-1.5 flex-wrap">
-                  <ClubBadge klub={m.clubRef} size="xs" />
+                  <ClubBadge klub={m.clubRef} size="md" />
                   {m.districtNum != null && <span className="text-muted-foreground">okr. {m.districtNum}</span>}
                 </div>
               </div>
@@ -242,7 +242,7 @@ function TableView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
                   {m.firstLastName}
                 </div>
                 <div className="font-sans text-[11px] text-secondary-foreground mt-1 flex items-center gap-1.5">
-                  <ClubBadge klub={m.clubRef} size="xs" />
+                  <ClubBadge klub={m.clubRef} size="md" />
                   {m.districtNum != null && <span className="text-muted-foreground">okr. {m.districtNum}</span>}
                 </div>
               </div>
@@ -262,7 +262,7 @@ function TableView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
                 <span className="truncate">{m.firstLastName}</span>
               </span>
               <span className="flex items-center gap-1.5 min-w-0">
-                <ClubBadge klub={m.clubRef} size="xs" />
+                <ClubBadge klub={m.clubRef} size="md" />
                 <span className="text-secondary-foreground truncate">{KLUB_LABELS[m.clubRef ?? ""] ?? m.clubRef ?? "—"}</span>
               </span>
               <span className="text-secondary-foreground text-[12.5px] truncate">

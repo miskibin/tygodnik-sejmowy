@@ -123,7 +123,7 @@ export async function FeatureTileGrid() {
     : null;
 
   return (
-    <section className="px-4 md:px-8 lg:px-14 py-12 md:py-16 border-b border-rule">
+    <section className="px-4 md:px-8 lg:px-14 py-12 md:py-16">
       <div className="max-w-[1100px] mx-auto">
         <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 mb-8 md:mb-10">
           <h2 className="font-serif font-medium tracking-[-0.025em] leading-none m-0" style={{ fontSize: "clamp(1.75rem, 4.5vw, 3rem)" }}>

@@ -61,11 +61,11 @@ export function VotesList({ rows, dissentCount }: { rows: MpVoteRow[]; dissentCo
 
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-4 flex-wrap gap-3">
-        <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between mb-4 min-w-0">
+        <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] shrink-0">
           Lista głosowań
         </div>
-        <div className="flex gap-1.5 font-sans text-[12px]">
+        <div className="flex flex-wrap gap-1.5 font-sans text-[12px] min-w-0">
           <button
             type="button"
             onClick={() => {
@@ -107,7 +107,7 @@ export function VotesList({ rows, dissentCount }: { rows: MpVoteRow[]; dissentCo
         </p>
       ) : (
         <>
-          <ul>
+          <ul className="min-w-0">
             {slice.map((r) => {
               const dissent =
                 r.clubWinner != null &&

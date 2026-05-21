@@ -102,43 +102,8 @@ export function VotingRow({
     ? { target: "_blank" as const, rel: "noopener noreferrer" }
     : {};
 
-  return (
-    <li
-      className="flex items-start gap-3 py-2.5 px-2 border-l-2"
-      style={{
-        borderLeftColor: leftBorder,
-        borderBottom: "1px dotted var(--border)",
-        background: wash,
-      }}
-    >
-      <span className="font-mono text-[11px] text-muted-foreground tracking-wide w-[58px] shrink-0 pt-[2px]">
-        {formatShortDate(date)}
-      </span>
-
-      <div className="min-w-0 flex-1">
-        <Link
-          href={linkHref}
-          {...linkExtras}
-          className="block font-serif text-[14px] leading-snug hover:text-destructive"
-          style={{
-            color: "var(--foreground)",
-            fontWeight: isFinal ? 600 : 400,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-          title={titleTooltip ?? title}
-        >
-          {title}
-        </Link>
-        {agendaCaption && (
-          <div className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground mt-0.5 truncate">
-            {agendaCaption}
-          </div>
-        )}
-      </div>
-
+  const meta = (
+    <>
       {badge && (
         <span
           className="font-sans text-[9.5px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 whitespace-nowrap"
@@ -155,7 +120,7 @@ export function VotingRow({
       )}
 
       <span
-        className="font-mono text-[11px] tabular-nums shrink-0 whitespace-nowrap pt-[2px]"
+        className="font-mono text-[11px] tabular-nums shrink-0 whitespace-nowrap"
         title={`Za / Przeciw / Wstrz.`}
       >
         <span style={{ color: "var(--success)" }}>{yes}</span>
@@ -167,7 +132,7 @@ export function VotingRow({
 
       {mpVote && (
         <span
-          className="font-sans text-[10.5px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 w-[54px] text-center"
+          className="font-sans text-[10.5px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 min-w-[54px] text-center"
           style={{
             color: VOTE_COLOR[mpVote],
             border: `1px solid ${VOTE_COLOR[mpVote]}`,
@@ -180,7 +145,7 @@ export function VotingRow({
 
       {verdict && (
         <span
-          className="font-sans text-[10px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 w-[64px] text-center"
+          className="font-sans text-[10px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 min-w-[64px] text-center"
           style={{
             color: verdict.passed ? "var(--success)" : "var(--destructive)",
             border: `1px solid ${verdict.passed ? "var(--success)" : "var(--destructive)"}`,
@@ -192,13 +157,60 @@ export function VotingRow({
 
       {dissent && (
         <span
-          className="font-mono text-[10px] tracking-wide shrink-0 pt-[2px]"
+          className="font-mono text-[10px] tracking-wide shrink-0"
           style={{ color: "var(--destructive)" }}
           title={dissent.tooltip ?? ""}
         >
           ✕ wbrew klub.
         </span>
       )}
+    </>
+  );
+
+  return (
+    <li
+      className="py-2.5 px-2 border-l-2 min-w-0"
+      style={{
+        borderLeftColor: leftBorder,
+        borderBottom: "1px dotted var(--border)",
+        background: wash,
+      }}
+    >
+      <div className="flex flex-col gap-2 min-w-0 sm:flex-row sm:items-start sm:gap-3">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
+          <span className="font-mono text-[11px] text-muted-foreground tracking-wide w-[58px] shrink-0 pt-[2px]">
+            {formatShortDate(date)}
+          </span>
+
+          <div className="min-w-0 flex-1">
+            <Link
+              href={linkHref}
+              {...linkExtras}
+              className="block font-serif text-[14px] leading-snug hover:text-destructive"
+              style={{
+                color: "var(--foreground)",
+                fontWeight: isFinal ? 600 : 400,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+              title={titleTooltip ?? title}
+            >
+              {title}
+            </Link>
+            {agendaCaption && (
+              <div className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground mt-0.5 truncate">
+                {agendaCaption}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pl-[70px] sm:pl-0 sm:pt-[2px] sm:shrink-0">
+          {meta}
+        </div>
+      </div>
     </li>
   );
 }

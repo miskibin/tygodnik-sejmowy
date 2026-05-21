@@ -16,6 +16,7 @@ import {
 import { ProfilPanel } from "./_components/ProfilPanel";
 import { HeroLedeBand } from "./_components/HeroLedeBand";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
+import { KLUB_LABELS } from "@/lib/atlas/constants";
 import { NotFoundPage } from "@/components/chrome/NotFoundPage";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
@@ -294,7 +295,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
       {/* HERO */}
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pb-6 sm:pb-8 border-b border-border">
         <div
-          className="grid gap-5 md:gap-9 items-end min-w-0 grid-cols-[100px_1fr] sm:grid-cols-[140px_1fr] md:grid-cols-[180px_1fr_240px]"
+          className="grid gap-5 md:gap-9 items-end min-w-0 grid-cols-[88px_1fr] sm:grid-cols-[120px_1fr] md:grid-cols-[152px_1fr_240px]"
         >
           {/* Portrait */}
           <div
@@ -316,22 +317,6 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
 
           {/* Name + badges + lede */}
           <div className="min-w-0">
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase bg-destructive text-background px-2.5 py-1">
-                {roleLabel} · X kadencja
-              </span>
-              {mp.districtNum && (
-                <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-foreground/40 text-secondary-foreground px-2.5 py-1">
-                  Okręg {mp.districtNum}
-                </span>
-              )}
-              {!mp.active && (
-                <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-warning text-warning px-2.5 py-1">
-                  Były poseł
-                </span>
-              )}
-            </div>
-
             <h1
               className="font-serif font-medium m-0 leading-[0.96] tracking-[-0.035em] text-balance break-words"
               style={{ fontSize: "clamp(2.25rem, 7vw, 5.25rem)" }}
@@ -340,18 +325,37 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
               <em className="not-italic font-serif italic text-destructive">{last}</em>
             </h1>
 
-            <p className="font-serif text-secondary-foreground mt-3 sm:mt-4 mb-0 leading-[1.45] text-[15px] sm:text-[17px] max-w-[640px] break-words text-pretty">
-              {mp.clubRef ? (
-                <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 align-middle">
-                  <ClubBadge klub={mp.clubRef} size="sm" tooltip={clubName ?? undefined} />
-                  <strong className="text-foreground font-medium">{clubName ?? mp.clubRef}</strong>
-                </span>
-              ) : (
-                <strong className="text-foreground">brak klubu</strong>
+            <div className="mt-3 sm:mt-4 max-w-[640px] flex flex-col gap-2">
+              <div className="font-serif text-secondary-foreground leading-[1.45] text-[15px] sm:text-[17px] break-words text-pretty">
+                {mp.clubRef ? (
+                  <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 align-middle">
+                    <ClubBadge klub={mp.clubRef} size="xl" tooltip={clubName ?? undefined} />
+                    <strong
+                      className="text-foreground font-medium"
+                      title={clubName ?? undefined}
+                    >
+                      {KLUB_LABELS[mp.clubRef] ?? mp.clubRef}
+                    </strong>
+                  </span>
+                ) : (
+                  <strong className="text-foreground">brak klubu</strong>
+                )}
+              </div>
+              {(mp.profession || mp.educationLevel) && (
+                <div className="flex flex-wrap gap-1.5">
+                  {mp.profession && (
+                    <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-foreground/40 text-secondary-foreground px-2.5 py-1">
+                      {mp.profession}
+                    </span>
+                  )}
+                  {mp.educationLevel && (
+                    <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-foreground/40 text-secondary-foreground px-2.5 py-1">
+                      wykszt. {mp.educationLevel}
+                    </span>
+                  )}
+                </div>
               )}
-              {mp.profession ? <> · {mp.profession}</> : null}
-              {mp.educationLevel ? <> · wykszt. {mp.educationLevel}</> : null}
-            </p>
+            </div>
           </div>
 
           {/* Action stack — mobile drops to full-width row below */}
