@@ -872,3 +872,59 @@ export async function getMpOfficeExpenses(
     dataConfidence: r.data_confidence ?? "unverified",
   };
 }
+
+// Lightweight summary used by hero/metadata — single round-trip, no items.
+// Returns the most recent year's total spent + confidence flag, so the MP
+// profile can surface "wydał X zł na biuro w 2025" without paying the cost
+// of fetching all 23 line items.
+export type MpOfficeExpenseSummary = {
+  year: number;
+  totalSpent: number;
+  dataConfidence: "verified" | "unverified";
+};
+
+export async function getMpOfficeExpenseSummary(
+  mpId: number,
+  term = DEFAULT_TERM,
+): Promise<MpOfficeExpenseSummary | null> {
+  const sb = supabase();
+  const r = await sb
+    .from("mp_office_expense_reports")
+    .select("id, year, funds_spent, data_confidence")
+    .eq("term", term)
+    .eq("mp_id", mpId)
+    .order("year", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (r.error) throw r.error;
+  if (!r.data) return null;
+  const row = r.data as unknown as {
+    id: number;
+    year: number;
+    funds_spent: number | string | null;
+    data_confidence: "verified" | "unverified";
+  };
+  // Prefer funds_spent from PDF (Razem). For jakglosuja-style reports where
+  // funds_spent is null but items exist, sum items inline. Hero/metadata
+  // both need a number; if neither is available, return null and the UI
+  // hides the tile.
+  let totalSpent = toNum(row.funds_spent);
+  if (totalSpent == null) {
+    const items = await sb
+      .from("mp_office_expense_items")
+      .select("amount")
+      .eq("report_id", row.id)
+      .limit(50);
+    if (items.error) throw items.error;
+    totalSpent = (items.data ?? []).reduce(
+      (acc, it) => acc + (toNum((it as { amount: number | string }).amount) ?? 0),
+      0,
+    );
+  }
+  if (totalSpent == null || totalSpent <= 0) return null;
+  return {
+    year: row.year,
+    totalSpent,
+    dataConfidence: row.data_confidence ?? "unverified",
+  };
+}

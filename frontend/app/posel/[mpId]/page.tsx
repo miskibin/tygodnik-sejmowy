@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMp, getClubName, getMpStats } from "@/lib/db/mps";
+import { getMpOfficeExpenseSummary } from "@/lib/db/posel-tabs";
 import { PoselTabs } from "./_components/PoselTabs";
 import {
   TydzienAsync,
@@ -19,6 +20,12 @@ import { NotFoundPage } from "@/components/chrome/NotFoundPage";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 
+const PLN_INT = new Intl.NumberFormat("pl-PL", {
+  style: "currency",
+  currency: "PLN",
+  maximumFractionDigits: 0,
+});
+
 export async function generateMetadata({
   params,
 }: { params: Promise<{ mpId: string }> }): Promise<Metadata> {
@@ -27,19 +34,58 @@ export async function generateMetadata({
   if (!Number.isFinite(mpId)) return {};
   const mp = await getMp(mpId);
   if (!mp) return {};
-  const clubName = await getClubName(mp.clubRef);
+  // Fetch expenses summary in parallel — adds one cheap query but materially
+  // improves SEO for "ile wydał poseł X" search intent.
+  const [clubName, expSummary] = await Promise.all([
+    getClubName(mp.clubRef),
+    getMpOfficeExpenseSummary(mpId).catch(() => null),
+  ]);
   const baseRole = guessRoleLabel(mp.firstLastName);
   const role = mp.active ? `${baseRole} X kadencji` : `By${baseRole === "Posłanka" ? "ła posłanka" : "ły poseł"}`;
   const club = clubName ?? mp.clubRef ?? "klub bezpartyjny";
   const district = mp.districtNum ? ` · okręg ${mp.districtNum}` : "";
-  const desc = `${role} · ${club}${district}. Frekwencja, głosowania, interpelacje, wystąpienia, obietnice vs głosy.`;
+
+  // SEO: when we have verified expense data, lead the description with the
+  // amount + year ("wydał X zł na biuro w 2025"). Polish search queries
+  // along the lines of "ile wydał poseł", "wydatki biura X", "sprawozdanie
+  // ryczałtowe" then surface this page with the number visible in SERP.
+  const isVerifiedExp = expSummary && expSummary.dataConfidence === "verified";
+  const expClause = isVerifiedExp
+    ? `Wydał ${PLN_INT.format(expSummary!.totalSpent)} na biuro poselskie w ${expSummary!.year} r. `
+    : "";
+  const titleSuffix = isVerifiedExp
+    ? `${PLN_INT.format(expSummary!.totalSpent)} wydatków biura ${expSummary!.year}`
+    : `${baseRole} ${mp.active ? "X kadencji" : "(były)"}`;
+  const desc =
+    `${expClause}${role} · ${club}${district}. ` +
+    "Frekwencja, głosowania, interpelacje, wystąpienia, obietnice vs głosy, " +
+    "sprawozdanie wydatków biura poselskiego.";
+
   const path = `/posel/${mpId}`;
+  const fullTitle = `${mp.firstLastName} — ${titleSuffix}`;
+
+  // Keyword string is mostly cosmetic for Google but still indexed by a few
+  // engines (Bing, Yandex, DuckDuckGo). Cheap to ship.
+  const keywords = [
+    mp.firstLastName,
+    `${mp.firstLastName} wydatki`,
+    `${mp.firstLastName} biuro poselskie`,
+    `${mp.firstLastName} sprawozdanie`,
+    `${mp.firstLastName} ryczałt`,
+    `ile wydaje poseł ${mp.firstLastName}`,
+    "sprawozdania wydatków biur poselskich",
+    "ryczałt biuro poselskie 2025",
+    "wydatki posłów Sejm X kadencja",
+    club,
+  ].filter(Boolean) as string[];
+
   return {
-    title: mp.firstLastName,
+    title: fullTitle,
     description: desc,
+    keywords,
     alternates: { canonical: path },
     openGraph: {
-      title: `${mp.firstLastName} — ${role}`,
+      title: fullTitle,
       description: desc,
       url: path,
       type: "profile",
@@ -47,7 +93,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${mp.firstLastName} — ${role}`,
+      title: fullTitle,
       description: desc,
       images: mp.photoUrl ? [mp.photoUrl] : undefined,
     },
@@ -98,10 +144,12 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
 
   let clubName: string | null = null;
   let stats: Awaited<ReturnType<typeof getMpStats>>;
+  let expSummary: Awaited<ReturnType<typeof getMpOfficeExpenseSummary>> = null;
   try {
-    [clubName, stats] = await Promise.all([
+    [clubName, stats, expSummary] = await Promise.all([
       getClubName(mp.clubRef),
       getMpStats(mpId),
+      getMpOfficeExpenseSummary(mpId).catch(() => null),
     ]);
   } catch (err) {
     console.error("[/posel/[mpId]] club/stats failed", { mpId, err });
@@ -115,6 +163,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
       questionCount: 0,
       statementCount: 0,
     };
+    expSummary = null;
   }
 
   const roleLabel = guessRoleLabel(mp.firstLastName);
@@ -181,8 +230,43 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
     { id: "profil", label: "Profil" },
   ];
 
+  // Schema.org Person + the year's office-expense total exposed as
+  // additionalProperty. Google/Bing pick this up for the Knowledge Graph
+  // and for richer SERP snippets — letting "ile wydał poseł X" queries
+  // hit our page with the actual number visible.
+  const ldJson: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: mp.firstLastName,
+    jobTitle: mp.active ? `${roleLabel} X kadencji Sejmu RP` : "Były poseł / była posłanka",
+    affiliation: clubName
+      ? { "@type": "Organization", name: clubName }
+      : undefined,
+    image: mp.photoUrl ?? undefined,
+    url: `https://tygodniksejmowy.pl/posel/${mpId}`,
+    nationality: "PL",
+  };
+  if (expSummary && expSummary.dataConfidence === "verified") {
+    ldJson.additionalProperty = [
+      {
+        "@type": "PropertyValue",
+        name: `Wydatki biura poselskiego ${expSummary.year}`,
+        value: expSummary.totalSpent,
+        unitText: "PLN",
+        description: `Łączne wydatki z ryczałtu na prowadzenie biura poselskiego w ${expSummary.year} r., wg sprawozdania zatwierdzonego przez Prezydium Sejmu.`,
+      },
+    ];
+  }
+
   return (
     <div className="bg-background text-foreground font-serif pb-16 sm:pb-20 min-w-0 overflow-x-hidden">
+      {/* JSON-LD structured data for the MP profile + (if verified) the
+          year's expense total. Surfaced in SERPs and Knowledge Graph. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
+      />
+
       {/* Breadcrumb */}
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 sm:pt-8">
         <PageBreadcrumb
@@ -283,6 +367,34 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
       <Suspense fallback={null}>
         <HeroLedeBand mpId={mpId} firstLastName={mp.firstLastName} />
       </Suspense>
+
+      {/* Office-expense headline — surfaces the year's spend total and links
+          to the detailed tab. Heavily SEO-relevant: matches Polish search
+          intent "ile wydał poseł X" with the keyword phrase visible. Skipped
+          when we have no verified report for the MP. */}
+      {expSummary && expSummary.dataConfidence === "verified" && (
+        <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6">
+          <a
+            href="#wydatki"
+            className="block group border border-border bg-muted/40 hover:bg-muted/70 transition-colors py-4 px-4 sm:px-5"
+          >
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                Wydatki biura poselskiego w {expSummary.year} r.
+              </span>
+              <span
+                className="font-serif font-medium tabular-nums tracking-[-0.02em] text-foreground"
+                style={{ fontSize: "clamp(1.4rem, 3.2vw, 2.1rem)" }}
+              >
+                {PLN_INT.format(expSummary.totalSpent)}
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-destructive ml-auto group-hover:translate-x-0.5 transition-transform">
+                Zobacz rozbicie →
+              </span>
+            </div>
+          </a>
+        </div>
+      )}
 
       {/* STATS STRIP — single edge-to-edge band of cells */}
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-2">
