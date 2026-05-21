@@ -1525,6 +1525,9 @@ def cmd_fetch(
         help="for acts: single year override (0 = use SUPAGRAF_ELI_YEARS env / default)"),
     force: bool = typer.Option(False, "--force",
         help="for committees: re-fetch all committee detail JSON, ignoring cached fixtures"),
+    workers: int = typer.Option(1, "--workers", "-w",
+        help="for mp-office-expenses: parallel fetch+OCR+LLM workers (1=sequential; "
+             "recommended 4–6 for full 460-PDF run)"),
 ):
     """Fetch real-data assets that aren't on disk yet (HTML statement bodies, etc.).
 
@@ -1599,6 +1602,7 @@ def cmd_fetch(
             year=target_year,
             throttle_s=max(throttle_s, 1.0),
             force=force,
+            workers=workers,
         )
         print(f"\nfetch mp-office-expenses: {rep.to_dict()}")
         return

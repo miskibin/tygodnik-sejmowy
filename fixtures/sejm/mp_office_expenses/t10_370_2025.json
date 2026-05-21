@@ -1,0 +1,101 @@
+{
+  "funds_spent": "237982",
+  "items": [
+    {
+      "amount": "62573",
+      "category_code": 1
+    },
+    {
+      "amount": "1800",
+      "category_code": 2
+    },
+    {
+      "amount": "2874",
+      "category_code": 3
+    },
+    {
+      "amount": "0",
+      "category_code": 4
+    },
+    {
+      "amount": "3656",
+      "category_code": 5
+    },
+    {
+      "amount": "0",
+      "category_code": 6
+    },
+    {
+      "amount": "4015",
+      "category_code": 7
+    },
+    {
+      "amount": "9",
+      "category_code": 8
+    },
+    {
+      "amount": "45080",
+      "category_code": 9
+    },
+    {
+      "amount": "1774",
+      "category_code": 10
+    },
+    {
+      "amount": "21066",
+      "category_code": 11
+    },
+    {
+      "amount": "0",
+      "category_code": 12
+    },
+    {
+      "amount": "4",
+      "category_code": 13
+    },
+    {
+      "amount": "10113",
+      "category_code": 14
+    },
+    {
+      "amount": "11298",
+      "category_code": 15
+    },
+    {
+      "amount": "13762",
+      "category_code": 16
+    },
+    {
+      "amount": "0",
+      "category_code": 17
+    },
+    {
+      "amount": "3050",
+      "category_code": 18
+    },
+    {
+      "amount": "844",
+      "category_code": 19
+    },
+    {
+      "amount": "0",
+      "category_code": 20
+    },
+    {
+      "amount": "0",
+      "category_code": 21
+    },
+    {
+      "amount": "0",
+      "category_code": 22
+    },
+    {
+      "amount": "56064",
+      "category_code": 23
+    }
+  ],
+  "mp_id": 370,
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025370/$File/2025ryczalt_370.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

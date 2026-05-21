@@ -1,9 +1,2216 @@
 [
   {
     "term": 10,
+    "mp_id": 100,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025100/$File/2025ryczalt_100.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 101,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025101/$File/2025ryczalt_101.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 102,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025102/$File/2025ryczalt_102.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 103,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025103/$File/2025ryczalt_103.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 104,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025104/$File/2025ryczalt_104.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 105,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025105/$File/2025ryczalt_105.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 106,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025106/$File/2025ryczalt_106.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 107,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025107/$File/2025ryczalt_107.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 108,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025108/$File/2025ryczalt_108.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 109,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025109/$File/2025ryczalt_109.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 110,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025110/$File/2025ryczalt_110.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 112,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025112/$File/2025ryczalt_112.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 113,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025113/$File/2025ryczalt_113.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 114,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025114/$File/2025ryczalt_114.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 115,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025115/$File/2025ryczalt_115.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 116,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025116/$File/2025ryczalt_116.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 117,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025117/$File/2025ryczalt_117.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 118,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025118/$File/2025ryczalt_118.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 119,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025119/$File/2025ryczalt_119.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 120,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025120/$File/2025ryczalt_120.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 121,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025121/$File/2025ryczalt_121.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 122,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025122/$File/2025ryczalt_122.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 123,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025123/$File/2025ryczalt_123.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 124,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025124/$File/2025ryczalt_124.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 125,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025125/$File/2025ryczalt_125.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 126,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025126/$File/2025ryczalt_126.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 127,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025127/$File/2025ryczalt_127.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 128,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025128/$File/2025ryczalt_128.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 130,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025130/$File/2025ryczalt_130.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 131,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025131/$File/2025ryczalt_131.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 132,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025132/$File/2025ryczalt_132.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 133,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025133/$File/2025ryczalt_133.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 134,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025134/$File/2025ryczalt_134.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 135,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025135/$File/2025ryczalt_135.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 136,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025136/$File/2025ryczalt_136.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 137,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025137/$File/2025ryczalt_137.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 138,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025138/$File/2025ryczalt_138.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 139,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025139/$File/2025ryczalt_139.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 140,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025140/$File/2025ryczalt_140.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 141,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025141/$File/2025ryczalt_141.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 142,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025142/$File/2025ryczalt_142.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 143,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025143/$File/2025ryczalt_143.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 145,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025145/$File/2025ryczalt_145.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 146,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025146/$File/2025ryczalt_146.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 147,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025147/$File/2025ryczalt_147.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 148,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025148/$File/2025ryczalt_148.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 149,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025149/$File/2025ryczalt_149.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 150,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025150/$File/2025ryczalt_150.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 151,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025151/$File/2025ryczalt_151.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 153,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025153/$File/2025ryczalt_153.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 154,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025154/$File/2025ryczalt_154.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 155,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025155/$File/2025ryczalt_155.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 156,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025156/$File/2025ryczalt_156.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 157,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025157/$File/2025ryczalt_157.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 158,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025158/$File/2025ryczalt_158.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 159,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025159/$File/2025ryczalt_159.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 161,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025161/$File/2025ryczalt_161.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 162,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025162/$File/2025ryczalt_162.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 163,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025163/$File/2025ryczalt_163.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 164,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025164/$File/2025ryczalt_164.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 165,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025165/$File/2025ryczalt_165.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 167,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025167/$File/2025ryczalt_167.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 168,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025168/$File/2025ryczalt_168.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 169,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025169/$File/2025ryczalt_169.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 170,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025170/$File/2025ryczalt_170.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 171,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025171/$File/2025ryczalt_171.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 172,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025172/$File/2025ryczalt_172.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 173,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025173/$File/2025ryczalt_173.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 174,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025174/$File/2025ryczalt_174.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 175,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025175/$File/2025ryczalt_175.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 176,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025176/$File/2025ryczalt_176.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 177,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025177/$File/2025ryczalt_177.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 178,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025178/$File/2025ryczalt_178.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 179,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025179/$File/2025ryczalt_179.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 180,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025180/$File/2025ryczalt_180.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 181,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025181/$File/2025ryczalt_181.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 182,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025182/$File/2025ryczalt_182.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 183,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025183/$File/2025ryczalt_183.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 184,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025184/$File/2025ryczalt_184.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 185,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025185/$File/2025ryczalt_185.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 186,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025186/$File/2025ryczalt_186.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 187,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025187/$File/2025ryczalt_187.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 188,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025188/$File/2025ryczalt_188.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 189,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025189/$File/2025ryczalt_189.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 190,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025190/$File/2025ryczalt_190.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 191,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025191/$File/2025ryczalt_191.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 192,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025192/$File/2025ryczalt_192.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 193,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025193/$File/2025ryczalt_193.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 194,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025194/$File/2025ryczalt_194.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 195,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025195/$File/2025ryczalt_195.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 196,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025196/$File/2025ryczalt_196.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 197,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025197/$File/2025ryczalt_197.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 198,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025198/$File/2025ryczalt_198.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 199,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025199/$File/2025ryczalt_199.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 200,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025200/$File/2025ryczalt_200.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 201,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025201/$File/2025ryczalt_201.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 202,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025202/$File/2025ryczalt_202.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 203,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025203/$File/2025ryczalt_203.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 204,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025204/$File/2025ryczalt_204.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 205,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025205/$File/2025ryczalt_205.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 206,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025206/$File/2025ryczalt_206.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 207,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025207/$File/2025ryczalt_207.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 208,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025208/$File/2025ryczalt_208.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 209,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025209/$File/2025ryczalt_209.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 210,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025210/$File/2025ryczalt_210.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 211,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025211/$File/2025ryczalt_211.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 212,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025212/$File/2025ryczalt_212.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 213,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025213/$File/2025ryczalt_213.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 214,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025214/$File/2025ryczalt_214.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 216,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025216/$File/2025ryczalt_216.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 217,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025217/$File/2025ryczalt_217.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 218,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025218/$File/2025ryczalt_218.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 219,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025219/$File/2025ryczalt_219.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 220,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025220/$File/2025ryczalt_220.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 221,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025221/$File/2025ryczalt_221.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 222,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025222/$File/2025ryczalt_222.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 223,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025223/$File/2025ryczalt_223.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 224,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025224/$File/2025ryczalt_224.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 225,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025225/$File/2025ryczalt_225.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 226,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025226/$File/2025ryczalt_226.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 228,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025228/$File/2025ryczalt_228.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 229,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025229/$File/2025ryczalt_229.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 230,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025230/$File/2025ryczalt_230.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 231,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025231/$File/2025ryczalt_231.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 233,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025233/$File/2025ryczalt_233.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 234,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025234/$File/2025ryczalt_234.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 235,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025235/$File/2025ryczalt_235.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 236,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025236/$File/2025ryczalt_236.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 237,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025237/$File/2025ryczalt_237.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 238,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025238/$File/2025ryczalt_238.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 239,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025239/$File/2025ryczalt_239.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 240,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025240/$File/2025ryczalt_240.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 241,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025241/$File/2025ryczalt_241.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 242,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025242/$File/2025ryczalt_242.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 243,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025243/$File/2025ryczalt_243.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 246,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025246/$File/2025ryczalt_246.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 247,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025247/$File/2025ryczalt_247.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 248,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025248/$File/2025ryczalt_248.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 249,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025249/$File/2025ryczalt_249.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 250,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025250/$File/2025ryczalt_250.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 252,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025252/$File/2025ryczalt_252.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 254,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025254/$File/2025ryczalt_254.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 256,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025256/$File/2025ryczalt_256.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 257,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025257/$File/2025ryczalt_257.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 258,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025258/$File/2025ryczalt_258.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 259,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025259/$File/2025ryczalt_259.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 260,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025260/$File/2025ryczalt_260.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 261,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025261/$File/2025ryczalt_261.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 262,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025262/$File/2025ryczalt_262.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 263,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025263/$File/2025ryczalt_263.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 264,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025264/$File/2025ryczalt_264.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 265,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025265/$File/2025ryczalt_265.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 266,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025266/$File/2025ryczalt_266.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 267,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025267/$File/2025ryczalt_267.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 269,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025269/$File/2025ryczalt_269.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 270,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025270/$File/2025ryczalt_270.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 271,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025271/$File/2025ryczalt_271.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 272,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025272/$File/2025ryczalt_272.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 273,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025273/$File/2025ryczalt_273.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 274,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025274/$File/2025ryczalt_274.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 275,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025275/$File/2025ryczalt_275.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 276,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025276/$File/2025ryczalt_276.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 277,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025277/$File/2025ryczalt_277.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 278,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025278/$File/2025ryczalt_278.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 280,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025280/$File/2025ryczalt_280.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 281,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025281/$File/2025ryczalt_281.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 282,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025282/$File/2025ryczalt_282.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 283,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025283/$File/2025ryczalt_283.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 284,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025284/$File/2025ryczalt_284.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 285,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025285/$File/2025ryczalt_285.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 286,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025286/$File/2025ryczalt_286.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 287,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025287/$File/2025ryczalt_287.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 288,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025288/$File/2025ryczalt_288.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 289,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025289/$File/2025ryczalt_289.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 290,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025290/$File/2025ryczalt_290.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 291,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025291/$File/2025ryczalt_291.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 292,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025292/$File/2025ryczalt_292.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 293,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025293/$File/2025ryczalt_293.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 294,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025294/$File/2025ryczalt_294.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 295,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025295/$File/2025ryczalt_295.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 296,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025296/$File/2025ryczalt_296.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 297,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025297/$File/2025ryczalt_297.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 298,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025298/$File/2025ryczalt_298.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 299,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025299/$File/2025ryczalt_299.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 300,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025300/$File/2025ryczalt_300.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 301,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025301/$File/2025ryczalt_301.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 302,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025302/$File/2025ryczalt_302.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 303,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025303/$File/2025ryczalt_303.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 306,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025306/$File/2025ryczalt_306.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 307,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025307/$File/2025ryczalt_307.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 308,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025308/$File/2025ryczalt_308.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 309,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025309/$File/2025ryczalt_309.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 310,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025310/$File/2025ryczalt_310.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 311,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025311/$File/2025ryczalt_311.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 312,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025312/$File/2025ryczalt_312.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 313,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025313/$File/2025ryczalt_313.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 314,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025314/$File/2025ryczalt_314.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 315,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025315/$File/2025ryczalt_315.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 317,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025317/$File/2025ryczalt_317.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 318,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025318/$File/2025ryczalt_318.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 319,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025319/$File/2025ryczalt_319.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 320,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025320/$File/2025ryczalt_320.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 321,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025321/$File/2025ryczalt_321.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 322,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025322/$File/2025ryczalt_322.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 324,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025324/$File/2025ryczalt_324.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 325,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025325/$File/2025ryczalt_325.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 326,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025326/$File/2025ryczalt_326.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 327,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025327/$File/2025ryczalt_327.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 329,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025329/$File/2025ryczalt_329.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 330,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025330/$File/2025ryczalt_330.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 331,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025331/$File/2025ryczalt_331.pdf?OpenElement"
+  },
+  {
+    "term": 10,
     "mp_id": 332,
     "year": 2025,
-    "pdf_url": "https://orka.sejm.gov.pl/BOP_info.nsf/0/4415502E82B9D612C1258107003FCFE4/$file/za%C5%82%201.pdf",
-    "_note": "PLACEHOLDER — this is the empty template URL from a Google probe, not a real Romanowski 2025 report. Replace with actual orka.sejm.gov.pl link once the listing page is scraped. mp_id=332 is a placeholder too."
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025332/$File/2025ryczalt_332.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 333,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025333/$File/2025ryczalt_333.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 334,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025334/$File/2025ryczalt_334.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 335,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025335/$File/2025ryczalt_335.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 336,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025336/$File/2025ryczalt_336.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 337,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025337/$File/2025ryczalt_337.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 339,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025339/$File/2025ryczalt_339.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 340,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025340/$File/2025ryczalt_340.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 341,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025341/$File/2025ryczalt_341.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 342,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025342/$File/2025ryczalt_342.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 343,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025343/$File/2025ryczalt_343.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 344,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025344/$File/2025ryczalt_344.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 345,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025345/$File/2025ryczalt_345.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 346,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025346/$File/2025ryczalt_346.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 347,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025347/$File/2025ryczalt_347.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 348,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025348/$File/2025ryczalt_348.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 350,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025350/$File/2025ryczalt_350.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 351,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025351/$File/2025ryczalt_351.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 352,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025352/$File/2025ryczalt_352.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 353,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025353/$File/2025ryczalt_353.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 354,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025354/$File/2025ryczalt_354.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 355,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025355/$File/2025ryczalt_355.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 356,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025356/$File/2025ryczalt_356.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 357,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025357/$File/2025ryczalt_357.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 358,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025358/$File/2025ryczalt_358.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 359,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025359/$File/2025ryczalt_359.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 360,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025360/$File/2025ryczalt_360.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 361,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025361/$File/2025ryczalt_361.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 362,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025362/$File/2025ryczalt_362.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 363,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025363/$File/2025ryczalt_363.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 364,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025364/$File/2025ryczalt_364.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 366,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025366/$File/2025ryczalt_366.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 367,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025367/$File/2025ryczalt_367.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 369,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025369/$File/2025ryczalt_369.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 370,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025370/$File/2025ryczalt_370.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 371,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025371/$File/2025ryczalt_371.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 372,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025372/$File/2025ryczalt_372.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 373,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025373/$File/2025ryczalt_373.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 374,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025374/$File/2025ryczalt_374.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 375,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025375/$File/2025ryczalt_375.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 376,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025376/$File/2025ryczalt_376.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 377,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025377/$File/2025ryczalt_377.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 378,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025378/$File/2025ryczalt_378.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 379,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025379/$File/2025ryczalt_379.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 380,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025380/$File/2025ryczalt_380.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 381,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025381/$File/2025ryczalt_381.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 382,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025382/$File/2025ryczalt_382.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 384,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025384/$File/2025ryczalt_384.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 385,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025385/$File/2025ryczalt_385.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 386,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025386/$File/2025ryczalt_386.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 387,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025387/$File/2025ryczalt_387.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 388,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025388/$File/2025ryczalt_388.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 389,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025389/$File/2025ryczalt_389.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 390,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025390/$File/2025ryczalt_390.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 391,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025391/$File/2025ryczalt_391.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 392,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025392/$File/2025ryczalt_392.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 393,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025393/$File/2025ryczalt_393.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 394,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025394/$File/2025ryczalt_394.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 395,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025395/$File/2025ryczalt_395.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 396,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025396/$File/2025ryczalt_396.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 397,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025397/$File/2025ryczalt_397.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 398,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025398/$File/2025ryczalt_398.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 399,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025399/$File/2025ryczalt_399.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 400,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025400/$File/2025ryczalt_400.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 402,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025402/$File/2025ryczalt_402.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 403,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025403/$File/2025ryczalt_403.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 404,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025404/$File/2025ryczalt_404.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 405,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025405/$File/2025ryczalt_405.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 406,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025406/$File/2025ryczalt_406.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 407,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025407/$File/2025ryczalt_407.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 408,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025408/$File/2025ryczalt_408.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 409,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025409/$File/2025ryczalt_409.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 410,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025410/$File/2025ryczalt_410.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 411,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025411/$File/2025ryczalt_411.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 412,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025412/$File/2025ryczalt_412.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 415,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025415/$File/2025ryczalt_415.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 416,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025416/$File/2025ryczalt_416.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 417,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025417/$File/2025ryczalt_417.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 418,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025418/$File/2025ryczalt_418.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 419,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025419/$File/2025ryczalt_419.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 420,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025420/$File/2025ryczalt_420.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 421,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025421/$File/2025ryczalt_421.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 422,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025422/$File/2025ryczalt_422.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 423,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025423/$File/2025ryczalt_423.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 424,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025424/$File/2025ryczalt_424.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 425,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025425/$File/2025ryczalt_425.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 426,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025426/$File/2025ryczalt_426.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 427,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025427/$File/2025ryczalt_427.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 428,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025428/$File/2025ryczalt_428.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 429,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025429/$File/2025ryczalt_429.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 430,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025430/$File/2025ryczalt_430.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 431,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025431/$File/2025ryczalt_431.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 432,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025432/$File/2025ryczalt_432.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 433,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025433/$File/2025ryczalt_433.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 434,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025434/$File/2025ryczalt_434.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 435,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025435/$File/2025ryczalt_435.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 436,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025436/$File/2025ryczalt_436.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 437,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025437/$File/2025ryczalt_437.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 438,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025438/$File/2025ryczalt_438.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 439,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025439/$File/2025ryczalt_439.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 440,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025440/$File/2025ryczalt_440.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 441,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025441/$File/2025ryczalt_441.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 442,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025442/$File/2025ryczalt_442.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 443,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025443/$File/2025ryczalt_443.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 444,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025444/$File/2025ryczalt_444.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 445,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025445/$File/2025ryczalt_445.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 446,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025446/$File/2025ryczalt_446.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 448,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025448/$File/2025ryczalt_448.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 449,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025449/$File/2025ryczalt_449.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 450,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025450/$File/2025ryczalt_450.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 451,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025451/$File/2025ryczalt_451.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 452,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025452/$File/2025ryczalt_452.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 453,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025453/$File/2025ryczalt_453.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 454,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025454/$File/2025ryczalt_454.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 455,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025455/$File/2025ryczalt_455.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 456,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025456/$File/2025ryczalt_456.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 457,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025457/$File/2025ryczalt_457.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 458,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025458/$File/2025ryczalt_458.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 459,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025459/$File/2025ryczalt_459.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 460,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025460/$File/2025ryczalt_460.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 461,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025461/$File/2025ryczalt_461.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 462,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025462/$File/2025ryczalt_462.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 463,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025463/$File/2025ryczalt_463.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 464,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025464/$File/2025ryczalt_464.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 465,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025465/$File/2025ryczalt_465.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 466,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025466/$File/2025ryczalt_466.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 467,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025467/$File/2025ryczalt_467.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 468,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025468/$File/2025ryczalt_468.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 469,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025469/$File/2025ryczalt_469.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 470,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025470/$File/2025ryczalt_470.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 471,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025471/$File/2025ryczalt_471.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 472,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025472/$File/2025ryczalt_472.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 473,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025473/$File/2025ryczalt_473.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 474,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025474/$File/2025ryczalt_474.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 475,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025475/$File/2025ryczalt_475.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 476,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025476/$File/2025ryczalt_476.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 477,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025477/$File/2025ryczalt_477.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 478,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025478/$File/2025ryczalt_478.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 479,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025479/$File/2025ryczalt_479.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 480,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025480/$File/2025ryczalt_480.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 481,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025481/$File/2025ryczalt_481.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 482,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025482/$File/2025ryczalt_482.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 483,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025483/$File/2025ryczalt_483.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 484,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025484/$File/2025ryczalt_484.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 485,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025485/$File/2025ryczalt_485.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 486,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025486/$File/2025ryczalt_486.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 487,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025487/$File/2025ryczalt_487.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 488,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025488/$File/2025ryczalt_488.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 489,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025489/$File/2025ryczalt_489.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 490,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025490/$File/2025ryczalt_490.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 491,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025491/$File/2025ryczalt_491.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 492,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025492/$File/2025ryczalt_492.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 493,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025493/$File/2025ryczalt_493.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 494,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025494/$File/2025ryczalt_494.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 495,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025495/$File/2025ryczalt_495.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 496,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025496/$File/2025ryczalt_496.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 497,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025497/$File/2025ryczalt_497.pdf?OpenElement"
+  },
+  {
+    "term": 10,
+    "mp_id": 498,
+    "year": 2025,
+    "pdf_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025498/$File/2025ryczalt_498.pdf?OpenElement"
   }
 ]

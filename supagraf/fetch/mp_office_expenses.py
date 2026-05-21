@@ -40,7 +40,9 @@ import json
 import os
 import re
 import tempfile
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -48,6 +50,7 @@ from typing import Any
 
 import httpx
 from loguru import logger
+from pydantic import BaseModel, Field
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -343,12 +346,119 @@ def parse_pdf_text(text: str) -> dict[str, Any]:
 
 
 def _extract_pdf_text(pdf_path: Path) -> str:
+    """Get text from a PDF. Digital PDFs use pymupdf directly; scans (real
+    BOP reports are MP-signed scans) auto-fallback to tesseract `pol` at
+    300 DPI per page."""
     import pymupdf  # imported lazily — pymupdf is a heavy native dep
     doc = pymupdf.open(pdf_path)
     try:
-        return "\n".join(page.get_text() for page in doc)
+        parts = []
+        for page in doc:
+            t = page.get_text()
+            if len(t.strip()) > 30:
+                parts.append(t)
+            else:
+                parts.append(_ocr_page(page))
+        return "\n".join(parts)
     finally:
         doc.close()
+
+
+def _ocr_page(page) -> str:
+    """OCR one pymupdf page via tesseract + Polish traineddata.
+
+    Raises RuntimeError if tesseract or pytesseract is missing — install via
+    `apt-get install tesseract-ocr tesseract-ocr-pol` and `uv add pytesseract pillow`.
+    """
+    try:
+        import io
+        import pytesseract
+        from PIL import Image
+    except ImportError as e:
+        raise RuntimeError(
+            "scan-PDF OCR requires `pytesseract` + `Pillow` (Python) and the "
+            "`tesseract-ocr` + `tesseract-ocr-pol` system packages"
+        ) from e
+    pix = page.get_pixmap(dpi=300)
+    img = Image.open(io.BytesIO(pix.tobytes("png")))
+    return pytesseract.image_to_string(img, lang="pol")
+
+
+# -------- LLM fallback for OCR'd reports --------
+# Heuristic regex on OCR text is unreliable — column layout gets scrambled.
+# We use deepseek-v4-flash (per CLAUDE.md: short structured outputs, ~10% of
+# pro cost) to parse the standardized form. Invoked only when regex parser
+# returns all-zeros (the digital-PDF template path stays fast and offline).
+
+class _LLMExtractItem(BaseModel):
+    category_code: int = Field(ge=1, le=23)
+    amount: str
+    notes: str | None = None
+
+
+class _LLMExtractResult(BaseModel):
+    funds_allocated: str | None = None
+    funds_carryover: str | None = None
+    funds_interest: str | None = None
+    funds_total: str | None = None
+    funds_spent: str | None = None
+    funds_remaining: str | None = None
+    items: list[_LLMExtractItem]
+
+
+def llm_extract(text: str) -> dict[str, Any]:
+    """Pass OCR text through deepseek-v4-flash → 23 categories + 6 funds fields.
+
+    Returns dict shaped like parse_pdf_text() output. Falls back to all-zeros if
+    DEEPSEEK_API_KEY is missing (caller will then ship raw report with empty
+    items rather than failing the whole pipeline).
+    """
+    if not os.environ.get("DEEPSEEK_API_KEY"):
+        logger.warning("DEEPSEEK_API_KEY missing — skipping LLM extract, items will be all-zero")
+        return {"items": [{"category_code": c, "amount": "0"} for c in range(1, 24)]}
+
+    from supagraf.enrich.llm import call_structured
+
+    model = os.environ.get(
+        "SUPAGRAF_MP_OFFICE_EXPENSES_LLM_MODEL",
+        os.environ.get("SUPAGRAF_LLM_MODEL_FLASH", "deepseek-v4-flash"),
+    )
+    call = call_structured(
+        model=model,
+        prompt_name="mp_office_expense_extract",
+        user_input=text,
+        output_model=_LLMExtractResult,
+    )
+    result: _LLMExtractResult = call.parsed  # type: ignore[assignment]
+    out: dict[str, Any] = {"items": []}
+    for fld in ("funds_allocated", "funds_carryover", "funds_interest",
+                "funds_total", "funds_spent", "funds_remaining"):
+        v = getattr(result, fld)
+        if v is not None:
+            out[fld] = v
+    # Ensure 23 items, sorted by category_code
+    by_code = {it.category_code: it for it in result.items}
+    for code in range(1, 24):
+        it = by_code.get(code)
+        out["items"].append({
+            "category_code": code,
+            "amount": (it.amount if it else "0"),
+            "notes": (it.notes if it else None),
+        })
+    return out
+
+
+def _items_all_zero(parsed: dict[str, Any]) -> bool:
+    items = parsed.get("items") or []
+    if not items:
+        return True
+    for it in items:
+        try:
+            if Decimal(str(it.get("amount", "0"))) > 0:
+                return False
+        except InvalidOperation:
+            continue
+    return True
 
 
 # -------- driver --------
@@ -367,6 +477,73 @@ def _index_path() -> Path:
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
+def _process_one(
+    entry: dict,
+    *,
+    term: int,
+    year: int,
+    dest_dir: Path,
+    headers: dict,
+    timeout_s: float,
+    force: bool,
+) -> tuple[str, dict | None, str | None]:
+    """Process one entry. Returns (status, payload_or_none, error_or_none).
+
+    status: 'skip-existing' | 'fetched' | 'cached' | '404' | 'fetch-err' | 'parse-err'
+    payload: written-to-disk dict on 'fetched'/'cached', None otherwise.
+    """
+    if not isinstance(entry, dict):
+        return ("skip-bad", None, "non-dict entry")
+    if int(entry.get("term", term)) != term:
+        return ("skip-term", None, None)
+    if int(entry.get("year", year)) != year:
+        return ("skip-year", None, None)
+    mp_id = entry.get("mp_id")
+    pdf_url = entry.get("pdf_url")
+    if not isinstance(mp_id, int) or not isinstance(pdf_url, str):
+        return ("skip-bad", None, "missing mp_id or pdf_url")
+
+    fixture_path = dest_dir / f"t{term}_{mp_id}_{year}.json"
+    if fixture_path.exists() and fixture_path.stat().st_size > 0 and not force:
+        return ("skip-existing", None, None)
+
+    # Per-thread httpx client — connection pooling not worth the complexity.
+    with httpx.Client(headers=headers, timeout=timeout_s, http2=False, follow_redirects=True) as client:
+        try:
+            pdf_path, body_sha, from_cache = fetch_pdf(client, pdf_url)
+        except MPOfficeExpenseNotFound:
+            return ("404", None, f"404 {pdf_url}")
+        except MPOfficeExpenseFetchError as e:
+            return ("fetch-err", None, str(e))
+
+    try:
+        text = _extract_pdf_text(pdf_path)
+        parsed = parse_pdf_text(text)
+        if _items_all_zero(parsed) and len(text.strip()) > 50:
+            parsed = llm_extract(text)
+    except Exception as e:  # noqa: BLE001
+        return ("parse-err", None, f"pdf parse: {e!r}")
+
+    payload = {
+        "term": term,
+        "mp_id": mp_id,
+        "year": year,
+        "source_url": pdf_url,
+        "source_sha256": body_sha,
+        "items": parsed.get("items", []),
+    }
+    for k in ("funds_allocated", "funds_carryover", "funds_interest",
+              "funds_total", "funds_spent", "funds_remaining"):
+        if k in parsed:
+            payload[k] = parsed[k]
+    for k in ("published_at", "approved_by_presidium_at", "period_start", "period_end"):
+        if entry.get(k):
+            payload[k] = entry[k]
+
+    _atomic_write_json(fixture_path, payload)
+    return (("cached" if from_cache else "fetched"), payload, None)
+
+
 def fetch_mp_office_expenses(
     term: int = 10,
     *,
@@ -374,12 +551,20 @@ def fetch_mp_office_expenses(
     throttle_s: float = DEFAULT_THROTTLE_S,
     timeout_s: float = DEFAULT_TIMEOUT_S,
     force: bool = False,
+    workers: int = 1,
 ) -> FetchReport:
     """Read _index.json, download missing PDFs, parse, write per-MP fixtures.
 
     Idempotent — fixtures already present on disk are re-parsed only when
     `force=True`. PDF bytes are always cached on disk; re-runs hit the
     cache and only re-parse if the fixture is missing.
+
+    `workers>1` parallelises with a ThreadPoolExecutor. Each worker handles
+    fetch + OCR + LLM end-to-end for one MP. Note: OCR is CPU-bound so the
+    GIL releases inside tesseract C code; LLM is API-bound. orka.sejm.gov.pl
+    tolerates ~5 concurrent connections without hitting 503; deepseek API
+    handles 10+ concurrent requests fine. Recommended: 4–6 workers.
+    Throttle is best-effort between submission, not per-worker.
     """
     report = FetchReport(term=term, year=year)
     index_path = _index_path()
@@ -399,73 +584,70 @@ def fetch_mp_office_expenses(
         return report
 
     dest_dir = _fixtures_dir(term)
+    dest_dir.mkdir(parents=True, exist_ok=True)
     headers = {"User-Agent": USER_AGENT, "Accept": "application/pdf,*/*"}
 
-    with httpx.Client(headers=headers, timeout=timeout_s, http2=False, follow_redirects=True) as client:
-        for entry in entries:
-            if not isinstance(entry, dict):
-                continue
-            if int(entry.get("term", term)) != term:
-                continue
-            if int(entry.get("year", year)) != year:
-                continue
-            report.entries_seen += 1
-            mp_id = entry.get("mp_id")
-            pdf_url = entry.get("pdf_url")
-            if not isinstance(mp_id, int) or not isinstance(pdf_url, str):
-                report.errors.append((str(entry), "missing mp_id or pdf_url"))
-                continue
+    workers = max(1, int(workers))
+    lock = threading.Lock()
 
-            fixture_path = dest_dir / f"t{term}_{mp_id}_{year}.json"
-            if fixture_path.exists() and fixture_path.stat().st_size > 0 and not force:
-                continue  # already extracted; nothing to do
-
-            try:
-                pdf_path, body_sha, from_cache = fetch_pdf(client, pdf_url)
-                if from_cache:
-                    report.pdf_from_cache += 1
-                else:
+    def _account(mp_id_str: str, status: str, err: str | None) -> None:
+        with lock:
+            if status in ("fetched", "cached"):
+                report.fixtures_written += 1
+                if status == "fetched":
                     report.pdf_fetched += 1
-            except MPOfficeExpenseNotFound:
-                report.errors.append((str(mp_id), f"404 {pdf_url}"))
-                logger.warning("404 for mp {} pdf {}", mp_id, pdf_url)
-                continue
-            except MPOfficeExpenseFetchError as e:
-                report.errors.append((str(mp_id), str(e)))
-                logger.error("mp {} pdf fetch failed: {!r}", mp_id, e)
-                continue
+                else:
+                    report.pdf_from_cache += 1
+            elif status == "404":
+                report.errors.append((mp_id_str, err or "404"))
+            elif status in ("fetch-err", "parse-err", "skip-bad"):
+                if err:
+                    report.errors.append((mp_id_str, err))
 
+    if workers == 1:
+        for entry in entries:
+            if isinstance(entry, dict) and int(entry.get("term", term)) == term and int(entry.get("year", year)) == year:
+                report.entries_seen += 1
             try:
-                text = _extract_pdf_text(pdf_path)
-                parsed = parse_pdf_text(text)
+                status, _payload, err = _process_one(
+                    entry, term=term, year=year, dest_dir=dest_dir,
+                    headers=headers, timeout_s=timeout_s, force=force,
+                )
             except Exception as e:  # noqa: BLE001
-                report.errors.append((str(mp_id), f"pdf parse: {e!r}"))
-                logger.error("mp {} pdf parse failed: {!r}", mp_id, e)
+                _account(str(entry.get("mp_id") if isinstance(entry, dict) else entry),
+                         "fetch-err", f"unexpected: {e!r}")
                 continue
-
-            payload = {
-                "term": term,
-                "mp_id": mp_id,
-                "year": year,
-                "source_url": pdf_url,
-                "source_sha256": body_sha,
-                "items": parsed.get("items", []),
-            }
-            for k in ("funds_allocated", "funds_carryover", "funds_interest",
-                      "funds_total", "funds_spent", "funds_remaining"):
-                if k in parsed:
-                    payload[k] = parsed[k]
-            # Optional overrides from the index entry — caller may know the
-            # publication date the PDF itself doesn't carry.
-            for k in ("published_at", "approved_by_presidium_at", "period_start", "period_end"):
-                if entry.get(k):
-                    payload[k] = entry[k]
-
-            _atomic_write_json(fixture_path, payload)
-            report.fixtures_written += 1
-
-            if throttle_s > 0 and not from_cache:
+            _account(str(entry.get("mp_id") if isinstance(entry, dict) else entry), status, err)
+            if throttle_s > 0 and status == "fetched":
                 time.sleep(throttle_s)
+    else:
+        # Pre-count valid entries
+        for entry in entries:
+            if isinstance(entry, dict) and int(entry.get("term", term)) == term and int(entry.get("year", year)) == year:
+                report.entries_seen += 1
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            futures = []
+            for entry in entries:
+                f = ex.submit(
+                    _process_one,
+                    entry, term=term, year=year, dest_dir=dest_dir,
+                    headers=headers, timeout_s=timeout_s, force=force,
+                )
+                futures.append((entry, f))
+                # Stagger submissions slightly so we don't hammer all at once
+                if throttle_s > 0:
+                    time.sleep(throttle_s / workers)
+            done = 0
+            for entry, f in futures:
+                try:
+                    status, _payload, err = f.result()
+                except Exception as e:  # noqa: BLE001
+                    status, err = "fetch-err", f"unexpected: {e!r}"
+                _account(str(entry.get("mp_id") if isinstance(entry, dict) else entry), status, err)
+                done += 1
+                if done % 20 == 0:
+                    logger.info("progress: {}/{} done ({} written, {} errors)",
+                                done, len(futures), report.fixtures_written, len(report.errors))
 
     logger.info("fetch_mp_office_expenses: {}", report.to_dict())
     return report
