@@ -17,4 +17,5 @@ def test_process_fixture_parses(path):
 
 
 def test_processes_fixture_count():
-    assert len(FILES) == 164
+    # Fixtures grow with each ETL refresh; assert lower bound.
+    assert len(FILES) >= 164

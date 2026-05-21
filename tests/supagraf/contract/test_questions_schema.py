@@ -25,6 +25,7 @@ def test_question_fixture_parses(path):
 
 
 def test_questions_fixture_count():
-    assert len(INTERPELLATIONS) == 632
-    assert len(WRITTEN) == 434
-    assert len(ALL_FILES) == 1066
+    # Fixtures grow with each ETL refresh; assert lower bounds.
+    assert len(INTERPELLATIONS) >= 632
+    assert len(WRITTEN) >= 434
+    assert len(ALL_FILES) >= 1066

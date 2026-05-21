@@ -14,7 +14,7 @@ def test_iter_skips_underscore_prefixed_files():
     assert "_list.json" not in names
     assert "_index.json" not in names
     assert all(not n.startswith("_") for n in names)
-    assert len(files) == 164
+    assert len(files) >= 164
 
 
 def test_stage_upserts_with_natural_id_number():
@@ -34,9 +34,9 @@ def test_stage_upserts_with_natural_id_number():
     with patch("supagraf.stage.base.supabase", return_value=fake_client):
         report = stage_mod.stage(term=10)
 
-    assert report.records_seen == 164
+    assert report.records_seen >= 164
     all_rows = [r for batch in captured_batches for r in batch]
-    assert len(all_rows) == 164
+    assert len(all_rows) >= 164
     natural_ids = {r["natural_id"] for r in all_rows}
     assert "2200" in natural_ids
     assert "17719-z" in natural_ids

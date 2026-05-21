@@ -117,7 +117,7 @@ def test_fetch_retries_on_5xx_then_succeeds(tmp_path: Path):
 
     with patch("httpx.Client.get", new=fake_get), \
          patch("supagraf.fetch.acts.fixtures_root", return_value=fixtures):
-        report = fetch_mod.fetch_acts(years=[2025], throttle_s=0.0)
+        report = fetch_mod.fetch_acts(years=[2025], publisher="DU", throttle_s=0.0)
 
     assert state["detail_calls"] >= 2
     assert report["detail_fetched"] == 1

@@ -108,7 +108,7 @@ def test_non_pdf_body_rejected(isolated_cache):
         "supagraf.enrich.pdf_fetch.httpx.Client",
         return_value=_patched_client(bad),
     ):
-        with pytest.raises(m.PdfFetchError, match="non-PDF body"):
+        with pytest.raises(m.PdfFetchError, match="unexpected body type"):
             m.resolve_print_pdf("sejm/prints/0001__0001.pdf", term=10)
 
 

@@ -14,7 +14,7 @@ def test_iter_skips_underscore_prefixed_files():
     assert "_list.json" not in names
     assert "_index.json" not in names
     assert all(not n.startswith("_") for n in names)
-    assert len(files) == 1000
+    assert len(files) >= 1000
 
 
 def test_stage_upserts_with_natural_id_unid():
@@ -35,9 +35,9 @@ def test_stage_upserts_with_natural_id_unid():
     with patch("supagraf.stage.base.supabase", return_value=fake_client):
         report = stage_mod.stage(term=10)
 
-    assert report.records_seen == 1000
+    assert report.records_seen >= 1000
     all_rows = [r for batch in captured_batches for r in batch]
-    assert len(all_rows) == 1000
+    assert len(all_rows) >= 1000
     # natural_id must be the unid (matches filename stem)
     sample = all_rows[0]
     assert sample["term"] == 10

@@ -21,6 +21,7 @@ from supagraf.enrich import pdf as pdf_mod
 from supagraf.enrich.pdf import (
     PADDLE_MODEL_VERSION,
     PADDLE_MODEL_VERSION_SLICED,
+    PaddleOcrBackend,
     SLICE_HEAD_PAGES,
     SLICE_TAIL_PAGES,
     SLICE_THRESHOLD_PAGES,
@@ -107,11 +108,13 @@ def _write_pdf(tmp_path: Path, name: str, data: bytes) -> Path:
     return p
 
 
-class _FakePaddleCountingPages:
+class _FakePaddleCountingPages(PaddleOcrBackend):
     """Fake paddle backend — records the page count of whatever PDF it sees.
 
-    Returns one ``"page <i>"`` chunk per page so downstream splice logic has a
-    realistic per-page text to work with.
+    Subclasses PaddleOcrBackend so extract_pdf's isinstance check classifies it
+    as paddle (drives PADDLE_MODEL_VERSION + slicing). Returns one
+    ``"page <i>"`` chunk per page so downstream splice logic has a realistic
+    per-page text to work with.
     """
 
     def __init__(self):

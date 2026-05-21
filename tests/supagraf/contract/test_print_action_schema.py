@@ -36,10 +36,11 @@ def test_action_default_is_none():
     assert out.action is None
 
 
-def test_action_over_140_chars_rejected():
+def test_action_over_max_chars_rejected():
+    # Schema cap on `action` was relaxed from 140 to 200 chars.
     with pytest.raises(ValidationError):
         PrintCitizenActionOutput.model_validate({
-            "action": "x" * 141,
+            "action": "x" * 201,
             "rationale": "Wystarczająco długi opis.",
         })
 

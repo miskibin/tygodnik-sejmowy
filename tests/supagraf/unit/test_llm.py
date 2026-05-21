@@ -36,8 +36,14 @@ def prompts_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 @pytest.fixture(autouse=True)
 def no_retry_sleep(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Eliminate tenacity backoff delay so retry tests run fast."""
+    """Eliminate tenacity backoff delay so retry tests run fast.
+
+    Also pin the backend to ollama — these tests target the Ollama wire format
+    (`{"message": {"content": "..."}}`). Deepseek uses a different envelope
+    (`{"choices": [...]}`) and its own retry'd function `_post_deepseek`.
+    """
     monkeypatch.setattr(llm_mod._post_chat.retry, "wait", wait_none())
+    monkeypatch.setenv("SUPAGRAF_LLM_BACKEND", "ollama")
 
 
 def _make_prompt(prompts_dir: Path, name: str, versions: list[int]) -> Path:
@@ -70,7 +76,7 @@ def test_happy_path(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "summarize", [1])
     calls = []
 
-    def fake_post(url, json, timeout):
+    def fake_post(url, json, timeout, **kwargs):
         calls.append((url, json, timeout))
         return _ok_chat({"summary": "x", "short_title": "y"})
 
@@ -93,7 +99,7 @@ def test_versioned_prompt_picks_highest(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1, 2, 10])
     monkeypatch.setattr(
         llm_mod.httpx, "post",
-        lambda url, json, timeout: _ok_chat({"summary": "x", "short_title": "y"}),
+        lambda url, json, timeout, **kwargs: _ok_chat({"summary": "x", "short_title": "y"}),
     )
     r = call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
     assert r.prompt.version == 10
@@ -103,7 +109,7 @@ def test_specific_version_pin(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1, 2])
     monkeypatch.setattr(
         llm_mod.httpx, "post",
-        lambda url, json, timeout: _ok_chat({"summary": "x", "short_title": "y"}),
+        lambda url, json, timeout, **kwargs: _ok_chat({"summary": "x", "short_title": "y"}),
     )
     r = call_structured(
         model="m", prompt_name="p", user_input="u",
@@ -137,7 +143,7 @@ def test_5xx_retries_and_succeeds(prompts_dir, monkeypatch):
     ]
     calls = {"n": 0}
 
-    def fake_post(url, json, timeout):
+    def fake_post(url, json, timeout, **kwargs):
         calls["n"] += 1
         return seq.pop(0)
 
@@ -151,7 +157,7 @@ def test_5xx_exhausted(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1])
     calls = {"n": 0}
 
-    def fake_post(url, json, timeout):
+    def fake_post(url, json, timeout, **kwargs):
         calls["n"] += 1
         return _FakeResponse(500, text="boom")
 
@@ -165,7 +171,7 @@ def test_4xx_no_retry(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1])
     calls = {"n": 0}
 
-    def fake_post(url, json, timeout):
+    def fake_post(url, json, timeout, **kwargs):
         calls["n"] += 1
         return _FakeResponse(401, text="unauth")
 
@@ -183,7 +189,7 @@ def test_timeout_retries_and_succeeds(prompts_dir, monkeypatch):
     ]
     calls = {"n": 0}
 
-    def fake_post(url, json, timeout):
+    def fake_post(url, json, timeout, **kwargs):
         calls["n"] += 1
         nxt = seq.pop(0)
         if isinstance(nxt, Exception):
@@ -200,7 +206,7 @@ def test_timeout_exhausted(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1])
     calls = {"n": 0}
 
-    def fake_post(url, json, timeout):
+    def fake_post(url, json, timeout, **kwargs):
         calls["n"] += 1
         raise httpx.TimeoutException("nope")
 
@@ -214,7 +220,7 @@ def test_malformed_json_content(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1])
     monkeypatch.setattr(
         llm_mod.httpx, "post",
-        lambda url, json, timeout: _FakeResponse(
+        lambda url, json, timeout, **kwargs: _FakeResponse(
             200, {"message": {"content": "not json {{"}}
         ),
     )
@@ -226,7 +232,7 @@ def test_missing_message_field(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1])
     monkeypatch.setattr(
         llm_mod.httpx, "post",
-        lambda url, json, timeout: _FakeResponse(200, {"foo": "bar"}),
+        lambda url, json, timeout, **kwargs: _FakeResponse(200, {"foo": "bar"}),
     )
     with pytest.raises(LLMResponseError, match="missing message.content"):
         call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
@@ -236,7 +242,7 @@ def test_schema_mismatch_missing_field(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1])
     monkeypatch.setattr(
         llm_mod.httpx, "post",
-        lambda url, json, timeout: _ok_chat({"summary": "x"}),
+        lambda url, json, timeout, **kwargs: _ok_chat({"summary": "x"}),
     )
     with pytest.raises(LLMResponseError, match="failed Out schema"):
         call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
@@ -246,7 +252,7 @@ def test_schema_mismatch_extra_field_when_forbidden(prompts_dir, monkeypatch):
     _make_prompt(prompts_dir, "p", [1])
     monkeypatch.setattr(
         llm_mod.httpx, "post",
-        lambda url, json, timeout: _ok_chat({"summary": "x", "junk": 1}),
+        lambda url, json, timeout, **kwargs: _ok_chat({"summary": "x", "junk": 1}),
     )
     with pytest.raises(LLMResponseError, match="failed StrictOut schema"):
         call_structured(

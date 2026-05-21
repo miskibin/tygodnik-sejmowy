@@ -8,6 +8,7 @@ yet. Schema validates the nested shape so we don't lose visibility on drift.
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -34,8 +35,12 @@ class Print(BaseModel):
     title: str
     attachments: list[str]
     process_print: list[str] = Field(alias="processPrint", default_factory=list)
+    # Some upstream prints carry a `numberAssociated` cross-reference list
+    # (mirrors AdditionalPrint). Optional — absent on most rows.
+    number_associated: list[str] = Field(alias="numberAssociated", default_factory=list)
     change_date: datetime = Field(alias="changeDate")
-    delivery_date: date = Field(alias="deliveryDate")
+    # deliveryDate is missing on a handful of prints (~0.5%) — make optional.
+    delivery_date: Optional[date] = Field(alias="deliveryDate", default=None)
     document_date: date = Field(alias="documentDate")
     additional_prints: list[AdditionalPrint] = Field(
         alias="additionalPrints", default_factory=list

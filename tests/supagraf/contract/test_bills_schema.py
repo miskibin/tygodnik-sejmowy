@@ -17,5 +17,5 @@ def test_bill_fixture_parses(path):
 
 
 def test_bills_fixture_count():
-    # 175 RPW_*.json entity files (excludes _list.json, _index.json).
-    assert len(FILES) == 175
+    # Fixtures grow with each ETL refresh; assert lower bound.
+    assert len(FILES) >= 175

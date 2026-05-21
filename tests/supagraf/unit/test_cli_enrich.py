@@ -51,6 +51,14 @@ class _SBChain:
         self.is_calls.append((col, val))
         return self
 
+    @property
+    def not_(self):
+        # production code uses `.is_(...).not_.is_(...)` for embed pending
+        return self
+
+    def gte(self, *_a, **_k):
+        return self
+
     def limit(self, n):
         self.limit_called_with = n
         return self
@@ -63,12 +71,20 @@ class _SBChain:
 
 @pytest.fixture
 def fake_runners():
-    """Patch the four runner imports inside _runner_for. Returns dict of mocks."""
+    """Patch every runner imported by _runner_for. Returns dict of mocks."""
     with patch("supagraf.enrich.print_summary.summarize_print") as summary, \
          patch("supagraf.enrich.print_stance.classify_stance") as stance, \
          patch("supagraf.enrich.print_mentions.extract_mentions") as mentions, \
+         patch("supagraf.enrich.print_personas.tag_personas") as personas, \
+         patch("supagraf.enrich.print_action.suggest_print_action") as action, \
+         patch("supagraf.enrich.print_plain_polish.summarize_plain_polish") as plain_polish, \
+         patch("supagraf.enrich.print_impact.assess_impact") as impact, \
          patch("supagraf.enrich.embed_print.embed_print") as embed:
-        yield {"summary": summary, "stance": stance, "mentions": mentions, "embed": embed}
+        yield {
+            "summary": summary, "stance": stance, "mentions": mentions,
+            "personas": personas, "action": action,
+            "plain_polish": plain_polish, "impact": impact, "embed": embed,
+        }
 
 
 @pytest.fixture
@@ -120,6 +136,7 @@ def test_single_print_happy_path(fake_runners, fake_path_exists):
         entity_type="print",
         entity_id="2055-A",
         pdf_relpath="sejm/prints/2055-A__2055-A.pdf",
+        term=10,
     )
     assert "ok=1" in result.output
 
@@ -127,7 +144,8 @@ def test_single_print_happy_path(fake_runners, fake_path_exists):
 # ---- attachment resolution ------------------------------------------------
 
 def test_no_pdf_attachment_skipped(fake_runners, fake_path_exists):
-    rows = [_row("9999", [{"filename": "doc.docx", "ordinal": 0}])]
+    # .html attachment is neither .pdf nor .docx → not picked → runner skipped.
+    rows = [_row("9999", [{"filename": "doc.html", "ordinal": 0}])]
     chain = _SBChain(rows)
     with patch("supagraf.cli.supabase", return_value=chain):
         result = runner.invoke(app, ["enrich", "prints", "--kind", "summary"])
@@ -154,13 +172,13 @@ def test_pdf_missing_on_disk_still_invokes_runner():
         entity_type="print",
         entity_id="2055-A",
         pdf_relpath="sejm/prints/2055-A__2055-A.pdf",
+        term=10,
     )
     assert "ok=1" in result.output
 
 
-def test_attachment_ordinal_picks_first_pdf(fake_runners, fake_path_exists):
-    # Ordinal 0 = docx (skipped), ordinal 1 = pdf (used). Confirms we don't
-    # bail at the first non-pdf — we keep scanning by ordinal.
+def test_attachment_prefers_docx_over_pdf(fake_runners, fake_path_exists):
+    # CLI prefers .docx (clean editable source) over .pdf (signed scan).
     rows = [_row("123", [
         {"filename": "extra.docx", "ordinal": 0},
         {"filename": "main.pdf", "ordinal": 1},
@@ -170,7 +188,7 @@ def test_attachment_ordinal_picks_first_pdf(fake_runners, fake_path_exists):
         result = runner.invoke(app, ["enrich", "prints", "--kind", "summary"])
     assert result.exit_code == 0
     args = fake_runners["summary"].call_args.kwargs
-    assert args["pdf_relpath"] == "sejm/prints/123__main.pdf"
+    assert args["pdf_relpath"] == "sejm/prints/123__extra.docx"
 
 
 # ---- failure isolation ----------------------------------------------------
@@ -205,17 +223,16 @@ def test_limit_passed_to_query(fake_runners, fake_path_exists):
 
 # ---- --kind all -----------------------------------------------------------
 
-def test_kind_all_runs_all_four_runners(fake_runners, fake_path_exists):
-    # Each kind's query returns 1 row; all four runners should fire once.
+def test_kind_all_runs_all_runners(fake_runners, fake_path_exists):
+    # Each kind's query returns 1 row; every runner in EnrichKind.all should fire once.
     rows = [_row("2055-A", [_pdf_att("2055-A.pdf")])]
     chain = _SBChain(rows)
     with patch("supagraf.cli.supabase", return_value=chain):
         result = runner.invoke(app, ["enrich", "prints", "--kind", "all"])
     assert result.exit_code == 0
-    fake_runners["summary"].assert_called_once()
-    fake_runners["stance"].assert_called_once()
-    fake_runners["mentions"].assert_called_once()
-    fake_runners["embed"].assert_called_once()
+    for k in ("summary", "stance", "mentions", "personas",
+              "action", "plain_polish", "impact", "embed"):
+        fake_runners[k].assert_called_once()
 
 
 def test_kind_all_uses_correct_pending_columns(fake_runners, fake_path_exists):
@@ -223,12 +240,12 @@ def test_kind_all_uses_correct_pending_columns(fake_runners, fake_path_exists):
     with patch("supagraf.cli.supabase", return_value=chain):
         result = runner.invoke(app, ["enrich", "prints", "--kind", "all"])
     assert result.exit_code == 0
-    # Each kind hits one is_(...) call.
+    # Each kind hits is_(...) on its pending column.
     cols = [c[0] for c in chain.is_calls]
-    assert "summary" in cols
-    assert "stance" in cols
-    assert "mentions_extracted_at" in cols
-    assert "embedded_at" in cols
+    for col in ("summary", "stance", "mentions_extracted_at",
+                "persona_tags", "citizen_action_model", "summary_plain",
+                "impact_punch", "embedded_at"):
+        assert col in cols, f"missing pending column {col!r} in {cols}"
 
 
 # ---- empty term -----------------------------------------------------------

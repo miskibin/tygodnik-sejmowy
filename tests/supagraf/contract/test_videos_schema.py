@@ -17,4 +17,5 @@ def test_video_fixture_parses(path):
 
 
 def test_videos_fixture_count():
-    assert len(FILES) == 1000
+    # Fixtures grow with each ETL refresh; assert lower bound.
+    assert len(FILES) >= 1000
