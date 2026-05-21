@@ -41,7 +41,8 @@ export async function generateMetadata({
     getMpOfficeExpenseSummary(mpId).catch(() => null),
   ]);
   const baseRole = guessRoleLabel(mp.firstLastName);
-  const role = mp.active ? `${baseRole} X kadencji` : `By${baseRole === "Posłanka" ? "ła posłanka" : "ły poseł"}`;
+  const isFemale = baseRole === "Posłanka";
+  const role = mp.active ? `${baseRole} X kadencji` : `By${isFemale ? "ła posłanka" : "ły poseł"}`;
   const club = clubName ?? mp.clubRef ?? "klub bezpartyjny";
   const district = mp.districtNum ? ` · okręg ${mp.districtNum}` : "";
 
@@ -50,12 +51,15 @@ export async function generateMetadata({
   // along the lines of "ile wydał poseł", "wydatki biura X", "sprawozdanie
   // ryczałtowe" then surface this page with the number visible in SERP.
   const isVerifiedExp = expSummary && expSummary.dataConfidence === "verified";
+  const verb = isFemale ? "Wydała" : "Wydał";
   const expClause = isVerifiedExp
-    ? `Wydał ${PLN_INT.format(expSummary!.totalSpent)} na biuro poselskie w ${expSummary!.year} r. `
+    ? `${verb} ${PLN_INT.format(expSummary!.totalSpent)} na biuro poselskie w ${expSummary!.year} r. `
     : "";
+  // Inactive-MP suffix matches the MP's gender (Polish requires it).
+  const inactiveSuffix = isFemale ? "(była posłanka)" : "(były poseł)";
   const titleSuffix = isVerifiedExp
     ? `${PLN_INT.format(expSummary!.totalSpent)} wydatków biura ${expSummary!.year}`
-    : `${baseRole} ${mp.active ? "X kadencji" : "(były)"}`;
+    : `${baseRole} ${mp.active ? "X kadencji" : inactiveSuffix}`;
   const desc =
     `${expClause}${role} · ${club}${district}. ` +
     "Frekwencja, głosowania, interpelacje, wystąpienia, obietnice vs głosy, " +
@@ -258,13 +262,18 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
     ];
   }
 
+  // Escape `<` so a stray `</script>` in any string field (MP name from DB,
+  // club name, …) can't break out of the script element. Same defensive
+  // pattern as app/jak-powstaje-ustawa/page.tsx.
+  const ldJsonHtml = JSON.stringify(ldJson).replace(/</g, "\\u003c");
+
   return (
     <div className="bg-background text-foreground font-serif pb-16 sm:pb-20 min-w-0 overflow-x-hidden">
       {/* JSON-LD structured data for the MP profile + (if verified) the
           year's expense total. Surfaced in SERPs and Knowledge Graph. */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
+        dangerouslySetInnerHTML={{ __html: ldJsonHtml }}
       />
 
       {/* Breadcrumb */}

@@ -888,11 +888,15 @@ export async function getMpOfficeExpenseSummary(
   term = DEFAULT_TERM,
 ): Promise<MpOfficeExpenseSummary | null> {
   const sb = supabase();
+  // Only consider verified reports — both metadata and hero hide the amount
+  // for 'unverified' rows, so returning one would just be wasted work. If the
+  // MP has unverified 2025 but verified 2024, we surface the older year.
   const r = await sb
     .from("mp_office_expense_reports")
     .select("id, year, funds_spent, data_confidence")
     .eq("term", term)
     .eq("mp_id", mpId)
+    .eq("data_confidence", "verified")
     .order("year", { ascending: false })
     .limit(1)
     .maybeSingle();
