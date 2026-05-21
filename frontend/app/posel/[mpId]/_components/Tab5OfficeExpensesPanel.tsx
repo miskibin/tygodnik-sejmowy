@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 import type { MpOfficeExpenseReport } from "@/lib/db/posel-tabs";
+import { BopInfoDialog } from "./BopInfoDialog";
 
 // Lp. → lucide icon for the 23 standardized BOP categories (Załącznik nr 1
 // do zarządzenia nr 2 Marszałka Sejmu z 31 III 2017 r.).
@@ -351,10 +352,11 @@ export function Tab5OfficeExpensesPanel({
       {/* Expense table */}
       <div className="border border-border bg-background">
         {/* Table header */}
-        <div className="border-b border-border bg-muted/40 px-3 sm:px-4 py-3">
+        <div className="border-b border-border bg-muted/40 px-3 sm:px-4 py-3 flex items-center gap-2">
           <h3 className="font-serif text-[16px] sm:text-[18px] font-medium text-foreground m-0">
             Wydatki biura w {report.year} roku
           </h3>
+          <BopInfoDialog />
         </div>
         <div
           className="grid items-center gap-3 sm:gap-4 px-3 sm:px-4 py-2 border-b border-border bg-muted/20"

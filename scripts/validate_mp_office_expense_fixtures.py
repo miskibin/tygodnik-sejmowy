@@ -35,10 +35,58 @@ from pathlib import Path
 FIXTURES_DIR = Path(__file__).resolve().parent.parent / "fixtures" / "sejm" / "mp_office_expenses"
 QUARANTINE_DIR = FIXTURES_DIR.parent / "mp_office_expenses_quarantine"
 
-MAX_REASONABLE = Decimal(1_500_000)
-MIN_ITEMS_SUM = Decimal(30_000)
+# Bounds grounded in regulations + ryczałt arithmetic for term 10, year 2025:
+#
+# - Annual ryczałt biurowy 2025: 23 310 zł/mc × 12 = 279 720 zł/rok
+#   (Art. 23 ust. 3 ustawy z 9 V 1996 r. o wykonywaniu mandatu posła i
+#   senatora — Dz.U. 2024 poz. 907 t.j.; Zarządzenie Marszałka Sejmu
+#   nr 8 z 25 IX 2001 r. w sprawie warunków organizacyjno-technicznych...).
+# - Posłowie z orzeczeniem o znacznym stopniu niepełnosprawności mogą
+#   otrzymać do +50 % (≈ 11 655 zł/mc; podstawa: §6a ZMS nr 8).
+# - Środki niewykorzystane z poprzedniego okresu (carryover) → praktyczna
+#   górna granica całorocznych wydatków ≈ 1,5× ryczałtu = ~420 k.
+MAX_REASONABLE = Decimal(1_500_000)     # absolute sanity ceiling
+MIN_ITEMS_SUM = Decimal(30_000)         # any office that ran spent at least this
 MIN_ALLOCATED = Decimal(100_000)
 MAX_SINGLE_ITEM = Decimal(500_000)
+
+# Per-category caps. STATUTORY caps are marked as such (cite the source);
+# the rest are empirical (p99 of 391 validated 2025 reports + headroom),
+# meant only to catch parser errors — not to enforce legality.
+#
+# References:
+#   ZMS nr 8 — Zarządzenie Marszałka Sejmu nr 8 z 25 IX 2001 r.
+#   ZMS nr 2/2017 — Zarządzenie nr 2 z 31 III 2017 r. (formularz sprawozdania).
+#   stawka km — Rozporządzenie Ministra Infrastruktury 2002/27/271
+#     (stawka 1,15 zł/km dla pojemności >900 cm³; 0,89 zł/km ≤900 cm³;
+#     do końca 2025 r. limit pojazdu osobowego: 3 500 km/mc).
+CATEGORY_CAPS: dict[int, Decimal] = {
+    1:  Decimal(280_000),   # Wynagrodzenia UoP (cap ≈ pełen ryczałt; brak twardego limitu)
+    2:  Decimal(50_000),    # Badania i szkolenia (empiryczne)
+    3:  Decimal(280_000),   # Umowy zlecenia/o dzieło (alt. do UoP; brak limitu)
+    4:  Decimal(250_000),   # Ekspertyzy/opinie (empiryczne; rok wyborczy ↑)
+    5:  Decimal(50_000),    # Telekomunikacja (mandat) — empiryczne
+    6:  Decimal(15_000),    # Telekomunikacja w Domu Poselskim (stałe niskie stawki)
+    7:  Decimal(100_000),   # Korespondencja (mailingi)
+    8:  Decimal(50_000),    # Wynajem sal
+    9:  Decimal(50_000),    # STATUTORY 2025: 3 500 km/mc × 12 × 1,15 zł = 48 300 zł/rok
+                            # (limit pojazdu osobowego >900 cm³ wg rozp. MI; reformy
+                            # Czarzastego od I 2026 obniżają do 1 500 km/mc = 20 700/rok)
+    10: Decimal(40_000),    # Taksówki — empiryczne
+    11: Decimal(250_000),   # Najem lokalu (premium WAW)
+    12: Decimal(20_000),    # Konserwacja sprzętu
+    13: Decimal(50_000),    # Naprawy/remonty lokalu
+    14: Decimal(100_000),   # Materiały biurowe i prasa
+    15: Decimal(50_000),    # Środki trwałe (wyposażenie)
+    16: Decimal(50_000),    # Podróże pracowników
+    17: Decimal(10_000),    # Odpis na ZFŚS (proporcjonalny do liczby pracowników)
+    18: Decimal(10_000),    # Świadczenia urlopowe (proporcjonalne)
+    19: Decimal(40_000),    # Księgowość i bankowość
+    20: Decimal(10_000),    # Polisa OC biura (typowo 1-2 k)
+    21: Decimal(5_000),     # Abonament RTV (ustawowo ~25 zł/mc; +TV firmowa daje przestrzeń do 5k)
+    22: Decimal(80_000),    # Strona www (budowa + utrzymanie)
+    23: Decimal(320_000),   # Inne wydatki (catch-all; cap = nieco powyżej ryczałtu)
+}
 
 
 def to_dec(s) -> Decimal | None:
@@ -61,13 +109,17 @@ def validate(payload: dict) -> tuple[bool, str]:
 
     item_sum = Decimal(0)
     for it in items:
+        code = it.get("category_code")
         v = to_dec(it.get("amount"))
         if v is None:
-            return False, f"item code {it.get('category_code')} amount not parseable: {it.get('amount')!r}"
+            return False, f"item code {code} amount not parseable: {it.get('amount')!r}"
         if v < 0:
-            return False, f"item code {it.get('category_code')} negative amount: {v}"
+            return False, f"item code {code} negative amount: {v}"
         if v > MAX_SINGLE_ITEM:
-            return False, f"item code {it.get('category_code')} amount {v} > {MAX_SINGLE_ITEM} (implausible)"
+            return False, f"item code {code} amount {v} > {MAX_SINGLE_ITEM} (implausible)"
+        cap = CATEGORY_CAPS.get(code)
+        if cap is not None and v > cap:
+            return False, f"item code {code} amount {v} > category cap {cap} (likely parser error — see CATEGORY_CAPS)"
         item_sum += v
 
     if item_sum < MIN_ITEMS_SUM:
