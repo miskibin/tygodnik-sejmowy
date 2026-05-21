@@ -22,11 +22,79 @@ import {
   Tv,
   Globe,
   MoreHorizontal,
+  Flag,
   type LucideIcon,
 } from "lucide-react";
 
 import type { MpOfficeExpenseReport } from "@/lib/db/posel-tabs";
 import { BopInfoDialog } from "./BopInfoDialog";
+
+// Public GitHub repo where readers can flag data issues. New-issue endpoint
+// supports query params for title, body and labels.
+const GH_NEW_ISSUE = "https://github.com/miskibin/tygodnik-sejmowy/issues/new";
+
+function buildReportIssueUrl({
+  mpId,
+  mpName,
+  year,
+  sourceUrl,
+  confidence,
+}: {
+  mpId: number;
+  mpName: string;
+  year: number;
+  sourceUrl: string;
+  confidence: "verified" | "unverified";
+}): string {
+  const title = `Niespójność: wydatki biura — ${mpName} (${year})`;
+  const body = [
+    `**Profil posła:** ${mpName} (mp_id: ${mpId})`,
+    `**Okres sprawozdawczy:** ${year}`,
+    `**Status danych w bazie:** ${confidence}`,
+    `**Oryginalne sprawozdanie (PDF):** ${sourceUrl}`,
+    "",
+    "---",
+    "",
+    "**Opisz niespójność** (czego dotyczy i jak ją zauważyłeś_aś):",
+    "",
+    'np. "kategoria 9 — przejazdy samochodem — strona pokazuje 38 000 zł, w PDF widnieje 25 000 zł"',
+    "",
+    "",
+  ].join("\n");
+  const params = new URLSearchParams({
+    title,
+    body,
+    labels: "wydatki-biura,data-quality",
+  });
+  return `${GH_NEW_ISSUE}?${params.toString()}`;
+}
+
+function ReportIssueButton({
+  mpId,
+  mpName,
+  year,
+  sourceUrl,
+  confidence,
+}: {
+  mpId: number;
+  mpName: string;
+  year: number;
+  sourceUrl: string;
+  confidence: "verified" | "unverified";
+}) {
+  const href = buildReportIssueUrl({ mpId, mpName, year, sourceUrl, confidence });
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.14em] text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+    >
+      <Flag size={12} strokeWidth={1.6} aria-hidden />
+      Zgłoś niespójność
+    </a>
+  );
+}
 
 // Lp. → lucide icon for the 23 standardized BOP categories (Załącznik nr 1
 // do zarządzenia nr 2 Marszałka Sejmu z 31 III 2017 r.).
@@ -247,8 +315,12 @@ function CategoryRow({
 
 export function Tab5OfficeExpensesPanel({
   report,
+  mpId,
+  mpName,
 }: {
   report: MpOfficeExpenseReport | null;
+  mpId: number;
+  mpName: string;
 }) {
   if (!report) {
     return (
@@ -289,18 +361,27 @@ export function Tab5OfficeExpensesPanel({
               w&nbsp;sekcji &bdquo;Inne wydatki&rdquo;, których parser pominął. Zamiast
               prezentować niespójne liczby pokazujemy link do oryginalnego dokumentu.
             </p>
-            <a
-              href={report.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.14em] text-[10.5px] text-foreground border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
-            >
-              Otwórz sprawozdanie (PDF, Sejm) →
-            </a>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <a
+                href={report.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.14em] text-[10.5px] text-foreground border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
+              >
+                Otwórz sprawozdanie (PDF, Sejm) →
+              </a>
+              <ReportIssueButton
+                mpId={mpId}
+                mpName={mpName}
+                year={report.year}
+                sourceUrl={report.sourceUrl}
+                confidence="unverified"
+              />
+            </div>
           </div>
         </div>
         <p className="font-sans text-[11px] text-muted-foreground leading-snug mt-3">
-          Dane zweryfikowane mamy dla 284 z 460 posłów — pozostałe sprawozdania
+          Dane zweryfikowane mamy dla 327 z 460 posłów — pozostałe sprawozdania
           stopniowo dochodzą po dopracowaniu odczytu OCR i ręcznej weryfikacji.
         </p>
       </div>
@@ -534,14 +615,23 @@ export function Tab5OfficeExpensesPanel({
             </>
           )}
         </div>
-        <a
-          href={report.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono uppercase tracking-[0.14em] text-[10px] underline underline-offset-2 hover:text-foreground"
-        >
-          Sprawozdanie (PDF, Sejm) →
-        </a>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <a
+            href={report.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono uppercase tracking-[0.14em] text-[10px] underline underline-offset-2 hover:text-foreground"
+          >
+            Sprawozdanie (PDF, Sejm) →
+          </a>
+          <ReportIssueButton
+            mpId={mpId}
+            mpName={mpName}
+            year={report.year}
+            sourceUrl={report.sourceUrl}
+            confidence="verified"
+          />
+        </div>
       </div>
     </div>
   );

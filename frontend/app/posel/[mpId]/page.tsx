@@ -348,7 +348,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
           ),
           wydatki: (
             <Suspense fallback={<PanelFallback rows={6} />}>
-              <OfficeExpensesAsync mpId={mpId} />
+              <OfficeExpensesAsync mpId={mpId} mpName={mp.firstLastName} />
             </Suspense>
           ),
           profil: <ProfilPanel mp={mp} clubName={clubName} />,
