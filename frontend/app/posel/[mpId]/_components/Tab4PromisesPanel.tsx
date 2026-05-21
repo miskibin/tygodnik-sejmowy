@@ -206,7 +206,7 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
         <p className="m-0">
           <strong className="text-foreground">Heurystyka.</strong>{" "}
           Druki dopasowane są do obietnic semantycznie, ograniczone do par oznaczonych jako
-          „confirmed". Głosowanie wybierane w pierwszej kolejności jako <em>main</em>{" "}
+          „confirmed”. Głosowanie wybierane w pierwszej kolejności jako <em>main</em>{" "}
           z <code className="font-mono text-[12px]">voting_print_links</code>; jeśli brak — pierwsze powiązane.
           Kolor uwzględnia <em>polarność wniosku</em> — głos NIE na &bdquo;wniosek o odrzucenie projektu&rdquo;
           jest <strong>zgodny</strong> z obietnicą wsparcia tego projektu, nie wbrew niej.

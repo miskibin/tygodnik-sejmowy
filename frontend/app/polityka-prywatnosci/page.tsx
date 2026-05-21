@@ -115,7 +115,7 @@ export default function PolitykaPrywatnosciPage() {
           </p>
           <p>
             Ponieważ nie przechowujemy danych osobowych, w praktyce każde żądanie sprowadza się
-            do informacji „nie mamy nic do udostępnienia ani usunięcia".
+            do informacji „nie mamy nic do udostępnienia ani usunięcia”.
           </p>
         </Section>
 

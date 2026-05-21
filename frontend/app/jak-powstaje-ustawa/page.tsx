@@ -178,10 +178,10 @@ const STAGES: Stage[] = [
       <>
         Każdy projekt musi zawierać <strong>uzasadnienie</strong> oraz{" "}
         <strong>ocenę skutków finansowych</strong> — to wymóg konstytucyjny.
-        Marszałek Sejmu nadaje projektowi numer druku (np. „druk nr 1650")
+        Marszałek Sejmu nadaje projektowi numer druku (np. „druk nr 1650”)
         i publikuje go w Systemie Informacyjnym Sejmu. Od tej chwili każdy
         obywatel może przeczytać pełną treść projektu wraz z uzasadnieniem.
-        Sam moment „wpłynięcia" niczego nie rozstrzyga — projekt po prostu
+        Sam moment „wpłynięcia” niczego nie rozstrzyga — projekt po prostu
         wchodzi do kalendarza prac Sejmu.
       </>,
     ],
@@ -209,7 +209,7 @@ const STAGES: Stage[] = [
         <strong>ustrój i właściwość władz publicznych</strong>, a także{" "}
         <strong>kodeksy</strong>. Pozostałe projekty trafiają najpierw do
         komisji branżowej, a Marszałek może w drodze wyjątku skierować
-        konkretny projekt na salę, jeśli „uzasadniają to ważne względy".
+        konkretny projekt na salę, jeśli „uzasadniają to ważne względy”.
       </>,
       <>
         Pierwsze czytanie nie może odbyć się{" "}
@@ -306,7 +306,7 @@ const STAGES: Stage[] = [
         Po zakończeniu prac komisja głosuje nad treścią projektu z wszystkimi
         wprowadzonymi poprawkami. Tworzy się <strong>sprawozdanie komisji</strong>{" "}
         — odrębny dokument publikowany jako kolejny druk sejmowy (zazwyczaj z
-        sufiksem „-A", np. „druk 1234-A"). Sprawozdanie zawiera{" "}
+        sufiksem „-A”, np. „druk 1234-A”). Sprawozdanie zawiera{" "}
         <strong>pełną listę poprawek</strong>, proponowane stanowisko (za
         przyjęciem, za odrzuceniem albo z dalszymi zmianami) oraz informacje o
         głosach mniejszości.
@@ -314,7 +314,7 @@ const STAGES: Stage[] = [
       <>
         Komisja wyznacza <strong>posła-sprawozdawcę</strong> — jednego ze swoich
         członków, który podczas II czytania na sali plenarnej przedstawi raport
-        z prac. Sprawozdawca staje się publiczną „twarzą" projektu na tym
+        z prac. Sprawozdawca staje się publiczną „twarzą” projektu na tym
         etapie — to jego nazwisko pojawia się w mediach gdy ustawa wchodzi do
         debaty.
       </>,
@@ -400,7 +400,7 @@ const STAGES: Stage[] = [
         Po przegłosowaniu wszystkich poprawek <strong>ostateczna treść
         projektu jest ustalona</strong>. Każda poprawka, która zebrała większość
         — wchodzi do tekstu. Każda, która nie zebrała — wypada. To moment, w
-        którym ustawa w wersji „gotowej do głosowania" przybiera ostateczny
+        którym ustawa w wersji „gotowej do głosowania” przybiera ostateczny
         kształt.
       </>,
     ],
@@ -432,7 +432,7 @@ const STAGES: Stage[] = [
       </>,
       <>
         Głosowanie odbywa się <strong>imiennie</strong> — każdy poseł
-        elektronicznie głosuje „za", „przeciw" lub „wstrzymuję się", a wynik
+        elektronicznie głosuje „za”, „przeciw” lub „wstrzymuję się”, a wynik
         publikowany jest natychmiast wraz z nazwiskami. Można sprawdzić, jak
         głosował konkretny poseł. To kluczowy moment dla obywatelskiej
         kontroli władzy.
@@ -478,7 +478,7 @@ const STAGES: Stage[] = [
       <>
         Termin zależy od trybu, w jakim ustawa jest procedowana:
       </>,
-      <ul className="list-disc pl-6 space-y-1 my-3">
+      <ul key="senate-durations" className="list-disc pl-6 space-y-1 my-3">
         <li>
           <strong>30 dni</strong> — standardowy termin dla zwykłej ustawy
           (art. 121 ust. 2 Konstytucji)
@@ -538,11 +538,11 @@ const STAGES: Stage[] = [
       </>,
       <>
         <strong>UWAGA — częsta pomyłka.</strong>{" "}
-        Bezwzględna większość TO NIE JEST „50% obecnych + 1". To wymaganie
+        Bezwzględna większość TO NIE JEST „50% obecnych + 1”. To wymaganie
         kworum, czyli czegoś innego. Bezwzględna większość oznacza, że głosów
         ZA musi być <strong>więcej niż PRZECIW i WSTRZYMUJĄCYCH RAZEM</strong>{" "}
         — czyli ponad połowa wszystkich głosów oddanych w danym głosowaniu.
-        Wstrzymujący się NIE są neutralni — działają jak głosy „przeciw" w tym
+        Wstrzymujący się NIE są neutralni — działają jak głosy „przeciw” w tym
         progu.
       </>,
       <>
@@ -576,7 +576,7 @@ const STAGES: Stage[] = [
         Po przejściu Sejmu i Senatu ustawa trafia do Prezydenta. Prezydent ma
         trzy opcje konstytucyjne:
       </>,
-      <ol className="list-decimal pl-6 space-y-2 my-3">
+      <ol key="president-options" className="list-decimal pl-6 space-y-2 my-3">
         <li>
           <strong>PODPISAĆ</strong> — ustawa zostaje promulgowana (zarządza jej
           publikację w Dzienniku Ustaw). Po publikacji zaczyna obowiązywać.
@@ -616,7 +616,7 @@ const STAGES: Stage[] = [
       <>
         Standardowy termin to <strong>21 dni</strong>. Ale są wyjątki:
       </>,
-      <ul className="list-disc pl-6 space-y-1 my-3">
+      <ul key="president-deadlines" className="list-disc pl-6 space-y-1 my-3">
         <li>
           <strong>7 dni</strong> dla ustaw uchwalanych w trybie pilnym
         </li>
@@ -698,7 +698,7 @@ const STAGES: Stage[] = [
         Tekst opublikowanej ustawy zawiera datę wejścia w życie. Standardowo
         ustawa wchodzi w życie po <strong>14 dniach od dnia ogłoszenia</strong>{" "}
         — to nazywa się <strong>vacatio legis</strong> (po polsku „spoczynek
-        ustawy"). Ten okres daje adresatom czas, by zapoznać się z nowymi
+        ustawy”). Ten okres daje adresatom czas, by zapoznać się z nowymi
         regulacjami i przygotować do ich stosowania. Ustawa może jednak
         określić własny termin — krótszy lub dłuższy. Przykład krótkiego: ustawa
         wchodzi w życie z dniem ogłoszenia. Przykład dłuższego: ustawa wchodzi
@@ -864,13 +864,13 @@ const GLOSSARY: Term[] = [
     def: (
       <>
         Głosów ZA musi być więcej niż PRZECIW i WSTRZYMUJĄCYCH razem — czyli
-        ponad 50% wszystkich oddanych głosów. Nie myl z „50% obecnych + 1".
+        ponad 50% wszystkich oddanych głosów. Nie myl z „50% obecnych + 1”.
       </>
     ),
   },
   {
     term: "Druk sejmowy",
-    def: <>Numerowany dokument wniesiony do Sejmu — projekt ustawy, sprawozdanie komisji, opinia, autopoprawka. Każdy ma unikalny numer (np. „druk 1650").</>,
+    def: <>Numerowany dokument wniesiony do Sejmu — projekt ustawy, sprawozdanie komisji, opinia, autopoprawka. Każdy ma unikalny numer (np. „druk 1650”).</>,
   },
   {
     term: "Dziennik Ustaw (Dz.U.)",
@@ -912,7 +912,7 @@ const GLOSSARY: Term[] = [
   },
   {
     term: "Vacatio legis",
-    def: <>Łac. „spoczynek ustawy" — okres między ogłoszeniem ustawy w Dz.U. a jej wejściem w życie. Standardowo 14 dni, ale ustawa może określić własny termin.</>,
+    def: <>Łac. „spoczynek ustawy” — okres między ogłoszeniem ustawy w Dz.U. a jej wejściem w życie. Standardowo 14 dni, ale ustawa może określić własny termin.</>,
   },
   {
     term: "Weto prezydenckie",
