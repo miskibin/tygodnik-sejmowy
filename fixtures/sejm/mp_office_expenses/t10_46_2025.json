@@ -1,0 +1,130 @@
+{
+  "funds_allocated": "279720.04",
+  "funds_carryover": "28651.06",
+  "funds_interest": "0.00",
+  "funds_remaining": "34429.34",
+  "funds_spent": "273941.76",
+  "funds_total": "308371.10",
+  "items": [
+    {
+      "amount": "108054.79",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "2164.26",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "11590.36",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "590.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "37000.00",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "20564.10",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "4094.21",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "8394.98",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "955.60",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "77810.06",
+      "category_code": 23,
+      "notes": "agrody rzeczowe 9861.58; Wiązanki/kwiaty 8929.00; Spożywcze 10097.87; Wynajem auta 48921.61"
+    }
+  ],
+  "mp_id": 46,
+  "source_sha256": "96f0a89d3be95fb42ec4dc4ecedf47f6f0c39b3311589254a4f89528285dd687",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025046/$File/2025ryczalt_046.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

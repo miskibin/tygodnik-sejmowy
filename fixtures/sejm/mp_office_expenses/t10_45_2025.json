@@ -1,24 +1,26 @@
 {
-  "funds_spent": "310286",
+  "funds_allocated": "279720",
+  "funds_carryover": "0",
+  "funds_total": "279720",
   "items": [
     {
-      "amount": "117334",
+      "amount": "2",
       "category_code": 1
     },
     {
-      "amount": "116",
+      "amount": "0",
       "category_code": 2
     },
     {
-      "amount": "33380",
+      "amount": "90795.79",
       "category_code": 3
     },
     {
-      "amount": "6765",
+      "amount": "6",
       "category_code": 4
     },
     {
-      "amount": "931",
+      "amount": "0",
       "category_code": 5
     },
     {
@@ -26,15 +28,15 @@
       "category_code": 6
     },
     {
-      "amount": "14315",
+      "amount": "9.77",
       "category_code": 7
     },
     {
-      "amount": "0",
+      "amount": "0.00",
       "category_code": 8
     },
     {
-      "amount": "21885",
+      "amount": "38640.00",
       "category_code": 9
     },
     {
@@ -42,27 +44,27 @@
       "category_code": 10
     },
     {
-      "amount": "38061",
+      "amount": "43",
       "category_code": 11
     },
     {
-      "amount": "553",
+      "amount": "0",
       "category_code": 12
     },
     {
-      "amount": "3920",
+      "amount": "0",
       "category_code": 13
     },
     {
-      "amount": "7394",
+      "amount": "0",
       "category_code": 14
     },
     {
-      "amount": "470",
+      "amount": "4",
       "category_code": 15
     },
     {
-      "amount": "1113",
+      "amount": "1",
       "category_code": 16
     },
     {
@@ -70,11 +72,11 @@
       "category_code": 17
     },
     {
-      "amount": "0",
+      "amount": "1",
       "category_code": 18
     },
     {
-      "amount": "6334",
+      "amount": "0",
       "category_code": 19
     },
     {
@@ -86,16 +88,17 @@
       "category_code": 21
     },
     {
-      "amount": "0",
+      "amount": "0.19",
       "category_code": 22
     },
     {
-      "amount": "-57965",
+      "amount": "0",
       "category_code": 23
     }
   ],
-  "mp_id": 125,
-  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025125/$File/2025ryczalt_125.pdf?OpenElement",
+  "mp_id": 45,
+  "source_sha256": "8a1657a85350f9159c29155d072ecdb1406d4ebe893f6e313358093651530e61",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025045/$File/2025ryczalt_045.pdf?OpenElement",
   "term": 10,
   "year": 2025
 }

@@ -1,8 +1,9 @@
 {
-  "funds_spent": "0",
+  "funds_remaining": "137.5",
+  "funds_spent": "292613.68",
   "items": [
     {
-      "amount": "0",
+      "amount": "2",
       "category_code": 1
     },
     {
@@ -10,15 +11,15 @@
       "category_code": 2
     },
     {
-      "amount": "0",
+      "amount": "29704.76",
       "category_code": 3
     },
     {
-      "amount": "0",
+      "amount": "6",
       "category_code": 4
     },
     {
-      "amount": "0",
+      "amount": "292613.68",
       "category_code": 5
     },
     {
@@ -26,15 +27,15 @@
       "category_code": 6
     },
     {
-      "amount": "0",
+      "amount": "2322",
       "category_code": 7
     },
     {
-      "amount": "0",
+      "amount": "9.30",
       "category_code": 8
     },
     {
-      "amount": "0",
+      "amount": "50",
       "category_code": 9
     },
     {
@@ -42,7 +43,7 @@
       "category_code": 10
     },
     {
-      "amount": "0",
+      "amount": "6.80",
       "category_code": 11
     },
     {
@@ -58,11 +59,11 @@
       "category_code": 14
     },
     {
-      "amount": "0",
+      "amount": "34",
       "category_code": 15
     },
     {
-      "amount": "0",
+      "amount": "1",
       "category_code": 16
     },
     {
@@ -70,7 +71,7 @@
       "category_code": 17
     },
     {
-      "amount": "0",
+      "amount": "1",
       "category_code": 18
     },
     {
@@ -78,7 +79,7 @@
       "category_code": 19
     },
     {
-      "amount": "0",
+      "amount": "78.88",
       "category_code": 20
     },
     {
@@ -90,12 +91,13 @@
       "category_code": 22
     },
     {
-      "amount": "0",
+      "amount": "62.89",
       "category_code": 23
     }
   ],
-  "mp_id": 266,
-  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025266/$File/2025ryczalt_266.pdf?OpenElement",
+  "mp_id": 5,
+  "source_sha256": "cdb59bb4c9e50b45a94bb13de52f4789ec072128174e167a1236fcd432a3d14b",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025005/$File/2025ryczalt_005.pdf?OpenElement",
   "term": 10,
   "year": 2025
 }

@@ -345,15 +345,34 @@ def parse_pdf_text(text: str) -> dict[str, Any]:
     return out
 
 
+# Max pages to OCR on a single report. The BOP form table fits across pages 1-2;
+# pages 3+ are just totals + signatures + optional "Inne wydatki" sub-list.
+# Capping prevents wasted tesseract time on multi-page signature appendices.
+MAX_OCR_PAGES = int(os.environ.get("SUPAGRAF_MP_EXPENSES_OCR_MAX_PAGES", "3"))
+OCR_DPI = int(os.environ.get("SUPAGRAF_MP_EXPENSES_OCR_DPI", "220"))
+
+# Tesseract spawns a multi-threaded subprocess per call. With our 4 workers
+# in parallel that oversubscribes the 4 CPU cores massively (~25x slowdown
+# observed empirically — single-page OCR went from 1.4 s → 2.5 min). Force
+# single-threaded per-instance so 4 workers cleanly map to 4 cores.
+os.environ.setdefault("OMP_THREAD_LIMIT", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+
+
 def _extract_pdf_text(pdf_path: Path) -> str:
     """Get text from a PDF. Digital PDFs use pymupdf directly; scans (real
-    BOP reports are MP-signed scans) auto-fallback to tesseract `pol` at
-    300 DPI per page."""
+    BOP reports are MP-signed scans) auto-fallback to tesseract `pol`.
+
+    DPI defaults to 220 (Polish form is readable at this resolution; ~2x faster
+    than 300). First MAX_OCR_PAGES pages only — pages 3+ are signatures.
+    """
     import pymupdf  # imported lazily — pymupdf is a heavy native dep
     doc = pymupdf.open(pdf_path)
     try:
         parts = []
-        for page in doc:
+        for i, page in enumerate(doc):
+            if i >= MAX_OCR_PAGES:
+                break
             t = page.get_text()
             if len(t.strip()) > 30:
                 parts.append(t)
@@ -379,9 +398,10 @@ def _ocr_page(page) -> str:
             "scan-PDF OCR requires `pytesseract` + `Pillow` (Python) and the "
             "`tesseract-ocr` + `tesseract-ocr-pol` system packages"
         ) from e
-    pix = page.get_pixmap(dpi=300)
+    pix = page.get_pixmap(dpi=OCR_DPI)
     img = Image.open(io.BytesIO(pix.tobytes("png")))
-    return pytesseract.image_to_string(img, lang="pol")
+    # psm 4: single column of text of variable sizes — works well for BOP form
+    return pytesseract.image_to_string(img, lang="pol", config="--psm 4")
 
 
 # -------- LLM fallback for OCR'd reports --------

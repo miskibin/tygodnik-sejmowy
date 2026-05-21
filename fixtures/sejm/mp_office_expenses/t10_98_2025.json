@@ -1,0 +1,127 @@
+{
+  "funds_allocated": "279720.00",
+  "funds_remaining": "0.00",
+  "funds_spent": "280820.84",
+  "items": [
+    {
+      "amount": "179273.64",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "27179.56",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "55366.80",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "10535.31",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "1312.04",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "2042.55",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "4360.00",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "440.34",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "310.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 23,
+      "notes": null
+    }
+  ],
+  "mp_id": 98,
+  "source_sha256": "c27eff9a6e791228425783f09c4d603d73c17f51530884e3cd96a4630d5fec08",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025098/$File/2025ryczalt_098.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

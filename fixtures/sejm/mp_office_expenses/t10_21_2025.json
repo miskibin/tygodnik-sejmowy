@@ -1,20 +1,22 @@
 {
-  "funds_spent": "0",
+  "funds_allocated": "279720.00",
+  "funds_carryover": "26153.30",
+  "funds_spent": "-303908.84",
   "items": [
     {
-      "amount": "0",
+      "amount": "1500.00",
       "category_code": 1
     },
     {
-      "amount": "0",
+      "amount": "303908.84",
       "category_code": 2
     },
     {
-      "amount": "0",
+      "amount": "80120.37",
       "category_code": 3
     },
     {
-      "amount": "0",
+      "amount": "6",
       "category_code": 4
     },
     {
@@ -26,7 +28,7 @@
       "category_code": 6
     },
     {
-      "amount": "0",
+      "amount": "189.49",
       "category_code": 7
     },
     {
@@ -34,15 +36,15 @@
       "category_code": 8
     },
     {
-      "amount": "0",
+      "amount": "46300.00",
       "category_code": 9
     },
     {
-      "amount": "0",
+      "amount": "578.67",
       "category_code": 10
     },
     {
-      "amount": "0",
+      "amount": "12",
       "category_code": 11
     },
     {
@@ -50,7 +52,7 @@
       "category_code": 12
     },
     {
-      "amount": "0",
+      "amount": "22787.53",
       "category_code": 13
     },
     {
@@ -58,11 +60,11 @@
       "category_code": 14
     },
     {
-      "amount": "0",
+      "amount": "6037.00",
       "category_code": 15
     },
     {
-      "amount": "0",
+      "amount": "34650.47",
       "category_code": 16
     },
     {
@@ -70,11 +72,11 @@
       "category_code": 17
     },
     {
-      "amount": "0",
+      "amount": "1",
       "category_code": 18
     },
     {
-      "amount": "0",
+      "amount": "12610.50",
       "category_code": 19
     },
     {
@@ -86,16 +88,17 @@
       "category_code": 21
     },
     {
-      "amount": "0",
+      "amount": "506.00",
       "category_code": 22
     },
     {
-      "amount": "0",
+      "amount": "33914.56",
       "category_code": 23
     }
   ],
-  "mp_id": 335,
-  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025335/$File/2025ryczalt_335.pdf?OpenElement",
+  "mp_id": 21,
+  "source_sha256": "d15da4775c555446954b545df01c6beae74df376b5bd1fc3acd7b78a7deea743",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025021/$File/2025ryczalt_021.pdf?OpenElement",
   "term": 10,
   "year": 2025
 }

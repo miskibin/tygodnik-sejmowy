@@ -1,0 +1,127 @@
+{
+  "funds_remaining": "7952.28",
+  "funds_spent": "288621.44",
+  "funds_total": "296573.72",
+  "items": [
+    {
+      "amount": "79450.80",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "27800.00",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "3855.02",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "47599.00",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "55842.59",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "424.02",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "8694.98",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "3400.00",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "9622.00",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "51933.03",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze i środki czystości; Wiaty, wiązanki na uroczystości; Dyplomy, medale, statuetki, ramki; Promocja; Drobne wyposażenie; Wynajem auta"
+    }
+  ],
+  "mp_id": 78,
+  "source_sha256": "2eea7a600eb9e964fd4a1265ece4791bb1edea2e54b5e9138a1a30e94e8acddb",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025078/$File/2025ryczalt_078.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

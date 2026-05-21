@@ -1,20 +1,24 @@
 {
-  "funds_spent": "0",
+  "funds_allocated": "279720.00",
+  "funds_carryover": "3762.46",
+  "funds_remaining": "242.04",
+  "funds_spent": "283240.42",
+  "funds_total": "283482.46",
   "items": [
     {
-      "amount": "0",
+      "amount": "3417.95",
       "category_code": 1
     },
     {
-      "amount": "0",
+      "amount": "283240.42",
       "category_code": 2
     },
     {
-      "amount": "0",
+      "amount": "15128.00",
       "category_code": 3
     },
     {
-      "amount": "0",
+      "amount": "0.00",
       "category_code": 4
     },
     {
@@ -26,7 +30,7 @@
       "category_code": 6
     },
     {
-      "amount": "0",
+      "amount": "9.31",
       "category_code": 7
     },
     {
@@ -90,12 +94,13 @@
       "category_code": 22
     },
     {
-      "amount": "0",
+      "amount": "30319.60",
       "category_code": 23
     }
   ],
-  "mp_id": 477,
-  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025477/$File/2025ryczalt_477.pdf?OpenElement",
+  "mp_id": 40,
+  "source_sha256": "826278d5257574259c716b2635122146d9c31c8445f86f73a22cfd3733ee3d2f",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025040/$File/2025ryczalt_040.pdf?OpenElement",
   "term": 10,
   "year": 2025
 }

@@ -1,0 +1,130 @@
+{
+  "funds_allocated": "279720.00",
+  "funds_carryover": "74972.29",
+  "funds_interest": "0.00",
+  "funds_remaining": "79879.39",
+  "funds_spent": "274812.90",
+  "funds_total": "354692.29",
+  "items": [
+    {
+      "amount": "128660.15",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "15300.00",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "1283.06",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "4548.00",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "123.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "42837.50",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "602.44",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "41136.02",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "344.97",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "6833.15",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "10122.42",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "1412.50",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "9.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "1002.24",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "20607.45",
+      "category_code": 23,
+      "notes": "artykuły spożywcze 3124.83; wydawnictwa/kwiaty 3846.00; drobne nagrody/rekwizyty 4050.70; usługi szkoleniowe"
+    }
+  ],
+  "mp_id": 41,
+  "source_sha256": "e6e976a89e4b7d3b768c5c8e8239a8f8c8d8325fb09e695dd7406c825fc1cc89",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025041/$File/2025ryczalt_041.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

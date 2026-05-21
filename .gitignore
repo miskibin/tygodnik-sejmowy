@@ -26,9 +26,12 @@ backups/sejmograf_public_*.dump
 !/fixtures/sejm/
 /fixtures/sejm/*
 !/fixtures/sejm/mp_office_expenses/
-# All per-MP fixtures are tracked too (≈1 MB total; derived from scripts/
-# bootstrap_jakglosuja_expenses.py + jakglosuja.pl). Lets CI / fresh
-# clones load straight to the DB without running the scraper.
+# All per-MP fixtures are tracked too (≈2 MB total; derived from scripts/
+# bootstrap_jakglosuja_expenses.py + Phase 2 OCR+LLM via supagraf/fetch/).
+# Lets CI / fresh clones load straight to the DB without re-running the
+# pipeline. mp_office_expenses_quarantine/ is the LLM-extracted set that
+# failed validation (scripts/validate_mp_office_expense_fixtures.py) —
+# intentionally NOT tracked; those are scratch files for offline re-extract.
 !/fixtures/sejm/mp_office_expenses/_index.json
 !/fixtures/sejm/mp_office_expenses/t*_*.json
 *.log

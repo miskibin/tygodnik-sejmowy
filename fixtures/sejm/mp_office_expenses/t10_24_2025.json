@@ -1,12 +1,16 @@
 {
-  "funds_spent": "0",
+  "funds_allocated": "279720.00",
+  "funds_carryover": "121720.99",
+  "funds_interest": "0.00",
+  "funds_remaining": "50001.08",
+  "funds_spent": "351439.91",
   "items": [
     {
-      "amount": "0",
+      "amount": "4.69",
       "category_code": 1
     },
     {
-      "amount": "0",
+      "amount": "0.00",
       "category_code": 2
     },
     {
@@ -14,7 +18,7 @@
       "category_code": 3
     },
     {
-      "amount": "0",
+      "amount": "351439.91",
       "category_code": 4
     },
     {
@@ -34,7 +38,7 @@
       "category_code": 8
     },
     {
-      "amount": "0",
+      "amount": "60.00",
       "category_code": 9
     },
     {
@@ -42,7 +46,7 @@
       "category_code": 10
     },
     {
-      "amount": "0",
+      "amount": "7.13",
       "category_code": 11
     },
     {
@@ -58,15 +62,15 @@
       "category_code": 14
     },
     {
-      "amount": "0",
+      "amount": "64.50",
       "category_code": 15
     },
     {
-      "amount": "0",
+      "amount": "20.81",
       "category_code": 16
     },
     {
-      "amount": "0",
+      "amount": "591.50",
       "category_code": 17
     },
     {
@@ -78,15 +82,15 @@
       "category_code": 19
     },
     {
-      "amount": "0",
+      "amount": "2",
       "category_code": 20
     },
     {
-      "amount": "0",
+      "amount": "0.00",
       "category_code": 21
     },
     {
-      "amount": "0",
+      "amount": "6.44",
       "category_code": 22
     },
     {
@@ -94,8 +98,9 @@
       "category_code": 23
     }
   ],
-  "mp_id": 124,
-  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025124/$File/2025ryczalt_124.pdf?OpenElement",
+  "mp_id": 24,
+  "source_sha256": "016cbe127119e20610029eaaf0599a36e6454b9ff3e7ca3f450e7e10356e8d56",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025024/$File/2025ryczalt_024.pdf?OpenElement",
   "term": 10,
   "year": 2025
 }

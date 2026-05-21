@@ -1,0 +1,130 @@
+{
+  "funds_allocated": "279720.00",
+  "funds_carryover": "58687.09",
+  "funds_interest": "0.00",
+  "funds_remaining": "112636.88",
+  "funds_spent": "225770.21",
+  "funds_total": "338407.09",
+  "items": [
+    {
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "104505.41",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "1911.90",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "38002.90",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "13601.87",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "1881.80",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "400.02",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "6352.66",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "8860.00",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "2432.56",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "41423.57",
+      "category_code": 23,
+      "notes": "wiązanki okolicznościowe 4140.00 zł; catering na spotkanie z wyborcami 4140.59 zł; zakup upominków okolicznościowych 215.00 zł; drobne nagrody rzeczowe 2017.35 zł; artykuły spożywcze na użytek biura 3701.72 zł; artykuły do sprzątania 1900.39 zł; dostawa środków trwałych 0.00 zł; działalność poselska w mediach społecznościowych 4610.00 zł; wyposażenie biura 2104.52 zł"
+    }
+  ],
+  "mp_id": 96,
+  "source_sha256": "5f3a647c7e87f46fcc484fc4fefe15492ed957dcb501b53ef21943080cee12a0",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025096/$File/2025ryczalt_096.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}
