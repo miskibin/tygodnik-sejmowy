@@ -134,7 +134,7 @@ function CategoryRow({
   namePl,
   amount,
   notes,
-  spentTotal,
+  shareBase,
   maxAmount,
   precise,
 }: {
@@ -143,13 +143,13 @@ function CategoryRow({
   namePl: string;
   amount: number;
   notes: string | null;
-  spentTotal: number;
+  shareBase: number;
   maxAmount: number;
   precise: boolean;
 }) {
   const Icon = CATEGORY_ICONS[code] ?? MoreHorizontal;
   const barPct = maxAmount > 0 ? (amount / maxAmount) * 100 : 0;
-  const sharePct = spentTotal > 0 ? (amount / spentTotal) * 100 : null;
+  const sharePct = shareBase > 0 ? (amount / shareBase) * 100 : null;
   return (
     <div
       className="grid items-center gap-3 sm:gap-4 py-3 px-3 sm:px-4 border-b border-border last:border-b-0"
@@ -240,7 +240,11 @@ export function Tab5OfficeExpensesPanel({
   // Bars are sized relative to the largest non-zero amount so the biggest
   // row fills the bar column and smaller rows show their relative weight.
   const maxAmount = sortedNonZero[0]?.amount ?? 0;
-  const spentTotal = spent ?? sortedNonZero.reduce((a, it) => a + it.amount, 0);
+  // Shares are computed as a fraction of the sum of visible items — this
+  // is the only way percentages can sum to 100% regardless of whether the
+  // PDF's "Razem" total matches our extracted sum (OCR'd reports
+  // sometimes have small mismatches against the reported funds_spent).
+  const itemsSum = sortedNonZero.reduce((a, it) => a + it.amount, 0);
 
   // Detect precision mode: jakglosuja-derived rows are all integers (no .NN),
   // OCR+LLM-derived rows carry decimals. Render decimals only when present.
@@ -325,7 +329,7 @@ export function Tab5OfficeExpensesPanel({
               namePl={it.namePl}
               amount={it.amount}
               notes={it.notes}
-              spentTotal={spentTotal}
+              shareBase={itemsSum}
               maxAmount={maxAmount}
               precise={hasFraction}
             />
@@ -351,7 +355,7 @@ export function Tab5OfficeExpensesPanel({
                   namePl={it.namePl}
                   amount={it.amount}
                   notes={it.notes}
-                  spentTotal={spentTotal}
+                  shareBase={itemsSum}
                   maxAmount={maxAmount}
                   precise={hasFraction}
                 />
