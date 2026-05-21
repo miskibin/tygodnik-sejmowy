@@ -138,6 +138,8 @@ function CategoryRow({
   shareBase,
   maxAmount,
   precise,
+  categoryMedian,
+  categoryNonzeroCount,
 }: {
   code: number;
   shortLabel: string;
@@ -147,10 +149,25 @@ function CategoryRow({
   shareBase: number;
   maxAmount: number;
   precise: boolean;
+  categoryMedian: number | null;
+  categoryNonzeroCount: number;
 }) {
   const Icon = CATEGORY_ICONS[code] ?? MoreHorizontal;
   const barPct = maxAmount > 0 ? (amount / maxAmount) * 100 : 0;
   const sharePct = shareBase > 0 ? (amount / shareBase) * 100 : null;
+  // Deviation badge: shown only when this MP spent something on the category,
+  // the category has a meaningful sample (≥30 MPs spent on it across the
+  // year), and the deviation from the median is at least ±25 %.
+  let deviationPct: number | null = null;
+  if (
+    amount > 0 &&
+    categoryMedian != null &&
+    categoryMedian > 0 &&
+    categoryNonzeroCount >= 30
+  ) {
+    const d = ((amount - categoryMedian) / categoryMedian) * 100;
+    if (Math.abs(d) >= 25) deviationPct = d;
+  }
   return (
     <div
       className="grid items-center gap-3 sm:gap-4 py-3 px-3 sm:px-4 border-b border-border last:border-b-0"
@@ -188,9 +205,29 @@ function CategoryRow({
             aria-hidden
           />
         </div>
-        {notes && (
-          <div className="font-sans text-[10.5px] text-muted-foreground leading-snug break-words mt-1">
-            {notes}
+        {(deviationPct != null || notes) && (
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            {deviationPct != null && (
+              <span
+                className="font-mono text-[10px] uppercase tracking-[0.06em]"
+                style={{
+                  color:
+                    deviationPct > 0 ? "var(--destructive)" : "var(--success)",
+                }}
+                title={`mediana w kategorii: ${categoryMedian!.toLocaleString("pl-PL", { maximumFractionDigits: 0 })} zł (z ${categoryNonzeroCount} posłów z wydatkiem)`}
+              >
+                {deviationPct > 0 ? "+" : ""}
+                {deviationPct.toLocaleString("pl-PL", {
+                  maximumFractionDigits: 0,
+                })}
+                % niż mediana
+              </span>
+            )}
+            {notes && (
+              <span className="font-sans text-[10.5px] text-muted-foreground leading-snug break-words">
+                {notes}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -223,6 +260,48 @@ export function Tab5OfficeExpensesPanel({
           Sprawozdania roczne 460 posłów publikuje Kancelaria Sejmu po zatwierdzeniu
           przez Prezydium Sejmu i Komisję Regulaminową. Dodajemy je iteracyjnie do bazy
           tygodnika.
+        </p>
+      </div>
+    );
+  }
+
+  // For reports where we couldn't verify internal consistency (sum of items
+  // != PDF's "Razem" within rounding), refuse to show the item breakdown.
+  // Putting numbers we can't vouch for in front of readers is the worst
+  // failure mode for this kind of public data.
+  if (report.dataConfidence === "unverified") {
+    return (
+      <div className="min-w-0">
+        <div className="border border-border bg-background">
+          <div className="border-b border-border bg-muted/40 px-3 sm:px-4 py-3 flex items-center gap-2">
+            <h3 className="font-serif text-[16px] sm:text-[18px] font-medium text-foreground m-0">
+              Wydatki biura w {report.year} roku
+            </h3>
+            <BopInfoDialog />
+          </div>
+          <div className="px-3 sm:px-5 py-6 sm:py-8 max-w-[640px]">
+            <p className="font-serif text-[14px] sm:text-[15px] leading-relaxed text-foreground m-0 mb-3">
+              Sprawozdanie wymaga weryfikacji.
+            </p>
+            <p className="font-sans text-[12px] text-muted-foreground leading-snug m-0 mb-4">
+              Maszynowy odczyt PDF zwrócił dane, które nie zgadzają się z kwotą &bdquo;Razem&rdquo;
+              z formularza — najczęściej dotyczy to ręcznie wypełnianych pozycji
+              w&nbsp;sekcji &bdquo;Inne wydatki&rdquo;, których parser pominął. Zamiast
+              prezentować niespójne liczby pokazujemy link do oryginalnego dokumentu.
+            </p>
+            <a
+              href={report.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.14em] text-[10.5px] text-foreground border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
+            >
+              Otwórz sprawozdanie (PDF, Sejm) →
+            </a>
+          </div>
+        </div>
+        <p className="font-sans text-[11px] text-muted-foreground leading-snug mt-3">
+          Dane zweryfikowane mamy dla 284 z 460 posłów — pozostałe sprawozdania
+          stopniowo dochodzą po dopracowaniu odczytu OCR i ręcznej weryfikacji.
         </p>
       </div>
     );
@@ -335,7 +414,7 @@ export function Tab5OfficeExpensesPanel({
         <div className="mb-4 p-3 border-l-2 border-warning bg-warning/5 font-sans text-[11.5px] text-muted-foreground leading-snug">
           <strong className="text-foreground">Uwaga.</strong> Suma 23 kategorii poniżej
           ({fmtPLN(itemsSum, { precise: hasFraction })}) różni się od kwoty
-          „wydatkowano" zadeklarowanej w PDF ({fmtPLN(reportedSpent, { precise: hasFraction })}).
+          &bdquo;wydatkowano&rdquo; zadeklarowanej w PDF ({fmtPLN(reportedSpent, { precise: hasFraction })}).
           Może to wynikać z ograniczeń maszynowego odczytu PDF — zalecamy weryfikację w{" "}
           <a
             href={report.sourceUrl}
@@ -393,6 +472,8 @@ export function Tab5OfficeExpensesPanel({
               shareBase={itemsSum}
               maxAmount={maxAmount}
               precise={hasFraction}
+              categoryMedian={it.categoryMedian}
+              categoryNonzeroCount={it.categoryNonzeroCount}
             />
           ))
         )}
@@ -419,6 +500,8 @@ export function Tab5OfficeExpensesPanel({
                   shareBase={itemsSum}
                   maxAmount={maxAmount}
                   precise={hasFraction}
+                  categoryMedian={it.categoryMedian}
+                  categoryNonzeroCount={it.categoryNonzeroCount}
                 />
               ))}
           </details>

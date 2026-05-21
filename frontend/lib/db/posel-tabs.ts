@@ -717,6 +717,11 @@ export type MpOfficeExpenseItem = {
   namePl: string;
   amount: number;
   notes: string | null;
+  // Per-category benchmark across all VERIFIED reports of the same year:
+  // median amount among MPs who spent any non-zero on this category.
+  // Used to surface notable deviations (e.g. "+22% niż mediana").
+  categoryMedian: number | null;
+  categoryNonzeroCount: number;
 };
 
 export type MpOfficeExpenseReport = {
@@ -733,6 +738,10 @@ export type MpOfficeExpenseReport = {
   publishedAt: string | null;
   approvedByPresidiumAt: string | null;
   items: MpOfficeExpenseItem[];
+  // 'verified' iff sum(items) = funds_spent ±5 zł (or no funds_spent and
+  // items in normal annual range). 'unverified' means the displayed
+  // numbers disagree with the PDF — UI hides the item table in this case.
+  dataConfidence: "verified" | "unverified";
 };
 
 function toNum(v: unknown): number | null {
@@ -752,7 +761,7 @@ export async function getMpOfficeExpenses(
     .select(
       "id, year, period_start, period_end, funds_allocated, funds_carryover, " +
       "funds_interest, funds_total, funds_spent, funds_remaining, " +
-      "source_url, published_at, approved_by_presidium_at"
+      "source_url, published_at, approved_by_presidium_at, data_confidence"
     )
     .eq("term", term)
     .eq("mp_id", mpId)
@@ -777,9 +786,10 @@ export async function getMpOfficeExpenses(
     source_url: string;
     published_at: string | null;
     approved_by_presidium_at: string | null;
+    data_confidence: "verified" | "unverified";
   };
 
-  const [itemsRes, catsRes] = await Promise.all([
+  const [itemsRes, catsRes, statsRes] = await Promise.all([
     sb
       .from("mp_office_expense_items")
       .select("category_code, amount, notes")
@@ -790,9 +800,16 @@ export async function getMpOfficeExpenses(
       .select("code, name_pl, short_label, display_order")
       .order("display_order", { ascending: true })
       .limit(50),
+    sb
+      .from("mp_office_expense_category_stats")
+      .select("category_code, n_nonzero, median_nonzero")
+      .eq("term", term)
+      .eq("year", r.year)
+      .limit(50),
   ]);
   if (itemsRes.error) throw itemsRes.error;
   if (catsRes.error) throw catsRes.error;
+  if (statsRes.error) throw statsRes.error;
 
   const cats = new Map<number, MpOfficeExpenseCategory>();
   for (const c of (catsRes.data ?? []) as Array<{
@@ -806,17 +823,30 @@ export async function getMpOfficeExpenses(
     });
   }
 
+  const stats = new Map<number, { median: number | null; n: number }>();
+  for (const s of (statsRes.data ?? []) as Array<{
+    category_code: number; n_nonzero: number; median_nonzero: number | string | null;
+  }>) {
+    stats.set(s.category_code, {
+      median: toNum(s.median_nonzero),
+      n: s.n_nonzero ?? 0,
+    });
+  }
+
   const itemRows = (itemsRes.data ?? []) as Array<{
     category_code: number; amount: number | string; notes: string | null;
   }>;
   const items: MpOfficeExpenseItem[] = itemRows.map((it) => {
     const cat = cats.get(it.category_code);
+    const st = stats.get(it.category_code);
     return {
       categoryCode: it.category_code,
       shortLabel: cat?.shortLabel ?? `Kategoria ${it.category_code}`,
       namePl: cat?.namePl ?? `Kategoria ${it.category_code}`,
       amount: toNum(it.amount) ?? 0,
       notes: it.notes,
+      categoryMedian: st?.median ?? null,
+      categoryNonzeroCount: st?.n ?? 0,
     };
   });
   items.sort((a, b) => {
@@ -839,5 +869,6 @@ export async function getMpOfficeExpenses(
     publishedAt: r.published_at,
     approvedByPresidiumAt: r.approved_by_presidium_at,
     items,
+    dataConfidence: r.data_confidence ?? "unverified",
   };
 }
