@@ -26,9 +26,10 @@ backups/sejmograf_public_*.dump
 !/fixtures/sejm/
 /fixtures/sejm/*
 !/fixtures/sejm/mp_office_expenses/
-# Track ONLY the curation input. The per-MP fixtures (435+ × ~3 kB) are
-# regenerated on demand by `scripts/bootstrap_jakglosuja_expenses_json.py` —
-# DB is the source of truth for production, fixtures are dev artefacts.
+# Inside the un-ignored dir, re-ignore everything then surface ONLY the
+# curation input. Per-MP fixtures (~435 × 3 kB) regenerate on demand from
+# scripts/bootstrap_jakglosuja_expenses_json.py — DB is source of truth.
+/fixtures/sejm/mp_office_expenses/*
 !/fixtures/sejm/mp_office_expenses/_index.json
 *.log
 # Caches & build artifacts
