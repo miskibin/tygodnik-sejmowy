@@ -250,29 +250,48 @@ function CategoryRow({
   }
   return (
     <div
-      className="grid items-center gap-3 sm:gap-4 py-3 px-3 sm:px-4 border-b border-border last:border-b-0"
+      className={
+        // Mobile: stacked rows. The previous 4-col grid crammed every column
+        // to ~80 px on a 360 px phone, truncated category labels to "Wy…"
+        // and let long kat 23 notes push the layout into bizarre L-shapes.
+        // sm+: original 4-col grid (icon+name | bar | amount | share).
+        "py-3 px-3 sm:px-4 border-b border-border last:border-b-0 " +
+        "flex flex-col gap-2 sm:grid sm:items-center sm:gap-4"
+      }
       style={{
-        gridTemplateColumns:
-          "minmax(0, 1.6fr) minmax(0, 1.4fr) auto auto",
+        // Only used at sm+ — `flex flex-col` ignores gridTemplateColumns
+        // when grid display isn't active.
+        gridTemplateColumns: "minmax(0, 1.6fr) minmax(0, 1.4fr) auto auto",
       }}
     >
-      {/* Icon + name */}
-      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-        <span
-          className="shrink-0 text-muted-foreground"
-          aria-hidden
-        >
+      {/* Top row (mobile) / col 1 (desktop): icon + name. Mobile also tucks
+          the amount + share on the right so the headline row reads at a
+          glance without scrolling past the bar. */}
+      <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0">
+        <span className="shrink-0 mt-[2px] sm:mt-0 text-muted-foreground" aria-hidden>
           <Icon size={18} strokeWidth={1.5} />
         </span>
         <span
-          className="font-serif text-[14px] sm:text-[15px] leading-snug truncate"
+          className="font-serif text-[14px] sm:text-[15px] leading-snug flex-1 min-w-0 sm:truncate"
           title={namePl}
         >
           {shortLabel}
         </span>
+        {/* Mobile-only stacked amount + share on the right of the name row */}
+        <div className="sm:hidden flex flex-col items-end shrink-0 leading-tight">
+          <span className="font-mono tabular-nums text-[13px] whitespace-nowrap">
+            {fmtPLN(amount, { precise })}
+          </span>
+          {sharePct != null && (
+            <span className="font-mono tabular-nums text-[10.5px] text-muted-foreground whitespace-nowrap mt-0.5">
+              {fmtPct(sharePct)}
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Bar */}
+      {/* Bar (mobile: full row) / col 2 (desktop) — with deviation + notes
+          underneath. */}
       <div className="min-w-0">
         <div className="h-2 sm:h-2.5 rounded-full bg-muted/60 overflow-hidden">
           <div
@@ -286,10 +305,10 @@ function CategoryRow({
           />
         </div>
         {(deviationPct != null || notes) && (
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             {deviationPct != null && (
               <span
-                className="font-mono text-[10px] uppercase tracking-[0.06em]"
+                className="font-mono text-[10px] uppercase tracking-[0.06em] whitespace-nowrap"
                 style={{
                   color:
                     deviationPct > 0 ? "var(--destructive)" : "var(--success)",
@@ -312,13 +331,12 @@ function CategoryRow({
         )}
       </div>
 
-      {/* Amount */}
-      <div className="font-mono tabular-nums text-[13px] sm:text-[14px] text-right whitespace-nowrap">
+      {/* Desktop-only amount + share columns. Hidden on mobile because the
+          values are already tucked into the icon-name row above. */}
+      <div className="hidden sm:block font-mono tabular-nums text-[13px] sm:text-[14px] text-right whitespace-nowrap">
         {fmtPLN(amount, { precise })}
       </div>
-
-      {/* Share */}
-      <div className="font-mono tabular-nums text-[11px] sm:text-[12px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem]">
+      <div className="hidden sm:block font-mono tabular-nums text-[11px] sm:text-[12px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem]">
         {sharePct != null ? fmtPct(sharePct) : "—"}
       </div>
     </div>
@@ -531,8 +549,11 @@ export function Tab5OfficeExpensesPanel({
           </h3>
           <BopInfoDialog />
         </div>
+        {/* Header row. On mobile (where CategoryRow stacks) we collapse to
+            a single "Kategoria · Kwota / Udział" line to match the new
+            row layout. Desktop keeps the 4-col headers aligned with rows. */}
         <div
-          className="grid items-center gap-3 sm:gap-4 px-3 sm:px-4 py-2 border-b border-border bg-muted/20"
+          className="flex sm:grid items-center justify-between gap-3 sm:gap-4 px-3 sm:px-4 py-2 border-b border-border bg-muted/20"
           style={{
             gridTemplateColumns:
               "minmax(0, 1.6fr) minmax(0, 1.4fr) auto auto",
@@ -541,11 +562,12 @@ export function Tab5OfficeExpensesPanel({
           <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground">
             Kategoria wydatku
           </div>
-          <div aria-hidden />
+          <div className="hidden sm:block" aria-hidden />
           <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground text-right whitespace-nowrap">
-            Kwota
+            <span className="sm:hidden">Kwota / udział</span>
+            <span className="hidden sm:inline">Kwota</span>
           </div>
-          <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem]">
+          <div className="hidden sm:block font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem]">
             Udział
           </div>
         </div>
