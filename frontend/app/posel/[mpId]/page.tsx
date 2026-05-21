@@ -347,6 +347,25 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
 
           {/* Action stack — mobile drops to full-width row below */}
           <div className="col-span-2 md:col-span-1 flex md:flex-col w-full min-w-0 gap-2 mt-2 md:mt-0">
+            {expSummary && expSummary.dataConfidence === "verified" && (
+              <a
+                href="#wydatki"
+                className="block group text-center md:text-right shrink-0 flex-1 md:flex-none"
+              >
+                <span className="block font-mono text-[9.5px] sm:text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                  Wydał w {expSummary.year}
+                </span>
+                <span
+                  className="block font-serif font-medium tabular-nums tracking-[-0.03em] text-foreground group-hover:text-destructive transition-colors leading-[0.95] mt-0.5"
+                  style={{ fontSize: "clamp(1.9rem, 4.4vw, 2.9rem)" }}
+                >
+                  {PLN_INT.format(expSummary.totalSpent)}
+                </span>
+                <span className="block font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground group-hover:text-destructive mt-0.5">
+                  na biuro poselskie →
+                </span>
+              </a>
+            )}
             {mp.email ? (
               <a
                 href={`mailto:${mp.email}`}
@@ -367,34 +386,6 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
       <Suspense fallback={null}>
         <HeroLedeBand mpId={mpId} firstLastName={mp.firstLastName} />
       </Suspense>
-
-      {/* Office-expense headline — surfaces the year's spend total and links
-          to the detailed tab. Heavily SEO-relevant: matches Polish search
-          intent "ile wydał poseł X" with the keyword phrase visible. Skipped
-          when we have no verified report for the MP. */}
-      {expSummary && expSummary.dataConfidence === "verified" && (
-        <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6">
-          <a
-            href="#wydatki"
-            className="block group border border-border bg-muted/40 hover:bg-muted/70 transition-colors py-4 px-4 sm:px-5"
-          >
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                Wydatki biura poselskiego w {expSummary.year} r.
-              </span>
-              <span
-                className="font-serif font-medium tabular-nums tracking-[-0.02em] text-foreground"
-                style={{ fontSize: "clamp(1.4rem, 3.2vw, 2.1rem)" }}
-              >
-                {PLN_INT.format(expSummary.totalSpent)}
-              </span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-destructive ml-auto group-hover:translate-x-0.5 transition-transform">
-                Zobacz rozbicie →
-              </span>
-            </div>
-          </a>
-        </div>
-      )}
 
       {/* STATS STRIP — single edge-to-edge band of cells */}
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-2">
