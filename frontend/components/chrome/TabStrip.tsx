@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 
 export type TabStripItem = { id: string; label: string; count?: number | null };
 
@@ -10,6 +10,11 @@ export type TabStripItem = { id: string; label: string; count?: number | null };
 // container's padding — callers pass `edgeBleedClass` matching their
 // outer horizontal padding (e.g. "-mx-4 md:-mx-8 lg:-mx-14") and the
 // inner scroller re-applies the same padding via `edgePadClass`.
+//
+// Active tab is also synced with `location.hash` so deep links like
+// /posel/426#wydatki open directly on that tab — useful for SEO snippets
+// and for in-page anchors like the "Wydatki biura → Zobacz rozbicie" CTA
+// in the MP profile hero.
 export function TabStrip({
   tabs,
   panels,
@@ -25,10 +30,50 @@ export function TabStrip({
   panelClassName?: string;
   initialTabId?: string;
 }) {
+  const tabIds = tabs.map((t) => t.id);
   const [active, setActive] = useState(initialTabId ?? tabs[0]?.id ?? "");
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Sync from hash on mount + on hashchange. We only switch when the hash
+  // matches a known tab id — strangers (e.g. fragment from another section)
+  // don't reset the panel. On hashchange (external navigation, e.g. an
+  // in-page anchor like the "Wydatki biura → Zobacz rozbicie" CTA in the
+  // hero), also scroll the tab strip into view so the user lands on the
+  // newly-activated tab instead of staring at the page top. Internal
+  // select() uses replaceState which doesn't fire hashchange, so tab clicks
+  // never re-scroll.
+  useEffect(() => {
+    const apply = (scroll: boolean) => {
+      const h = (typeof window !== "undefined" ? window.location.hash : "").replace(/^#/, "");
+      if (h && tabIds.includes(h)) {
+        setActive(h);
+        if (scroll && rootRef.current) {
+          // Defer one frame so the panel content can mount before we scroll.
+          requestAnimationFrame(() => {
+            rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        }
+      }
+    };
+    apply(false);
+    const onHashChange = () => apply(true);
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const select = (id: string) => {
+    setActive(id);
+    if (typeof window !== "undefined") {
+      // Replace (not push) so back-button still leaves the page rather than
+      // walking through every tab switch.
+      const url = `${window.location.pathname}${window.location.search}#${id}`;
+      window.history.replaceState(null, "", url);
+    }
+  };
 
   return (
-    <div className="min-w-0">
+    <div className="min-w-0" ref={rootRef}>
       <div className={`relative ${edgeBleedClass} min-w-0`}>
         <div
           className={`border-b border-border flex gap-0 font-sans text-[12px] sm:text-[13px] overflow-x-auto overscroll-x-contain ${edgePadClass} no-scrollbar`}
@@ -40,7 +85,7 @@ export function TabStrip({
               <button
                 key={t.id}
                 type="button"
-                onClick={() => setActive(t.id)}
+                onClick={() => select(t.id)}
                 className="cursor-pointer flex items-baseline gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap rounded-none px-3 py-2.5 sm:px-[18px] sm:py-[14px]"
                 style={{
                   color: on ? "var(--destructive)" : "var(--secondary-foreground)",
