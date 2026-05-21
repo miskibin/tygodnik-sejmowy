@@ -35,6 +35,7 @@ from tenacity import (
     wait_exponential,
 )
 
+from supagraf.etl.watermark import bulk_seal
 from supagraf.fixtures.storage import fixtures_root
 
 RecordCallback = Callable[[str, dict, str], None]
@@ -200,6 +201,17 @@ def fetch_committee_sittings(
             _atomic_write_json(target, bundle)
             report.bundles_fetched += 1
             report.sittings_total += len(payload)
+            # Seal each FINISHED sitting so downstream gates can skip rework.
+            finished_keys = [
+                f"term{term}__{code}__{s.get('num')}"
+                for s in payload
+                if isinstance(s, dict) and s.get("status") == "FINISHED" and s.get("num") is not None
+            ]
+            if finished_keys:
+                try:
+                    bulk_seal("committee_sitting", finished_keys, source="predicate_status_finished")
+                except Exception as e:  # noqa: BLE001
+                    logger.warning("bulk_seal committee_sitting {} failed: {!r}", code, e)
             if on_record is not None:
                 try:
                     rel_path = f"fixtures/sejm/committee_sittings/{code}.json"

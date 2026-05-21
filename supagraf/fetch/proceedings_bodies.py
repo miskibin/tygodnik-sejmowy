@@ -29,6 +29,7 @@ from tenacity import (
 )
 
 from supagraf.db import supabase
+from supagraf.etl.watermark import load_sealed, seal
 from supagraf.fixtures.storage import fixtures_root
 
 # Endpoint: returns the HTML body for one statement on one proceeding-day.
@@ -183,6 +184,19 @@ def _select_target_days(term: int) -> list[dict]:
         if len(rows) < page:
             break
         offset += len(rows)
+    # Drop rows whose proceeding is already sealed. Sealed proceedings
+    # have all body_text populated; the upstream query may still return
+    # them transiently during a partial backfill, so this gate is a
+    # belt-and-suspenders skip.
+    sealed = load_sealed("proceeding_body")
+    if sealed:
+        def _key(r: dict) -> str | None:
+            day = r.get("proceeding_day") or {}
+            proc = (day.get("proceeding") or {})
+            n = proc.get("number")
+            t = proc.get("term")
+            return f"term{t}__proc{n}" if n is not None and t is not None else None
+        out = [r for r in out if (_key(r) not in sealed)]
     return out
 
 
@@ -209,6 +223,15 @@ def fetch_proceeding_bodies(
     if limit > 0:
         rows = rows[:limit]
     report = FetchReport()
+    # Track which proceedings we touched and whether any statement was left
+    # unfetched (404, empty body, write error). Only proceedings that we
+    # touched AND ended with zero gaps get sealed at the end.
+    per_proc_seen: dict[int, int] = {}
+    per_proc_incomplete: set[int] = set()
+
+    def _mark_gap(pn: int) -> None:
+        per_proc_incomplete.add(pn)
+
     headers = {"User-Agent": USER_AGENT, "Accept": "text/html, */*"}
     with httpx.Client(
         timeout=timeout_s,
@@ -227,6 +250,7 @@ def fetch_proceeding_bodies(
                     (str(row.get("id")), f"missing proc/date/num in row: {row!r}")
                 )
                 continue
+            per_proc_seen[proc_num] = per_proc_seen.get(proc_num, 0) + 1
             date_str = str(date_obj)[:10]
             target = _statement_path(proc_num, date_str, snum)
             if target.exists() and target.stat().st_size > 0:
@@ -240,6 +264,7 @@ def fetch_proceeding_bodies(
             except StatementNotFound:
                 logger.info("404 statement: {}", url)
                 report.skipped_404 += 1
+                _mark_gap(proc_num)
                 # Honor throttle even on 404 — still hit upstream.
                 if throttle_s > 0:
                     time.sleep(throttle_s)
@@ -247,12 +272,14 @@ def fetch_proceeding_bodies(
             except Exception as e:  # noqa: BLE001
                 report.errors.append((url, repr(e)))
                 logger.error("fetch failed: {}: {!r}", url, e)
+                _mark_gap(proc_num)
                 continue
             if not text or not text.strip():
                 # Empty body — treat as 404-equivalent to avoid creating empty
                 # files that the stager would later misread as "loaded".
                 logger.warning("empty body: {}", url)
                 report.skipped_404 += 1
+                _mark_gap(proc_num)
                 if throttle_s > 0:
                     time.sleep(throttle_s)
                 continue
@@ -261,6 +288,7 @@ def fetch_proceeding_bodies(
             except Exception as e:  # noqa: BLE001
                 report.errors.append((str(target), f"write failed: {e!r}"))
                 logger.error("write failed: {}: {!r}", target, e)
+                _mark_gap(proc_num)
                 continue
             report.fetched += 1
             if report.fetched % 100 == 0:
@@ -275,6 +303,19 @@ def fetch_proceeding_bodies(
                 )
             if throttle_s > 0:
                 time.sleep(throttle_s)
+    # Seal any proceeding whose all-touched statements were fetched
+    # successfully (no 404 / write-error / empty gap left behind).
+    sealed_count = 0
+    for pn, _seen in per_proc_seen.items():
+        if pn in per_proc_incomplete:
+            continue
+        try:
+            seal("proceeding_body", f"term{term}__proc{pn}", source="predicate_all_bodies_present")
+            sealed_count += 1
+        except Exception as e:  # noqa: BLE001
+            logger.warning("seal failed for proceeding {}: {!r}", pn, e)
+    if sealed_count:
+        logger.info("sealed {} proceeding_body watermarks", sealed_count)
     logger.info(
         "fetch_proceeding_bodies done: {}",
         json.dumps(report.to_dict()),

@@ -29,8 +29,13 @@ from tenacity import (
     wait_exponential,
 )
 
+from datetime import date, timedelta
+
+from supagraf.etl.watermark import bulk_seal, load_sealed, seal
 from supagraf.fixtures.storage import fixtures_root
 from supagraf.schema.acts import ActIn, ActListPage
+
+ACT_SEAL_AGE_DAYS = 14
 
 ELI_LIST_URL = "https://api.sejm.gov.pl/eli/acts/{publisher}/{year}"
 ELI_DETAIL_URL = "https://api.sejm.gov.pl/eli/acts/{publisher}/{year}/{position}"
@@ -120,6 +125,26 @@ def _http_get_json(client: httpx.Client, url: str) -> Any:
     if r.status_code >= 400:
         raise ActNotFound(f"{r.status_code} {url}")
     return r.json()
+
+
+def _maybe_seal_act(publisher: str, year: int, position: int, data: Any) -> None:
+    """Seal `(publisher, year, position)` if announcement/promulgation > 14d old."""
+    if not isinstance(data, dict):
+        return
+    raw = data.get("announcementDate") or data.get("promulgation")
+    if not isinstance(raw, str):
+        return
+    try:
+        dt = date.fromisoformat(raw[:10])
+    except ValueError:
+        return
+    if dt > (date.today() - timedelta(days=ACT_SEAL_AGE_DAYS)):
+        return
+    key = f"{publisher}__{year}__{position}"
+    try:
+        seal("act", key, source="predicate_act_settled")
+    except Exception as e:  # noqa: BLE001
+        logger.warning("seal act {} failed: {!r}", key, e)
 
 
 def _detail_path(publisher: str, year: int, position: int) -> Path:
@@ -288,6 +313,10 @@ def _fetch_acts_for_publisher(
                 continue
 
             report.detail_fetched += 1
+            # Seal acts whose announcement/promulgation has settled (>14d
+            # old). Sejm/MP publication dates don't shift after the
+            # initial publication window so this is safe.
+            _maybe_seal_act(publisher, year, pos, data)
             if report.detail_fetched % 100 == 0:
                 logger.info(
                     "progress: fetched={} skipped_existing={} skipped_404={} errors={} (year={})",

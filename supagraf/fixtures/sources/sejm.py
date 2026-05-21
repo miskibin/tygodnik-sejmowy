@@ -20,6 +20,8 @@ from typing import Any, Callable, Iterable, Optional
 
 from loguru import logger
 
+from supagraf.etl.watermark import load_sealed, seal
+
 from ..client import SejmClient
 from ..filters import first_date, in_year
 from ..storage import exists, update_index, write_binary, write_json, write_text
@@ -449,6 +451,7 @@ async def capture_votings(
     if limit is not None:
         proc_nums = proc_nums[:limit]
 
+    sealed_votings = load_sealed("voting")
     captured: list[str] = []
     for proc in proc_nums:
         proc_list = await client.get_json(f"{base}/votings/{proc}")
@@ -460,6 +463,9 @@ async def capture_votings(
                 continue
             num = v.get("votingNumber")
             if num is None:
+                continue
+            watermark_key = f"term{term}__{proc}__{num}"
+            if watermark_key in sealed_votings:
                 continue
             sid = f"{proc}__{num}"
             captured.append(sid)
@@ -476,6 +482,11 @@ async def capture_votings(
                     dest_dir / f"{sid}.pdf",
                     refresh,
                 )
+            if isinstance(payload, dict) and payload.get("votes"):
+                try:
+                    seal("voting", watermark_key, source="predicate_votes_captured")
+                except Exception as e:  # noqa: BLE001
+                    logger.warning("seal voting {} failed: {!r}", watermark_key, e)
     update_index(dest_dir / "_index.json", captured)
     return captured
 
