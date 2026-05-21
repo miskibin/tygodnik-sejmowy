@@ -13,7 +13,7 @@ import pytest
 from pydantic import ValidationError as PVErr
 
 from supagraf.enrich import DEFAULT_LLM_MODEL
-from supagraf.enrich.llm import LLMCall, LLMResponseError, PromptRef
+from supagraf.enrich.llm import LLMCall, LLMResponseError, PromptRef, TokenUsage
 from supagraf.enrich.pdf import ExtractionResult
 from supagraf.enrich.print_mentions import (
     Mention,
@@ -38,10 +38,12 @@ def _fake_extraction(text: str = "Min. Anna Kowalska poparła wniosek Komisji Fi
 def _fake_call(parsed: PrintMentionsOutput, *, version: int = 1, sha: str = "abc123") -> LLMCall:
     return LLMCall(
         model=DEFAULT_LLM_MODEL,
+        backend='ollama',
         prompt=PromptRef(name="print_mentions", version=version,
                          path=Path("/tmp/v1.md"), sha256=sha, body="..."),
         parsed=parsed,
         raw_response="{}",
+        usage=TokenUsage(input_tokens=None, output_tokens=None),
         model_run_id=None,
     )
 
@@ -62,8 +64,8 @@ def mock_pipeline():
     with patch("supagraf.enrich.print_mentions.extract_pdf") as extr, \
          patch("supagraf.enrich.print_mentions.call_structured") as llm, \
          patch("supagraf.enrich.print_mentions.supabase") as sb, \
-         patch("supagraf.enrich.print_mentions.fixtures_root") as froot:
-        froot.return_value = Path("/tmp/fixtures")
+         patch("supagraf.enrich.print_mentions.resolve_print_pdf") as rpdf:
+        rpdf.return_value = Path("/tmp/fixtures/test.pdf")
         # Default: print exists in DB → returns id=42.
         sb.return_value.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = MagicMock(
             data=[{"id": 42}]

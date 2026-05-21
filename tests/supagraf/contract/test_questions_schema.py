@@ -11,7 +11,7 @@ import pytest
 
 from supagraf.schema.questions import Question
 
-from .conftest import fixture_files, load_json
+from ._helpers import fixture_files, load_json
 
 INTERPELLATIONS = fixture_files("interpellations")
 WRITTEN = fixture_files("writtenQuestions")

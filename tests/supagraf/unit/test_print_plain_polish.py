@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from supagraf.enrich import DEFAULT_LLM_MODEL
-from supagraf.enrich.llm import LLMCall, LLMResponseError, PromptRef
+from supagraf.enrich.llm import LLMCall, LLMResponseError, PromptRef, TokenUsage
 from supagraf.enrich.pdf import ExtractionResult
 from supagraf.enrich.print_plain_polish import (
     PrintPlainPolishOutput,
@@ -38,10 +38,12 @@ def _fake_extraction(text: str = "Tekst pisma sejmowego.") -> ExtractionResult:
 def _fake_call(parsed: PrintPlainPolishOutput, *, version: int = 1, sha: str = "abc123") -> LLMCall:
     return LLMCall(
         model=DEFAULT_LLM_MODEL,
+        backend='ollama',
         prompt=PromptRef(name="print_plain_polish", version=version,
                          path=Path("/tmp/v1.md"), sha256=sha, body="..."),
         parsed=parsed,
         raw_response="{}",
+        usage=TokenUsage(input_tokens=None, output_tokens=None),
         model_run_id=None,
     )
 

@@ -9,7 +9,7 @@ import pytest
 
 from supagraf.schema.committee_sittings import CommitteeSittingsBundle
 
-from .conftest import fixture_files, load_json
+from ._helpers import fixture_files, load_json
 
 FILES = fixture_files("committee_sittings")
 
