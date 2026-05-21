@@ -28,6 +28,7 @@ import {
 
 import type { MpOfficeExpenseReport } from "@/lib/db/posel-tabs";
 import { BopInfoDialog } from "./BopInfoDialog";
+import { ExpensesShareButton } from "./ExpensesShareButton";
 
 // Public GitHub repo where readers can flag data issues. New-issue endpoint
 // supports query params for title, body and labels.
@@ -223,12 +224,23 @@ function CategoryRow({
   const Icon = CATEGORY_ICONS[code] ?? MoreHorizontal;
   const barPct = maxAmount > 0 ? (amount / maxAmount) * 100 : 0;
   const sharePct = shareBase > 0 ? (amount / shareBase) * 100 : null;
-  // Deviation badge: shown only when this MP spent something on the category,
-  // the category has a meaningful sample (≥30 MPs spent on it across the
-  // year), and the deviation from the median is at least ±25 %.
+  // Deviation badge: shown only when:
+  // - this MP spent > 5 000 zł on the category (under that, % deviation is
+  //   noise — a "+220 % niż mediana" on 2 000 zł vs 600 zł median reads as
+  //   scandalous despite being trivial in absolute terms);
+  // - the category has a meaningful sample (≥30 MPs spent on it);
+  // - deviation from the median is at least ±25 %;
+  // - the row is NOT a residual fallback. When the JSON scraper couldn't get
+  //   kat 23 sub-items it dumped (funds_spent − sum(other 22)) into cat 23 to
+  //   keep arithmetic consistent. That residual could be missing rent or
+  //   salaries that OCR failed elsewhere — surfacing it as "huge Inne wydatki"
+  //   would defame the MP. Marked by the inference note in `notes`.
+  const isInferredResidual =
+    code === 23 && (notes ?? "").includes("wyliczona jako roznica");
   let deviationPct: number | null = null;
   if (
-    amount > 0 &&
+    amount >= 5_000 &&
+    !isInferredResidual &&
     categoryMedian != null &&
     categoryMedian > 0 &&
     categoryNonzeroCount >= 30
@@ -317,10 +329,12 @@ export function Tab5OfficeExpensesPanel({
   report,
   mpId,
   mpName,
+  klubRef,
 }: {
   report: MpOfficeExpenseReport | null;
   mpId: number;
   mpName: string;
+  klubRef: string | null;
 }) {
   if (!report) {
     return (
@@ -381,8 +395,8 @@ export function Tab5OfficeExpensesPanel({
           </div>
         </div>
         <p className="font-sans text-[11px] text-muted-foreground leading-snug mt-3">
-          Dane zweryfikowane mamy dla 327 z 460 posłów — pozostałe sprawozdania
-          stopniowo dochodzą po dopracowaniu odczytu OCR i ręcznej weryfikacji.
+          Sprawozdania publikujemy stopniowo — w miarę jak Prezydium Sejmu zatwierdza
+          kolejne i poprawiamy odczyt skanów ręcznie wypełnianych pól.
         </p>
       </div>
     );
@@ -423,10 +437,9 @@ export function Tab5OfficeExpensesPanel({
     Math.abs(reportedTotal - arithmeticTotal) < 5 &&
     (report.fundsAllocated ?? 0) >= 100_000;
 
-  // Pozostało only when total AND spent are both trustworthy AND their
-  // difference matches the reported remaining (or the reported remaining
-  // is missing — then we compute it ourselves).
-  const reportedRemaining = report.fundsRemaining;
+  // Pozostało only when total AND spent are both trustworthy. We compute
+  // remaining ourselves (reportedTotal − itemsSum) — the report's own
+  // funds_remaining field is redundant when the upstream arithmetic adds up.
   const showRemaining =
     totalIsConsistent && spentMatchesSum && reportedTotal != null;
   const computedRemaining = showRemaining
@@ -624,6 +637,19 @@ export function Tab5OfficeExpensesPanel({
           >
             Sprawozdanie (PDF, Sejm) →
           </a>
+          <ExpensesShareButton
+            mpId={mpId}
+            mpName={mpName}
+            klubRef={klubRef}
+            year={report.year}
+            totalSpent={itemsSum}
+            topItems={sortedNonZero.slice(0, 4).map((it) => ({
+              categoryCode: it.categoryCode,
+              shortLabel: it.shortLabel,
+              amount: it.amount,
+            }))}
+            precise={hasFraction}
+          />
           <ReportIssueButton
             mpId={mpId}
             mpName={mpName}

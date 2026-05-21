@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class MPOfficeExpenseItem(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-    category_code: int = Field(ge=1, le=99)
+    category_code: int = Field(ge=1, le=23)
     amount: Decimal = Field(default=Decimal("0"))
     notes: str | None = None
 

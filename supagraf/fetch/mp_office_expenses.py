@@ -351,12 +351,16 @@ def parse_pdf_text(text: str) -> dict[str, Any]:
 MAX_OCR_PAGES = int(os.environ.get("SUPAGRAF_MP_EXPENSES_OCR_MAX_PAGES", "3"))
 OCR_DPI = int(os.environ.get("SUPAGRAF_MP_EXPENSES_OCR_DPI", "220"))
 
-# Tesseract spawns a multi-threaded subprocess per call. With our 4 workers
-# in parallel that oversubscribes the 4 CPU cores massively (~25x slowdown
-# observed empirically — single-page OCR went from 1.4 s → 2.5 min). Force
-# single-threaded per-instance so 4 workers cleanly map to 4 cores.
-os.environ.setdefault("OMP_THREAD_LIMIT", "1")
-os.environ.setdefault("OMP_NUM_THREADS", "1")
+def _ensure_omp_single_threaded() -> None:
+    """Tesseract spawns a multi-threaded subprocess per call. With our 4
+    workers in parallel that oversubscribes the 4 CPU cores massively
+    (single-page OCR went from 1.4 s → 2.5 min empirically). Pinning per-
+    instance to 1 thread lets the 4 workers map cleanly to 4 cores. Called
+    from `fetch_mp_office_expenses()` so importing this module doesn't
+    silently mutate global OMP env for unrelated workloads.
+    """
+    os.environ.setdefault("OMP_THREAD_LIMIT", "1")
+    os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 
 def _extract_pdf_text(pdf_path: Path) -> str:
@@ -586,6 +590,7 @@ def fetch_mp_office_expenses(
     handles 10+ concurrent requests fine. Recommended: 4–6 workers.
     Throttle is best-effort between submission, not per-worker.
     """
+    _ensure_omp_single_threaded()
     report = FetchReport(term=term, year=year)
     index_path = _index_path()
     if not index_path.exists():

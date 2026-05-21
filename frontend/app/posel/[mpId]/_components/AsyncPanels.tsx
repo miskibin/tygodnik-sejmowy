@@ -132,9 +132,19 @@ export async function PromisesAsync({ mpId }: { mpId: number }) {
   return <Tab4PromisesPanel data={data} />;
 }
 
-export async function OfficeExpensesAsync({ mpId, mpName }: { mpId: number; mpName: string }) {
+export async function OfficeExpensesAsync({
+  mpId,
+  mpName,
+  klubRef,
+}: {
+  mpId: number;
+  mpName: string;
+  klubRef: string | null;
+}) {
   const report = await getMpOfficeExpenses(mpId);
-  return <Tab5OfficeExpensesPanel report={report} mpId={mpId} mpName={mpName} />;
+  return (
+    <Tab5OfficeExpensesPanel report={report} mpId={mpId} mpName={mpName} klubRef={klubRef} />
+  );
 }
 
 export function PanelFallback({ rows = 6 }: { rows?: number }) {
