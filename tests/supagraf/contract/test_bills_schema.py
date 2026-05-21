@@ -5,7 +5,7 @@ import pytest
 
 from supagraf.schema.bills import Bill
 
-from .conftest import fixture_files, load_json
+from ._helpers import fixture_files, load_json
 
 FILES = fixture_files("bills")
 

@@ -296,7 +296,7 @@ export default function WhatsNextTimeline({
               >
                 {promiseLink.party_code}
               </Link>{" "}
-              z kampanii: „{promiseLink.title}".
+              z kampanii: „{promiseLink.title}”.
             </p>
           </div>
         )}

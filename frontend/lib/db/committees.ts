@@ -454,7 +454,7 @@ export async function getCommitteeLinkedPrints(
 
   // Fetch prints by (term, number) — match each process's primary print.
   const printQueries = procRowsTyped.map((p) => `and(term.eq.${p.term},number.eq.${p.number})`);
-  let printRowsByKey = new Map<string, { id: number; term: number; number: string; title: string; short_title: string | null }>();
+  const printRowsByKey = new Map<string, { id: number; term: number; number: string; title: string; short_title: string | null }>();
   if (printQueries.length > 0) {
     const { data: printRows, error: printErr } = await sb
       .from("prints")

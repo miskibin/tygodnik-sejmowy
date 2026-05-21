@@ -372,7 +372,7 @@ export async function getMpStatementsStats(mpId: number, term = DEFAULT_TERM): P
   }
 
   const dayIds = Array.from(new Set(stmts.map((s) => s.proceeding_day_id).filter((x): x is number => x != null)));
-  let dayInfo = new Map<number, { date: string | null; proceedingNumber: number | null }>();
+  const dayInfo = new Map<number, { date: string | null; proceedingNumber: number | null }>();
   if (dayIds.length) {
     const dRes = await sb
       .from("proceeding_days")
@@ -383,7 +383,7 @@ export async function getMpStatementsStats(mpId: number, term = DEFAULT_TERM): P
     type D = { id: number; date: string | null; proceeding_id: number | null };
     const days = (dRes.data ?? []) as D[];
     const procIds = Array.from(new Set(days.map((d) => d.proceeding_id).filter((x): x is number => x != null)));
-    let procNumByPid = new Map<number, number>();
+    const procNumByPid = new Map<number, number>();
     if (procIds.length) {
       const pRes = await sb.from("proceedings").select("id, number").in("id", procIds).limit(procIds.length);
       if (pRes.error) throw pRes.error;
@@ -442,7 +442,7 @@ export async function getMpStatementsRows(
   const stmts = (data ?? []) as StmtRowFull[];
 
   const dayIds = Array.from(new Set(stmts.map((s) => s.proceeding_day_id).filter((x): x is number => x != null)));
-  let dayInfo = new Map<number, { date: string | null; proceedingNumber: number | null }>();
+  const dayInfo = new Map<number, { date: string | null; proceedingNumber: number | null }>();
   if (dayIds.length) {
     const dRes = await sb
       .from("proceeding_days")
@@ -453,7 +453,7 @@ export async function getMpStatementsRows(
     type D = { id: number; date: string | null; proceeding_id: number | null };
     const days = (dRes.data ?? []) as D[];
     const procIds = Array.from(new Set(days.map((d) => d.proceeding_id).filter((x): x is number => x != null)));
-    let procNumByPid = new Map<number, number>();
+    const procNumByPid = new Map<number, number>();
     if (procIds.length) {
       const pRes = await sb.from("proceedings").select("id, number").in("id", procIds).limit(procIds.length);
       if (pRes.error) throw pRes.error;

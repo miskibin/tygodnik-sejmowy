@@ -5,7 +5,7 @@ import pytest
 
 from supagraf.schema.districts import DistrictPostcode
 
-from .conftest import fixture_files, load_json
+from ._helpers import fixture_files, load_json
 
 FILES = fixture_files("postcodes", subdir="external")
 

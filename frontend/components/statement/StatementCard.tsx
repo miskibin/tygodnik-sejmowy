@@ -303,7 +303,7 @@ function RelatedVariant(
             className="font-serif italic text-foreground m-0 leading-snug group-hover:text-destructive transition-colors"
             style={{ fontSize: 16, textWrap: "balance" }}
           >
-            „{props.viralQuote}"
+            „{props.viralQuote}”
           </p>
         )}
         {props.summaryOneLine && (

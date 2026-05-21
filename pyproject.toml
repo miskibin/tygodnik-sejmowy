@@ -56,3 +56,12 @@ include = ["supagraf*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+pythonpath = ["."]
+# `pythonpath = ["."]` puts the repo root on sys.path so `import supagraf`
+# resolves to /supagraf/, not to tests/supagraf/. Critical: keep
+# tests/supagraf/ WITHOUT an __init__.py (otherwise it shadows the real
+# package on pytest's rootdir-derived sys.path). Subdirs `unit/`, `contract/`,
+# `e2e/` DO have __init__.py so duplicate basenames (test_embed.py exists
+# in both unit/ and e2e/) live in distinct module namespaces (unit.test_embed
+# vs e2e.test_embed) without needing --import-mode=importlib (which breaks
+# `unittest.mock.patch("supagraf.X.Y")` resolution).

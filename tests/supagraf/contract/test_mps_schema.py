@@ -5,7 +5,7 @@ import pytest
 
 from supagraf.schema.mps import MP
 
-from .conftest import fixture_files, load_json
+from ._helpers import fixture_files, load_json
 
 FILES = fixture_files("mps")
 

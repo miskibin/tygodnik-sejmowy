@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from supagraf.enrich import DEFAULT_LLM_MODEL
-from supagraf.enrich.llm import LLMCall, LLMResponseError, PromptRef
+from supagraf.enrich.llm import LLMCall, LLMResponseError, PromptRef, TokenUsage
 from supagraf.enrich.pdf import ExtractionResult
 from supagraf.enrich.print_summary import PrintSummaryOutput, summarize_print
 
@@ -32,10 +32,12 @@ def _fake_extraction(text: str = "Tekst pisma sejmowego.") -> ExtractionResult:
 def _fake_call(parsed: PrintSummaryOutput, *, version: int = 1, sha: str = "abc123") -> LLMCall:
     return LLMCall(
         model=DEFAULT_LLM_MODEL,
+        backend='ollama',
         prompt=PromptRef(name="print_summary", version=version,
                          path=Path("/tmp/v1.md"), sha256=sha, body="..."),
         parsed=parsed,
         raw_response="{}",
+        usage=TokenUsage(input_tokens=None, output_tokens=None),
         model_run_id=None,
     )
 
@@ -56,8 +58,8 @@ def mock_pipeline():
     with patch("supagraf.enrich.print_summary.extract_pdf") as extr, \
          patch("supagraf.enrich.print_summary.call_structured") as llm, \
          patch("supagraf.enrich.print_summary.supabase") as sb, \
-         patch("supagraf.enrich.print_summary.fixtures_root") as froot:
-        froot.return_value = Path("/tmp/fixtures")
+         patch("supagraf.enrich.print_summary.resolve_print_pdf") as rpdf:
+        rpdf.return_value = Path("/tmp/fixtures/test.pdf")
         # supabase().table().update().eq().execute() call chain — every method
         # returns the same MagicMock so .execute() resolves at the end.
         sb.return_value.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()

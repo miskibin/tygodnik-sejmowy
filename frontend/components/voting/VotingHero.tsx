@@ -103,7 +103,7 @@ export function VotingHero({ data }: { data: VotingPageData }) {
               >
                 pytanie poddane pod głosowanie
               </span>
-              „{motionQuestion}".
+              „{motionQuestion}”.
             </p>
             {agendaCaption && (
               <p

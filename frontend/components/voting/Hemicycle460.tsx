@@ -65,7 +65,7 @@ function allocateArc(cap: number, clubSizes: number[]): number[] {
   if (total === 0) return clubSizes.map(() => 0);
   const ideal = clubSizes.map(n => (cap * n) / total);
   const floor = ideal.map(x => Math.floor(x));
-  let allocated = floor.reduce((s, n) => s + n, 0);
+  const allocated = floor.reduce((s, n) => s + n, 0);
   const remainder = cap - allocated;
   const sortedByFrac = ideal
     .map((x, i) => ({ i, frac: x - Math.floor(x) }))

@@ -315,7 +315,7 @@ async function resolveStatementContext(
   // Process titles via processes(term, number) — main-bill match. Children
   // (autopoprawka, sub-prints) won't resolve; that's expected.
   const printNumbers = Array.from(new Set(prints.map((p) => p.number)));
-  let procByNumber = new Map<string, string>();
+  const procByNumber = new Map<string, string>();
   if (printNumbers.length > 0) {
     const { data: procs, error: pErr } = await sb
       .from("processes")
