@@ -102,6 +102,10 @@ create table if not exists _stage_mp_office_expenses (
 );
 
 -- ---------- load_mp_office_expenses ----------
+-- NOTE: this function is REPLACED by migration 0100 to add the
+-- `data_confidence` flag. If you change this body, re-derive from 0100,
+-- not 0099 — otherwise you'll silently lose the confidence computation.
+--
 -- Idempotent on (term, mp_id, year). After upsert, replaces all items for
 -- the report (delete-and-insert pattern keeps the 23 rows consistent with
 -- whatever the staged payload currently says — simpler than per-row upsert

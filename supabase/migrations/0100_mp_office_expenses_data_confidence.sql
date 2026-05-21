@@ -117,9 +117,14 @@ begin
     -- rounding alone, plus jakglosuja's sub-list aggregation adds a few more.
     if rec.funds_spent is not null then
       conf := case when abs(rec.funds_spent - it_sum) < 100 then 'verified' else 'unverified' end;
-    elsif it_sum between 30000 and 1500000 then
-      -- jakglosuja-style payloads carry no funds_spent; trust items if they
-      -- are in the normal annual-spend range.
+    elsif it_sum between 30000 and 1500000
+          and exists (select 1 from public.mp_office_expense_items
+                       where report_id = rid and amount > 5000) then
+      -- jakglosuja-style payloads carry no funds_spent; trust items if (a)
+      -- the total is in normal annual-spend range AND (b) at least one
+      -- category has a substantive amount. The second clause rejects pure
+      -- OCR-noise reports where 23 small fragments (page nums, dates,
+      -- telephone digits) happen to sum to ~30 k.
       conf := 'verified';
     else
       conf := 'unverified';

@@ -68,11 +68,18 @@ MAX_SINGLE_ITEM = Decimal(500_000)
 # not per-category empirical p99.
 GLOBAL_CAP = Decimal(250_000)
 CATEGORY_CAPS: dict[int, Decimal] = {
+    6:  Decimal(15_000),    # Telekomunikacja w Domu Poselskim — fixed monthly
+                            # tariff from Kancelaria Sejmu, real values rarely
+                            # exceed 5 k/rok; 15 k catches the "LLM dumped the
+                            # whole funds_spent into kat 6" failure mode.
     9:  Decimal(50_000),    # STATUTORY 2025: 3 500 km/mc × 12 × 1,15 zł = 48 300 zł/rok
                             # (rozp. Min. Infrastruktury, stawka km dla >900 cm³;
-                            # reformy Czarzastego od I 2026 → 1 500 km/mc = 20 700/rok)
+                            # reformy Czarzastego od I 2026 → 1 500 km/mc = 20 700/rok).
+                            # Note: posłowie z orzeczeniem o niepełnosprawności
+                            # mogą mieć +50 % ryczałtu, ale kilometrówka jest
+                            # OSOBNYM limitem z rozp. MI — nie podlega tej bonifikacie.
     21: Decimal(5_000),     # STATUTORY: abonament RTV ~25 zł/mc/odbiornik
-                            # (5 k pokrywa nawet kilka odbiorników w premium-biurze)
+                            # (5 k pokrywa nawet kilka odbiorników w premium-biurze).
 }
 
 

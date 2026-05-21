@@ -185,6 +185,12 @@ def fetch_pdf(client: httpx.Client, url: str) -> tuple[Path, str, bool]:
 # This regex finds the amount that ends a row block: a numeric like
 # "12 345,67" / "1234,00" / "0" optionally followed by "zł". We map rows by
 # the Lp. anchor (1..23) scanning text from top to bottom.
+#
+# Caveat: matches bare integers too (e.g. stray "2025" year, page number,
+# telephone fragment). parse_pdf_text below takes the LAST numeric in each
+# block, which on a row wrapping into "(2025 r.)" can pick up the year.
+# Mitigated downstream: if all 23 amounts come out 0/low, _items_all_zero
+# triggers the LLM fallback which sees the whole text and re-categorises.
 _AMOUNT_RE = re.compile(
     r"(?P<amount>-?\d{1,3}(?:[\s ]\d{3})*(?:[,.]\d{1,2})?|0)"
 )
@@ -231,12 +237,6 @@ _FUNDS_LINE_RE = {
     ),
 }
 
-_PERIOD_RE = re.compile(
-    r"za okres od dnia\s*(?P<start>\d{1,2}[\s.\-/]\w+[\s.\-/]\d{4}|\d{4}-\d{2}-\d{2})"
-    r"\s*do dnia\s*(?P<end>\d{1,2}[\s.\-/]\w+[\s.\-/]\d{4}|\d{4}-\d{2}-\d{2})",
-    re.IGNORECASE,
-)
-
 
 def parse_pdf_text(text: str) -> dict[str, Any]:
     """Best-effort parse of the standardized BOP form.
@@ -277,13 +277,6 @@ def parse_pdf_text(text: str) -> dict[str, Any]:
         v = _parse_pl_decimal(m_remain.group("amount"))
         if v is not None:
             out["funds_remaining"] = str(v)
-
-    # Period
-    m_period = _PERIOD_RE.search(text)
-    if m_period:
-        # Leave date parsing to a later pass — the form text-date can be
-        # "1 stycznia 2025" or "01.01.2025"; we don't crash, we just skip.
-        out.setdefault("_period_raw", {"start": m_period.group("start"), "end": m_period.group("end")})
 
     # 23 category rows. We split text into "row blocks" by the Lp. anchors
     # 1..23, then take the first numeric amount in each block. The form has
