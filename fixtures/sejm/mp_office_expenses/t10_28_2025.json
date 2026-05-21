@@ -1,0 +1,107 @@
+{
+  "funds_allocated": "279720.00",
+  "funds_carryover": "39650.19",
+  "funds_interest": "0.00",
+  "funds_remaining": "701.47",
+  "funds_spent": "318668.72",
+  "funds_total": "319370.19",
+  "items": [
+    {
+      "amount": "0.00",
+      "category_code": 1
+    },
+    {
+      "amount": "1",
+      "category_code": 2
+    },
+    {
+      "amount": "108316.91",
+      "category_code": 3
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4
+    },
+    {
+      "amount": "0.00",
+      "category_code": 5
+    },
+    {
+      "amount": "0",
+      "category_code": 6
+    },
+    {
+      "amount": "17888.13",
+      "category_code": 7
+    },
+    {
+      "amount": "16020.80",
+      "category_code": 8
+    },
+    {
+      "amount": "48300.00",
+      "category_code": 9
+    },
+    {
+      "amount": "3964.84",
+      "category_code": 10
+    },
+    {
+      "amount": "36616.10",
+      "category_code": 11
+    },
+    {
+      "amount": "0.00",
+      "category_code": 12
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13
+    },
+    {
+      "amount": "1870.48",
+      "category_code": 14
+    },
+    {
+      "amount": "9.80",
+      "category_code": 15
+    },
+    {
+      "amount": "1",
+      "category_code": 16
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17
+    },
+    {
+      "amount": "1",
+      "category_code": 18
+    },
+    {
+      "amount": "8.90",
+      "category_code": 19
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21
+    },
+    {
+      "amount": "6150.00",
+      "category_code": 22
+    },
+    {
+      "amount": "318668.72",
+      "category_code": 23
+    }
+  ],
+  "mp_id": 28,
+  "source_sha256": "27f4a3ff252baf0e2b5ffbd8fb93bb76c3b8f7005fc0cd062af5d16b2c0376dd",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025028/$File/2025ryczalt_028.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

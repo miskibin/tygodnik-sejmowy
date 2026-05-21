@@ -227,12 +227,6 @@ export function Tab5OfficeExpensesPanel({
     );
   }
 
-  const spent = report.fundsSpent ?? null;
-  const total = report.fundsTotal ?? report.fundsAllocated ?? null;
-  const remaining = report.fundsRemaining ?? null;
-  const utilizationPct =
-    spent != null && total != null && total > 0 ? (spent / total) * 100 : null;
-
   const nonZero = report.items.filter((it) => it.amount > 0);
   const sortedNonZero = [...nonZero].sort((a, b) => b.amount - a.amount);
   const zeroItems = report.items.filter((it) => it.amount === 0);
@@ -240,38 +234,82 @@ export function Tab5OfficeExpensesPanel({
   // Bars are sized relative to the largest non-zero amount so the biggest
   // row fills the bar column and smaller rows show their relative weight.
   const maxAmount = sortedNonZero[0]?.amount ?? 0;
-  // Shares are computed as a fraction of the sum of visible items — this
-  // is the only way percentages can sum to 100% regardless of whether the
-  // PDF's "Razem" total matches our extracted sum (OCR'd reports
-  // sometimes have small mismatches against the reported funds_spent).
+  // Ground truth: the sum of what we'll actually display. Percentages are
+  // shares of this sum so they always add to 100%. The PDF-reported
+  // funds_spent / funds_total / funds_remaining are SHOWN ONLY when they
+  // pass the consistency checks below — otherwise hidden to avoid putting
+  // contradictory numbers in front of readers.
   const itemsSum = sortedNonZero.reduce((a, it) => a + it.amount, 0);
+
+  // Trust funds_spent only if it matches sum(items) within 5 zł rounding
+  // (some MPs use integer złotówki on the form, others decimal — either way
+  // a 5 zł tolerance covers the worst rounding from 23 categories).
+  const reportedSpent = report.fundsSpent;
+  const spentMatchesSum =
+    reportedSpent != null && Math.abs(reportedSpent - itemsSum) < 5;
+
+  // Trust funds_total only if it equals allocated + carryover + interest
+  // (the PDF's own arithmetic from points 1-4 of the form) AND >= 100 k zł
+  // (anything smaller is parser noise — annual ryczałt is ~280 k).
+  const arithmeticTotal =
+    (report.fundsAllocated ?? 0) +
+    (report.fundsCarryover ?? 0) +
+    (report.fundsInterest ?? 0);
+  const reportedTotal = report.fundsTotal;
+  const totalIsConsistent =
+    reportedTotal != null &&
+    reportedTotal >= 100_000 &&
+    Math.abs(reportedTotal - arithmeticTotal) < 5 &&
+    (report.fundsAllocated ?? 0) >= 100_000;
+
+  // Pozostało only when total AND spent are both trustworthy AND their
+  // difference matches the reported remaining (or the reported remaining
+  // is missing — then we compute it ourselves).
+  const reportedRemaining = report.fundsRemaining;
+  const showRemaining =
+    totalIsConsistent && spentMatchesSum && reportedTotal != null;
+  const computedRemaining = showRemaining
+    ? reportedTotal! - itemsSum
+    : null;
 
   // Detect precision mode: jakglosuja-derived rows are all integers (no .NN),
   // OCR+LLM-derived rows carry decimals. Render decimals only when present.
   const hasFraction = sortedNonZero.some((it) => Math.round(it.amount) !== it.amount);
 
+  // Headline figure shown to the user is ALWAYS sum(items) — that's what
+  // the 23 rows below add up to. We compute % of ryczałt only when we
+  // have a trustworthy reported total.
+  const headlineSpent = itemsSum;
+  const utilizationPct = totalIsConsistent && reportedTotal!
+    ? (headlineSpent / reportedTotal!) * 100
+    : null;
+
   return (
     <div className="min-w-0">
-      {/* KPI strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+      {/* KPI strip — hide tiles we don't have honest data for */}
+      <div
+        className={`grid grid-cols-1 gap-3 mb-6 ${totalIsConsistent ? "sm:grid-cols-3" : "sm:grid-cols-1 max-w-md"}`}
+      >
+        {totalIsConsistent && (
+          <KpiTile
+            label="Ryczałt do rozliczenia"
+            value={fmtPLN(reportedTotal)}
+            sub={
+              report.fundsCarryover && report.fundsCarryover > 0
+                ? `w tym z poprzedniego okresu: ${fmtPLN(report.fundsCarryover)}`
+                : "łącznie w okresie sprawozdawczym"
+            }
+          />
+        )}
         <KpiTile
-          label="Ryczałt do rozliczenia"
-          value={fmtPLN(total)}
-          sub={
-            report.fundsCarryover
-              ? `w tym z poprzedniego okresu: ${fmtPLN(report.fundsCarryover)}`
-              : "łącznie w okresie sprawozdawczym"
-          }
-        />
-        <KpiTile
-          label="Wydatkowano"
-          value={fmtPLN(spent)}
+          label="Wydatki łącznie"
+          value={fmtPLN(headlineSpent, { precise: hasFraction })}
           sub={
             utilizationPct != null
               ? `${utilizationPct.toLocaleString("pl-PL", {
                   maximumFractionDigits: 1,
                 })}% ryczałtu`
-              : "wg sprawozdania"
+              : `suma ${sortedNonZero.length} kategorii`
           }
           emphasis={
             utilizationPct == null
@@ -281,13 +319,34 @@ export function Tab5OfficeExpensesPanel({
                 : "neutral"
           }
         />
-        <KpiTile
-          label="Pozostało"
-          value={fmtPLN(remaining)}
-          sub="niewykorzystane środki ryczałtu"
-          emphasis={remaining != null && remaining > 0 ? "good" : "neutral"}
-        />
+        {showRemaining && computedRemaining != null && (
+          <KpiTile
+            label="Pozostało"
+            value={fmtPLN(computedRemaining)}
+            sub="niewykorzystane środki ryczałtu"
+            emphasis={computedRemaining > 0 ? "good" : "neutral"}
+          />
+        )}
       </div>
+
+      {/* Data quality disclosure when PDF-reported numbers disagree with our sum */}
+      {reportedSpent != null && !spentMatchesSum && (
+        <div className="mb-4 p-3 border-l-2 border-warning bg-warning/5 font-sans text-[11.5px] text-muted-foreground leading-snug">
+          <strong className="text-foreground">Uwaga.</strong> Suma 23 kategorii poniżej
+          ({fmtPLN(itemsSum, { precise: hasFraction })}) różni się od kwoty
+          „wydatkowano" zadeklarowanej w PDF ({fmtPLN(reportedSpent, { precise: hasFraction })}).
+          Może to wynikać z ograniczeń maszynowego odczytu PDF — zalecamy weryfikację w{" "}
+          <a
+            href={report.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            oryginalnym sprawozdaniu
+          </a>
+          .
+        </div>
+      )}
 
       {/* Expense table */}
       <div className="border border-border bg-background">
@@ -365,9 +424,12 @@ export function Tab5OfficeExpensesPanel({
       </div>
 
       <p className="font-sans text-[11px] text-muted-foreground leading-snug mt-3 mb-4">
+        Dane ze sprawozdania zatwierdzonego przez Prezydium Sejmu (Załącznik nr 1
+        do zarz. nr 2 Marsz. Sejmu z 31 III 2017 r.).{" "}
         {hasFraction
-          ? "Dane z formularza zatwierdzonego przez Prezydium Sejmu (Załącznik nr 1 do zarz. nr 2 Marsz. Sejmu z 31 III 2017 r.). Pełne dane w sprawozdaniu PDF."
-          : "Kwoty zaokrąglone do złotówek. Pełne dane w sprawozdaniu PDF."}
+          ? "Odczytane maszynowo ze skanu PDF — możliwe drobne nieścisłości."
+          : "Kwoty zaokrąglone do pełnych złotych."}{" "}
+        <strong>Wiążący jest oryginalny PDF</strong> (link poniżej).
       </p>
 
       {/* Footer: provenance */}

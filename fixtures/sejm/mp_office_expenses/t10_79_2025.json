@@ -1,19 +1,20 @@
 {
   "funds_allocated": "279720.00",
-  "funds_carryover": "51900.02",
-  "funds_interest": "2241620.02",
-  "funds_total": "2241620.02",
+  "funds_carryover": "17243.63",
+  "funds_interest": "296963.63",
+  "funds_spent": "1262848.19",
+  "funds_total": "296963.63",
   "items": [
     {
-      "amount": "133244",
+      "amount": "2",
       "category_code": 1
     },
     {
-      "amount": "0",
+      "amount": "0.00",
       "category_code": 2
     },
     {
-      "amount": "0",
+      "amount": "80.00",
       "category_code": 3
     },
     {
@@ -29,15 +30,15 @@
       "category_code": 6
     },
     {
-      "amount": "0",
+      "amount": "4.66",
       "category_code": 7
     },
     {
-      "amount": "0.00",
+      "amount": "0",
       "category_code": 8
     },
     {
-      "amount": "0",
+      "amount": "10",
       "category_code": 9
     },
     {
@@ -45,23 +46,23 @@
       "category_code": 10
     },
     {
-      "amount": "0",
+      "amount": "50.57",
       "category_code": 11
     },
     {
-      "amount": "0",
+      "amount": "13",
       "category_code": 12
     },
     {
-      "amount": "0",
+      "amount": "262848.19",
       "category_code": 13
     },
     {
-      "amount": "0",
+      "amount": "583.50",
       "category_code": 14
     },
     {
-      "amount": "0",
+      "amount": "9.00",
       "category_code": 15
     },
     {
@@ -73,11 +74,11 @@
       "category_code": 17
     },
     {
-      "amount": "0",
+      "amount": "1.70",
       "category_code": 18
     },
     {
-      "amount": "0",
+      "amount": "364.48",
       "category_code": 19
     },
     {
@@ -89,17 +90,17 @@
       "category_code": 21
     },
     {
-      "amount": "0",
+      "amount": "7.73",
       "category_code": 22
     },
     {
-      "amount": "0",
+      "amount": "0.00",
       "category_code": 23
     }
   ],
-  "mp_id": 61,
-  "source_sha256": "f9d8d7d24311f717edc19b516925a970ed1c074b0c0c70383d61ce8a199eb12f",
-  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025061/$File/2025ryczalt_061.pdf?OpenElement",
+  "mp_id": 79,
+  "source_sha256": "1430989131433c56f12846ac6a897939a49c759eeb3994a32884fae06f5172b7",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025079/$File/2025ryczalt_079.pdf?OpenElement",
   "term": 10,
   "year": 2025
 }

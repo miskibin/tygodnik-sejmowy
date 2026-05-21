@@ -1,19 +1,28 @@
-"""Validate mp_office_expense fixtures after OCR+LLM extraction.
+"""Validator for mp_office_expense fixtures.
 
-The LLM occasionally:
-- mis-categorizes amounts when OCR scrambles columns
-- hallucinates small values from OCR noise (single-digit "amounts")
-- drops funds_* header fields entirely
-- produces a sum(items) that's way off from funds_spent/funds_total
+Public data must be correct. The OCR + LLM pipeline produces some
+garbage (negative funds, items with single-digit "amounts" from OCR noise,
+funds_spent that disagrees with sum(items) by tens of thousands). This
+script quarantines anything we can't vouch for.
 
-This script flags + optionally quarantines fixtures whose internal arithmetic
-doesn't check out. A real report should have:
-  - funds_allocated > 0 (everyone got a ryczałt)
-  - sum(items) ≈ funds_spent (within ±1 zł rounding)
-  - funds_allocated + funds_carryover + funds_interest ≈ funds_total
+Strategy: trust `sum(items)` as ground truth (always self-consistent — it's
+literally the sum of what we'll display). Hard-reject fixtures that fail
+sanity bounds or look like parser garbage. The UI separately decides
+which of the *PDF-reported* funds_* fields to show — only those that
+agree with sum(items).
+
+Hard-reject rules (this script):
+- funds_spent < 0 OR > 1.5 M zł.
+- funds_allocated present and < 100 k zł (parser noise; real allocation
+  is ~280 k for full-year MP).
+- Any single item amount < 0 OR > 500 k zł.
+- sum(items) < 30 k OR > 1.5 M zł (any office that ran the year spent
+  at least ~30 k; cap at 1.5 M for sanity).
+- Item codes not exactly 1..23.
 
 Run:
-    uv run python scripts/validate_mp_office_expense_fixtures.py [--quarantine]
+    uv run python scripts/validate_mp_office_expense_fixtures.py
+    uv run python scripts/validate_mp_office_expense_fixtures.py --quarantine
 """
 from __future__ import annotations
 
@@ -25,6 +34,11 @@ from pathlib import Path
 
 FIXTURES_DIR = Path(__file__).resolve().parent.parent / "fixtures" / "sejm" / "mp_office_expenses"
 QUARANTINE_DIR = FIXTURES_DIR.parent / "mp_office_expenses_quarantine"
+
+MAX_REASONABLE = Decimal(1_500_000)
+MIN_ITEMS_SUM = Decimal(30_000)
+MIN_ALLOCATED = Decimal(100_000)
+MAX_SINGLE_ITEM = Decimal(500_000)
 
 
 def to_dec(s) -> Decimal | None:
@@ -40,37 +54,48 @@ def validate(payload: dict) -> tuple[bool, str]:
     items = payload.get("items") or []
     if len(items) != 23:
         return False, f"expected 23 items, got {len(items)}"
-    item_sum = sum((to_dec(it.get("amount")) or Decimal(0)) for it in items)
-    funds_spent = to_dec(payload.get("funds_spent"))
-    funds_total = to_dec(payload.get("funds_total"))
-    funds_allocated = to_dec(payload.get("funds_allocated"))
 
-    # Everyone got at least one annual ryczałt (≈280k for 2025). If funds_allocated
-    # is missing and item_sum is tiny, the LLM almost certainly produced garbage.
-    if funds_allocated is None and item_sum < Decimal(1000):
-        return False, f"no funds_allocated and item_sum tiny ({item_sum})"
+    codes = sorted(it.get("category_code") for it in items)
+    if codes != list(range(1, 24)):
+        return False, f"category codes not 1..23: {codes}"
 
-    # Items typically sum to 100k–400k. Anything under 5k is almost certainly
-    # OCR noise being mis-extracted as amounts.
-    if item_sum < Decimal(5000):
-        return False, f"item sum suspiciously low: {item_sum}"
-
-    if funds_spent is not None and funds_spent > Decimal(1000):
-        diff = abs(item_sum - funds_spent)
-        # Two cases of legitimate small mismatch:
-        #   - jakglosuja integer rounding: ~30 zł over 23 categories
-        #   - illegible handwritten field that one parser missed: a few k
-        # Quarantine only catastrophic mismatches (LLM got the wrong PDF /
-        # OCR was unreadable / item_sum is half of total).
-        pct_off = float(diff) / float(funds_spent)
-        if pct_off > 0.30 and diff > Decimal(50_000):
-            return False, f"sum(items)={item_sum} vs funds_spent={funds_spent} (diff={diff}, {pct_off*100:.0f}%)"
-
-    # Any single item exceeding 500k zł is suspect (no category should be that big)
+    item_sum = Decimal(0)
     for it in items:
-        v = to_dec(it.get("amount")) or Decimal(0)
-        if v > Decimal(500_000):
-            return False, f"item code {it.get('category_code')} amount={v} > 500k"
+        v = to_dec(it.get("amount"))
+        if v is None:
+            return False, f"item code {it.get('category_code')} amount not parseable: {it.get('amount')!r}"
+        if v < 0:
+            return False, f"item code {it.get('category_code')} negative amount: {v}"
+        if v > MAX_SINGLE_ITEM:
+            return False, f"item code {it.get('category_code')} amount {v} > {MAX_SINGLE_ITEM} (implausible)"
+        item_sum += v
+
+    if item_sum < MIN_ITEMS_SUM:
+        return False, f"sum(items)={item_sum} < {MIN_ITEMS_SUM} (likely OCR failure)"
+    if item_sum > MAX_REASONABLE:
+        return False, f"sum(items)={item_sum} > {MAX_REASONABLE} (implausible)"
+
+    funds_spent = to_dec(payload.get("funds_spent"))
+    funds_allocated = to_dec(payload.get("funds_allocated"))
+    funds_total = to_dec(payload.get("funds_total"))
+
+    if funds_spent is not None:
+        if funds_spent < 0:
+            return False, f"funds_spent negative: {funds_spent}"
+        if funds_spent > MAX_REASONABLE:
+            return False, f"funds_spent {funds_spent} > {MAX_REASONABLE}"
+
+    if funds_allocated is not None and funds_allocated > 0:
+        if funds_allocated < MIN_ALLOCATED:
+            return False, f"funds_allocated {funds_allocated} < {MIN_ALLOCATED} (parser noise)"
+        if funds_allocated > MAX_REASONABLE:
+            return False, f"funds_allocated {funds_allocated} > {MAX_REASONABLE}"
+
+    if funds_total is not None and funds_total > 0:
+        if funds_total < MIN_ALLOCATED:
+            return False, f"funds_total {funds_total} < {MIN_ALLOCATED}"
+        if funds_total > MAX_REASONABLE:
+            return False, f"funds_total {funds_total} > {MAX_REASONABLE}"
 
     return True, ""
 
@@ -96,12 +121,12 @@ def main() -> int:
     print(f"  Valid:  {ok}")
     print(f"  Failed: {len(bad)}")
     if bad:
-        print("\nFailures:")
-        for path, reason in bad[:30]:
+        print("\nFailures (first 40):")
+        for path, reason in bad[:40]:
             mp_id = path.stem.split("_")[1]
             print(f"  mp_id={mp_id:>3}: {reason}")
-        if len(bad) > 30:
-            print(f"  ... and {len(bad)-30} more")
+        if len(bad) > 40:
+            print(f"  ... and {len(bad)-40} more")
 
     if quarantine and bad:
         QUARANTINE_DIR.mkdir(parents=True, exist_ok=True)

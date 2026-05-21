@@ -1,24 +1,25 @@
 {
-  "funds_allocated": "279720.00",
-  "funds_carryover": "20783.14",
+  "funds_allocated": "279120.00",
+  "funds_carryover": "12894.19",
   "funds_interest": "0.00",
-  "funds_spent": "-297453.75",
-  "funds_total": "300503.14",
+  "funds_remaining": "10507.39",
+  "funds_spent": "282106.80",
+  "funds_total": "292614.19",
   "items": [
     {
-      "amount": "0.00",
+      "amount": "3710.00",
       "category_code": 1
     },
     {
-      "amount": "0",
+      "amount": "282106.80",
       "category_code": 2
     },
     {
-      "amount": "16451.62",
+      "amount": "36000.00",
       "category_code": 3
     },
     {
-      "amount": "6",
+      "amount": "0.0",
       "category_code": 4
     },
     {
@@ -26,19 +27,19 @@
       "category_code": 5
     },
     {
-      "amount": "302",
+      "amount": "0",
       "category_code": 6
     },
     {
-      "amount": "16479.00",
+      "amount": "1649.95",
       "category_code": 7
     },
     {
-      "amount": "0.00",
+      "amount": "350.00",
       "category_code": 8
     },
     {
-      "amount": "46747.50",
+      "amount": "48300.00",
       "category_code": 9
     },
     {
@@ -46,11 +47,11 @@
       "category_code": 10
     },
     {
-      "amount": "49520.00",
+      "amount": "5.42",
       "category_code": 11
     },
     {
-      "amount": "245.60",
+      "amount": "0",
       "category_code": 12
     },
     {
@@ -58,15 +59,15 @@
       "category_code": 13
     },
     {
-      "amount": "3505.49",
+      "amount": "0",
       "category_code": 14
     },
     {
-      "amount": "129.99",
+      "amount": "340.00",
       "category_code": 15
     },
     {
-      "amount": "1",
+      "amount": "248.40",
       "category_code": 16
     },
     {
@@ -74,11 +75,11 @@
       "category_code": 17
     },
     {
-      "amount": "2396.59",
+      "amount": "1",
       "category_code": 18
     },
     {
-      "amount": "9062.62",
+      "amount": "962.10",
       "category_code": 19
     },
     {
@@ -86,7 +87,7 @@
       "category_code": 20
     },
     {
-      "amount": "0.00",
+      "amount": "94.00",
       "category_code": 21
     },
     {
@@ -94,13 +95,13 @@
       "category_code": 22
     },
     {
-      "amount": "297453.75",
+      "amount": "26557.82",
       "category_code": 23
     }
   ],
-  "mp_id": 88,
-  "source_sha256": "c554b69218bc8b4ebc5df693ca261a20a862ea4da97067350b48bdd03dbccb67",
-  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025088/$File/2025ryczalt_088.pdf?OpenElement",
+  "mp_id": 11,
+  "source_sha256": "6d7f93196244271f0d62f1edb1d59814996dd6bdd0ca56577ef6fcdb4d52b41c",
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025011/$File/2025ryczalt_011.pdf?OpenElement",
   "term": 10,
   "year": 2025
 }
