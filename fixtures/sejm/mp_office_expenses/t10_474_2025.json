@@ -1,97 +1,121 @@
 {
-  "funds_spent": "278860",
+  "funds_spent": "278859.70",
+  "funds_total": "280114.61",
   "items": [
     {
-      "amount": "133008",
-      "category_code": 1
+      "amount": "133008.14",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "1240",
-      "category_code": 2
+      "amount": "1240.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1448",
-      "category_code": 5
+      "amount": "1447.81",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "146",
-      "category_code": 7
+      "amount": "146.30",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "12109",
-      "category_code": 8
+      "amount": "12109.40",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "28446",
-      "category_code": 9
+      "amount": "28446.40",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "68591",
-      "category_code": 11
+      "amount": "68591.29",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "3445",
-      "category_code": 13
+      "amount": "3445.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2691",
-      "category_code": 14
+      "amount": "2690.62",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "250",
-      "category_code": 15
+      "amount": "249.99",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "4573",
-      "category_code": 16
+      "amount": "4573.36",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "910",
-      "category_code": 19
+      "amount": "909.50",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "8000",
-      "category_code": 22
+      "amount": "8000.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "14002",
-      "category_code": 23
+      "amount": "14001.89",
+      "category_code": 23,
+      "notes": "Kwiaty i inne: 6026.09 zł; Reklama: 5905.60 zł; Art. Piśmiennicze i patriotyczne: 2070.20 zł"
     }
   ],
   "mp_id": 474,

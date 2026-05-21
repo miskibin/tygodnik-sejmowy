@@ -1,97 +1,121 @@
 {
-  "funds_spent": "267874",
+  "funds_spent": "267874.47",
+  "funds_total": "299374.21",
   "items": [
     {
-      "amount": "99117",
-      "category_code": 1
+      "amount": "99117.24",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "280",
-      "category_code": 2
+      "amount": "280.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "4612",
-      "category_code": 5
+      "amount": "4612.05",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "45869",
-      "category_code": 7
+      "amount": "45869.05",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "486",
-      "category_code": 8
+      "amount": "485.75",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47307",
-      "category_code": 9
+      "amount": "47307.25",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "44",
-      "category_code": 10
+      "amount": "43.69",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "31895",
-      "category_code": 11
+      "amount": "31895.48",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "263",
-      "category_code": 12
+      "amount": "263.26",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "6126",
-      "category_code": 14
+      "amount": "6125.82",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "9107",
-      "category_code": 15
+      "amount": "9107.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "715",
-      "category_code": 19
+      "amount": "715.40",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "5572",
-      "category_code": 22
+      "amount": "5572.43",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "16480",
-      "category_code": 23
+      "amount": "16480.05",
+      "category_code": 23,
+      "notes": "Drobne nagrody rzeczowe i wiązanki: 3752.12 zł; Art. spożywcze i usługi cateringowe: 12727.93 zł"
     }
   ],
   "mp_id": 410,

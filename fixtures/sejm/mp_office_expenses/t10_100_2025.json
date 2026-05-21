@@ -1,97 +1,121 @@
 {
-  "funds_spent": "301650",
+  "funds_spent": "301650.22",
+  "funds_total": "389341.05",
   "items": [
     {
-      "amount": "154952",
-      "category_code": 1
+      "amount": "154952.21",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1295",
-      "category_code": 7
+      "amount": "1294.74",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "16020",
-      "category_code": 9
+      "amount": "16019.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "26",
-      "category_code": 10
+      "amount": "26.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "36546",
-      "category_code": 11
+      "amount": "36545.95",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "696",
-      "category_code": 13
+      "amount": "696.33",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3995",
-      "category_code": 14
+      "amount": "3995.25",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "3130",
-      "category_code": 16
+      "amount": "3129.90",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "12000",
-      "category_code": 19
+      "amount": "11999.70",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1230",
-      "category_code": 22
+      "amount": "1230.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "71761",
-      "category_code": 23
+      "amount": "71760.64",
+      "category_code": 23,
+      "notes": "Kwiaty, wiązanki, wieńce: 14408.56 zł; Koszty spotkań, art., spożywcze: 11029.02 zł; Opłata parkingowa: 9468.90 zł; Art. pozostałe: 576.97 zł; Koszty konferencji – udział pracownika: 9963.00 zł; Koszty najmu samochodu: 26314.19 zł"
     }
   ],
   "mp_id": 100,

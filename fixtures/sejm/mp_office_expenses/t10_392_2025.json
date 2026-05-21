@@ -1,0 +1,125 @@
+{
+  "funds_spent": "274726.65",
+  "funds_total": "294504.69",
+  "items": [
+    {
+      "amount": "107767.46",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "130.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "15999.65",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "4788.08",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "16974.00",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "65090.10",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "9006.37",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "427.05",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "1622.20",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "1356.69",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "48841.65",
+      "category_code": 23,
+      "notes": "Wypożyczenie samochodu: 42000.00 zł; Kwiaty: 3500.00 zł; Art. spoż.: 2590.11 zł; Drobne nagrody: 751.54 zł"
+    }
+  ],
+  "mp_id": 392,
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025392/$File/2025ryczalt_392.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

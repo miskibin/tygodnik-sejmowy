@@ -1,97 +1,121 @@
 {
-  "funds_spent": "260536",
+  "funds_spent": "260535.66",
+  "funds_total": "302346.48",
   "items": [
     {
-      "amount": "101067",
-      "category_code": 1
+      "amount": "101066.69",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "150",
-      "category_code": 2
+      "amount": "150.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "4245",
-      "category_code": 3
+      "amount": "4245.48",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "4115",
-      "category_code": 5
+      "amount": "4114.75",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "6010",
-      "category_code": 7
+      "amount": "6010.40",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "5358",
-      "category_code": 8
+      "amount": "5357.80",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "24380",
-      "category_code": 9
+      "amount": "24380.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "45323",
-      "category_code": 11
+      "amount": "45322.84",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4715",
-      "category_code": 14
+      "amount": "4714.74",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "6062",
-      "category_code": 16
+      "amount": "6061.65",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4355",
-      "category_code": 19
+      "amount": "4354.80",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "295",
-      "category_code": 22
+      "amount": "295.20",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "54461",
-      "category_code": 23
+      "amount": "54461.31",
+      "category_code": 23,
+      "notes": "obsługa medialna konta na FB: 5498.10 zł; kwiaty: 3200.00 zł; kolportaż: 5608.80 zł; najem samochodu do celów realizacji mandatu poselskiego: 39061.50 zł; artykuły spożywcze: 1092.91 zł"
     }
   ],
   "mp_id": 294,

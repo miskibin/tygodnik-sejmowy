@@ -1,97 +1,121 @@
 {
-  "funds_spent": "277393",
+  "funds_spent": "277393.47",
+  "funds_total": "280435.27",
   "items": [
     {
-      "amount": "122828",
-      "category_code": 1
+      "amount": "122827.60",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "24000",
-      "category_code": 3
+      "amount": "24000.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "7814",
-      "category_code": 5
+      "amount": "7813.83",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "36455",
-      "category_code": 9
+      "amount": "36455.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "28731",
-      "category_code": 11
+      "amount": "28731.48",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "179",
-      "category_code": 13
+      "amount": "178.57",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4611",
-      "category_code": 14
+      "amount": "4610.75",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1269",
-      "category_code": 15
+      "amount": "1269.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "36993",
-      "category_code": 16
+      "amount": "36992.50",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4197",
-      "category_code": 19
+      "amount": "4197.40",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "7594",
-      "category_code": 23
+      "amount": "7593.94",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze i chemiczne: 7593.94 zł"
     }
   ],
   "mp_id": 427,

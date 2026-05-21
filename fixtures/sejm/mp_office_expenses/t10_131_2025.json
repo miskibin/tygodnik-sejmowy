@@ -1,97 +1,121 @@
 {
-  "funds_spent": "282635",
+  "funds_spent": "282634.52",
+  "funds_total": "282671.62",
   "items": [
     {
-      "amount": "143872",
-      "category_code": 1
+      "amount": "143872.07",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "6081",
-      "category_code": 5
+      "amount": "6080.69",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "2041",
-      "category_code": 7
+      "amount": "2040.99",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "3000",
-      "category_code": 8
+      "amount": "2999.97",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "36996",
-      "category_code": 9
+      "amount": "36995.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "72548",
-      "category_code": 11
+      "amount": "72547.62",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5528",
-      "category_code": 14
+      "amount": "5528.16",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "5447",
-      "category_code": 18
+      "amount": "5446.80",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "642",
-      "category_code": 19
+      "amount": "641.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "6481",
-      "category_code": 23
+      "amount": "6251.75",
+      "category_code": 23,
+      "notes": "kwiaty/okresowe uprawienie: 1020.85 zł; autostrada i parkingowa: 4333.00 zł; mikrofon bezprzewodowy: 159.00 zł; oprogramowanie komputerowe: 738.90 zł"
     }
   ],
   "mp_id": 131,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "288060",
+  "funds_spent": "288060.01",
+  "funds_total": "375014.76",
   "items": [
     {
-      "amount": "152209",
-      "category_code": 1
+      "amount": "152208.80",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "140",
-      "category_code": 2
+      "amount": "140.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "58500",
-      "category_code": 3
+      "amount": "58500.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "120",
-      "category_code": 5
+      "amount": "120.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "306",
-      "category_code": 7
+      "amount": "306.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "5056",
-      "category_code": 8
+      "amount": "5056.30",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "44725",
-      "category_code": 9
+      "amount": "44725.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "15543",
-      "category_code": 11
+      "amount": "15542.88",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3156",
-      "category_code": 14
+      "amount": "3155.77",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "14487",
-      "category_code": 16
+      "amount": "14487.15",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "308",
-      "category_code": 19
+      "amount": "308.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "510",
-      "category_code": 23
+      "amount": "510.00",
+      "category_code": 23,
+      "notes": "kwiaty okolicznościowe: 510.00 zł"
     }
   ],
   "mp_id": 399,

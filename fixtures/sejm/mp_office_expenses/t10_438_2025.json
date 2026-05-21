@@ -1,97 +1,121 @@
 {
-  "funds_spent": "299119",
+  "funds_spent": "299118.60",
+  "funds_total": "307632.41",
   "items": [
     {
-      "amount": "126357",
-      "category_code": 1
+      "amount": "126357.49",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "130",
-      "category_code": 2
+      "amount": "130.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "6150",
-      "category_code": 4
+      "amount": "6150.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "8279",
-      "category_code": 5
+      "amount": "8279.46",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "3331",
-      "category_code": 7
+      "amount": "3330.52",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "600",
-      "category_code": 8
+      "amount": "600.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "30110",
-      "category_code": 9
+      "amount": "30110.45",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1282",
-      "category_code": 10
+      "amount": "1281.70",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "79211",
-      "category_code": 11
+      "amount": "79211.45",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "309",
-      "category_code": 12
+      "amount": "309.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "1014",
-      "category_code": 13
+      "amount": "1013.83",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "6833",
-      "category_code": 14
+      "amount": "6833.42",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "7619",
-      "category_code": 15
+      "amount": "7619.31",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "1486",
-      "category_code": 16
+      "amount": "1485.80",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "464",
-      "category_code": 19
+      "amount": "463.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "328",
-      "category_code": 21
+      "amount": "327.60",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1130",
-      "category_code": 22
+      "amount": "1130.36",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "21761",
-      "category_code": 23
+      "amount": "21761.21",
+      "category_code": 23,
+      "notes": "Obsługa materiałów filmowych z wystąpień filmowych: 3600.00 zł; Koszty cateringu na spotkania z wyborcami: 10355.86 zł; Artykuły spożywcze: 4982.26 zł; Kwiaty: 2534.99 zł; Przejazdy autostradą: 288.10 zł"
     }
   ],
   "mp_id": 438,

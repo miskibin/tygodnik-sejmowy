@@ -1,97 +1,121 @@
 {
-  "funds_spent": "257175",
+  "funds_spent": "257175.27",
+  "funds_total": "249720.00",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "144612",
-      "category_code": 3
+      "amount": "144612.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "240",
-      "category_code": 5
+      "amount": "240.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "38569",
-      "category_code": 7
+      "amount": "38569.06",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "6300",
-      "category_code": 8
+      "amount": "6300.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47166",
-      "category_code": 9
+      "amount": "47166.10",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "18522",
-      "category_code": 11
+      "amount": "18521.73",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "764",
-      "category_code": 14
+      "amount": "764.21",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "230",
-      "category_code": 15
+      "amount": "230.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 19
+      "amount": "0.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "772",
-      "category_code": 23
+      "amount": "772.17",
+      "category_code": 23,
+      "notes": "zakup chorągiewek: 400.00 zł; dorobienie klucza do biura: 14.76 zł; zakup artykułów spożywczych: 357.41 zł"
     }
   ],
   "mp_id": 408,

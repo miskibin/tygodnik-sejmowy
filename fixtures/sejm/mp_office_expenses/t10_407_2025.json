@@ -1,97 +1,121 @@
 {
-  "funds_spent": "318330",
+  "funds_spent": "318330.18",
+  "funds_total": "279720.00",
   "items": [
     {
-      "amount": "115661",
-      "category_code": 1
+      "amount": "115660.80",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "79740",
-      "category_code": 3
+      "amount": "79739.76",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1087",
-      "category_code": 5
+      "amount": "1087.11",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "881",
-      "category_code": 7
+      "amount": "881.41",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1500",
-      "category_code": 8
+      "amount": "1500.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 9
+      "amount": "0.70",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 10
+      "amount": "0.70",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "65760",
-      "category_code": 11
+      "amount": "65760.14",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 12
+      "amount": "0.70",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 13
+      "amount": "0.70",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 14
+      "amount": "0.70",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 15
+      "amount": "0.70",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 16
+      "amount": "0.70",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 17
+      "amount": "0.70",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 18
+      "amount": "0.70",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3016",
-      "category_code": 19
+      "amount": "3015.80",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 20
+      "amount": "0.70",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 21
+      "amount": "0.70",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 22
+      "amount": "0.70",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "50685.16",
+      "category_code": 23,
+      "notes": "WYNAJĘCIE SAMOCHODU: 48145.16 zł; KWITTY: 1540.00 zł; FLAGI: 1000.00 zł"
     }
   ],
   "mp_id": 407,

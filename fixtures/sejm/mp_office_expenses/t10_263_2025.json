@@ -1,97 +1,121 @@
 {
-  "funds_spent": "244889",
+  "funds_spent": "244889.02",
+  "funds_total": "304105.32",
   "items": [
     {
-      "amount": "84483",
-      "category_code": 1
+      "amount": "84483.45",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "49179",
-      "category_code": 3
+      "amount": "49178.94",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "351",
-      "category_code": 5
+      "amount": "351.09",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "2000",
-      "category_code": 8
+      "amount": "2000.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "21657",
-      "category_code": 9
+      "amount": "21656.82",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1484",
-      "category_code": 10
+      "amount": "1484.24",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "68142",
-      "category_code": 11
+      "amount": "68141.64",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2418",
-      "category_code": 14
+      "amount": "2417.57",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3885",
-      "category_code": 19
+      "amount": "3885.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "3856",
-      "category_code": 23
+      "amount": "3855.87",
+      "category_code": 23,
+      "notes": "KWNYM: 2634.99 zł; DET. SPÓŁK LUBEŁKA/REŁKI: 1220.88 zł"
     }
   ],
   "mp_id": 263,

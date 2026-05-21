@@ -1,97 +1,121 @@
 {
-  "funds_spent": "232403",
+  "funds_spent": "232402.52",
+  "funds_total": "279720.00",
   "items": [
     {
-      "amount": "71539",
-      "category_code": 1
+      "amount": "71539.28",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "170",
-      "category_code": 2
+      "amount": "170.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "14400",
-      "category_code": 3
+      "amount": "14400.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2348",
-      "category_code": 5
+      "amount": "2348.23",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "24",
-      "category_code": 7
+      "amount": "24.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "45922",
-      "category_code": 9
+      "amount": "45922.45",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "33288",
-      "category_code": 11
+      "amount": "33288.03",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "349",
-      "category_code": 14
+      "amount": "348.70",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "5588",
-      "category_code": 15
+      "amount": "5587.92",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "2408",
-      "category_code": 19
+      "amount": "2408.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "56366",
-      "category_code": 23
+      "amount": "56365.91",
+      "category_code": 23,
+      "notes": "Statuetki: 10250.00 zł; Opłata leasingowa: 43561.91 zł; Kartki świąteczne: 492.00 zł; Wiązanki i Kwiaty: 1462.00 zł; Canva + Capcut: 600.00 zł"
     }
   ],
   "mp_id": 109,

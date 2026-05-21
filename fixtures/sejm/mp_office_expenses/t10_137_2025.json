@@ -1,97 +1,121 @@
 {
-  "funds_spent": "259703",
+  "funds_spent": "259702.51",
+  "funds_total": "295180.21",
   "items": [
     {
-      "amount": "113111",
-      "category_code": 1
+      "amount": "113110.96",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "600",
-      "category_code": 3
+      "amount": "600.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "261",
-      "category_code": 5
+      "amount": "260.69",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "4668",
-      "category_code": 7
+      "amount": "4667.85",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "2211",
-      "category_code": 8
+      "amount": "2211.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "43100",
-      "category_code": 9
+      "amount": "43100.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "50246",
-      "category_code": 11
+      "amount": "50246.42",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "429",
-      "category_code": 12
+      "amount": "428.99",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "3450",
-      "category_code": 13
+      "amount": "3450.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5463",
-      "category_code": 14
+      "amount": "5463.36",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "106",
-      "category_code": 15
+      "amount": "106.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "11152",
-      "category_code": 16
+      "amount": "11152.12",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4122",
-      "category_code": 19
+      "amount": "4121.69",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "18060.03",
+      "category_code": 23,
+      "notes": "Abonament Rejestr.io: 2988.00 zł; Artykuły spożywcze: 500.84 zł; Zakup kwiatów: 2000.00 zł; Usługi Gastronomiczne: 1051.07 zł; Podróże asystenta społecznego: 293.88 zł; Nagrody: 104.99 zł; Okulary dla pracownika: 669.90 zł; Wynajem samochodu: 10451.35 zł"
     }
   ],
   "mp_id": 137,

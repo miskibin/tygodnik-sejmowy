@@ -1,97 +1,121 @@
 {
-  "funds_spent": "248817",
+  "funds_spent": "248816.74",
+  "funds_total": "312292.71",
   "items": [
     {
-      "amount": "67943",
-      "category_code": 1
+      "amount": "67942.96",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "180",
-      "category_code": 2
+      "amount": "180.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "51458",
-      "category_code": 3
+      "amount": "51458.16",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2563",
-      "category_code": 5
+      "amount": "2562.66",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1794",
-      "category_code": 7
+      "amount": "1793.85",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "43643",
-      "category_code": 9
+      "amount": "43642.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "203",
-      "category_code": 10
+      "amount": "203.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "33287",
-      "category_code": 11
+      "amount": "33287.45",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "584",
-      "category_code": 12
+      "amount": "583.50",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "2598",
-      "category_code": 13
+      "amount": "2598.43",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "12332",
-      "category_code": 14
+      "amount": "12332.38",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "12300",
-      "category_code": 15
+      "amount": "12299.50",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "327",
-      "category_code": 16
+      "amount": "327.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2500",
-      "category_code": 18
+      "amount": "2500.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1498",
-      "category_code": 19
+      "amount": "1498.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "5471",
-      "category_code": 22
+      "amount": "5471.26",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "10136",
-      "category_code": 23
+      "amount": "10135.89",
+      "category_code": 23,
+      "notes": "Kwiaty i wiązanki na uroczystości: 3402.00 zł; Artykuły spożywcze i catering na spotkania z mieszkańcami: 3233.89 zł; Koszty parkingu: 3500.00 zł"
     }
   ],
   "mp_id": 481,

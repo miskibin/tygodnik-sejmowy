@@ -1,97 +1,121 @@
 {
-  "funds_spent": "258362",
+  "funds_spent": "258361.76",
+  "funds_total": "294040.38",
   "items": [
     {
-      "amount": "80076",
-      "category_code": 1
+      "amount": "80075.73",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "106487",
-      "category_code": 3
+      "amount": "106486.58",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2710",
-      "category_code": 5
+      "amount": "2710.47",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "17107",
-      "category_code": 7
+      "amount": "17106.51",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "13092",
-      "category_code": 9
+      "amount": "13091.60",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "15022",
-      "category_code": 11
+      "amount": "15021.65",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "295",
-      "category_code": 14
+      "amount": "294.90",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "10587",
-      "category_code": 15
+      "amount": "10587.40",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "8205",
-      "category_code": 19
+      "amount": "8204.50",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "2607",
-      "category_code": 22
+      "amount": "2607.42",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "2175",
-      "category_code": 23
+      "amount": "2175.00",
+      "category_code": 23,
+      "notes": "Wiązanka pogrzebowa: 120.00 zł; Porcelana: 1221.00 zł; Kwiaty: 834.00 zł"
     }
   ],
   "mp_id": 143,

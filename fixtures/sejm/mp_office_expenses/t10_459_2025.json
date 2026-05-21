@@ -1,97 +1,121 @@
 {
-  "funds_spent": "259726",
+  "funds_spent": "259726.05",
+  "funds_total": "350692.98",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "164400",
-      "category_code": 3
+      "amount": "164400.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "296",
-      "category_code": 5
+      "amount": "296.40",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "8093",
-      "category_code": 7
+      "amount": "8093.40",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "10800",
-      "category_code": 8
+      "amount": "10800.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "28294",
-      "category_code": 9
+      "amount": "28293.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "34220",
-      "category_code": 11
+      "amount": "34220.33",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "60",
-      "category_code": 12
+      "amount": "59.98",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "110",
-      "category_code": 14
+      "amount": "109.92",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "92",
-      "category_code": 19
+      "amount": "92.25",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "13360",
-      "category_code": 23
+      "amount": "13360.27",
+      "category_code": 23,
+      "notes": "artykuły spożywcze: 125.27 zł; catering na spotkanie z rybami: 12235.00 zł; kwoty wstępne: 1000.00 zł"
     }
   ],
   "mp_id": 459,

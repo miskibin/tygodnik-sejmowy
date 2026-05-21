@@ -1,97 +1,121 @@
 {
-  "funds_spent": "283525",
+  "funds_spent": "283524.64",
+  "funds_total": "309510.69",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "120125",
-      "category_code": 3
+      "amount": "120125.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3565",
-      "category_code": 5
+      "amount": "3564.50",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "41323",
-      "category_code": 7
+      "amount": "41323.45",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "28708",
-      "category_code": 9
+      "amount": "28707.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "3791",
-      "category_code": 10
+      "amount": "3791.17",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "41308",
-      "category_code": 11
+      "amount": "41307.90",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4132",
-      "category_code": 14
+      "amount": "4131.79",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "2868",
-      "category_code": 15
+      "amount": "2868.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1764",
-      "category_code": 19
+      "amount": "1764.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "1226",
-      "category_code": 21
+      "amount": "1225.50",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1937",
-      "category_code": 22
+      "amount": "1937.25",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "32778",
-      "category_code": 23
+      "amount": "32778.38",
+      "category_code": 23,
+      "notes": "Usługa cateringowa: 12615.70 zł; Przejazdy asystentów: 5599.92 zł; Kwiaty, puchary, książki, dyplomy: 7462.76 zł; Social Media - obsługa biura: 100.00 zł; Audyt bezpieczeństwa: 7000.00 zł"
     }
   ],
   "mp_id": 112,

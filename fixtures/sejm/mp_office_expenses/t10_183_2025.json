@@ -1,97 +1,121 @@
 {
-  "funds_spent": "304451",
+  "funds_spent": "304451.24",
+  "funds_total": "348291.54",
   "items": [
     {
-      "amount": "98826",
-      "category_code": 1
+      "amount": "98825.82",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "120",
-      "category_code": 2
+      "amount": "120.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "58993",
-      "category_code": 3
+      "amount": "58993.40",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "5391",
-      "category_code": 5
+      "amount": "5391.21",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "13800",
-      "category_code": 9
+      "amount": "13800.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "45152",
-      "category_code": 11
+      "amount": "45152.49",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "2520",
-      "category_code": 12
+      "amount": "2520.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "628",
-      "category_code": 13
+      "amount": "628.40",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1040",
-      "category_code": 14
+      "amount": "1040.49",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4308",
-      "category_code": 19
+      "amount": "4308.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "13122",
-      "category_code": 22
+      "amount": "13122.28",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "57549",
-      "category_code": 23
+      "amount": "57518.58",
+      "category_code": 23,
+      "notes": "nigdyński - święta pomiaru: 12606.00 zł; artykuły spożywcze - biura: 515.58 zł; koszt ochronne - spółka: 20248.00 zł; mogłoby wczorle i rekreacji: 24149.00 zł"
     }
   ],
   "mp_id": 183,

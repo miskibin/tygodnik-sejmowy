@@ -1,97 +1,121 @@
 {
-  "funds_spent": "249726",
+  "funds_spent": "249725.80",
+  "funds_total": "336298.94",
   "items": [
     {
-      "amount": "141508",
-      "category_code": 1
+      "amount": "141507.98",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "350",
-      "category_code": 2
+      "amount": "350.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3529",
-      "category_code": 5
+      "amount": "3529.38",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "18005",
-      "category_code": 7
+      "amount": "18005.14",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47862",
-      "category_code": 9
+      "amount": "47862.12",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "23361",
-      "category_code": 11
+      "amount": "23361.20",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "400",
-      "category_code": 12
+      "amount": "400.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "7743",
-      "category_code": 14
+      "amount": "7742.90",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "7668",
-      "category_code": 15
+      "amount": "7667.98",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2273",
-      "category_code": 16
+      "amount": "2273.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "5447",
-      "category_code": 18
+      "amount": "5446.80",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "2378",
-      "category_code": 19
+      "amount": "2378.32",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "19201",
-      "category_code": 23
+      "amount": "19200.98",
+      "category_code": 23,
+      "notes": "puchaczy, dypl., statuetki: 4200.00 zł; katalogi na spotkania z wyborcami: 1911.02 zł; ant. Społ.: 7267.82 zł; kwoty, wpisowe, zniżki: 2568.14 zł; inne: 3254.00 zł"
     }
   ],
   "mp_id": 267,

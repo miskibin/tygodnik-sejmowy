@@ -1,97 +1,121 @@
 {
-  "funds_spent": "286423",
+  "funds_spent": "286423.21",
+  "funds_total": "289892.99",
   "items": [
     {
-      "amount": "197721",
-      "category_code": 1
+      "amount": "197721.38",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1050",
-      "category_code": 5
+      "amount": "1049.74",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47420",
-      "category_code": 9
+      "amount": "47420.25",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "7802",
-      "category_code": 10
+      "amount": "7802.34",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "19439",
-      "category_code": 11
+      "amount": "19438.63",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2229",
-      "category_code": 14
+      "amount": "2228.63",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1749",
-      "category_code": 15
+      "amount": "1749.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4210",
-      "category_code": 19
+      "amount": "4209.80",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "596",
-      "category_code": 22
+      "amount": "596.23",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "4208",
-      "category_code": 23
+      "amount": "4208.21",
+      "category_code": 23,
+      "notes": "kwiaty, wielkanocne, zniżki: 1882.00 zł; artykuły spożywcze: 1246.21 zł; usługa gastronomiczna: 1080.00 zł"
     }
   ],
   "mp_id": 248,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "277620",
+  "funds_spent": "277620.17",
+  "funds_total": "287545.73",
   "items": [
     {
-      "amount": "97690",
-      "category_code": 1
+      "amount": "97690.08",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "5264",
-      "category_code": 5
+      "amount": "5263.51",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "39417",
-      "category_code": 7
+      "amount": "39416.59",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "240",
-      "category_code": 8
+      "amount": "239.85",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "2071",
-      "category_code": 10
+      "amount": "2071.23",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "21527",
-      "category_code": 11
+      "amount": "21526.56",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "210",
-      "category_code": 12
+      "amount": "210.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "258",
-      "category_code": 13
+      "amount": "258.30",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "6270",
-      "category_code": 14
+      "amount": "6269.61",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "4597",
-      "category_code": 15
+      "amount": "4597.41",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2396",
-      "category_code": 18
+      "amount": "2396.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "205",
-      "category_code": 19
+      "amount": "205.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "25",
-      "category_code": 22
+      "amount": "25.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "49151",
-      "category_code": 23
+      "amount": "49150.63",
+      "category_code": 23,
+      "notes": "zakup kwiatów i wiązanek na święta i uroczystości państwowe: 3577.91 zł; koszt podróży asystentów społecznych: 1111.52 zł; drobne nagrody rzeczowe i rekwizyty na święta państwowe: 2142.40 zł; koszt podróży posła autostradą, parkingi: 1552.49 zł; zakup artykułów spożywczych na użytek biura poselskiego: 1166.31 zł; koszt najmu samochodu: 39600.00 zł"
     }
   ],
   "mp_id": 102,

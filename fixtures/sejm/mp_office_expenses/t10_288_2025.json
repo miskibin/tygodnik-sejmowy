@@ -1,97 +1,121 @@
 {
-  "funds_spent": "280156",
+  "funds_spent": "280156.31",
+  "funds_total": "294213.04",
   "items": [
     {
-      "amount": "25435",
-      "category_code": 1
+      "amount": "25434.71",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "400",
-      "category_code": 2
+      "amount": "400.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "128610",
-      "category_code": 3
+      "amount": "128610.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2789",
-      "category_code": 5
+      "amount": "2789.13",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "2214",
-      "category_code": 7
+      "amount": "2213.63",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "35051",
-      "category_code": 11
+      "amount": "35051.30",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "390",
-      "category_code": 12
+      "amount": "390.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "512",
-      "category_code": 13
+      "amount": "512.12",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5908",
-      "category_code": 14
+      "amount": "5907.64",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "602",
-      "category_code": 15
+      "amount": "602.40",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1057",
-      "category_code": 19
+      "amount": "1057.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "28888.18",
+      "category_code": 23,
+      "notes": "PARKING: 2700.00 zł; ARTYKUŁY SPOŻYWCZE: 6788.43 zł; KWIATY: 5009.95 zł; USŁUGA GASTRONOMICZNA: 14150.00 zł; MATERIAŁY PATRIOTYCZNE: 239.80 zł"
     }
   ],
   "mp_id": 288,

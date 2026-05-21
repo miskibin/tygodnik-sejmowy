@@ -1,97 +1,121 @@
 {
-  "funds_spent": "275195",
+  "funds_spent": "275194.97",
+  "funds_total": "297742.32",
   "items": [
     {
-      "amount": "167447",
-      "category_code": 1
+      "amount": "167446.80",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "1989",
-      "category_code": 3
+      "amount": "1989.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "738",
-      "category_code": 5
+      "amount": "738.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "374",
-      "category_code": 7
+      "amount": "374.09",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48000",
-      "category_code": 9
+      "amount": "48000.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "24898",
-      "category_code": 11
+      "amount": "24898.41",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "203",
-      "category_code": 12
+      "amount": "202.96",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5684",
-      "category_code": 14
+      "amount": "5683.69",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "3631",
-      "category_code": 18
+      "amount": "3631.20",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5612",
-      "category_code": 19
+      "amount": "5611.90",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "16619",
-      "category_code": 23
+      "amount": "16618.92",
+      "category_code": 23,
+      "notes": "zakup wiązanek i zniczy na uroczystości państwowe i święta: 6910.00 zł; artykuły spożywcze do biura: 1399.16 zł; nagrody rzeczowe, rekwizyty, książki na uroczystości, konkursy, święta państwowe: 4374.16 zł; opłata za miejsce parkingowe: 2884.11 zł; usługi medialne: 349.00 zł; materiały patriotyczne: 702.49 zł"
     }
   ],
   "mp_id": 443,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "276239",
+  "funds_spent": "276238.61",
+  "funds_total": "298369.33",
   "items": [
     {
-      "amount": "15028",
-      "category_code": 1
+      "amount": "15028.22",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "61357",
-      "category_code": 3
+      "amount": "61356.64",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "6000",
-      "category_code": 4
+      "amount": "6000.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3268",
-      "category_code": 5
+      "amount": "3267.68",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "41056",
-      "category_code": 7
+      "amount": "41055.50",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "500",
-      "category_code": 8
+      "amount": "500.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48277",
-      "category_code": 9
+      "amount": "48277.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "3239",
-      "category_code": 10
+      "amount": "3238.78",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "36680",
-      "category_code": 11
+      "amount": "36680.06",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "8612",
-      "category_code": 14
+      "amount": "8612.23",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1187",
-      "category_code": 15
+      "amount": "1186.98",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "454",
-      "category_code": 19
+      "amount": "454.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "210",
-      "category_code": 22
+      "amount": "210.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "50371",
-      "category_code": 23
+      "amount": "50371.32",
+      "category_code": 23,
+      "notes": "Kwiaty, dekoracja biura: 2860.18 zł; Artykuły spożywcze dla potrzeb biura poselskiego: 1734.09 zł; Długoterminowy najem pojazdu: 28635.72 zł; Zakup usługi gastronomicznej: 17065.80 zł; Parking, opłata autostrada, inne: 75.53 zł"
     }
   ],
   "mp_id": 367,

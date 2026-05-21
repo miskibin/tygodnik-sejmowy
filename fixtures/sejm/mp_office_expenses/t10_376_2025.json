@@ -1,97 +1,121 @@
 {
-  "funds_spent": "307624",
+  "funds_spent": "307624.32",
+  "funds_total": "297420.33",
   "items": [
     {
-      "amount": "85720",
-      "category_code": 1
+      "amount": "85719.60",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "26957",
-      "category_code": 3
+      "amount": "26957.15",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "300",
-      "category_code": 5
+      "amount": "300.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "532",
-      "category_code": 7
+      "amount": "531.50",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "27669",
-      "category_code": 9
+      "amount": "27669.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "2593",
-      "category_code": 10
+      "amount": "2592.86",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "41701",
-      "category_code": 11
+      "amount": "41701.36",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "9386",
-      "category_code": 13
+      "amount": "9386.22",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "30500",
-      "category_code": 14
+      "amount": "30500.02",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "23740",
-      "category_code": 15
+      "amount": "23739.60",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2140",
-      "category_code": 16
+      "amount": "2140.28",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4167",
-      "category_code": 19
+      "amount": "4167.30",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "304",
-      "category_code": 22
+      "amount": "303.81",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "51916",
-      "category_code": 23
+      "amount": "51915.62",
+      "category_code": 23,
+      "notes": "Abonament monitorowania: 275.52 zł; Artykuły spożywcze: 6006.42 zł; Chorągiewki okolicznościowe: 576.00 zł; Ubezpieczenie mienia: 278.00 zł; Usługi gastronomiczne/catering: 6591.00 zł; Usługi prania flagi narodowej: 71.98 zł; Usługi transportowe *przez ineb*: 600.00 zł; Wiązanki okolicznościowe: 5180.00 zł; Wynajem samochodu: 32336.70 zł"
     }
   ],
   "mp_id": 376,

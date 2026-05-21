@@ -1,97 +1,121 @@
 {
-  "funds_spent": "354249",
+  "funds_spent": "354248.67",
+  "funds_total": "356723.37",
   "items": [
     {
-      "amount": "159717",
-      "category_code": 1
+      "amount": "159716.69",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "2000",
-      "category_code": 2
+      "amount": "2000.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "5262",
-      "category_code": 4
+      "amount": "5262.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "461",
-      "category_code": 5
+      "amount": "461.24",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "14460",
-      "category_code": 8
+      "amount": "14460.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "43950",
-      "category_code": 9
+      "amount": "43950.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "17723",
-      "category_code": 11
+      "amount": "17722.55",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 14
+      "amount": "0.00",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3690",
-      "category_code": 19
+      "amount": "3690.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "106986",
-      "category_code": 23
+      "amount": "106986.19",
+      "category_code": 23,
+      "notes": "Opłata za prowadzenie rachunku: 60.00 zł; Wynajem samochodu: 29574.24 zł; Zakup pucharów i medali: 77351.95 zł"
     }
   ],
   "mp_id": 145,

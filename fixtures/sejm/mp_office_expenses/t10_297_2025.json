@@ -1,97 +1,121 @@
 {
-  "funds_spent": "281693",
+  "funds_spent": "281693.37",
+  "funds_total": "285650.32",
   "items": [
     {
-      "amount": "116552",
-      "category_code": 1
+      "amount": "116552.08",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "30050",
-      "category_code": 3
+      "amount": "30050.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1627",
-      "category_code": 5
+      "amount": "1627.26",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "105",
-      "category_code": 7
+      "amount": "105.48",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "3368",
-      "category_code": 8
+      "amount": "3367.50",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "28208",
-      "category_code": 9
+      "amount": "28208.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "2635",
-      "category_code": 10
+      "amount": "2635.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "46195",
-      "category_code": 11
+      "amount": "46194.62",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "9231",
-      "category_code": 14
+      "amount": "9231.08",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "6174",
-      "category_code": 15
+      "amount": "6173.97",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5892",
-      "category_code": 19
+      "amount": "5891.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "26137",
-      "category_code": 22
+      "amount": "26137.28",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "5520",
-      "category_code": 23
+      "amount": "5519.50",
+      "category_code": 23,
+      "notes": "Kwiaty: 3930.00 zł; Nagrody, upominki: 1378.52 zł; Catering: 210.98 zł"
     }
   ],
   "mp_id": 297,

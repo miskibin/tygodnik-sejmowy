@@ -1,97 +1,121 @@
 {
-  "funds_spent": "241283",
+  "funds_spent": "241283.49",
+  "funds_total": "318744.70",
   "items": [
     {
-      "amount": "101187",
-      "category_code": 1
+      "amount": "101186.95",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "1064",
-      "category_code": 2
+      "amount": "1064.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "11704",
-      "category_code": 3
+      "amount": "11704.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "4822",
-      "category_code": 5
+      "amount": "4821.70",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "16157",
-      "category_code": 7
+      "amount": "16157.22",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "3825",
-      "category_code": 8
+      "amount": "3825.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "27600",
-      "category_code": 9
+      "amount": "27600.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "56267",
-      "category_code": 11
+      "amount": "56267.12",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5172",
-      "category_code": 14
+      "amount": "5171.51",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2396",
-      "category_code": 18
+      "amount": "2396.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5041",
-      "category_code": 19
+      "amount": "5040.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "2374",
-      "category_code": 22
+      "amount": "2373.90",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "3675",
-      "category_code": 23
+      "amount": "3675.09",
+      "category_code": 23,
+      "notes": "KWIATY: 1800.00 zł; TRANSPORT MEBLI; ARTYKUŁY SPOŻYWCZE: 1875.09 zł; USŁUGA PARKINGOWA; DROBNE NAGRODY RZECZOWE"
     }
   ],
   "mp_id": 115,

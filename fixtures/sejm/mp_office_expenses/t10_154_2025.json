@@ -1,97 +1,121 @@
 {
-  "funds_spent": "306716",
+  "funds_spent": "306716.21",
+  "funds_total": "354862.67",
   "items": [
     {
-      "amount": "116616",
-      "category_code": 1
+      "amount": "116616.15",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "996",
-      "category_code": 3
+      "amount": "996.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "8147",
-      "category_code": 5
+      "amount": "8147.02",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "44137",
-      "category_code": 9
+      "amount": "44137.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1831",
-      "category_code": 10
+      "amount": "1830.81",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "37122",
-      "category_code": 11
+      "amount": "37122.46",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "668",
-      "category_code": 12
+      "amount": "668.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "2579",
-      "category_code": 13
+      "amount": "2578.56",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3707",
-      "category_code": 14
+      "amount": "3706.57",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "23023",
-      "category_code": 15
+      "amount": "23022.85",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3337",
-      "category_code": 19
+      "amount": "3336.78",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "64554.01",
+      "category_code": 23,
+      "notes": "Wynajem Samochodu: 46545.24 zł; Subskrypcje oprogramowania + obsługa graficzna posła (X-corp, Adobe, canva, envato): 14412.32 zł; Wiązanki okolicznościowe: 3240.00 zł; Catering na spotkania z wyborcami: 356.45 zł"
     }
   ],
   "mp_id": 154,

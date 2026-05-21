@@ -1,97 +1,121 @@
 {
-  "funds_spent": "260710",
+  "funds_spent": "260709.77",
+  "funds_total": "288016.81",
   "items": [
     {
-      "amount": "157195",
-      "category_code": 1
+      "amount": "157195.24",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "400",
-      "category_code": 2
+      "amount": "400.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "3600",
-      "category_code": 3
+      "amount": "3600.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1864",
-      "category_code": 5
+      "amount": "1863.86",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "43",
-      "category_code": 7
+      "amount": "43.46",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 9
+      "amount": "0.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "22",
-      "category_code": 10
+      "amount": "22.40",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "60813",
-      "category_code": 11
+      "amount": "60813.37",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "43",
-      "category_code": 13
+      "amount": "42.66",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3772",
-      "category_code": 14
+      "amount": "3771.86",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "4507",
-      "category_code": 15
+      "amount": "4506.80",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "4308",
-      "category_code": 16
+      "amount": "4308.40",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "4717",
-      "category_code": 18
+      "amount": "4716.56",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "893",
-      "category_code": 19
+      "amount": "892.94",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "15493",
-      "category_code": 22
+      "amount": "15493.15",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "3039",
-      "category_code": 23
+      "amount": "3039.07",
+      "category_code": 23,
+      "notes": "Koszty przejazdów asyst. spół: 623.76 zł; Noclegi asyst. spół: 481.51 zł; Poczęstunki: 1236.80 zł; Prace stałe okalancuje pracownika: 697.00 zł"
     }
   ],
   "mp_id": 484,

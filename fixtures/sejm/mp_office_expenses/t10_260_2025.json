@@ -1,97 +1,121 @@
 {
-  "funds_spent": "271355",
+  "funds_spent": "271355.49",
+  "funds_total": "299435.66",
   "items": [
     {
-      "amount": "67369",
-      "category_code": 1
+      "amount": "67369.47",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "54924",
-      "category_code": 3
+      "amount": "54924.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3540",
-      "category_code": 5
+      "amount": "3539.85",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "398",
-      "category_code": 7
+      "amount": "397.86",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "37489",
-      "category_code": 9
+      "amount": "37488.90",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "24023",
-      "category_code": 11
+      "amount": "24023.16",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "72",
-      "category_code": 13
+      "amount": "71.86",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3205",
-      "category_code": 14
+      "amount": "3204.73",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "2143",
-      "category_code": 15
+      "amount": "2143.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "484",
-      "category_code": 19
+      "amount": "483.50",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "68486",
-      "category_code": 23
+      "amount": "74986.16",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze: 2380.89 zł; Podróże służbowe asystenta: 636.53 zł; Kwiaty: 2858.00 zł; Drobne nagrody rzeczowe, rekwizyty na święta państwowe: 1639.85 zł; Catering, gastronomia: 1950.50 zł; Parking: 193.39 zł; Obsługa biura poselskiego: 43800.00 zł; Leasing: 19777.01 zł; Program komputerowy: 1749.99 zł"
     }
   ],
   "mp_id": 260,

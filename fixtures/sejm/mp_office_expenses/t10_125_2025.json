@@ -1,0 +1,125 @@
+{
+  "funds_spent": "310285.73",
+  "funds_total": "333154.36",
+  "items": [
+    {
+      "amount": "117334.41",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "116.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "33380.04",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "6765.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "931.11",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "14314.89",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "21884.50",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "38061.19",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "553.01",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "3920.29",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "7393.51",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "470.00",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "1113.20",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "6333.70",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "57714.88",
+      "category_code": 23,
+      "notes": "Zakup kwiatów i wiązanek na święta i uroczystości państwowe: 4255.00 zł; Zakup art. spożywczych na użytek biura poselskiego: 2839.11 zł; Drobne nagrody rzeczowe oraz rekwizyty na święta państwowe: 4463.37 zł; Koszty parkingu; Koszty cateringu na spotkania z wyborcami: 3312.00 zł; Koszty najmu samochodu: 41180.40 zł; Opłata telewizyjna Canal+: 1355.00 zł; Koszty badań lekarskich i szkoleń osób innych niż pracowników, o których mowa w pkt 1: 310.00 zł"
+    }
+  ],
+  "mp_id": 125,
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025125/$File/2025ryczalt_125.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

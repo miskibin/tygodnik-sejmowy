@@ -1,97 +1,121 @@
 {
-  "funds_spent": "321229",
+  "funds_spent": "321228.84",
+  "funds_total": "402505.40",
   "items": [
     {
-      "amount": "57782",
-      "category_code": 1
+      "amount": "57782.40",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "126843",
-      "category_code": 3
+      "amount": "126843.44",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "27456",
-      "category_code": 7
+      "amount": "27456.27",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "2600",
-      "category_code": 8
+      "amount": "2600.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "28385",
-      "category_code": 9
+      "amount": "28384.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "2004",
-      "category_code": 10
+      "amount": "2003.80",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "48608",
-      "category_code": 11
+      "amount": "48608.29",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "11046",
-      "category_code": 14
+      "amount": "11046.05",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "13053",
-      "category_code": 15
+      "amount": "13053.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1857",
-      "category_code": 19
+      "amount": "1857.30",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "1584",
-      "category_code": 23
+      "amount": "1583.75",
+      "category_code": 23,
+      "notes": "WIAŁAŃ Z KUJĄTOW ZYWYCH: 350.00 zł; PRZEJAZDY PRACOWNIKI NA OCHR ZGODNE: 1233.75 zł"
     }
   ],
   "mp_id": 369,

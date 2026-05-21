@@ -1,97 +1,121 @@
 {
-  "funds_spent": "294830",
+  "funds_spent": "294830.06",
+  "funds_total": "297613.68",
   "items": [
     {
-      "amount": "131578",
-      "category_code": 1
+      "amount": "131578.32",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "923",
-      "category_code": 2
+      "amount": "922.50",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1919",
-      "category_code": 5
+      "amount": "1918.80",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "12819",
-      "category_code": 7
+      "amount": "12818.72",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "46000",
-      "category_code": 9
+      "amount": "46000.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "16200",
-      "category_code": 11
+      "amount": "16200.00",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4670",
-      "category_code": 14
+      "amount": "4669.88",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "6309",
-      "category_code": 15
+      "amount": "6308.98",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "1133",
-      "category_code": 16
+      "amount": "1133.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3108",
-      "category_code": 19
+      "amount": "3108.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "18567",
-      "category_code": 22
+      "amount": "18566.54",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "48882",
-      "category_code": 23
+      "amount": "48881.92",
+      "category_code": 23,
+      "notes": "kwiaty, wiązanki na święta i uroczystości państwowe: 4890.00 zł; drobne nagrody rzeczowe: książki, wpinki, dyplomy: 5207.61 zł; artykuły spożywcze na spotkania z wyborcami: 3835.68 zł; koszt najmu samochodu: 33748.63 zł; koszt parkingu: 1200.00 zł"
     }
   ],
   "mp_id": 343,

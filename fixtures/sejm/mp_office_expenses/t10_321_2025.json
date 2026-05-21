@@ -1,97 +1,121 @@
 {
-  "funds_spent": "279720",
+  "funds_spent": "279720.00",
+  "funds_total": "279720.00",
   "items": [
     {
-      "amount": "117405",
-      "category_code": 1
+      "amount": "117404.79",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "530",
-      "category_code": 2
+      "amount": "530.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "2000",
-      "category_code": 3
+      "amount": "2000.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1673",
-      "category_code": 5
+      "amount": "1672.80",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "58867",
-      "category_code": 7
+      "amount": "58867.45",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1602",
-      "category_code": 8
+      "amount": "1602.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "35104",
-      "category_code": 9
+      "amount": "35103.60",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "37871",
-      "category_code": 11
+      "amount": "37871.37",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "2801",
-      "category_code": 12
+      "amount": "2800.95",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "207",
-      "category_code": 13
+      "amount": "206.98",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1211",
-      "category_code": 14
+      "amount": "1210.63",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1740",
-      "category_code": 15
+      "amount": "1739.97",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2136",
-      "category_code": 16
+      "amount": "2135.66",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "7533",
-      "category_code": 19
+      "amount": "7533.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "9041",
-      "category_code": 23
+      "amount": "9040.80",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze: 329.91 zł; Wiązanka: 150.00 zł; Opłaty parkingowe: 342.50 zł; Akcesoria telefoniczne, komputerowe: 3306.58 zł; Usługi porządkowe, techniczne: 4911.81 zł"
     }
   ],
   "mp_id": 321,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "248744",
+  "funds_spent": "248743.83",
+  "funds_total": "298903.86",
   "items": [
     {
-      "amount": "132529",
-      "category_code": 1
+      "amount": "132529.42",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "934",
-      "category_code": 2
+      "amount": "934.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "1230",
-      "category_code": 4
+      "amount": "1230.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1682",
-      "category_code": 5
+      "amount": "1681.65",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1476",
-      "category_code": 7
+      "amount": "1476.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "3427",
-      "category_code": 8
+      "amount": "3427.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "31162",
-      "category_code": 9
+      "amount": "31162.40",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "52666",
-      "category_code": 11
+      "amount": "52665.86",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "210",
-      "category_code": 12
+      "amount": "210.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "443",
-      "category_code": 13
+      "amount": "442.80",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1916",
-      "category_code": 14
+      "amount": "1916.38",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "3000",
-      "category_code": 15
+      "amount": "2999.99",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4264",
-      "category_code": 19
+      "amount": "4264.10",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "13804",
-      "category_code": 23
+      "amount": "13803.63",
+      "category_code": 23,
+      "notes": "SPOŻYW CZE: 1567.63 zł; KSIĄŻKI, TEDALE: 1500.00 zł; KWIATY: 10736.00 zł"
     }
   ],
   "mp_id": 197,

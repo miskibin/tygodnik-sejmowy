@@ -1,97 +1,121 @@
 {
-  "funds_spent": "270648",
+  "funds_spent": "270647.73",
+  "funds_total": "304391.34",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "70800",
-      "category_code": 3
+      "amount": "70800.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1491",
-      "category_code": 5
+      "amount": "1491.27",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "10832",
-      "category_code": 7
+      "amount": "10832.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47700",
-      "category_code": 9
+      "amount": "47699.70",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "34378",
-      "category_code": 11
+      "amount": "34377.53",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "17449",
-      "category_code": 14
+      "amount": "17448.68",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "9185",
-      "category_code": 15
+      "amount": "9184.99",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "28303",
-      "category_code": 19
+      "amount": "28303.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "15900",
-      "category_code": 22
+      "amount": "15900.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "34610",
-      "category_code": 23
+      "amount": "34610.42",
+      "category_code": 23,
+      "notes": "Umowy związane ze spotkaniami: 7261.50 zł; Kwoty i zniżki: 1910.92 zł; Wynajem, leasing: 20090.23 zł; Artykuły spożywcze: 5347.77 zł"
     }
   ],
   "mp_id": 290,

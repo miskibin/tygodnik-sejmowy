@@ -1,97 +1,121 @@
 {
-  "funds_spent": "296785",
+  "funds_spent": "296784.92",
+  "funds_total": "316168.63",
   "items": [
     {
-      "amount": "169005",
-      "category_code": 1
+      "amount": "169004.55",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "34702",
-      "category_code": 3
+      "amount": "34701.70",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2511",
-      "category_code": 5
+      "amount": "2510.78",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1919",
-      "category_code": 7
+      "amount": "1918.80",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1200",
-      "category_code": 8
+      "amount": "1200.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "34880",
-      "category_code": 9
+      "amount": "34879.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "488",
-      "category_code": 10
+      "amount": "487.50",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "39661",
-      "category_code": 11
+      "amount": "39661.02",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1234",
-      "category_code": 14
+      "amount": "1234.19",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "4766",
-      "category_code": 18
+      "amount": "4765.95",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "390",
-      "category_code": 19
+      "amount": "390.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "554",
-      "category_code": 22
+      "amount": "553.50",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "5477",
-      "category_code": 23
+      "amount": "5477.43",
+      "category_code": 23,
+      "notes": "Art. spożywcze: 2742.66 zł; Kwiaty: 2014.50 zł; Abonament oprogramowania: 362.27 zł; Parking i przejazdy autostradą: 358.00 zł"
     }
   ],
   "mp_id": 363,

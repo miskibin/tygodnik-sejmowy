@@ -1,97 +1,121 @@
 {
-  "funds_spent": "250032",
+  "funds_spent": "250031.87",
+  "funds_total": "344773.05",
   "items": [
     {
-      "amount": "71000",
-      "category_code": 1
+      "amount": "71000.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "150",
-      "category_code": 2
+      "amount": "150.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "34900",
-      "category_code": 3
+      "amount": "34900.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "929",
-      "category_code": 5
+      "amount": "928.65",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "3381",
-      "category_code": 7
+      "amount": "3381.09",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "43746",
-      "category_code": 9
+      "amount": "43746.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "23398",
-      "category_code": 11
+      "amount": "23398.27",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1780",
-      "category_code": 14
+      "amount": "1780.14",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "8663",
-      "category_code": 19
+      "amount": "8663.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "62084.72",
+      "category_code": 23,
+      "notes": "Najem długoterminowy: 39185.64 zł; Videosejm: 6600.00 zł; Kwiaty, puchary, nagrody: 10475.18 zł; Catering: 4901.40 zł; Opłaty parkingowe: 922.50 zł"
     }
   ],
   "mp_id": 444,

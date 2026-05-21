@@ -1,97 +1,121 @@
 {
-  "funds_spent": "252733",
+  "funds_spent": "252732.79",
+  "funds_total": "333552.90",
   "items": [
     {
-      "amount": "113892",
-      "category_code": 1
+      "amount": "113891.70",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "540",
-      "category_code": 2
+      "amount": "540.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "1986",
-      "category_code": 3
+      "amount": "1986.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1050",
-      "category_code": 5
+      "amount": "1050.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "2414",
-      "category_code": 7
+      "amount": "2414.17",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1200",
-      "category_code": 8
+      "amount": "1200.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "45442",
-      "category_code": 9
+      "amount": "45441.62",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "495",
-      "category_code": 10
+      "amount": "494.65",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "18908",
-      "category_code": 11
+      "amount": "18907.77",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "250",
-      "category_code": 12
+      "amount": "250.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "60",
-      "category_code": 13
+      "amount": "60.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4137",
-      "category_code": 14
+      "amount": "4137.03",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "8195",
-      "category_code": 15
+      "amount": "8195.24",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "2367",
-      "category_code": 19
+      "amount": "2367.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "759",
-      "category_code": 21
+      "amount": "759.48",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "51038",
-      "category_code": 23
+      "amount": "51038.13",
+      "category_code": 23,
+      "notes": "Koszty parkingów: 5113.90 zł; Zakup art. spożywczych na użytek biura: 3112.68 zł; Drobne nagrody rzeczowe: 2872.15 zł; Koszty obsługi Video Sejm: 7200.00 zł; Produkcja grafik, filmów i innych materiałów promocyjnych: 16342.30 zł; Zakup wieńców na uroczystości państwowe oraz kwiatów i wiązanek na lokalne uroczystości: 7725.10 zł; Spotkania z wyborcami – usługi gastronomiczne: 3887.00 zł; Zakup albumów i innych publikacji z Kancelarii Sejmu: 4785.00 zł"
     }
   ],
   "mp_id": 186,

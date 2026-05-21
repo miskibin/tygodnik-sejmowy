@@ -1,97 +1,121 @@
 {
-  "funds_spent": "280134",
+  "funds_spent": "280134.28",
+  "funds_total": "280181.80",
   "items": [
     {
-      "amount": "65253",
-      "category_code": 1
+      "amount": "65253.49",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "441",
-      "category_code": 2
+      "amount": "441.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "1000",
-      "category_code": 4
+      "amount": "1000.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "11256",
-      "category_code": 5
+      "amount": "11255.89",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "2840",
-      "category_code": 7
+      "amount": "2840.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "3332",
-      "category_code": 8
+      "amount": "3332.41",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "46000",
-      "category_code": 9
+      "amount": "46000.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "835",
-      "category_code": 10
+      "amount": "834.73",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "34311",
-      "category_code": 11
+      "amount": "34311.23",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "1902",
-      "category_code": 13
+      "amount": "1901.77",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "29003",
-      "category_code": 14
+      "amount": "29003.41",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "3036",
-      "category_code": 15
+      "amount": "3035.89",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "3717",
-      "category_code": 16
+      "amount": "3717.07",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5187",
-      "category_code": 19
+      "amount": "5187.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1000",
-      "category_code": 22
+      "amount": "1000.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "70360",
-      "category_code": 23
+      "amount": "26103.58",
+      "category_code": 23,
+      "notes": "artykuły spożywcze: 13745.00 zł; Wydatki na catering: 2382.78 zł; opłaty pocztowe: 560.00 zł; Koszty biurowe ogólnopozapłacowe; autostrady; Mandaty: 27.80 zł; koszty: 9388.00 zł"
     }
   ],
   "mp_id": 236,

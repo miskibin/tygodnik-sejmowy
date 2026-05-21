@@ -1,97 +1,121 @@
 {
-  "funds_spent": "279790",
+  "funds_spent": "279790.00",
+  "funds_total": "280463.19",
   "items": [
     {
-      "amount": "8377",
-      "category_code": 1
+      "amount": "8377.29",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "98279",
-      "category_code": 3
+      "amount": "98279.39",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1533",
-      "category_code": 5
+      "amount": "1533.24",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "14021",
-      "category_code": 7
+      "amount": "14021.30",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "28225",
-      "category_code": 9
+      "amount": "28225.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "70701",
-      "category_code": 11
+      "amount": "70701.02",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "800",
-      "category_code": 12
+      "amount": "800.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "360",
-      "category_code": 13
+      "amount": "360.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5751",
-      "category_code": 14
+      "amount": "5750.79",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "11964",
-      "category_code": 19
+      "amount": "11964.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "28071",
-      "category_code": 22
+      "amount": "28071.21",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "8706",
-      "category_code": 23
+      "amount": "8706.26",
+      "category_code": 23,
+      "notes": "zakupy społeczne, w. całonigrowe: 7656.83 zł; koszt: 535.00 zł; nagrody, puchazy: 249.69 zł; koszt podróży służbowych ang. składek: 264.74 zł"
     }
   ],
   "mp_id": 276,

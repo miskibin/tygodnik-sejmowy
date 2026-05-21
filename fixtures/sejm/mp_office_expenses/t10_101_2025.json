@@ -1,97 +1,121 @@
 {
-  "funds_spent": "232200",
+  "funds_spent": "232199.86",
+  "funds_total": "281677.66",
   "items": [
     {
-      "amount": "104147",
-      "category_code": 1
+      "amount": "104147.30",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "2874",
-      "category_code": 3
+      "amount": "2873.70",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2365",
-      "category_code": 5
+      "amount": "2365.47",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "10316",
-      "category_code": 7
+      "amount": "10316.39",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1834",
-      "category_code": 8
+      "amount": "1833.75",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48049",
-      "category_code": 9
+      "amount": "48049.30",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "829",
-      "category_code": 10
+      "amount": "828.97",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "38581",
-      "category_code": 11
+      "amount": "38580.69",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "52",
-      "category_code": 12
+      "amount": "51.96",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "1057",
-      "category_code": 13
+      "amount": "1056.56",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "8241",
-      "category_code": 14
+      "amount": "8240.66",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "2224",
-      "category_code": 15
+      "amount": "2223.98",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3785",
-      "category_code": 19
+      "amount": "3784.82",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "4783",
-      "category_code": 22
+      "amount": "4783.47",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "4887",
-      "category_code": 23
+      "amount": "3062.84",
+      "category_code": 23,
+      "notes": "opłaty za parking: 119.00 zł; opłaty za autostrady: 845.80 zł; wiązanki okolicznościowe i znicze: 244.82 zł; artykuły spożywcze: 325.73 zł; nagrody konkursowe: 240.97 zł; Usługi graficzno-fotograficzne: 1286.52 zł"
     }
   ],
   "mp_id": 101,

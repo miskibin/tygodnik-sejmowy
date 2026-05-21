@@ -1,97 +1,121 @@
 {
-  "funds_spent": "217388",
+  "funds_spent": "217387.90",
+  "funds_total": "358135.03",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "98619",
-      "category_code": 3
+      "amount": "98619.36",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1197",
-      "category_code": 5
+      "amount": "1196.98",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1169",
-      "category_code": 7
+      "amount": "1168.50",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "45900",
-      "category_code": 9
+      "amount": "45899.95",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "694",
-      "category_code": 10
+      "amount": "693.93",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "53213",
-      "category_code": 11
+      "amount": "53213.20",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "981",
-      "category_code": 12
+      "amount": "981.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "633",
-      "category_code": 13
+      "amount": "632.99",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1175",
-      "category_code": 14
+      "amount": "1174.51",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1120",
-      "category_code": 15
+      "amount": "1119.99",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "206",
-      "category_code": 19
+      "amount": "205.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1048",
-      "category_code": 22
+      "amount": "1048.08",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "11434",
-      "category_code": 23
+      "amount": "11433.81",
+      "category_code": 23,
+      "notes": "Obsługa mediów społecznościowych: 3502.92 zł; Catering + artykuły spożywcze: 5843.10 zł; Zakup drobnych sprzętów: 552.98 zł; Zakup kwiatów: 120.00 zł; Wynajem samochodu: 738.00 zł; Przejazdy autostradami: 353.00 zł; Koszty podróży asystentów społecznych: 323.81 zł"
     }
   ],
   "mp_id": 237,

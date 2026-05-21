@@ -1,97 +1,121 @@
 {
-  "funds_spent": "276222",
+  "funds_spent": "276221.51",
+  "funds_total": "329419.40",
   "items": [
     {
-      "amount": "36877",
-      "category_code": 1
+      "amount": "36877.01",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "44326",
-      "category_code": 3
+      "amount": "44325.80",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "5017",
-      "category_code": 5
+      "amount": "5017.23",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "18396",
-      "category_code": 7
+      "amount": "18396.15",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "8457",
-      "category_code": 8
+      "amount": "8456.55",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "36004",
-      "category_code": 9
+      "amount": "36004.20",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "3023",
-      "category_code": 10
+      "amount": "3022.90",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "42826",
-      "category_code": 11
+      "amount": "42826.45",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "246",
-      "category_code": 13
+      "amount": "246.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "14472",
-      "category_code": 14
+      "amount": "14472.18",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "7500",
-      "category_code": 15
+      "amount": "7500.01",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "399",
-      "category_code": 16
+      "amount": "399.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "20899",
-      "category_code": 19
+      "amount": "20898.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "5190",
-      "category_code": 22
+      "amount": "5189.97",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "32589",
-      "category_code": 23
+      "amount": "32589.46",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze: 3410.55 zł; Kwiaty: 2978.90 zł; parking: 8.00 zł; Najem samochodu: 26192.01 zł"
     }
   ],
   "mp_id": 225,

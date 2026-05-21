@@ -1,97 +1,121 @@
 {
-  "funds_spent": "286489",
+  "funds_spent": "286488.94",
+  "funds_total": "286580.29",
   "items": [
     {
-      "amount": "89224",
-      "category_code": 1
+      "amount": "89224.42",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "38259",
-      "category_code": 3
+      "amount": "38259.38",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "1845",
-      "category_code": 4
+      "amount": "1845.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3190",
-      "category_code": 5
+      "amount": "3189.93",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "5313",
-      "category_code": 8
+      "amount": "5313.37",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "40254",
-      "category_code": 9
+      "amount": "40253.63",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "2321",
-      "category_code": 10
+      "amount": "2320.91",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "39192",
-      "category_code": 11
+      "amount": "39191.55",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "356",
-      "category_code": 13
+      "amount": "356.47",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "21770",
-      "category_code": 14
+      "amount": "21770.22",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "8947",
-      "category_code": 15
+      "amount": "8946.52",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "927",
-      "category_code": 16
+      "amount": "927.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "17619",
-      "category_code": 19
+      "amount": "17619.03",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "17272",
-      "category_code": 23
+      "amount": "17271.51",
+      "category_code": 23,
+      "notes": "Kwiaty na uroczystości państwowe: 450.00 zł; Obsługa internetowa: 8892.51 zł; Materiały do publikacji w social mediach: 7929.00 zł"
     }
   ],
   "mp_id": 161,

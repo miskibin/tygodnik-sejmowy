@@ -1,8 +1,4 @@
 {
-  "funds_allocated": "279720.00",
-  "funds_carryover": "16988.62",
-  "funds_interest": "0.00",
-  "funds_remaining": "26725.81",
   "funds_spent": "269982.81",
   "funds_total": "296708.62",
   "items": [
@@ -119,11 +115,10 @@
     {
       "amount": "144742.51",
       "category_code": 23,
-      "notes": "obsługa administracyjna biura; zakup kwiatów; zakup kart świątecznych; zakup statuetek; usługa dorobienia kluczy; przygotowanie filii w Prudniku; przejazdy autostradą; zakup biletów przejazdowych"
+      "notes": "Koszt obsługi administracyjnej biura: 109360.00 zł; Koszt najmu samochodu: 25629.96 zł; Zakup kwiatów na uroczystości: 6305.00 zł; Zakup kart świątecznych: 457.56 zł; Zakup statuetek, pucharów: 2100.00 zł; Koszt usługi dorobienia kluczy: 72.00 zł; Zakup Konstytucji RP w dużym formacie: 150.00 zł; Przygotowanie filii biura poselskiego w Prudniku - część kosztów oklejenia szyb: 599.99 zł; Koszt przejazdów autostradą - zakup biletów przejazdowych: 68.00 zł"
     }
   ],
   "mp_id": 466,
-  "source_sha256": "15dcb49b6e87eb8b13bc844afa28db777c23602e4e959d8b8b063bbb7911e415",
   "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025466/$File/2025ryczalt_466.pdf?OpenElement",
   "term": 10,
   "year": 2025

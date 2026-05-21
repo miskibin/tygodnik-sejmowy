@@ -1,97 +1,121 @@
 {
-  "funds_spent": "273594",
+  "funds_spent": "273593.53",
+  "funds_total": "285537.18",
   "items": [
     {
-      "amount": "114290",
-      "category_code": 1
+      "amount": "114289.74",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "13761",
-      "category_code": 3
+      "amount": "13761.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1255",
-      "category_code": 8
+      "amount": "1255.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "35539",
-      "category_code": 9
+      "amount": "35539.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "22796",
-      "category_code": 11
+      "amount": "22796.36",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "666",
-      "category_code": 14
+      "amount": "665.80",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2093",
-      "category_code": 16
+      "amount": "2093.35",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "6000",
-      "category_code": 19
+      "amount": "6000.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "74469.88",
+      "category_code": 23,
+      "notes": "artykuły informatyczno-telekomunikacyjne: 13917.20 zł; zakup dzbanka/czajnika: 242.89 zł; zakup kwiatów: 550.00 zł; promocja w internecie: 46076.57 zł; materiały graficzne na posiedzenie sejmu: 228.29 zł; abonament/subskrypcja: 7143.60 zł; open AI: 1152.10 zł; zakup artykułów spożywczych na użytek biura poselskiego: 1161.53 zł; materiały biurowe: 2898.30 zł; artykuły chemiczne: 1099.40 zł"
     }
   ],
   "mp_id": 234,

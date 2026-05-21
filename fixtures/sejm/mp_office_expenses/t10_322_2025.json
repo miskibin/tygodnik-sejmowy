@@ -1,97 +1,121 @@
 {
-  "funds_spent": "322023",
+  "funds_spent": "322022.76",
+  "funds_total": "321967.77",
   "items": [
     {
-      "amount": "99350",
-      "category_code": 1
+      "amount": "99349.99",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "4930",
-      "category_code": 2
+      "amount": "4930.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "31230",
-      "category_code": 3
+      "amount": "31229.85",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2528",
-      "category_code": 5
+      "amount": "2527.96",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "9728",
-      "category_code": 7
+      "amount": "9728.20",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "860",
-      "category_code": 8
+      "amount": "860.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "36996",
-      "category_code": 9
+      "amount": "36995.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "32",
-      "category_code": 10
+      "amount": "31.90",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "42472",
-      "category_code": 11
+      "amount": "42472.00",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "546",
-      "category_code": 13
+      "amount": "545.74",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "16095",
-      "category_code": 14
+      "amount": "16095.24",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "10550",
-      "category_code": 15
+      "amount": "10550.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5345",
-      "category_code": 19
+      "amount": "5344.90",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "18200",
-      "category_code": 22
+      "amount": "18200.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "43167",
-      "category_code": 23
+      "amount": "43168.28",
+      "category_code": 23,
+      "notes": "Wynajęcie sądu: 21570.18 zł; Zakup kwestionariuszy i druków spółek: 2590.00 zł; Zakup artykułów spożywczych dla biura poselskiego: 1503.05 zł; Drobne niegroźne naprawy: 8605.85 zł; Koszty cateringu spotkań i wykładów: 8505.60 zł; Koszty podróży autostradowych: 174.80 zł; Koszty opłat parkingowych: 218.80 zł"
     }
   ],
   "mp_id": 322,

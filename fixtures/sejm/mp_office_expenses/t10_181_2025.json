@@ -1,97 +1,121 @@
 {
-  "funds_spent": "258828",
+  "funds_spent": "258827.85",
+  "funds_total": "333410.71",
   "items": [
     {
-      "amount": "60028",
-      "category_code": 1
+      "amount": "60027.79",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "48749",
-      "category_code": 3
+      "amount": "48748.54",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2217",
-      "category_code": 5
+      "amount": "2216.97",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "584",
-      "category_code": 7
+      "amount": "583.94",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "45845",
-      "category_code": 11
+      "amount": "45845.34",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2727",
-      "category_code": 14
+      "amount": "2726.54",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4718",
-      "category_code": 19
+      "amount": "4718.10",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "8871",
-      "category_code": 22
+      "amount": "8870.74",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "36790",
-      "category_code": 23
+      "amount": "36789.89",
+      "category_code": 23,
+      "notes": "zakup kinierów na siatki i uruchamianie podstaw: 2440.00 zł; koszt cateringu na spotkaniu z opłaceniem: 6921.75 zł; drobne nagrody nierówne: 2072.12 zł; koszt najmu samochodu: 25356.02 zł"
     }
   ],
   "mp_id": 181,

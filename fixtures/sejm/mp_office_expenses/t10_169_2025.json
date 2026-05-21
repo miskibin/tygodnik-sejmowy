@@ -1,97 +1,121 @@
 {
-  "funds_spent": "258504",
+  "funds_spent": "258503.78",
+  "funds_total": "281487.06",
   "items": [
     {
-      "amount": "80486",
-      "category_code": 1
+      "amount": "80485.60",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "36054",
-      "category_code": 3
+      "amount": "36053.84",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1034",
-      "category_code": 5
+      "amount": "1033.58",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "3383",
-      "category_code": 7
+      "amount": "3382.50",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "31818",
-      "category_code": 9
+      "amount": "31818.20",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "32586",
-      "category_code": 11
+      "amount": "32586.00",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4398",
-      "category_code": 14
+      "amount": "4398.05",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "329",
-      "category_code": 19
+      "amount": "328.74",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "68417",
-      "category_code": 23
+      "amount": "68417.27",
+      "category_code": 23,
+      "notes": "Zakup artykułów spożywczych na użytek biura poselskiego: 1809.12 zł; Zakup kwiatów: 4835.00 zł; Koszty cateringu na spotkania z wyborcami: 5588.00 zł; Koszty obsługi profili SoMe: 14760.00 zł; Najem długoterminowy auta: 34641.12 zł; Zwrot kosztów podróży asystenta społecznego: 575.54 zł; Drobne nagrody rzeczowe: 6208.49 zł"
     }
   ],
   "mp_id": 169,

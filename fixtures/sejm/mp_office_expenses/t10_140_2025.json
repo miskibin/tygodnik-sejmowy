@@ -1,97 +1,121 @@
 {
-  "funds_spent": "293146",
+  "funds_spent": "293146.17",
+  "funds_total": "304497.84",
   "items": [
     {
-      "amount": "132742",
-      "category_code": 1
+      "amount": "132742.03",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "15584",
-      "category_code": 3
+      "amount": "15583.51",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "11224",
-      "category_code": 5
+      "amount": "11224.21",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "26005",
-      "category_code": 7
+      "amount": "26004.66",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "360",
-      "category_code": 8
+      "amount": "360.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "52",
-      "category_code": 10
+      "amount": "52.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "16477",
-      "category_code": 11
+      "amount": "16477.32",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4527",
-      "category_code": 14
+      "amount": "4527.21",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "4167",
-      "category_code": 16
+      "amount": "4166.60",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "540",
-      "category_code": 19
+      "amount": "540.40",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "295",
-      "category_code": 21
+      "amount": "294.90",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "12907",
-      "category_code": 22
+      "amount": "12906.66",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "17243",
-      "category_code": 23
+      "amount": "17243.27",
+      "category_code": 23,
+      "notes": "PARKING LOTNISKO ŁAWICA: 799.50 zł; ZWROT KOSZTÓW PALIWA ASYSTENTÓW SPOŁECZNYCH: 419.10 zł; KWIATY: 1260.00 zł; PROGRAM KOMPUT LICENCJA: 179.00 zł; DYPLOMY/ DROBNE UPOMINKI: 6739.43 zł; CATERING NA SPOTKANIACH Z WYBORCAMI: 7846.24 zł"
     }
   ],
   "mp_id": 140,

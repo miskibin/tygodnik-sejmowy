@@ -1,97 +1,121 @@
 {
-  "funds_spent": "229038",
+  "funds_spent": "229038.44",
+  "funds_total": "326926.74",
   "items": [
     {
-      "amount": "97862",
-      "category_code": 1
+      "amount": "97862.04",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "455",
-      "category_code": 2
+      "amount": "454.50",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "39413",
-      "category_code": 3
+      "amount": "39412.88",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "773",
-      "category_code": 5
+      "amount": "772.89",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "490",
-      "category_code": 7
+      "amount": "489.75",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "9",
-      "category_code": 8
+      "amount": "9.34",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "24863",
-      "category_code": 9
+      "amount": "24863.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1939",
-      "category_code": 10
+      "amount": "1939.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "23578",
-      "category_code": 11
+      "amount": "23577.72",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "487",
-      "category_code": 12
+      "amount": "487.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "133",
-      "category_code": 13
+      "amount": "133.18",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2779",
-      "category_code": 14
+      "amount": "2778.82",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "6499",
-      "category_code": 15
+      "amount": "6499.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "3159",
-      "category_code": 16
+      "amount": "3159.20",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5264",
-      "category_code": 19
+      "amount": "5263.82",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "2508",
-      "category_code": 22
+      "amount": "2508.20",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "18828",
-      "category_code": 23
+      "amount": "18828.10",
+      "category_code": 23,
+      "notes": "Kwiaty, znicze: 4619.81 zł; Art. Spożywcze: 1754.22 zł; Kurier: 149.93 zł; Nagrody: 697.87 zł; Catering: 656.46 zł; Usługi graficzno-fotograficzne: 1286.52 zł; Subskrypcja oprogramowania: 350.00 zł; Najem samochodu: 9313.29 zł"
     }
   ],
   "mp_id": 168,

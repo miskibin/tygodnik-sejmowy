@@ -1,97 +1,121 @@
 {
-  "funds_spent": "289582",
+  "funds_spent": "289581.90",
+  "funds_total": "308175.38",
   "items": [
     {
-      "amount": "107639",
-      "category_code": 1
+      "amount": "107638.67",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "6630",
-      "category_code": 2
+      "amount": "6630.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "39503",
-      "category_code": 3
+      "amount": "39502.97",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "7380",
-      "category_code": 4
+      "amount": "7380.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1605",
-      "category_code": 5
+      "amount": "1604.96",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "41361",
-      "category_code": 9
+      "amount": "41360.90",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1363",
-      "category_code": 10
+      "amount": "1362.96",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "12614",
-      "category_code": 11
+      "amount": "12614.48",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1403",
-      "category_code": 14
+      "amount": "1403.00",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "10671",
-      "category_code": 15
+      "amount": "10670.88",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "700",
-      "category_code": 19
+      "amount": "700.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "2770",
-      "category_code": 22
+      "amount": "2769.73",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "55352",
-      "category_code": 23
+      "amount": "55943.35",
+      "category_code": 23,
+      "notes": "Wynajem samochodu: 17917.83 zł; Artykuły spożywcze: 1351.31 zł; Kwiaty na uroczystości państwowe: 860.00 zł; Usługi cateringowe spotkanie z wyborcami w biurze poselskim: 540.00 zł; Zakup medali i książek dla dzieci na wydarzenia sportowe pod patronatem posła: 1641.36 zł; Koszty PR w obszarze komunikacji: 6150.00 zł; Koszty zakupu oprogramowania: 12518.10 zł; Materiały i usługi reklamowe związane z działalnością biura: 14311.75 zł; Koszty bankowe: 653.00 zł"
     }
   ],
   "mp_id": 117,

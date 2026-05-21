@@ -1,97 +1,121 @@
 {
-  "funds_spent": "279193",
+  "funds_spent": "279193.45",
+  "funds_total": "351128.31",
   "items": [
     {
-      "amount": "147532",
-      "category_code": 1
+      "amount": "147532.08",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "350",
-      "category_code": 2
+      "amount": "350.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "5643",
-      "category_code": 3
+      "amount": "5642.83",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "200",
-      "category_code": 4
+      "amount": "200.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1019",
-      "category_code": 5
+      "amount": "1018.96",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "19665",
-      "category_code": 7
+      "amount": "19664.56",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 9
+      "amount": "0.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "545",
-      "category_code": 10
+      "amount": "545.27",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "61484",
-      "category_code": 11
+      "amount": "61483.74",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "278",
-      "category_code": 12
+      "amount": "277.93",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "3353",
-      "category_code": 13
+      "amount": "3352.98",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "6813",
-      "category_code": 14
+      "amount": "6812.63",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "12950",
-      "category_code": 15
+      "amount": "12950.07",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "507",
-      "category_code": 16
+      "amount": "507.25",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "6146",
-      "category_code": 19
+      "amount": "6146.40",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "304",
-      "category_code": 22
+      "amount": "303.81",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "12405",
-      "category_code": 23
+      "amount": "12404.94",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze: 1125.84 zł; Wiązanki okolicznościowe: 1650.00 zł; Drobne wyposażenie biura: 2587.22 zł; Środki czystości i artykuły higieniczne: 250.23 zł; Bilety kolejowe dla asystentów społecznych: 380.90 zł; Organizacja pobytu na wydarzeniu branżowym: 260.00 zł; Usługa sprzątania: 984.00 zł; Usługa transportu mebli: 2460.00 zł; Subskrypcja programów komputerowych: 2706.75 zł"
     }
   ],
   "mp_id": 239,

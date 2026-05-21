@@ -1,97 +1,121 @@
 {
-  "funds_spent": "262514",
+  "funds_spent": "262514.24",
+  "funds_total": "306185.39",
   "items": [
     {
-      "amount": "93836",
-      "category_code": 1
+      "amount": "93835.64",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "28625",
-      "category_code": 3
+      "amount": "28625.48",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3810",
-      "category_code": 5
+      "amount": "3809.55",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "20426",
-      "category_code": 7
+      "amount": "20425.84",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1723",
-      "category_code": 8
+      "amount": "1722.50",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "38065",
-      "category_code": 9
+      "amount": "38065.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "28655",
-      "category_code": 11
+      "amount": "28654.65",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "8787",
-      "category_code": 14
+      "amount": "8786.80",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "9166",
-      "category_code": 16
+      "amount": "9165.50",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "464",
-      "category_code": 19
+      "amount": "463.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "14999",
-      "category_code": 22
+      "amount": "14999.11",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "13961",
-      "category_code": 23
+      "amount": "13960.47",
+      "category_code": 23,
+      "notes": "KWIATY: 3690.00 zł; DROBIE MAGRODY RZECZONE: 7143.07 zł; ART. SPÓŁWOWE: 3127.40 zł"
     }
   ],
   "mp_id": 230,

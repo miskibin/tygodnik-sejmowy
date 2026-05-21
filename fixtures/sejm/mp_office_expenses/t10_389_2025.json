@@ -1,97 +1,121 @@
 {
-  "funds_spent": "265145",
+  "funds_spent": "265145.15",
+  "funds_total": "295875.12",
   "items": [
     {
-      "amount": "110285",
-      "category_code": 1
+      "amount": "110284.90",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "281",
-      "category_code": 2
+      "amount": "281.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "18005",
-      "category_code": 3
+      "amount": "18004.70",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1229",
-      "category_code": 5
+      "amount": "1228.72",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "11338",
-      "category_code": 7
+      "amount": "11337.55",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "695",
-      "category_code": 8
+      "amount": "695.10",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "35909",
-      "category_code": 11
+      "amount": "35908.62",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "376",
-      "category_code": 12
+      "amount": "375.81",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "584",
-      "category_code": 13
+      "amount": "584.26",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "9037",
-      "category_code": 14
+      "amount": "9036.73",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2625",
-      "category_code": 16
+      "amount": "2625.45",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "2609",
-      "category_code": 19
+      "amount": "2608.80",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "117",
-      "category_code": 22
+      "amount": "116.85",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "21033",
-      "category_code": 23
+      "amount": "21033.26",
+      "category_code": 23,
+      "notes": "Kwiaty: 5075.97 zł; Art. spożywcze: 2878.95 zł; Catering: 6807.44 zł; Wynajem mebli: 1800.00 zł; Usługa Video Sejm: 3120.00 zł; Drobne nagrody rzeczowe: 966.00 zł; Przejazdy autostradą, parkingi: 384.90 zł"
     }
   ],
   "mp_id": 389,

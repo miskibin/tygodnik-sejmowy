@@ -1,97 +1,121 @@
 {
-  "funds_spent": "250118",
+  "funds_spent": "250117.50",
+  "funds_total": "295207.49",
   "items": [
     {
-      "amount": "170367",
-      "category_code": 1
+      "amount": "170366.88",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "15518",
-      "category_code": 3
+      "amount": "15518.22",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "3198",
-      "category_code": 8
+      "amount": "3198.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 9
+      "amount": "0.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "43628",
-      "category_code": 11
+      "amount": "43628.25",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "100",
-      "category_code": 12
+      "amount": "100.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "308",
-      "category_code": 13
+      "amount": "307.50",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "798",
-      "category_code": 14
+      "amount": "797.83",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "1727",
-      "category_code": 16
+      "amount": "1726.63",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "1",
-      "category_code": 18
+      "amount": "1.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "6566",
-      "category_code": 19
+      "amount": "6566.30",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "2699",
-      "category_code": 22
+      "amount": "2698.62",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "17103.12",
+      "category_code": 23,
+      "notes": "Spisywanie biurowych dokumentów: 13360.15 zł; Wykup ubezpieczeń - Opłaty: 2307.50 zł; Kwiaty: 150.00 zł; Ochrona - koszt: 1285.47 zł"
     }
   ],
   "mp_id": 357,

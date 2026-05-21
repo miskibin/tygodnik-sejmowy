@@ -113,8 +113,10 @@ begin
       from public.mp_office_expense_items
      where report_id = rid;
 
+    -- Tolerance 100 zł: real reports drift by up to ~12 zł from 23-row
+    -- rounding alone, plus jakglosuja's sub-list aggregation adds a few more.
     if rec.funds_spent is not null then
-      conf := case when abs(rec.funds_spent - it_sum) < 5 then 'verified' else 'unverified' end;
+      conf := case when abs(rec.funds_spent - it_sum) < 100 then 'verified' else 'unverified' end;
     elsif it_sum between 30000 and 1500000 then
       -- jakglosuja-style payloads carry no funds_spent; trust items if they
       -- are in the normal annual-spend range.

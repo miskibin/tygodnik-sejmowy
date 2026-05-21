@@ -1,97 +1,121 @@
 {
-  "funds_spent": "270453",
+  "funds_spent": "270452.58",
+  "funds_total": "320018.64",
   "items": [
     {
-      "amount": "171015",
-      "category_code": 1
+      "amount": "171014.60",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "400",
-      "category_code": 2
+      "amount": "400.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "1500",
-      "category_code": 3
+      "amount": "1500.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "550",
-      "category_code": 5
+      "amount": "550.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "10282",
-      "category_code": 7
+      "amount": "10281.77",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "40595",
-      "category_code": 9
+      "amount": "40595.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "44",
-      "category_code": 10
+      "amount": "44.20",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "6034",
-      "category_code": 11
+      "amount": "6034.47",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "141",
-      "category_code": 13
+      "amount": "140.88",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "10698",
-      "category_code": 14
+      "amount": "10697.62",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "4228",
-      "category_code": 16
+      "amount": "4227.55",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "3078",
-      "category_code": 18
+      "amount": "3078.25",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4203",
-      "category_code": 19
+      "amount": "4202.60",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "224",
-      "category_code": 22
+      "amount": "223.86",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "17462",
-      "category_code": 23
+      "amount": "17461.78",
+      "category_code": 23,
+      "notes": "Organizacja spotkań z wyborcami: 464.50 zł; Kwiaty i wiązanki: 515.00 zł; Refundacja okularów korekcyjnych dla pracowników biura poselskiego: 546.99 zł; Drobne nagrody: 351.49 zł; Obsługa prawna biura poselskiego: 15000.00 zł; Podróże służbowe współpracowników społecznych: 583.80 zł"
     }
   ],
   "mp_id": 198,

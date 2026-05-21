@@ -1,97 +1,121 @@
 {
-  "funds_spent": "237003",
+  "funds_spent": "237003.42",
+  "funds_total": "328516.56",
   "items": [
     {
-      "amount": "175755",
-      "category_code": 1
+      "amount": "175754.80",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "290",
-      "category_code": 2
+      "amount": "290.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1707",
-      "category_code": 5
+      "amount": "1706.96",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "492",
-      "category_code": 7
+      "amount": "492.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "12443",
-      "category_code": 9
+      "amount": "12443.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "34474",
-      "category_code": 11
+      "amount": "34474.42",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "1210",
-      "category_code": 12
+      "amount": "1210.11",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "160",
-      "category_code": 13
+      "amount": "160.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2052",
-      "category_code": 14
+      "amount": "2051.93",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "598",
-      "category_code": 19
+      "amount": "597.93",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "5099",
-      "category_code": 23
+      "amount": "5098.87",
+      "category_code": 23,
+      "notes": "KWIATY: 1260.50 zł; ART. SPOŻYWCZE: 1433.37 zł; USŁUGA CATERINGOWA: 881.00 zł; CZYSZCZENIE DYWANÓW: 444.00 zł; OKULARY DLA PRACOWNIKA: 1080.00 zł"
     }
   ],
   "mp_id": 185,

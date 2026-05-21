@@ -1,97 +1,121 @@
 {
-  "funds_spent": "316816",
+  "funds_spent": "316816.45",
+  "funds_total": "340176.90",
   "items": [
     {
-      "amount": "62901",
-      "category_code": 1
+      "amount": "62900.91",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "220",
-      "category_code": 2
+      "amount": "220.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "64452",
-      "category_code": 3
+      "amount": "64452.40",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "36448",
-      "category_code": 4
+      "amount": "36448.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "8397",
-      "category_code": 5
+      "amount": "8397.01",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "2500",
-      "category_code": 8
+      "amount": "2500.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "18091",
-      "category_code": 11
+      "amount": "18090.78",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "94",
-      "category_code": 12
+      "amount": "94.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "12458",
-      "category_code": 14
+      "amount": "12458.09",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "6413",
-      "category_code": 15
+      "amount": "6412.83",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "419",
-      "category_code": 16
+      "amount": "419.20",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "1362",
-      "category_code": 18
+      "amount": "1361.70",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "15149",
-      "category_code": 19
+      "amount": "15149.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "246",
-      "category_code": 22
+      "amount": "246.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "39367",
-      "category_code": 23
+      "amount": "39366.53",
+      "category_code": 23,
+      "notes": "KWIATY: 879.99 zł; CATERING: 9252.00 zł; AKTUALIZACJA VIDEO: 3600.00 zł; WYNAJEM SAMOCHODU: 22140.00 zł; ART.SPOŻYWCZE: 902.54 zł; PRZEWÓZ MEBLI: 2592.00 zł"
     }
   ],
   "mp_id": 380,

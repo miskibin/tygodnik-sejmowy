@@ -1,97 +1,121 @@
 {
-  "funds_spent": "256233",
+  "funds_spent": "256233.24",
+  "funds_total": "299542.58",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "195301",
-      "category_code": 3
+      "amount": "195301.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1227",
-      "category_code": 5
+      "amount": "1227.35",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "2013",
-      "category_code": 7
+      "amount": "2013.30",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1446",
-      "category_code": 8
+      "amount": "1446.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "14224",
-      "category_code": 9
+      "amount": "14224.12",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "30466",
-      "category_code": 11
+      "amount": "30465.88",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2206",
-      "category_code": 14
+      "amount": "2206.31",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "2564",
-      "category_code": 15
+      "amount": "2564.05",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "3036",
-      "category_code": 16
+      "amount": "3036.05",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "199",
-      "category_code": 19
+      "amount": "199.22",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "550",
-      "category_code": 23
+      "amount": "550.00",
+      "category_code": 23,
+      "notes": "Koszty i wpisania okładek wstępnych: 550.00 zł"
     }
   ],
   "mp_id": 412,

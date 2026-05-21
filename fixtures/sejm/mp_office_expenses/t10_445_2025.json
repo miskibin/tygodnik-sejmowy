@@ -1,97 +1,121 @@
 {
-  "funds_spent": "291383",
+  "funds_spent": "291383.36",
+  "funds_total": "310520.14",
   "items": [
     {
-      "amount": "197220",
-      "category_code": 1
+      "amount": "197220.42",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "8418",
-      "category_code": 3
+      "amount": "8417.56",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 9
+      "amount": "0.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "65866",
-      "category_code": 11
+      "amount": "65865.50",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "524",
-      "category_code": 13
+      "amount": "523.94",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "6083",
-      "category_code": 14
+      "amount": "6082.73",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "3274",
-      "category_code": 15
+      "amount": "3274.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "4085",
-      "category_code": 18
+      "amount": "4085.10",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "756",
-      "category_code": 19
+      "amount": "755.80",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "761",
-      "category_code": 22
+      "amount": "761.37",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "4397",
-      "category_code": 23
+      "amount": "4396.94",
+      "category_code": 23,
+      "notes": "Abonament ENVATO: 937.52 zł; Artykuły spożywcze: 668.91 zł; Artykuły spożywcze: 606.59 zł; Artykuły spożywcze: 574.31 zł; Koszty wyjazdów asystentów społecznych: 1409.61 zł; Zakupy kwiatów na uroczystości państwowe: 200.00 zł"
     }
   ],
   "mp_id": 445,

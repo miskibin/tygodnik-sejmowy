@@ -1,97 +1,121 @@
 {
-  "funds_spent": "179048",
+  "funds_spent": "179047.76",
+  "funds_total": "370715.21",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "101185",
-      "category_code": 3
+      "amount": "101185.42",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "15010",
-      "category_code": 4
+      "amount": "15010.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "867",
-      "category_code": 5
+      "amount": "867.26",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "3650",
-      "category_code": 7
+      "amount": "3650.03",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "4554",
-      "category_code": 9
+      "amount": "4554.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "800",
-      "category_code": 10
+      "amount": "800.45",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "30046",
-      "category_code": 11
+      "amount": "30045.63",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1316",
-      "category_code": 14
+      "amount": "1315.98",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1519",
-      "category_code": 15
+      "amount": "1518.80",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "7696",
-      "category_code": 19
+      "amount": "7696.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "6881",
-      "category_code": 22
+      "amount": "6880.94",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "5523",
-      "category_code": 23
+      "amount": "5523.25",
+      "category_code": 23,
+      "notes": "gastronomia, catering: 1214.50 zł; książki, nagrody: 809.75 zł; kwiaty, wiązanki: 3499.00 zł; szkolenia w zakresie obsługi biura poselskiego - zleceniobiorcy"
     }
   ],
   "mp_id": 156,

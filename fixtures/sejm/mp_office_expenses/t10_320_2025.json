@@ -1,97 +1,121 @@
 {
-  "funds_spent": "276179",
+  "funds_spent": "276178.53",
+  "funds_total": "331666.15",
   "items": [
     {
-      "amount": "45054",
-      "category_code": 1
+      "amount": "45054.42",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "22000",
-      "category_code": 3
+      "amount": "22000.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "20635",
-      "category_code": 7
+      "amount": "20634.53",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "49808",
-      "category_code": 9
+      "amount": "49808.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "55216",
-      "category_code": 11
+      "amount": "55215.92",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "13874",
-      "category_code": 14
+      "amount": "13874.15",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "6533",
-      "category_code": 19
+      "amount": "6532.81",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "6613",
-      "category_code": 22
+      "amount": "6612.53",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "56446",
-      "category_code": 23
+      "amount": "56446.17",
+      "category_code": 23,
+      "notes": "Najem samochodu: 33540.77 zł; Zakup wiązanki: 8629.00 zł; Zakup art. spożywczych: 3790.62 zł; Zakup art. spożywczych na spotkanie z wyborcami: 3772.89 zł; Zakup kotylionów: 599.00 zł; Zakup dyplomu okolicznościowego: 2821.01 zł; Zakup materiałów na uroczystości państwowe: 2411.40 zł; Zakup drobnych upominków: 801.49 zł; Zakup art. dekoracyjnych do biura poselskiego: 79.99 zł"
     }
   ],
   "mp_id": 320,

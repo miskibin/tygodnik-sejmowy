@@ -1,97 +1,121 @@
 {
-  "funds_spent": "277385",
+  "funds_spent": "277384.93",
+  "funds_total": "351479.25",
   "items": [
     {
-      "amount": "115140",
-      "category_code": 1
+      "amount": "115140.21",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "216",
-      "category_code": 2
+      "amount": "216.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "17367",
-      "category_code": 3
+      "amount": "17366.84",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "2460",
-      "category_code": 4
+      "amount": "2460.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1400",
-      "category_code": 5
+      "amount": "1400.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "3000",
-      "category_code": 7
+      "amount": "3000.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "4441",
-      "category_code": 8
+      "amount": "4441.20",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "36892",
-      "category_code": 9
+      "amount": "36892.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "2575",
-      "category_code": 10
+      "amount": "2574.60",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "53281",
-      "category_code": 11
+      "amount": "53281.27",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "201",
-      "category_code": 13
+      "amount": "200.79",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4118",
-      "category_code": 14
+      "amount": "4117.99",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "9863",
-      "category_code": 15
+      "amount": "9862.91",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "612",
-      "category_code": 16
+      "amount": "611.80",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3230",
-      "category_code": 19
+      "amount": "3229.50",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "328",
-      "category_code": 21
+      "amount": "327.60",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "19539",
-      "category_code": 23
+      "amount": "19538.82",
+      "category_code": 23,
+      "notes": "Zakup kwiatów: 3050.00 zł; Zakup art. spożywczych: 4314.90 zł; Drobne nagrody rzeczowe oraz rekwizyty na święta państwowe: 7534.92 zł; Koszty parkingów: 4639.00 zł"
     }
   ],
   "mp_id": 298,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "273437",
+  "funds_spent": "273436.99",
+  "funds_total": "384624.98",
   "items": [
     {
-      "amount": "154990",
-      "category_code": 1
+      "amount": "154989.70",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "20014",
-      "category_code": 3
+      "amount": "20013.92",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "23521",
-      "category_code": 4
+      "amount": "23520.90",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1036",
-      "category_code": 5
+      "amount": "1036.45",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "26399",
-      "category_code": 9
+      "amount": "26399.40",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "25207",
-      "category_code": 11
+      "amount": "25206.93",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3710",
-      "category_code": 14
+      "amount": "3709.92",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "5398",
-      "category_code": 15
+      "amount": "5397.67",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3266",
-      "category_code": 19
+      "amount": "3266.10",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "9896",
-      "category_code": 23
+      "amount": "9896.00",
+      "category_code": 23,
+      "notes": "Kwota i drobne unijne pamiątkowe: 914.00 zł; Usługa fotograficzna: 7072.50 zł; Flaga: 615.50 zł; Usługa marketingowa: 1294.00 zł"
     }
   ],
   "mp_id": 425,

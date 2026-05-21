@@ -1,97 +1,121 @@
 {
-  "funds_spent": "299768",
+  "funds_spent": "299767.70",
+  "funds_total": "292806.62",
   "items": [
     {
-      "amount": "173197",
-      "category_code": 1
+      "amount": "173197.41",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "219",
-      "category_code": 2
+      "amount": "219.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "12768",
-      "category_code": 3
+      "amount": "12768.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "443",
-      "category_code": 5
+      "amount": "443.18",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "321",
-      "category_code": 7
+      "amount": "320.90",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "30813",
-      "category_code": 11
+      "amount": "30813.15",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "83",
-      "category_code": 12
+      "amount": "83.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "9451",
-      "category_code": 14
+      "amount": "9451.30",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5160",
-      "category_code": 19
+      "amount": "5160.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "1489",
-      "category_code": 21
+      "amount": "1489.34",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "403",
-      "category_code": 22
+      "amount": "403.44",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "17119",
-      "category_code": 23
+      "amount": "17119.02",
+      "category_code": 23,
+      "notes": "USŁUGI GASTRONOMICZNE: 9068.00 zł; USŁUGI VIDEO-FILMOWANIE: 3600.00 zł; ZAKUP KWIATÓW I WIZYTAWEK: 4451.02 zł"
     }
   ],
   "mp_id": 127,

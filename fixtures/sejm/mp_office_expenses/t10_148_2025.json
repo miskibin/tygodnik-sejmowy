@@ -1,97 +1,121 @@
 {
-  "funds_spent": "242409",
+  "funds_spent": "242409.44",
+  "funds_total": "318843.56",
   "items": [
     {
-      "amount": "183838",
-      "category_code": 1
+      "amount": "183837.94",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "160",
-      "category_code": 2
+      "amount": "160.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "31200",
-      "category_code": 4
+      "amount": "31200.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "543",
-      "category_code": 5
+      "amount": "543.07",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "50",
-      "category_code": 7
+      "amount": "50.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 9
+      "amount": "0.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "17839",
-      "category_code": 11
+      "amount": "17839.08",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "79",
-      "category_code": 14
+      "amount": "79.10",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "5447",
-      "category_code": 18
+      "amount": "5446.80",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "2297",
-      "category_code": 19
+      "amount": "2297.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "956",
-      "category_code": 23
+      "amount": "956.45",
+      "category_code": 23,
+      "notes": "ARTYKUŁY SPÓŻYWCZE: 956.45 zł"
     }
   ],
   "mp_id": 148,

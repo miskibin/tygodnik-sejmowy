@@ -1,97 +1,121 @@
 {
-  "funds_spent": "374544",
+  "funds_spent": "374544.40",
+  "funds_total": "377630.73",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "186370",
-      "category_code": 3
+      "amount": "186370.30",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "2590",
-      "category_code": 4
+      "amount": "2590.38",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2202",
-      "category_code": 5
+      "amount": "2201.63",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "17966",
-      "category_code": 7
+      "amount": "17966.18",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "45522",
-      "category_code": 9
+      "amount": "45521.80",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "3375",
-      "category_code": 10
+      "amount": "3374.54",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "45932",
-      "category_code": 11
+      "amount": "45931.65",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "1430",
-      "category_code": 12
+      "amount": "1430.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "8659",
-      "category_code": 14
+      "amount": "8658.69",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "20252",
-      "category_code": 15
+      "amount": "20251.73",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "9304",
-      "category_code": 19
+      "amount": "9303.50",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "30944",
-      "category_code": 23
+      "amount": "30855.00",
+      "category_code": 23,
+      "notes": "Kwiaty, wiązanki okolicznościowe: 1080.00 zł; Parking, autostrada: 876.00 zł; Obsługa administracyjna biura poselskiego zrealizowana na podstawie faktur: 28899.00 zł"
     }
   ],
   "mp_id": 456,

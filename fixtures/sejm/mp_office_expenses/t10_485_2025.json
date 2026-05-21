@@ -1,97 +1,121 @@
 {
-  "funds_spent": "264478",
+  "funds_spent": "264478.33",
+  "funds_total": "292413.60",
   "items": [
     {
-      "amount": "114541",
-      "category_code": 1
+      "amount": "114541.46",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "46190",
-      "category_code": 3
+      "amount": "46190.26",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "215",
-      "category_code": 5
+      "amount": "214.95",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1095",
-      "category_code": 7
+      "amount": "1094.55",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "3078",
-      "category_code": 8
+      "amount": "3078.40",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "26234",
-      "category_code": 9
+      "amount": "26233.80",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "37497",
-      "category_code": 11
+      "amount": "37497.08",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "216",
-      "category_code": 13
+      "amount": "215.65",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1566",
-      "category_code": 14
+      "amount": "1565.91",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "1076",
-      "category_code": 16
+      "amount": "1075.65",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1991",
-      "category_code": 19
+      "amount": "1990.50",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "5702",
-      "category_code": 22
+      "amount": "5701.58",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "25079",
-      "category_code": 23
+      "amount": "25078.54",
+      "category_code": 23,
+      "notes": "KOSZTY NAJMU SAMOCHODU: 20411.07 zł; ZAKUP KWIĄTOW I WIĄZANEK: 2050.00 zł; CATERING NA SPOTKANIA Z WYSOKIM: 1479.90 zł; DROBNE NAGRODY RZECZOWE: 1137.57 zł"
     }
   ],
   "mp_id": 485,

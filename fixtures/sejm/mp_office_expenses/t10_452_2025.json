@@ -1,97 +1,121 @@
 {
-  "funds_spent": "250015",
+  "funds_spent": "250015.23",
+  "funds_total": "335515.59",
   "items": [
     {
-      "amount": "97680",
-      "category_code": 1
+      "amount": "97679.53",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "16800",
-      "category_code": 3
+      "amount": "16800.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "5955",
-      "category_code": 5
+      "amount": "5955.30",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "14693",
-      "category_code": 7
+      "amount": "14692.52",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1180",
-      "category_code": 8
+      "amount": "1180.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47615",
-      "category_code": 9
+      "amount": "47614.50",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "41318",
-      "category_code": 11
+      "amount": "41318.13",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "7830",
-      "category_code": 14
+      "amount": "7830.22",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "299",
-      "category_code": 15
+      "amount": "299.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2270",
-      "category_code": 16
+      "amount": "2269.79",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1313",
-      "category_code": 19
+      "amount": "1313.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1505",
-      "category_code": 22
+      "amount": "1504.97",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "8835",
-      "category_code": 23
+      "amount": "8834.67",
+      "category_code": 23,
+      "notes": "Zakup kwiatów: 6156.50 zł; Zakup artykułów spożywczych na użytek biura poselskiego: 223.27 zł; Koszty parkingu: 60.60 zł; Koszty cateringu na spotkaniu z wyborcami: 1890.00 zł; Wykonanie naklejki na tablicy informacyjnej: 73.80 zł; Najem samochodu: 430.50 zł"
     }
   ],
   "mp_id": 452,

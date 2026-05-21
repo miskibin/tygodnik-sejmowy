@@ -1,97 +1,121 @@
 {
-  "funds_spent": "278869",
+  "funds_spent": "278868.60",
+  "funds_total": "279720.00",
   "items": [
     {
-      "amount": "125543",
-      "category_code": 1
+      "amount": "125543.37",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "35873",
-      "category_code": 3
+      "amount": "35872.50",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "10318",
-      "category_code": 5
+      "amount": "10317.70",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "4190",
-      "category_code": 7
+      "amount": "4190.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "35600",
-      "category_code": 9
+      "amount": "35600.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "410",
-      "category_code": 10
+      "amount": "410.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "48095",
-      "category_code": 11
+      "amount": "48095.13",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3594",
-      "category_code": 14
+      "amount": "3593.62",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "6857",
-      "category_code": 15
+      "amount": "6856.99",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "728",
-      "category_code": 19
+      "amount": "728.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "2472",
-      "category_code": 21
+      "amount": "2471.66",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "701",
-      "category_code": 22
+      "amount": "701.10",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "4488",
-      "category_code": 23
+      "amount": "4488.33",
+      "category_code": 23,
+      "notes": "Zdjęcia, video spotkań z wyborcami: 1088.00 zł; Kwiaty na uroczystości państwowe: 1820.20 zł; Artykuły spożywcze do biura: 80.13 zł; Drobne nagrody rzeczowe: 1500.00 zł"
     }
   ],
   "mp_id": 146,

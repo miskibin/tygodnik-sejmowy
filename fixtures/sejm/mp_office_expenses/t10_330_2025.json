@@ -1,97 +1,121 @@
 {
-  "funds_spent": "279425",
+  "funds_spent": "279424.92",
+  "funds_total": "279730.25",
   "items": [
     {
-      "amount": "122125",
-      "category_code": 1
+      "amount": "122124.90",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "450",
-      "category_code": 2
+      "amount": "450.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "60834",
-      "category_code": 3
+      "amount": "60834.20",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "5704",
-      "category_code": 5
+      "amount": "5703.58",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "5261",
-      "category_code": 7
+      "amount": "5260.75",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1555",
-      "category_code": 8
+      "amount": "1555.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "15755",
-      "category_code": 9
+      "amount": "15755.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "33607",
-      "category_code": 11
+      "amount": "33606.84",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4508",
-      "category_code": 14
+      "amount": "4508.31",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "2026",
-      "category_code": 15
+      "amount": "2025.98",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "6",
-      "category_code": 16
+      "amount": "6.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5867",
-      "category_code": 19
+      "amount": "5867.10",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "409",
-      "category_code": 21
+      "amount": "409.30",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "13000",
-      "category_code": 22
+      "amount": "13000.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "8324",
-      "category_code": 23
+      "amount": "8323.96",
+      "category_code": 23,
+      "notes": "spożywcze: 6367.96 zł; kwoty: 1059.00 zł; catering na spotkaniu z wyborcami: 897.00 zł"
     }
   ],
   "mp_id": 330,

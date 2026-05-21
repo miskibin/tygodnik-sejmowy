@@ -1,97 +1,121 @@
 {
-  "funds_spent": "243101",
+  "funds_spent": "243101.38",
+  "funds_total": "319959.30",
   "items": [
     {
-      "amount": "115150",
-      "category_code": 1
+      "amount": "115150.23",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "97",
-      "category_code": 2
+      "amount": "97.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "4540",
-      "category_code": 3
+      "amount": "4540.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2849",
-      "category_code": 5
+      "amount": "2848.63",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "2835",
-      "category_code": 7
+      "amount": "2835.15",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "33925",
-      "category_code": 9
+      "amount": "33925.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "37959",
-      "category_code": 11
+      "amount": "37958.50",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3828",
-      "category_code": 14
+      "amount": "3828.36",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "6688",
-      "category_code": 19
+      "amount": "6688.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "778",
-      "category_code": 22
+      "amount": "777.99",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "31729",
-      "category_code": 23
+      "amount": "31729.12",
+      "category_code": 23,
+      "notes": "Art. spożywcze: 418.47 zł; Opłata miejska: 2512.70 zł; Usługi najmu długoterminowego: 28797.95 zł"
     }
   ],
   "mp_id": 488,

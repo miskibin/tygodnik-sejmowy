@@ -1,97 +1,121 @@
 {
-  "funds_spent": "293260",
+  "funds_spent": "293259.80",
+  "funds_total": "340792.65",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "121708",
-      "category_code": 3
+      "amount": "121707.85",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "10633",
-      "category_code": 5
+      "amount": "10633.33",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "615",
-      "category_code": 7
+      "amount": "615.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "850",
-      "category_code": 8
+      "amount": "850.09",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47455",
-      "category_code": 9
+      "amount": "47454.90",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "108",
-      "category_code": 10
+      "amount": "108.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "37146",
-      "category_code": 11
+      "amount": "37146.00",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "369",
-      "category_code": 13
+      "amount": "369.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5005",
-      "category_code": 14
+      "amount": "5005.32",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "7218",
-      "category_code": 15
+      "amount": "7217.72",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "7367",
-      "category_code": 19
+      "amount": "7367.05",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "54786",
-      "category_code": 23
+      "amount": "54785.54",
+      "category_code": 23,
+      "notes": "kwiaty/wiązanki: 4310.00 zł; art. spożywcze/gastronomia: 1151.14 zł; leasing auta: 47904.26 zł; nagrody/książki: 1389.39 zł; Kongres Mikołajki: 30.75 zł"
     }
   ],
   "mp_id": 108,

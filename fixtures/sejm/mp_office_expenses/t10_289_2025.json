@@ -1,97 +1,121 @@
 {
-  "funds_spent": "265212",
+  "funds_spent": "265212.37",
+  "funds_total": "344565.08",
   "items": [
     {
-      "amount": "96654",
-      "category_code": 1
+      "amount": "96654.11",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1804",
-      "category_code": 5
+      "amount": "1803.53",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "31701",
-      "category_code": 7
+      "amount": "31701.34",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "408",
-      "category_code": 8
+      "amount": "408.30",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47638",
-      "category_code": 9
+      "amount": "47637.60",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "54993",
-      "category_code": 11
+      "amount": "54992.56",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2699",
-      "category_code": 14
+      "amount": "2698.98",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "3604",
-      "category_code": 15
+      "amount": "3603.81",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5287",
-      "category_code": 19
+      "amount": "5287.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "16204",
-      "category_code": 22
+      "amount": "16204.42",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "4220.50",
+      "category_code": 23,
+      "notes": "KWIATY: 1370.00 zł; DYPLOMY, MEDALE: 2277.00 zł; UST. GASTRONOMICZNA: 573.50 zł"
     }
   ],
   "mp_id": 289,

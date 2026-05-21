@@ -1,97 +1,121 @@
 {
-  "funds_spent": "208303",
+  "funds_spent": "208303.19",
+  "funds_total": "356736.42",
   "items": [
     {
-      "amount": "91278",
-      "category_code": 1
+      "amount": "91277.87",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "200",
-      "category_code": 2
+      "amount": "200.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "12736",
-      "category_code": 3
+      "amount": "12736.44",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1797",
-      "category_code": 5
+      "amount": "1796.74",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "14259",
-      "category_code": 7
+      "amount": "14258.76",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1200",
-      "category_code": 8
+      "amount": "1200.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "25300",
-      "category_code": 9
+      "amount": "25300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "45338",
-      "category_code": 11
+      "amount": "45338.21",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "554",
-      "category_code": 12
+      "amount": "553.50",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "948",
-      "category_code": 14
+      "amount": "947.95",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2043",
-      "category_code": 18
+      "amount": "2042.55",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4800",
-      "category_code": 19
+      "amount": "4800.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "932",
-      "category_code": 22
+      "amount": "932.33",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "6919",
-      "category_code": 23
+      "amount": "6918.64",
+      "category_code": 23,
+      "notes": "Kwiaty na uroczystości oficjalne: 1639.00 zł; Art. spożywcze na użytek biura poselskiego: 279.64 zł; Koszty cateringu na spotkania z wyborcami: 4500.00 zł; Zakup okularów korekcyjnych dla pracownika biura poselskiego: 500.00 zł"
     }
   ],
   "mp_id": 249,

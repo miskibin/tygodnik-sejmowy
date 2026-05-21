@@ -1,97 +1,121 @@
 {
-  "funds_spent": "284852",
+  "funds_spent": "284852.09",
+  "funds_total": "281144.48",
   "items": [
     {
-      "amount": "97879",
-      "category_code": 1
+      "amount": "97879.44",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2529",
-      "category_code": 5
+      "amount": "2528.79",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "14671",
-      "category_code": 7
+      "amount": "14671.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "4550",
-      "category_code": 8
+      "amount": "4550.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "24789",
-      "category_code": 9
+      "amount": "24789.40",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "39559",
-      "category_code": 11
+      "amount": "39558.53",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "148",
-      "category_code": 12
+      "amount": "148.01",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "12547",
-      "category_code": 14
+      "amount": "12546.86",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "8827",
-      "category_code": 15
+      "amount": "8827.26",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "4099",
-      "category_code": 16
+      "amount": "4099.10",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2396",
-      "category_code": 18
+      "amount": "2396.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "17359",
-      "category_code": 19
+      "amount": "17359.10",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "14000",
-      "category_code": 22
+      "amount": "14000.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "41498",
-      "category_code": 23
+      "amount": "41498.20",
+      "category_code": 23,
+      "notes": "Zakup kwiatów i wiązanek: 10213.06 zł; Drobne nagrody rzeczowe oraz rekwizyty na święta państwowe: 7675.96 zł; Zakup art. spożywczych na użytek Biura Poselskiego: 6634.98 zł; Koszty usługi gastronomicznej na spotkania z wyborcami: 5011.50 zł; Wydruk materiałów informacyjnych: 9674.30 zł; Wynajęcie powierzchni reklamowej na baner z adresem Biura Poselskiego w Tucholi: 600.00 zł; Koszty przesyłki: 266.00 zł; Produkcja materiału filmowego: 500.00 zł; Koszty parkingu: 922.40 zł"
     }
   ],
   "mp_id": 157,

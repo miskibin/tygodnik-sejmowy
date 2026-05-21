@@ -1,97 +1,121 @@
 {
-  "funds_spent": "271230",
+  "funds_spent": "271229.89",
+  "funds_total": "311175.41",
   "items": [
     {
-      "amount": "26666",
-      "category_code": 1
+      "amount": "26666.34",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "4000",
-      "category_code": 3
+      "amount": "4000.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2036",
-      "category_code": 5
+      "amount": "2035.98",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1124",
-      "category_code": 7
+      "amount": "1123.98",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47220",
-      "category_code": 9
+      "amount": "47220.15",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "861",
-      "category_code": 10
+      "amount": "860.80",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "25379",
-      "category_code": 11
+      "amount": "25379.48",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "357",
-      "category_code": 13
+      "amount": "357.20",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "7248",
-      "category_code": 14
+      "amount": "7248.19",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "15824",
-      "category_code": 15
+      "amount": "15823.92",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "11904",
-      "category_code": 19
+      "amount": "11903.70",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "164",
-      "category_code": 21
+      "amount": "163.80",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "4000",
-      "category_code": 22
+      "amount": "4000.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "124446",
-      "category_code": 23
+      "amount": "124446.35",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze: 4826.26 zł; Zakup kwiatów: 5357.00 zł; Koszty cateringu i restauracji: 721.00 zł; Zakup art.patr. i promocji Sejmu: 2757.09 zł; Wynajem auta osobowego: 45935.00 zł; Usługi administracyjno-biurowe: 64850.00 zł"
     }
   ],
   "mp_id": 132,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "307534",
+  "funds_spent": "307533.55",
+  "funds_total": "380009.15",
   "items": [
     {
-      "amount": "160951",
-      "category_code": 1
+      "amount": "160951.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "380",
-      "category_code": 2
+      "amount": "380.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1267",
-      "category_code": 5
+      "amount": "1267.04",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "966",
-      "category_code": 7
+      "amount": "965.60",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "750",
-      "category_code": 8
+      "amount": "750.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "23920",
-      "category_code": 9
+      "amount": "23920.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "60171",
-      "category_code": 11
+      "amount": "60171.24",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4098",
-      "category_code": 14
+      "amount": "4098.30",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "6512",
-      "category_code": 15
+      "amount": "6511.95",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "34",
-      "category_code": 16
+      "amount": "34.30",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "3758",
-      "category_code": 18
+      "amount": "3758.10",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "2318",
-      "category_code": 19
+      "amount": "2317.65",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "42408",
-      "category_code": 23
+      "amount": "42408.37",
+      "category_code": 23,
+      "notes": "Wynajem samochodu: 27671.28 zł; Dorabianie kluczy i wymiana zamków: 1373.00 zł; Transport mebli; Obsługa gastronomiczna spotkań z wyborcami: 3400.00 zł; Kwiaty: 2680.00 zł; Usługi graficzne: 2462.54 zł; Opłaty bankowe; Artykuły spożywcze: 4244.58 zł; Oprogramowanie; Przejazdy asystentów społecznych: 576.97 zł"
     }
   ],
   "mp_id": 420,

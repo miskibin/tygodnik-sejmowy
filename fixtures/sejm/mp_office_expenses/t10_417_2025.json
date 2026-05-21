@@ -1,97 +1,121 @@
 {
-  "funds_spent": "292321",
+  "funds_spent": "292321.37",
+  "funds_total": "312467.14",
   "items": [
     {
-      "amount": "134288",
-      "category_code": 1
+      "amount": "134288.46",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "62938",
-      "category_code": 3
+      "amount": "62938.11",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "520",
-      "category_code": 5
+      "amount": "520.44",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "300",
-      "category_code": 7
+      "amount": "300.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "2214",
-      "category_code": 8
+      "amount": "2214.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "15740",
-      "category_code": 9
+      "amount": "15740.05",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "406",
-      "category_code": 10
+      "amount": "406.05",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "57628",
-      "category_code": 11
+      "amount": "57627.59",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5820",
-      "category_code": 14
+      "amount": "5819.60",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "5158",
-      "category_code": 15
+      "amount": "5158.48",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "696",
-      "category_code": 16
+      "amount": "696.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "274",
-      "category_code": 19
+      "amount": "274.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "114",
-      "category_code": 22
+      "amount": "114.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "6225",
-      "category_code": 23
+      "amount": "6224.59",
+      "category_code": 23,
+      "notes": "Kwiaty na uroczystości: 3450.00 zł; Catering i środki spożywcze na spotkania z wyborcami: 1052.59 zł; Usługa przewozu mebli: 1722.00 zł"
     }
   ],
   "mp_id": 417,

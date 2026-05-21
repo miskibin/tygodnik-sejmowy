@@ -1,97 +1,121 @@
 {
-  "funds_spent": "281285",
+  "funds_spent": "281285.34",
+  "funds_total": "309067.09",
   "items": [
     {
-      "amount": "172264",
-      "category_code": 1
+      "amount": "172264.17",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "2768",
-      "category_code": 3
+      "amount": "2767.70",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "3575",
-      "category_code": 4
+      "amount": "3575.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2287",
-      "category_code": 5
+      "amount": "2286.56",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "1679",
-      "category_code": 7
+      "amount": "1678.54",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "39722",
-      "category_code": 9
+      "amount": "39722.20",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "15970",
-      "category_code": 11
+      "amount": "15970.40",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "866",
-      "category_code": 12
+      "amount": "865.73",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1983",
-      "category_code": 14
+      "amount": "1982.98",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "11768",
-      "category_code": 15
+      "amount": "11768.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "194",
-      "category_code": 16
+      "amount": "194.40",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "3595",
-      "category_code": 18
+      "amount": "3595.10",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3400",
-      "category_code": 19
+      "amount": "3400.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "21214",
-      "category_code": 23
+      "amount": "21214.36",
+      "category_code": 23,
+      "notes": "videoparlament: 2700.00 zł; artykuły patriotyczne i drobne nagrody i rekwizyty z okazji uroczystości: 5499.26 zł; artykuły spożywcze na spotkania z wyborcami: 2563.10 zł; kwiaty: 10452.00 zł"
     }
   ],
   "mp_id": 126,

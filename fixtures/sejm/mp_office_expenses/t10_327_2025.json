@@ -1,97 +1,121 @@
 {
-  "funds_spent": "280208",
+  "funds_spent": "280207.59",
+  "funds_total": "293604.39",
   "items": [
     {
-      "amount": "105685",
-      "category_code": 1
+      "amount": "105684.77",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "160",
-      "category_code": 2
+      "amount": "160.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "2000",
-      "category_code": 3
+      "amount": "2000.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "2042",
-      "category_code": 5
+      "amount": "2042.08",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "473",
-      "category_code": 7
+      "amount": "473.28",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "35410",
-      "category_code": 9
+      "amount": "35410.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "5976",
-      "category_code": 10
+      "amount": "5975.53",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "29867",
-      "category_code": 11
+      "amount": "29866.90",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4803",
-      "category_code": 14
+      "amount": "4803.37",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1493",
-      "category_code": 15
+      "amount": "1492.95",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "661",
-      "category_code": 16
+      "amount": "661.35",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "7898",
-      "category_code": 19
+      "amount": "7897.70",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "39852",
-      "category_code": 22
+      "amount": "39852.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "41164.26",
+      "category_code": 23,
+      "notes": "Artykuły spożywcze, produkty gastronomiczne: 10785.44 zł; Drobne wyposażenie: 2254.33 zł; Najem auta: 15247.96 zł; Kwiaty, wiązanki, flagi: 2723.20 zł; Catering gastronomia: 3844.00 zł; Środki czystości: 5843.25 zł; Ładowarki, kable, baterie: 466.08 zł"
     }
   ],
   "mp_id": 327,

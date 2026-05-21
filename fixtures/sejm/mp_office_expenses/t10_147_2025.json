@@ -1,97 +1,121 @@
 {
-  "funds_spent": "300307",
+  "funds_spent": "300306.59",
+  "funds_total": "318837.84",
   "items": [
     {
-      "amount": "144362",
-      "category_code": 1
+      "amount": "144362.07",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "300",
-      "category_code": 2
+      "amount": "300.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "923",
-      "category_code": 4
+      "amount": "922.50",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1888",
-      "category_code": 5
+      "amount": "1887.60",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "7123",
-      "category_code": 7
+      "amount": "7123.44",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "500",
-      "category_code": 8
+      "amount": "500.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48185",
-      "category_code": 9
+      "amount": "48185.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1796",
-      "category_code": 10
+      "amount": "1796.10",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "31796",
-      "category_code": 11
+      "amount": "31796.00",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "6889",
-      "category_code": 14
+      "amount": "6889.06",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2676",
-      "category_code": 16
+      "amount": "2676.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1019",
-      "category_code": 19
+      "amount": "1019.20",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "2269",
-      "category_code": 22
+      "amount": "2268.63",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "50581",
-      "category_code": 23
+      "amount": "50580.99",
+      "category_code": 23,
+      "notes": "Zakup kwiatów: 5397.91 zł; Zakup artykułów spożywczych: 2463.63 zł; Koszty wynajmu samochodu: 32122.34 zł; Koszty usług gastronomicznych: 6891.67 zł; Koszty parkingu: 327.00 zł; Koszty przejazdów posła w związku z wykonywaniem mandatu poselskiego UTO: 530.44 zł; Zakup nagród i rekwizytów na święta państwowe: 2848.00 zł"
     }
   ],
   "mp_id": 147,

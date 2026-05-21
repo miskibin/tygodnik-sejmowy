@@ -1,97 +1,121 @@
 {
-  "funds_spent": "261541",
+  "funds_spent": "261540.65",
+  "funds_total": "338161.54",
   "items": [
     {
-      "amount": "123167",
-      "category_code": 1
+      "amount": "123167.01",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "5759",
-      "category_code": 5
+      "amount": "5758.62",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "656",
-      "category_code": 7
+      "amount": "656.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "2200",
-      "category_code": 8
+      "amount": "2200.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "162",
-      "category_code": 10
+      "amount": "162.20",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "46365",
-      "category_code": 11
+      "amount": "46365.19",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "620",
-      "category_code": 12
+      "amount": "620.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2528",
-      "category_code": 14
+      "amount": "2527.83",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "4956",
-      "category_code": 15
+      "amount": "4955.67",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "619",
-      "category_code": 16
+      "amount": "618.98",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2396",
-      "category_code": 18
+      "amount": "2396.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "245",
-      "category_code": 19
+      "amount": "245.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "5520",
-      "category_code": 22
+      "amount": "5519.90",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "13538",
-      "category_code": 23
+      "amount": "18048.25",
+      "category_code": 23,
+      "notes": "promocja biura: 13538.29 zł; kwiaty: 1460.00 zł; słodycze: 2762.96 zł; drobne upominki (dyplomy): 180.00 zł; mikrofon krawatowy: 69.00 zł; pełnomocnictwo Urząd Skarbowy: 38.00 zł"
     }
   ],
   "mp_id": 204,

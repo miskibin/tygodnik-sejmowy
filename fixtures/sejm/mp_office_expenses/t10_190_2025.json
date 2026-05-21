@@ -1,97 +1,121 @@
 {
-  "funds_spent": "287485",
+  "funds_spent": "287485.00",
+  "funds_total": "291935.62",
   "items": [
     {
-      "amount": "34322",
-      "category_code": 1
+      "amount": "34322.26",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "105733",
-      "category_code": 3
+      "amount": "105732.54",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "14500",
-      "category_code": 5
+      "amount": "14499.96",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "16209",
-      "category_code": 7
+      "amount": "16209.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "9",
-      "category_code": 8
+      "amount": "9.31",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "42090",
-      "category_code": 9
+      "amount": "42090.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "8841",
-      "category_code": 10
+      "amount": "8840.59",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "31369",
-      "category_code": 11
+      "amount": "31369.07",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "4",
-      "category_code": 13
+      "amount": "4.26",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "2652",
-      "category_code": 14
+      "amount": "2651.83",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "177",
-      "category_code": 19
+      "amount": "176.68",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "31580",
-      "category_code": 23
+      "amount": "31579.50",
+      "category_code": 23,
+      "notes": "Art. spoż. (kawa, woda, słodycze): 1523.83 zł; Kwiaty, znicze, kartki świąteczne: 2934.68 zł; Autostrada: 640.00 zł; Usługi fotograficzne, graficzne, poligraficzne: 11184.67 zł; Koszty podróży asystentów społecznych: 441.88 zł; Catering na spotkania z wyborcami: 94.44 zł; Usługi administracyjne B2B: 14760.00 zł"
     }
   ],
   "mp_id": 190,

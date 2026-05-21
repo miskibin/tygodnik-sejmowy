@@ -1,97 +1,121 @@
 {
-  "funds_spent": "275214",
+  "funds_spent": "275214.07",
+  "funds_total": "289329.88",
   "items": [
     {
-      "amount": "144635",
-      "category_code": 1
+      "amount": "144634.94",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "63183",
-      "category_code": 3
+      "amount": "63183.18",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "994",
-      "category_code": 8
+      "amount": "994.20",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "35134",
-      "category_code": 9
+      "amount": "35134.38",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1186",
-      "category_code": 10
+      "amount": "1185.78",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "29691",
-      "category_code": 11
+      "amount": "29691.00",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "138",
-      "category_code": 14
+      "amount": "137.67",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "140",
-      "category_code": 19
+      "amount": "140.02",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "113",
-      "category_code": 23
+      "amount": "112.90",
+      "category_code": 23,
+      "notes": "Koszty podróży zleceniobiorcy: 112.90 zł"
     }
   ],
   "mp_id": 286,

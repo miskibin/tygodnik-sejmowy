@@ -1,97 +1,121 @@
 {
-  "funds_spent": "286902",
+  "funds_spent": "286901.90",
+  "funds_total": "341150.83",
   "items": [
     {
-      "amount": "193320",
-      "category_code": 1
+      "amount": "193319.94",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "3000",
-      "category_code": 4
+      "amount": "3000.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "4244",
-      "category_code": 5
+      "amount": "4243.84",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "17164",
-      "category_code": 7
+      "amount": "17163.85",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 9
+      "amount": "0.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "50201",
-      "category_code": 11
+      "amount": "50200.61",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "767",
-      "category_code": 13
+      "amount": "767.40",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3293",
-      "category_code": 14
+      "amount": "3292.93",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "363",
-      "category_code": 15
+      "amount": "363.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2397",
-      "category_code": 18
+      "amount": "2397.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5050",
-      "category_code": 19
+      "amount": "5049.90",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "295",
-      "category_code": 21
+      "amount": "294.90",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "6808",
-      "category_code": 23
+      "amount": "6808.13",
+      "category_code": 23,
+      "notes": "artykuły spożywcze: 3305.73 zł; abonament Canal+: 450.00 zł; poczta/wul: 2462.40 zł; umowy: 590.00 zł"
     }
   ],
   "mp_id": 222,

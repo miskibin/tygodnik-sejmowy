@@ -1,97 +1,121 @@
 {
-  "funds_spent": "281468",
+  "funds_spent": "281467.60",
+  "funds_total": "365027.03",
   "items": [
     {
-      "amount": "77978",
-      "category_code": 1
+      "amount": "77977.59",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "780",
-      "category_code": 3
+      "amount": "780.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "200",
-      "category_code": 4
+      "amount": "200.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3092",
-      "category_code": 5
+      "amount": "3091.54",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "15545",
-      "category_code": 7
+      "amount": "15544.58",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47242",
-      "category_code": 9
+      "amount": "47242.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "7646",
-      "category_code": 10
+      "amount": "7646.27",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "9980",
-      "category_code": 11
+      "amount": "9980.34",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "694",
-      "category_code": 12
+      "amount": "693.54",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4425",
-      "category_code": 14
+      "amount": "4424.55",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "8469",
-      "category_code": 15
+      "amount": "8468.98",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "385",
-      "category_code": 19
+      "amount": "384.50",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "49084",
-      "category_code": 22
+      "amount": "49084.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "55950",
-      "category_code": 23
+      "amount": "55949.71",
+      "category_code": 23,
+      "notes": "KWIATY: 2582.00 zł; DROBNE NAGRODY I REKWIZYTY PATRIOTYCZNE: 3440.52 zł; USŁUGI GASTRONOMICZNE (SPOTKANIA WYBORCZE): 13293.33 zł; ARTYKUŁY SPÓŁDZIELCZE: 4727.39 zł; NAJEM SAMOCHODU: 31906.47 zł"
     }
   ],
   "mp_id": 175,

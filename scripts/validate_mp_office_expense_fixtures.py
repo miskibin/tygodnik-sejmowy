@@ -60,33 +60,24 @@ MAX_SINGLE_ITEM = Decimal(500_000)
 #   stawka km — Rozporządzenie Ministra Infrastruktury 2002/27/271
 #     (stawka 1,15 zł/km dla pojemności >900 cm³; 0,89 zł/km ≤900 cm³;
 #     do końca 2025 r. limit pojazdu osobowego: 3 500 km/mc).
+# Strategy: tight cap only on STATUTORILY-limited categories (kat 9 kilometrówka,
+# kat 21 RTV). Other categories use a generous global cap — any single category
+# exceeding 250 k zł would imply ~90 % of the annual ryczałt going to one
+# bucket, which never happens with real data. The sum-vs-funds_spent
+# consistency check (data_confidence) is what actually catches mis-extractions,
+# not per-category empirical p99.
+GLOBAL_CAP = Decimal(250_000)
 CATEGORY_CAPS: dict[int, Decimal] = {
-    1:  Decimal(280_000),   # Wynagrodzenia UoP (cap ≈ pełen ryczałt; brak twardego limitu)
-    2:  Decimal(50_000),    # Badania i szkolenia (empiryczne)
-    3:  Decimal(280_000),   # Umowy zlecenia/o dzieło (alt. do UoP; brak limitu)
-    4:  Decimal(250_000),   # Ekspertyzy/opinie (empiryczne; rok wyborczy ↑)
-    5:  Decimal(50_000),    # Telekomunikacja (mandat) — empiryczne
-    6:  Decimal(15_000),    # Telekomunikacja w Domu Poselskim (stałe niskie stawki)
-    7:  Decimal(100_000),   # Korespondencja (mailingi)
-    8:  Decimal(50_000),    # Wynajem sal
     9:  Decimal(50_000),    # STATUTORY 2025: 3 500 km/mc × 12 × 1,15 zł = 48 300 zł/rok
-                            # (limit pojazdu osobowego >900 cm³ wg rozp. MI; reformy
-                            # Czarzastego od I 2026 obniżają do 1 500 km/mc = 20 700/rok)
-    10: Decimal(40_000),    # Taksówki — empiryczne
-    11: Decimal(250_000),   # Najem lokalu (premium WAW)
-    12: Decimal(20_000),    # Konserwacja sprzętu
-    13: Decimal(50_000),    # Naprawy/remonty lokalu
-    14: Decimal(100_000),   # Materiały biurowe i prasa
-    15: Decimal(50_000),    # Środki trwałe (wyposażenie)
-    16: Decimal(50_000),    # Podróże pracowników
-    17: Decimal(10_000),    # Odpis na ZFŚS (proporcjonalny do liczby pracowników)
-    18: Decimal(10_000),    # Świadczenia urlopowe (proporcjonalne)
-    19: Decimal(40_000),    # Księgowość i bankowość
-    20: Decimal(10_000),    # Polisa OC biura (typowo 1-2 k)
-    21: Decimal(5_000),     # Abonament RTV (ustawowo ~25 zł/mc; +TV firmowa daje przestrzeń do 5k)
-    22: Decimal(80_000),    # Strona www (budowa + utrzymanie)
-    23: Decimal(320_000),   # Inne wydatki (catch-all; cap = nieco powyżej ryczałtu)
+                            # (rozp. Min. Infrastruktury, stawka km dla >900 cm³;
+                            # reformy Czarzastego od I 2026 → 1 500 km/mc = 20 700/rok)
+    21: Decimal(5_000),     # STATUTORY: abonament RTV ~25 zł/mc/odbiornik
+                            # (5 k pokrywa nawet kilka odbiorników w premium-biurze)
 }
+
+
+def _cap_for(code: int) -> Decimal:
+    return CATEGORY_CAPS.get(code, GLOBAL_CAP)
 
 
 def to_dec(s) -> Decimal | None:
@@ -117,9 +108,9 @@ def validate(payload: dict) -> tuple[bool, str]:
             return False, f"item code {code} negative amount: {v}"
         if v > MAX_SINGLE_ITEM:
             return False, f"item code {code} amount {v} > {MAX_SINGLE_ITEM} (implausible)"
-        cap = CATEGORY_CAPS.get(code)
-        if cap is not None and v > cap:
-            return False, f"item code {code} amount {v} > category cap {cap} (likely parser error — see CATEGORY_CAPS)"
+        cap = _cap_for(code)
+        if v > cap:
+            return False, f"item code {code} amount {v} > category cap {cap} (likely parser error)"
         item_sum += v
 
     if item_sum < MIN_ITEMS_SUM:

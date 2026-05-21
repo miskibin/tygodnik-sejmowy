@@ -1,97 +1,121 @@
 {
-  "funds_spent": "281337",
+  "funds_spent": "281337.19",
+  "funds_total": "281980.75",
   "items": [
     {
-      "amount": "105720",
-      "category_code": 1
+      "amount": "105719.87",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "23551",
-      "category_code": 3
+      "amount": "23551.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 5
+      "amount": "0.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "39005",
-      "category_code": 9
+      "amount": "39004.55",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "29379",
-      "category_code": 11
+      "amount": "29378.68",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "9811",
-      "category_code": 14
+      "amount": "9810.53",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "3590",
-      "category_code": 16
+      "amount": "3589.68",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "4184",
-      "category_code": 19
+      "amount": "4184.30",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "9088",
-      "category_code": 22
+      "amount": "9088.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "54287",
-      "category_code": 23
+      "amount": "54287.18",
+      "category_code": 23,
+      "notes": "Wynajem samochodu, parking: 44714.90 zł; Kwiaty, wiązanki: 3374.50 zł; Drobne nagrody: 2398.28 zł; Koszt spotkań, zakup art. spożywczych: 3310.50 zł; Ogłoszenie: 369.00 zł; Kondolencje: 120.00 zł"
     }
   ],
   "mp_id": 164,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "278525",
+  "funds_spent": "278525.21",
+  "funds_total": "295086.30",
   "items": [
     {
-      "amount": "0",
-      "category_code": 1
+      "amount": "0.00",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "83077",
-      "category_code": 3
+      "amount": "83077.41",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3136",
-      "category_code": 5
+      "amount": "3136.37",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "44171",
-      "category_code": 7
+      "amount": "44171.22",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1600",
-      "category_code": 8
+      "amount": "1600.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "48640",
-      "category_code": 11
+      "amount": "48640.04",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "4166",
-      "category_code": 13
+      "amount": "4166.14",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "1393",
-      "category_code": 14
+      "amount": "1392.72",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1680",
-      "category_code": 15
+      "amount": "1679.60",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3554",
-      "category_code": 19
+      "amount": "3553.90",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1069",
-      "category_code": 22
+      "amount": "1068.84",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "34739",
-      "category_code": 23
+      "amount": "37738.94",
+      "category_code": 23,
+      "notes": "Drobne nagrody personelu: 10125.00 zł; Liczby i usługi na warunkach: 4815.00 zł; Artykuły spożywcze: 886.94 zł; Wpłaty na fundusze z uprawnieniami: 21912.00 zł"
     }
   ],
   "mp_id": 339,

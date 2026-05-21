@@ -1,97 +1,121 @@
 {
-  "funds_spent": "241480",
+  "funds_spent": "241480.46",
+  "funds_total": "329725.13",
   "items": [
     {
-      "amount": "127123",
-      "category_code": 1
+      "amount": "127122.50",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "27760",
-      "category_code": 3
+      "amount": "27760.16",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "500",
-      "category_code": 5
+      "amount": "500.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "19390",
-      "category_code": 9
+      "amount": "19390.23",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "7806",
-      "category_code": 10
+      "amount": "7805.50",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "42548",
-      "category_code": 11
+      "amount": "42547.88",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "1784",
-      "category_code": 13
+      "amount": "1783.50",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4249",
-      "category_code": 14
+      "amount": "4249.35",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1295",
-      "category_code": 15
+      "amount": "1294.99",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "3085",
-      "category_code": 19
+      "amount": "3084.80",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "3218",
-      "category_code": 23
+      "amount": "3218.15",
+      "category_code": 23,
+      "notes": "Grafiki: 983.76 zł; Art.spożywcze: 1064.59 zł; Biiety PKD dla asystentki: 245.85 zł; Kwiaty ułte: 648.55 zł; Usługa cateringowa: 275.40 zł"
     }
   ],
   "mp_id": 479,

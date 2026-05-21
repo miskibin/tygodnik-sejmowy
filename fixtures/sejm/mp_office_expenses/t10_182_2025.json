@@ -1,97 +1,121 @@
 {
-  "funds_spent": "275970",
+  "funds_spent": "275969.58",
+  "funds_total": "282471.00",
   "items": [
     {
-      "amount": "145727",
-      "category_code": 1
+      "amount": "145726.78",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "250",
-      "category_code": 2
+      "amount": "250.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "11911",
-      "category_code": 3
+      "amount": "11911.18",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "31980",
-      "category_code": 4
+      "amount": "31980.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1929",
-      "category_code": 5
+      "amount": "1929.20",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "7052",
-      "category_code": 9
+      "amount": "7051.80",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "36983",
-      "category_code": 11
+      "amount": "36982.54",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "550",
-      "category_code": 12
+      "amount": "550.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "17818",
-      "category_code": 14
+      "amount": "17818.42",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 15
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "4255",
-      "category_code": 16
+      "amount": "4255.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "5759",
-      "category_code": 19
+      "amount": "5758.61",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "492",
-      "category_code": 22
+      "amount": "492.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "11264",
-      "category_code": 23
+      "amount": "11264.05",
+      "category_code": 23,
+      "notes": "kwiaty, wiązanki: 4153.96 zł; art. spożywcze: 419.75 zł; prezenty, drobne nagrody: 3967.17 zł; opłata za wydanie zaświadczenia: 21.00 zł; emisja życzeń, kartki: 589.17 zł; koszt spotkań: 2113.00 zł"
     }
   ],
   "mp_id": 182,

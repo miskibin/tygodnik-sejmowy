@@ -1,97 +1,121 @@
 {
-  "funds_spent": "275703",
+  "funds_spent": "275703.08",
+  "funds_total": "332285.66",
   "items": [
     {
-      "amount": "92609",
-      "category_code": 1
+      "amount": "92608.72",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "49798",
-      "category_code": 3
+      "amount": "49797.62",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "159",
-      "category_code": 5
+      "amount": "159.34",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "11200",
-      "category_code": 7
+      "amount": "11200.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "48300",
-      "category_code": 9
+      "amount": "48300.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "83",
-      "category_code": 10
+      "amount": "82.50",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "30627",
-      "category_code": 11
+      "amount": "30626.83",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "600",
-      "category_code": 12
+      "amount": "600.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "1200",
-      "category_code": 13
+      "amount": "1200.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "823",
-      "category_code": 14
+      "amount": "822.87",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "2999",
-      "category_code": 15
+      "amount": "2999.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "12806",
-      "category_code": 19
+      "amount": "12805.93",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "6819.32",
+      "category_code": 23,
+      "notes": "Wiązanki: 2800.86 zł; Podstawa: 289.30 zł; Prawa: 756.59 zł; Szczegółowe: 1008.46 zł; Wzgl. A: 1964.11 zł"
     }
   ],
   "mp_id": 217,

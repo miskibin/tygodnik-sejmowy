@@ -1,97 +1,121 @@
 {
-  "funds_spent": "277862",
+  "funds_spent": "277861.80",
+  "funds_total": "287094.05",
   "items": [
     {
-      "amount": "83239",
-      "category_code": 1
+      "amount": "83238.51",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "150",
-      "category_code": 2
+      "amount": "150.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "1080",
-      "category_code": 3
+      "amount": "1080.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "1476",
-      "category_code": 4
+      "amount": "1476.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1687",
-      "category_code": 5
+      "amount": "1687.13",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "9601",
-      "category_code": 7
+      "amount": "9601.07",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1387",
-      "category_code": 8
+      "amount": "1387.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "43010",
-      "category_code": 9
+      "amount": "43010.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "1543",
-      "category_code": 10
+      "amount": "1543.35",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "38601",
-      "category_code": 11
+      "amount": "38600.64",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "1337",
-      "category_code": 13
+      "amount": "1336.50",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "4272",
-      "category_code": 14
+      "amount": "4272.15",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "720",
-      "category_code": 15
+      "amount": "720.15",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "1049",
-      "category_code": 19
+      "amount": "1049.40",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "32200",
-      "category_code": 22
+      "amount": "32200.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "56470",
-      "category_code": 23
+      "amount": "56509.90",
+      "category_code": 23,
+      "notes": "Zakup artykułów spożywczych: 6273.93 zł; Koszty cateringu: 4873.00 zł; Zakup kwiatów/wiązanek: 4375.00 zł; Zakup nagród rzecz. i rekwizytów: 5367.46 zł; Zwrot za podróże asystenta społ.: 34.02 zł; Koszty najmu długoterminowego: 35586.49 zł"
     }
   ],
   "mp_id": 158,

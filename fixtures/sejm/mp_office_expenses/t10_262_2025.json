@@ -1,97 +1,121 @@
 {
-  "funds_spent": "264933",
+  "funds_spent": "264932.81",
+  "funds_total": "295571.64",
   "items": [
     {
-      "amount": "67340",
-      "category_code": 1
+      "amount": "67340.18",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "55285",
-      "category_code": 3
+      "amount": "55285.21",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "9182",
-      "category_code": 5
+      "amount": "9181.57",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 7
+      "amount": "0.00",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "43900",
-      "category_code": 9
+      "amount": "43900.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "4243",
-      "category_code": 10
+      "amount": "4242.58",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "23500",
-      "category_code": 11
+      "amount": "23500.00",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "110",
-      "category_code": 12
+      "amount": "110.48",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "14017",
-      "category_code": 14
+      "amount": "14017.21",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "9925",
-      "category_code": 15
+      "amount": "9925.00",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "2980",
-      "category_code": 16
+      "amount": "2980.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "6735",
-      "category_code": 19
+      "amount": "6735.35",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1405",
-      "category_code": 22
+      "amount": "1404.66",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "23587",
-      "category_code": 23
+      "amount": "23587.17",
+      "category_code": 23,
+      "notes": "Współprowadzenie kont w serwisach społecznościowych: 2400.00 zł; Zakup kwiatów i wiązanek: 3147.50 zł; Artykuły spożywcze: 1710.53 zł; Wynajem samochodu: 12300.00 zł; Koszty parkingu: 1400.00 zł; Koszty cateringu na spotkania z wyborcami: 509.30 zł; Subskrypcja ChatGPT Plus: 957.92 zł; Koszty podróży autostradą: 119.00 zł; Kondolencje: 1042.92 zł"
     }
   ],
   "mp_id": 262,

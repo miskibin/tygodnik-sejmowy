@@ -1,97 +1,121 @@
 {
-  "funds_spent": "286187",
+  "funds_spent": "286186.93",
+  "funds_total": "329678.51",
   "items": [
     {
-      "amount": "108041",
-      "category_code": 1
+      "amount": "108041.10",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "39154",
-      "category_code": 3
+      "amount": "39154.40",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1067",
-      "category_code": 5
+      "amount": "1067.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "19373",
-      "category_code": 7
+      "amount": "19373.18",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "6833",
-      "category_code": 8
+      "amount": "6832.81",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "42037",
-      "category_code": 9
+      "amount": "42037.39",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "33675",
-      "category_code": 11
+      "amount": "33674.53",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "5301",
-      "category_code": 14
+      "amount": "5301.34",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "8325",
-      "category_code": 15
+      "amount": "8324.94",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "6619",
-      "category_code": 16
+      "amount": "6619.40",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "776",
-      "category_code": 19
+      "amount": "776.00",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 22
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "12261",
-      "category_code": 23
+      "amount": "12261.44",
+      "category_code": 23,
+      "notes": "Kwiaty i drobne wyposażenie biura poselskiego: 3917.98 zł; Artykuły spożywcze na potrzeby biura poselskiego: 761.69 zł; Drobne nagrody rzeczowe, rekwizyty na święta państwowe: 1452.62 zł; Wynajem samochodów do załatwiania spraw biura poselskiego: 4795.65 zł; Opłaty parkingowe, opłaty za przejazd autostradą: 182.00 zł; Koszty obsługi konferencji prasowych: 25.23 zł; Licencje na program księgowy - Druki Gofin: 328.00 zł; Koszt przedłużenia ważności certyfikatu kwalifikowanego - podpis elektroniczny posła, usługi informatyczne: 798.27 zł"
     }
   ],
   "mp_id": 247,

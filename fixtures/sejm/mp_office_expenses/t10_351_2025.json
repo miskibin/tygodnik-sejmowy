@@ -1,0 +1,125 @@
+{
+  "funds_spent": "291431.18",
+  "funds_total": "305017.32",
+  "items": [
+    {
+      "amount": "171958.93",
+      "category_code": 1,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
+    },
+    {
+      "amount": "176614.00",
+      "category_code": 5,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
+    },
+    {
+      "amount": "2322.00",
+      "category_code": 7,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
+    },
+    {
+      "amount": "48070.00",
+      "category_code": 9,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
+    },
+    {
+      "amount": "35002.73",
+      "category_code": 11,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
+    },
+    {
+      "amount": "2499.10",
+      "category_code": 14,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 15,
+      "notes": null
+    },
+    {
+      "amount": "1704.70",
+      "category_code": 16,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
+    },
+    {
+      "amount": "4321.00",
+      "category_code": 18,
+      "notes": null
+    },
+    {
+      "amount": "5609.75",
+      "category_code": 19,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
+    },
+    {
+      "amount": "0.00",
+      "category_code": 22,
+      "notes": null
+    },
+    {
+      "amount": "18182.56",
+      "category_code": 23,
+      "notes": "Puchny/maslak: 7135.16 zł; Książki: 2786.40 zł; Kwiaty: 8261.00 zł"
+    }
+  ],
+  "mp_id": 351,
+  "source_url": "https://orka.sejm.gov.pl/rozlicz10.nsf/lista/2025351/$File/2025ryczalt_351.pdf?OpenElement",
+  "term": 10,
+  "year": 2025
+}

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "250898",
+  "funds_spent": "250898.26",
+  "funds_total": "309814.87",
   "items": [
     {
-      "amount": "127121",
-      "category_code": 1
+      "amount": "127121.27",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "452",
-      "category_code": 2
+      "amount": "452.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 3
+      "amount": "0.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "3763",
-      "category_code": 5
+      "amount": "3763.18",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "20442",
-      "category_code": 7
+      "amount": "20441.71",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "1500",
-      "category_code": 8
+      "amount": "1500.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "26875",
-      "category_code": 9
+      "amount": "26875.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "117",
-      "category_code": 10
+      "amount": "116.64",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "22876",
-      "category_code": 11
+      "amount": "22875.78",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "697",
-      "category_code": 13
+      "amount": "696.90",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3217",
-      "category_code": 14
+      "amount": "3217.14",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "3185",
-      "category_code": 15
+      "amount": "3184.95",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "840",
-      "category_code": 16
+      "amount": "840.06",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "4085",
-      "category_code": 18
+      "amount": "4085.10",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "331",
-      "category_code": 19
+      "amount": "331.10",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "4556",
-      "category_code": 22
+      "amount": "4556.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "30841",
-      "category_code": 23
+      "amount": "30841.43",
+      "category_code": 23,
+      "notes": "Zakup kwiatów, zniczy na święta i uroczystości państw.: 10384.90 zł; Drobne nagrody rzeczowe oraz rekwizyty na święta państwowe: 15454.79 zł; Katering na spotkania z wyborcami oraz zakup art.spoż. na użytek biura: 3803.60 zł; Koszty podróży asystentów społecznych: 1198.14 zł"
     }
   ],
   "mp_id": 404,

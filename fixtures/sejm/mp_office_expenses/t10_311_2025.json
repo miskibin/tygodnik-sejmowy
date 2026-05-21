@@ -1,97 +1,121 @@
 {
-  "funds_spent": "281440",
+  "funds_spent": "281439.93",
+  "funds_total": "287777.12",
   "items": [
     {
-      "amount": "191326",
-      "category_code": 1
+      "amount": "191325.70",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "420",
-      "category_code": 2
+      "amount": "420.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "14000",
-      "category_code": 3
+      "amount": "14000.00",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "20",
-      "category_code": 5
+      "amount": "20.00",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "933",
-      "category_code": 7
+      "amount": "932.81",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 9
+      "amount": "0.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "41582",
-      "category_code": 11
+      "amount": "41581.81",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "529",
-      "category_code": 13
+      "amount": "529.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3325",
-      "category_code": 14
+      "amount": "3325.10",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "1665",
-      "category_code": 15
+      "amount": "1665.03",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 18
+      "amount": "0.00",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "12561",
-      "category_code": 19
+      "amount": "12561.09",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "12361",
-      "category_code": 22
+      "amount": "12360.71",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 23
+      "amount": "2718.68",
+      "category_code": 23,
+      "notes": "Zakup drobnych nagród rzeczowych; Zakup kwiatów i wiązanek: 1040.00 zł; Zakup artykułów spożywczych na potrzeby biura poselskiego: 1678.68 zł"
     }
   ],
   "mp_id": 311,

@@ -1,97 +1,121 @@
 {
-  "funds_spent": "278688",
+  "funds_spent": "278687.54",
+  "funds_total": "283996.46",
   "items": [
     {
-      "amount": "112226",
-      "category_code": 1
+      "amount": "112225.57",
+      "category_code": 1,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 2
+      "amount": "0.00",
+      "category_code": 2,
+      "notes": null
     },
     {
-      "amount": "6642",
-      "category_code": 3
+      "amount": "6642.20",
+      "category_code": 3,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 4
+      "amount": "0.00",
+      "category_code": 4,
+      "notes": null
     },
     {
-      "amount": "1846",
-      "category_code": 5
+      "amount": "1846.07",
+      "category_code": 5,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 6
+      "amount": "0.00",
+      "category_code": 6,
+      "notes": null
     },
     {
-      "amount": "24478",
-      "category_code": 7
+      "amount": "24477.87",
+      "category_code": 7,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 8
+      "amount": "0.00",
+      "category_code": 8,
+      "notes": null
     },
     {
-      "amount": "47242",
-      "category_code": 9
+      "amount": "47242.00",
+      "category_code": 9,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 10
+      "amount": "0.00",
+      "category_code": 10,
+      "notes": null
     },
     {
-      "amount": "44982",
-      "category_code": 11
+      "amount": "44982.48",
+      "category_code": 11,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 12
+      "amount": "0.00",
+      "category_code": 12,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 13
+      "amount": "0.00",
+      "category_code": 13,
+      "notes": null
     },
     {
-      "amount": "3015",
-      "category_code": 14
+      "amount": "3014.68",
+      "category_code": 14,
+      "notes": null
     },
     {
-      "amount": "2266",
-      "category_code": 15
+      "amount": "2265.96",
+      "category_code": 15,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 16
+      "amount": "0.00",
+      "category_code": 16,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 17
+      "amount": "0.00",
+      "category_code": 17,
+      "notes": null
     },
     {
-      "amount": "2723",
-      "category_code": 18
+      "amount": "2723.40",
+      "category_code": 18,
+      "notes": null
     },
     {
-      "amount": "216",
-      "category_code": 19
+      "amount": "216.10",
+      "category_code": 19,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 20
+      "amount": "0.00",
+      "category_code": 20,
+      "notes": null
     },
     {
-      "amount": "0",
-      "category_code": 21
+      "amount": "0.00",
+      "category_code": 21,
+      "notes": null
     },
     {
-      "amount": "1599",
-      "category_code": 22
+      "amount": "1599.00",
+      "category_code": 22,
+      "notes": null
     },
     {
-      "amount": "31452",
-      "category_code": 23
+      "amount": "31452.21",
+      "category_code": 23,
+      "notes": "Zakup kwiatów, zniczy i wiązanek na święta i uroczystości państwowe: 7899.00 zł; Zakup artykułów spożywczych na użytek biura poselskiego: 2234.71 zł; Koszty cateringu na spotkania z wyborcami: 10290.00 zł; Videoparlament: 3600.00 zł; Drobne nagrody rzeczowe i rekwizyty na święta Państwowe (flagi): 1854.00 zł; Koszty usług graficznych: 5227.50 zł; Czyszczenie tkanin - firan w biurze poselskim będących wyposażeniem biura: 347.00 zł"
     }
   ],
   "mp_id": 203,
