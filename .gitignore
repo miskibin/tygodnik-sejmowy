@@ -17,7 +17,20 @@ sejm-stats-439117-39efc9d2f8b8.json
 backups/sejmograf_public_*.dump
 # supagraf data fixtures: too large for git (~190MB JSON + PDFs).
 # Anchored to repo root so source modules under supagraf/fixtures/ stay tracked.
-/fixtures/
+# We can't use `/fixtures/` as a directory ignore (blocks negation of nested
+# paths); pattern the contents instead so we can re-include curation files.
+/fixtures/*
+# Exception: mp_office_expenses/_index.json is curation data (manually-edited
+# list of {term, mp_id, year, pdf_url} pairs, ≤460 rows). Lives in /fixtures/
+# only because that's where the fetcher reads from; not large data.
+!/fixtures/sejm/
+/fixtures/sejm/*
+!/fixtures/sejm/mp_office_expenses/
+# Inside the un-ignored dir, re-ignore everything then surface ONLY the
+# curation input. Per-MP fixtures (~435 × 3 kB) regenerate on demand from
+# scripts/bootstrap_jakglosuja_expenses_json.py — DB is source of truth.
+/fixtures/sejm/mp_office_expenses/*
+!/fixtures/sejm/mp_office_expenses/_index.json
 *.log
 # Caches & build artifacts
 .pytest_cache/

@@ -9,6 +9,7 @@ import {
   QuestionsAsync,
   StatementsAsync,
   PromisesAsync,
+  OfficeExpensesAsync,
   PanelFallback,
 } from "./_components/AsyncPanels";
 import { ProfilPanel } from "./_components/ProfilPanel";
@@ -176,6 +177,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
     { id: "interpelacje", label: "Interpelacje", count: stats.questionCount },
     { id: "wystapienia", label: "Wystąpienia", count: stats.statementCount },
     { id: "obietnice", label: "Obietnice vs głosy" },
+    { id: "wydatki", label: "Wydatki biura" },
     { id: "profil", label: "Profil" },
   ];
 
@@ -342,6 +344,11 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
           obietnice: (
             <Suspense fallback={<PanelFallback rows={4} />}>
               <PromisesAsync mpId={mpId} />
+            </Suspense>
+          ),
+          wydatki: (
+            <Suspense fallback={<PanelFallback rows={6} />}>
+              <OfficeExpensesAsync mpId={mpId} mpName={mp.firstLastName} klubRef={mp.clubRef ?? null} />
             </Suspense>
           ),
           profil: <ProfilPanel mp={mp} clubName={clubName} />,

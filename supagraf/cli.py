@@ -18,6 +18,7 @@ from supagraf.stage import clubs as stage_clubs
 from supagraf.stage import committees as stage_committees
 from supagraf.stage import committee_sittings as stage_committee_sittings
 from supagraf.stage import districts as stage_districts
+from supagraf.stage import mp_office_expenses as stage_mp_office_expenses
 from supagraf.stage import mps as stage_mps
 from supagraf.stage import proceedings as stage_proceedings
 from supagraf.stage import processes as stage_processes
@@ -175,7 +176,7 @@ def cmd_backfill_all(dry_run: bool = typer.Option(False, "--dry-run")):
 
 @app.command("stage")
 def cmd_stage(
-    resources: list[str] = typer.Argument(None, help="mps|clubs|votings|committees|committee_sittings|processes|bills|questions|videos|proceedings|districts|postcodes|promises|acts (default: all)"),
+    resources: list[str] = typer.Argument(None, help="mps|clubs|votings|committees|committee_sittings|processes|bills|questions|videos|proceedings|districts|postcodes|promises|acts|mp_office_expenses (default: all)"),
     term: int = 10,
 ):
     """Stage fixture JSON to _stage_* tables."""
@@ -184,7 +185,7 @@ def cmd_stage(
         "processes", "bills",
         "questions", "videos", "proceedings",
         "districts", "postcodes", "promises",
-        "acts",
+        "acts", "mp_office_expenses",
     ]
     runners = {
         "clubs": stage_clubs.stage,
@@ -201,6 +202,7 @@ def cmd_stage(
         "postcodes": stage_districts.stage_district_postcodes,
         "promises": stage_promises.stage_promises,
         "acts": stage_acts.stage,
+        "mp_office_expenses": stage_mp_office_expenses.stage,
     }
     for r in targets:
         if r not in runners:
@@ -1513,7 +1515,7 @@ def cmd_refresh_aggregates():
 
 @app.command("fetch")
 def cmd_fetch(
-    resource: str = typer.Argument(..., help="proceeding-bodies|mp-photos|acts|committees|committee-sittings"),
+    resource: str = typer.Argument(..., help="proceeding-bodies|mp-photos|acts|committees|committee-sittings|mp-office-expenses"),
     term: int = typer.Option(10, "--term", "-t"),
     throttle_s: float = typer.Option(0.2, "--throttle", help="seconds between requests (5 req/s default)"),
     limit: int = typer.Option(0, "--limit", "-n", help="cap on statements to attempt; 0 = no cap"),
@@ -1523,6 +1525,9 @@ def cmd_fetch(
         help="for acts: single year override (0 = use SUPAGRAF_ELI_YEARS env / default)"),
     force: bool = typer.Option(False, "--force",
         help="for committees: re-fetch all committee detail JSON, ignoring cached fixtures"),
+    workers: int = typer.Option(1, "--workers", "-w",
+        help="for mp-office-expenses: parallel fetch+OCR+LLM workers (1=sequential; "
+             "recommended 4–6 for full 460-PDF run)"),
 ):
     """Fetch real-data assets that aren't on disk yet (HTML statement bodies, etc.).
 
@@ -1581,6 +1586,25 @@ def cmd_fetch(
         from supagraf.fetch.committee_sittings import fetch_committee_sittings
         rep = fetch_committee_sittings(term=term, throttle_s=max(throttle_s, 1.0))
         print(f"\nfetch committee-sittings: {rep.to_dict()}")
+        return
+    if resource == "mp-office-expenses":
+        # MP office expense reports (sprawozdania wydatków biur poselskich).
+        # No Sejm API — PDFs hosted on orka.sejm.gov.pl. Reads
+        # `fixtures/sejm/mp_office_expenses/_index.json` (manually curated:
+        # one entry per {term, mp_id, year, pdf_url}), fetches each PDF
+        # behind a 1s throttle, parses the standardized BOP form, writes
+        # per-MP fixtures. Year defaults to 2025 (current reporting cycle),
+        # override with --year.
+        from supagraf.fetch.mp_office_expenses import fetch_mp_office_expenses
+        target_year = year if year > 0 else 2025
+        rep = fetch_mp_office_expenses(
+            term=term,
+            year=target_year,
+            throttle_s=max(throttle_s, 1.0),
+            force=force,
+            workers=workers,
+        )
+        print(f"\nfetch mp-office-expenses: {rep.to_dict()}")
         return
     logger.error("unknown fetch resource: {}", resource)
     raise typer.Exit(1)

@@ -6,12 +6,14 @@ import {
   getMpStatementsRows,
   getMpStatementsStats,
   getMpPromiseAlignments,
+  getMpOfficeExpenses,
 } from "@/lib/db/posel-tabs";
 import { MP_QUESTIONS_STATEMENTS_TAB_LIMIT } from "@/lib/posel-tab-page-size";
 import { Tab1VotesPanel } from "./Tab1VotesPanel";
 import { Tab2QuestionsPanel } from "./Tab2QuestionsPanel";
 import { Tab3StatementsPanel } from "./Tab3StatementsPanel";
 import { Tab4PromisesPanel } from "./Tab4PromisesPanel";
+import { Tab5OfficeExpensesPanel } from "./Tab5OfficeExpensesPanel";
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
@@ -128,6 +130,21 @@ export async function StatementsAsync({
 export async function PromisesAsync({ mpId }: { mpId: number }) {
   const data = await getMpPromiseAlignments(mpId);
   return <Tab4PromisesPanel data={data} />;
+}
+
+export async function OfficeExpensesAsync({
+  mpId,
+  mpName,
+  klubRef,
+}: {
+  mpId: number;
+  mpName: string;
+  klubRef: string | null;
+}) {
+  const report = await getMpOfficeExpenses(mpId);
+  return (
+    <Tab5OfficeExpensesPanel report={report} mpId={mpId} mpName={mpName} klubRef={klubRef} />
+  );
 }
 
 export function PanelFallback({ rows = 6 }: { rows?: number }) {

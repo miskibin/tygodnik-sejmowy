@@ -43,6 +43,9 @@ _PRE_STEPS = (
     "load_inferred_clubs",
     "load_mps",
     "load_mp_club_membership",
+    # MP office expense reports: depend on mps (composite FK). Independent
+    # of everything downstream — placed right after mp_club_membership.
+    "load_mp_office_expenses",
     # proceedings: depends on mps (composite FK on (term, mp_id)). Must run
     # BEFORE votings — votings.term, votings.sitting FKs into proceedings(term, number).
     "load_proceedings",
