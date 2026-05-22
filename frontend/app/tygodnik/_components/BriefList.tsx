@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
 import { dbTagsToTopics, type TopicId } from "@/lib/topics";
@@ -24,7 +24,6 @@ import { NumberedRow } from "@/components/tygodnik/NumberedRow";
 import { QuoteShareButton } from "@/components/statement/QuoteShareButton";
 import {
   CardTitle,
-  StanceSponsorChip,
   ProcessStageBar,
   DotyczyCallout,
   KpiStrip,
@@ -39,6 +38,7 @@ import {
   StageBadge,
   PrintRef,
   VoteResultCard,
+  QuoteCard,
   type VoteResultKind,
   SectionHead,
 } from "@/components/tygodnik/atoms";
@@ -46,25 +46,18 @@ import { STAGE_TYPE_LABEL } from "@/lib/stages";
 import type { SponsorAuthority } from "@/lib/db/prints";
 import { FilterBar } from "./FilterBar";
 
-// Polish uppercase labels for the sponsor-authority stage badge on print cards.
+// Polish uppercase labels for the sponsor-authority stage badge on print
+// cards. Format reads as the project's kind ("PROJEKT RZĄDOWY") so the
+// badge stands alone — no separate "wniósł" line below the title.
 const SPONSOR_BADGE_LABEL: Record<NonNullable<SponsorAuthority>, string> = {
-  rzad: "RZĄD",
-  prezydent: "PREZYDENT",
-  klub_poselski: "KLUB",
-  senat: "SENAT",
-  komisja: "KOMISJA",
-  prezydium: "PREZYDIUM",
-  obywatele: "OBYWATELE",
-  inne: "INNE",
-};
-
-// Polish motion-polarity labels for the right-side editorial vote card —
-// procedural → "WNIOSEK FORMALNY", reject → "WNIOSEK O ODRZUCENIE", etc.
-const MOTION_BADGE_LABEL: Record<string, string> = {
-  procedural: "WNIOSEK FORMALNY",
-  amendment: "POPRAWKA",
-  reject: "WNIOSEK O ODRZUCENIE",
-  minority: "WNIOSEK MNIEJSZOŚCI",
+  rzad: "PROJEKT RZĄDOWY",
+  prezydent: "PROJEKT PREZYDENCKI",
+  klub_poselski: "PROJEKT POSELSKI",
+  senat: "PROJEKT SENACKI",
+  komisja: "PROJEKT KOMISJI",
+  prezydium: "PROJEKT PREZYDIUM",
+  obywatele: "PROJEKT OBYWATELSKI",
+  inne: "PROJEKT",
 };
 
 // Derive the verdict label shown on the right-side VoteResultCard. The
@@ -146,18 +139,19 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
   ) : null;
 
   // Editorial stage badges shown in the kicker slot of NumberedRow.
-  // Order mirrors the reference screenshot: type → sponsor → process
-  // stage → outlined druk reference.
+  // Sponsor authority badge already encodes the project's kind
+  // ("PROJEKT RZĄDOWY") so no separate "NOWY PROJEKT" tag, and no
+  // StanceSponsorChip "wniósł" line below the title — the badge alone
+  // carries it.
   const sponsorLabel = item.sponsorAuthority
     ? SPONSOR_BADGE_LABEL[item.sponsorAuthority]
-    : null;
+    : "PROJEKT";
   const stageLabel = item.currentStageType
     ? (STAGE_TYPE_LABEL[item.currentStageType] ?? item.currentStageType).toUpperCase()
     : null;
   const stageBadges = (
     <div className="flex gap-1.5 flex-wrap items-center">
-      <StageBadge>NOWY PROJEKT</StageBadge>
-      {sponsorLabel && <StageBadge>{sponsorLabel}</StageBadge>}
+      <StageBadge>{sponsorLabel}</StageBadge>
       {stageLabel && <StageBadge>{stageLabel}</StageBadge>}
       <PrintRef term={item.term} number={item.number} />
     </div>
@@ -178,20 +172,39 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
     });
   }
 
-  const voteCard = item.voting ? (
-    <VoteResultCard
-      result={deriveVerdict(item.voting.yes, item.voting.no, item.voting.motionPolarity)}
-      subtitle={item.voting.topic}
-      yes={item.voting.yes}
-      no={item.voting.no}
-      abstain={item.voting.abstain}
-      absent={item.voting.notParticipating}
-      margin={Math.abs(item.voting.yes - item.voting.no)}
-      motionPolarity={item.voting.motionPolarity}
-      clubTally={item.voting.clubTally}
-      detailHref={`/glosowanie/${item.voting.votingId}`}
-    />
-  ) : undefined;
+  // Right-side editorial card: voting result when available, else the
+  // best floor quote linked to this print, else nothing.
+  let rightCard: ReactNode = undefined;
+  if (item.voting) {
+    rightCard = (
+      <VoteResultCard
+        result={deriveVerdict(item.voting.yes, item.voting.no, item.voting.motionPolarity)}
+        subtitle={item.voting.topic}
+        yes={item.voting.yes}
+        no={item.voting.no}
+        abstain={item.voting.abstain}
+        absent={item.voting.notParticipating}
+        margin={Math.abs(item.voting.yes - item.voting.no)}
+        motionPolarity={item.voting.motionPolarity}
+        clubTally={item.voting.clubTally}
+        detailHref={`/glosowanie/${item.voting.votingId}`}
+      />
+    );
+  } else if (item.topQuote) {
+    rightCard = (
+      <QuoteCard
+        text={item.topQuote.text}
+        speaker={item.topQuote.speakerName}
+        speakerFunction={item.topQuote.function}
+        club={item.topQuote.klub}
+        viralScore={
+          item.topQuote.viralScore != null
+            ? item.topQuote.viralScore.toFixed(2)
+            : null
+        }
+      />
+    );
+  }
 
   return (
     <NumberedRow
@@ -207,7 +220,7 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
           <div className="mt-1">{formatDate(item.changeDate)}</div>
         </>
       }
-      rightCard={voteCard}
+      rightCard={rightCard}
     >
       <CardTitle
         size={isFirst ? "hero" : "default"}
@@ -244,12 +257,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       )}
 
       <TopicChips topicIds={item.topics} className="mb-3" />
-
-      <StanceSponsorChip
-        stance={item.stance}
-        stanceConfidence={item.stanceConfidence}
-        sponsorAuthority={item.sponsorAuthority}
-      />
 
       <ProcessStageBar
         currentStageType={item.currentStageType}
@@ -509,20 +516,11 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
       )
     : null;
 
-  const toneLabel = s.tone?.trim().toUpperCase();
-  const kicker = (
-    <div className="flex gap-1.5 flex-wrap items-center">
-      <StageBadge>CYTAT</StageBadge>
-      {toneLabel && <StageBadge>{toneLabel}</StageBadge>}
-    </div>
-  );
-
   return (
     <NumberedRow
       idx={idx}
       pad="loose"
       showOrdinal={false}
-      kicker={kicker}
       asideExtra={
         <div className="mb-2 w-full min-w-0">
           <MPAvatar

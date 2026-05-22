@@ -25,6 +25,18 @@ type AffectedGroupRaw = {
   est_population: number | null;
 };
 
+export type PrintTopQuoteRaw = {
+  statement_id: number;
+  mp_id: number | null;
+  speaker_name: string;
+  function: string | null;
+  viral_quote: string;
+  viral_score: number | null;
+  // Enriched after MP join in lib/db/events.ts.
+  photo_url?: string | null;
+  klub?: string | null;
+};
+
 export type PrintEventPayload = {
   print_id: number;
   number: string;
@@ -46,6 +58,11 @@ export type PrintEventPayload = {
   // 6-step ProcessStageBar atom in tygodnik feed.
   current_stage_type?: string | null;
   process_passed?: boolean | null;
+  // Highest-viral statement linked to this print (via statement_print_links)
+  // from the current sitting. Used as the right-side QuoteCard on print
+  // rows that don't have a merged voting. Null when there's no linked
+  // viral statement.
+  top_quote?: PrintTopQuoteRaw | null;
 };
 
 export type LinkedPrint = {
@@ -298,5 +315,17 @@ export function printEventToBriefItem(
     currentStageType: p.current_stage_type ?? null,
     processPassed: p.process_passed ?? null,
     voting: null,
+    topQuote: p.top_quote
+      ? {
+          statementId: p.top_quote.statement_id,
+          mpId: p.top_quote.mp_id,
+          speakerName: p.top_quote.speaker_name,
+          function: p.top_quote.function,
+          text: p.top_quote.viral_quote,
+          viralScore: p.top_quote.viral_score,
+          photoUrl: p.top_quote.photo_url ?? null,
+          klub: p.top_quote.klub ?? null,
+        }
+      : null,
   };
 }

@@ -222,6 +222,89 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
       ev.payload.process_passed = proc?.passed ?? null;
       ev.payload.current_stage_type = proc ? stageByProc.get(proc.id) ?? null : null;
     }
+
+    // Top viral statement per print — feeds the right-side QuoteCard on
+    // print rows that don't have a merged voting. Statements are scoped
+    // to *this sitting* via the proceeding inner join so the "cytat z
+    // sali" is always from the same week the print appears in.
+    const { data: linkRows } = await sb
+      .from("statement_print_links")
+      .select("print_id, statement_id")
+      .in("print_id", printIds);
+    type LinkRow = { print_id: number; statement_id: number };
+    const stmtIds = Array.from(
+      new Set(((linkRows ?? []) as LinkRow[]).map((r) => r.statement_id)),
+    );
+    if (stmtIds.length > 0) {
+      type StmtRow = {
+        id: number;
+        mp_id: number | null;
+        speaker_name: string | null;
+        function: string | null;
+        viral_quote: string | null;
+        viral_score: number | string | null;
+        proceeding_day:
+          | { proceeding: { number: number | null } | null }
+          | null;
+      };
+      const { data: stmtRows } = await sb
+        .from("proceeding_statements")
+        .select(
+          "id, mp_id, speaker_name, function, viral_quote, viral_score, proceeding_day:proceeding_days!inner(proceeding:proceedings!inner(number))",
+        )
+        .in("id", stmtIds)
+        .eq("term", term)
+        .not("viral_quote", "is", null)
+        .order("viral_score", { ascending: false, nullsFirst: false })
+        .limit(200);
+      const inSitting = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
+        (r) =>
+          r.viral_quote &&
+          r.viral_quote.trim().length > 0 &&
+          r.proceeding_day?.proceeding?.number === sittingNum,
+      );
+      const stmtById = new Map<number, StmtRow>();
+      for (const r of inSitting) stmtById.set(r.id, r);
+
+      // Group statements by print, ordered by viral_score desc (already
+      // sorted from the query). Pick top-1 per print.
+      const topByPrint = new Map<number, StmtRow>();
+      for (const link of (linkRows ?? []) as LinkRow[]) {
+        const s = stmtById.get(link.statement_id);
+        if (!s) continue;
+        const prev = topByPrint.get(link.print_id);
+        const sScore =
+          typeof s.viral_score === "string"
+            ? parseFloat(s.viral_score)
+            : s.viral_score ?? 0;
+        const prevScore = prev
+          ? typeof prev.viral_score === "string"
+            ? parseFloat(prev.viral_score)
+            : prev.viral_score ?? 0
+          : -Infinity;
+        if (sScore > prevScore) topByPrint.set(link.print_id, s);
+      }
+
+      for (const ev of printEvents) {
+        const s = topByPrint.get(ev.payload.print_id);
+        if (!s || !s.viral_quote) {
+          ev.payload.top_quote = null;
+          continue;
+        }
+        const score =
+          typeof s.viral_score === "string"
+            ? parseFloat(s.viral_score)
+            : s.viral_score ?? null;
+        ev.payload.top_quote = {
+          statement_id: s.id,
+          mp_id: s.mp_id,
+          speaker_name: s.speaker_name ?? "—",
+          function: s.function,
+          viral_quote: s.viral_quote.trim(),
+          viral_score: score,
+        };
+      }
+    }
   }
 
   // Enrich vote events with per-MP seat votes for the hemicycle chart.
@@ -312,6 +395,8 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
       }
     } else if (ev.eventType === "viral_quote" && ev.payload.mp_id) {
       mpIds.add(ev.payload.mp_id);
+    } else if (ev.eventType === "print" && ev.payload.top_quote?.mp_id) {
+      mpIds.add(ev.payload.top_quote.mp_id);
     }
   }
   if (mpIds.size > 0) {
@@ -348,6 +433,11 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
         ev.payload.photo_url = mp?.photo_url ?? null;
         ev.payload.district = mp?.district_num ?? null;
         ev.payload.klub = ev.payload.mp_id ? klubMap.get(ev.payload.mp_id) ?? null : null;
+      } else if (ev.eventType === "print" && ev.payload.top_quote) {
+        const tq = ev.payload.top_quote;
+        const mp = tq.mp_id ? mpMap.get(tq.mp_id) : null;
+        tq.photo_url = mp?.photo_url ?? null;
+        tq.klub = tq.mp_id ? klubMap.get(tq.mp_id) ?? null : null;
       }
     }
   }

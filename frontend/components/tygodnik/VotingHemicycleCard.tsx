@@ -1,26 +1,16 @@
 import type { ClubTallyRow } from "@/lib/db/voting";
+import { isUnaffiliated } from "@/lib/clubs/filter";
+import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { CitationText } from "@/components/tygodnik/CitationLink";
 import { NumberedRow } from "@/components/tygodnik/NumberedRow";
 import {
   CardTitle,
   DotyczyCallout,
   FooterLinks,
-  StageBadge,
-  PrintRef,
-  VoteResultCard,
-  type VoteResultKind,
+  VoteResultBar,
   type FooterLink,
 } from "@/components/tygodnik/atoms";
 import type { MotionPolarity } from "@/lib/promiseAlignment";
-
-// Polish motion-polarity labels for the kicker stage badge — mirrors the
-// mapping in BriefList.tsx but kept local to avoid a circular import.
-const MOTION_BADGE_LABEL: Record<string, string> = {
-  procedural: "WNIOSEK FORMALNY",
-  amendment: "POPRAWKA",
-  reject: "WNIOSEK O ODRZUCENIE",
-  minority: "WNIOSEK MNIEJSZOŚCI",
-};
 
 // Standalone vote card — used only for votes whose linked print isn't
 // already in the feed (most votes get merged into their print's card via
@@ -47,25 +37,10 @@ export type VotingHemicycleData = {
   term: number;
 };
 
+const KLUB_LIMIT = 3;
+
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
-}
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-
-function deriveVerdict(
-  yes: number,
-  no: number,
-  motionPolarity?: MotionPolarity | null,
-): VoteResultKind {
-  const passed = yes > no;
-  if (motionPolarity === "procedural") {
-    return passed ? "WNIOSEK PRZYJĘTY" : "WNIOSEK ODRZUCONY";
-  }
-  return passed ? "PRZYJĘTA" : "ODRZUCONA";
 }
 
 export function VotingHemicycleCard({
@@ -91,6 +66,12 @@ export function VotingHemicycleCard({
   const primaryTitle = linkedPrint?.short_title ?? stripAgendaPrefix(voting.title);
   const agendaCaption = voting.title;
 
+  const topClubs = [...clubs]
+    .filter((c) => !isUnaffiliated(c.club_short))
+    .filter((c) => c.yes + c.no + c.abstain + c.not_voting > 0)
+    .sort((a, b) => b.total - a.total)
+    .slice(0, KLUB_LIMIT);
+
   // Title uses CardTitle `href` (same primitive as print ItemView). Footer keeps
   // only non-duplicate actions: druk link is the title when a print is linked.
   const titleHref = linkedPrint
@@ -101,47 +82,18 @@ export function VotingHemicycleCard({
     ? [{ href: `/glosowanie/${voting.voting_id}`, label: "wyniki głosowania", primary: true }]
     : [];
 
-  const motionLabel = voting.motion_polarity
-    ? MOTION_BADGE_LABEL[voting.motion_polarity]
-    : null;
-  const kicker = (
-    <div className="flex gap-1.5 flex-wrap items-center">
-      <StageBadge>GŁOSOWANIE</StageBadge>
-      {motionLabel && <StageBadge>{motionLabel}</StageBadge>}
-      {linkedPrint && <PrintRef term={voting.term} number={linkedPrint.number} />}
-    </div>
-  );
-
-  const voteCard = (
-    <VoteResultCard
-      time={formatTime(voting.date)}
-      result={deriveVerdict(voting.yes, voting.no, voting.motion_polarity ?? null)}
-      subtitle={voting.topic ?? null}
-      yes={voting.yes}
-      no={voting.no}
-      abstain={voting.abstain}
-      absent={voting.not_participating}
-      margin={Math.abs(voting.yes - voting.no)}
-      motionPolarity={voting.motion_polarity ?? null}
-      clubTally={clubs}
-      detailHref={`/glosowanie/${voting.voting_id}`}
-    />
-  );
-
   return (
     <NumberedRow
       idx={idx}
       indexSize={64}
       indexColor="var(--destructive)"
       pad="loose"
-      kicker={kicker}
       meta={
         <>
           <div>głos. <span className="text-foreground">{voting.voting_number}</span></div>
           <div>{formatDate(voting.date)}</div>
         </>
       }
-      rightCard={voteCard}
     >
       <CardTitle
         href={titleHref}
@@ -154,10 +106,72 @@ export function VotingHemicycleCard({
         {primaryTitle}
       </CardTitle>
 
+      {voting.topic?.trim() && (
+        <div
+          className="font-serif italic"
+          style={{
+            fontSize: 13,
+            lineHeight: 1.45,
+            color: "var(--secondary-foreground)",
+            marginBottom: 12,
+          }}
+        >
+          <span
+            className="font-mono"
+            style={{
+              fontSize: 10,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--muted-foreground)",
+              marginRight: 8,
+              fontStyle: "normal",
+            }}
+          >
+            pytanie:
+          </span>
+          „{voting.topic.trim()}”.
+        </div>
+      )}
+
       {linkedPrint?.impact_punch && (
         <DotyczyCallout>
           “<CitationText term={voting.term}>{linkedPrint.impact_punch}</CitationText>”
         </DotyczyCallout>
+      )}
+
+      <VoteResultBar
+        result={{
+          votingNumber: voting.voting_number,
+          yes: voting.yes,
+          no: voting.no,
+          abstain: voting.abstain,
+          notParticipating: voting.not_participating,
+          majorityVotes: voting.majority_votes ?? null,
+          motionPolarity: voting.motion_polarity ?? null,
+        }}
+      />
+
+      {topClubs.length > 0 && (
+        <div className="font-sans text-[12px] text-muted-foreground mb-3 flex flex-wrap gap-x-4 gap-y-1.5 items-center">
+          <span className="font-mono text-[10px] tracking-[0.14em] uppercase">kluby:</span>
+          {topClubs.map((c) => {
+            const a11y = `${c.club_name}: ${c.yes} za, ${c.no} przeciw`;
+            return (
+              <span
+                key={c.club_short}
+                className="inline-flex items-center gap-1.5"
+                title={a11y}
+                tabIndex={0}
+              >
+                <ClubBadge klub={c.club_short} tooltip={c.club_name} size="sm" />
+                <span aria-hidden style={{ color: "var(--success)" }}>{c.yes}</span>
+                <span aria-hidden className="text-muted-foreground">/</span>
+                <span aria-hidden style={{ color: "var(--destructive)" }}>{c.no}</span>
+                <span className="sr-only">{a11y}</span>
+              </span>
+            );
+          })}
+        </div>
       )}
 
       <FooterLinks links={links} />

@@ -91,6 +91,18 @@ export type BriefItem = {
     // Surfaces the vote kind on the editorial right-side card.
     topic?: string | null;
   } | null;
+  // Best floor quote linked to this print in the current sitting —
+  // used as the right-side QuoteCard when there's no voting yet.
+  topQuote: {
+    statementId: number;
+    mpId: number | null;
+    speakerName: string;
+    function: string | null;
+    text: string;
+    viralScore: number | null;
+    photoUrl: string | null;
+    klub: string | null;
+  } | null;
 };
 
 export type PrintDetail = BriefItem & {
@@ -770,6 +782,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     currentStageType: null,
     processPassed: null,
     voting: null,
+    topQuote: null,
   };
 
   return {
@@ -908,6 +921,7 @@ export async function getBriefItemsBySitting(term: number, sittingNum: number): 
     currentStageType: null,
     processPassed: null,
     voting: null,
+    topQuote: null,
   }));
 
   items.sort((a, b) => {
@@ -984,6 +998,7 @@ export async function getBriefItems(): Promise<BriefItem[]> {
     currentStageType: null,
     processPassed: null,
     voting: null,
+    topQuote: null,
   }));
 
   // 4. Final sort: homepage_score DESC, then change_date DESC.
