@@ -265,9 +265,20 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
     // print rows that don't have a merged voting. Statements are scoped
     // to *this sitting* via the proceeding inner join so the "cytat z
     // sali" is always from the same week the print appears in.
+    // Only the temporally-anchored source — statement_print_links rows
+    // backfilled by walking proceeding_day → agenda_items →
+    // agenda_item_prints + "Pkt. NN" body-text narrowing (migration
+    // 0060). The other source ('title_regex') tags a statement to a
+    // print just because the speaker mentioned "druk nr X" in passing,
+    // which sprays unrelated quotes across the feed (e.g. one
+    // tax-policy speech ends up labeled as "best quote" for every
+    // tax-related draft cited in it). Quick DB sweep: zero viral
+    // statements have title_regex links without also having an
+    // agenda_item link, so filtering here loses no coverage.
     const linkRes = await sb
       .from("statement_print_links")
       .select("print_id, statement_id")
+      .eq("source", "agenda_item")
       .in("print_id", printIds);
     if (linkRes.error) throw linkRes.error;
     type LinkRow = { print_id: number; statement_id: number };
