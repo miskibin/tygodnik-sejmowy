@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
 import { dbTagsToTopics, type TopicId } from "@/lib/topics";
@@ -24,21 +24,62 @@ import { NumberedRow } from "@/components/tygodnik/NumberedRow";
 import { QuoteShareButton } from "@/components/statement/QuoteShareButton";
 import {
   CardTitle,
-  StanceSponsorChip,
   ProcessStageBar,
   DotyczyCallout,
   KpiStrip,
   FooterLinks,
-  AffectedGroups,
   CitizenAction,
   EliTimelineStrip,
   DelayStamp,
-  VoteResultBar,
   type KpiSlot,
   TopicChips,
   type FooterLink,
+  StageBadge,
+  PrintRef,
+  VoteResultCard,
+  QuoteCard,
+  type VoteResultKind,
+  SectionHead,
 } from "@/components/tygodnik/atoms";
+import { STAGE_TYPE_LABEL } from "@/lib/stages";
+import type { SponsorAuthority } from "@/lib/db/prints";
 import { FilterBar } from "./FilterBar";
+
+// Polish uppercase labels for the sponsor-authority stage badge on print
+// cards. Format reads as the project's kind ("PROJEKT RZĄDOWY") so the
+// badge stands alone — no separate "wniósł" line below the title.
+const SPONSOR_BADGE_LABEL: Record<NonNullable<SponsorAuthority>, string> = {
+  rzad: "PROJEKT RZĄDOWY",
+  prezydent: "PROJEKT PREZYDENCKI",
+  klub_poselski: "PROJEKT POSELSKI",
+  senat: "PROJEKT SENACKI",
+  komisja: "PROJEKT KOMISJI",
+  prezydium: "PROJEKT PREZYDIUM",
+  obywatele: "PROJEKT OBYWATELSKI",
+  inne: "PROJEKT",
+};
+
+// Derive the verdict label shown on the right-side VoteResultCard. The
+// print/vote payload only carries yes/no/abstain counts + motionPolarity,
+// not the final verdict text — match sittings.ts deriveResult() so that
+// reject/minority motions also surface as "WNIOSEK PRZYJĘTY/ODRZUCONY"
+// rather than "PRZYJĘTA/ODRZUCONA" (a failed "wniosek o odrzucenie" must
+// NOT read as "ustawa odrzucona" — see issue #25).
+function deriveVerdict(
+  yes: number,
+  no: number,
+  motionPolarity?: string | null,
+): VoteResultKind {
+  const passed = yes > no;
+  const isWniosek =
+    motionPolarity === "procedural" ||
+    motionPolarity === "reject" ||
+    motionPolarity === "minority";
+  if (isWniosek) {
+    return passed ? "WNIOSEK PRZYJĘTY" : "WNIOSEK ODRZUCONY";
+  }
+  return passed ? "PRZYJĘTA" : "ODRZUCONA";
+}
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
@@ -58,12 +99,6 @@ function formatDateRange(first: string, last: string): string {
   }
   const firstFmt = f.toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
   return `${firstFmt} – ${lastFmt}`;
-}
-
-// Section label = first matched persona's category. Same logic as before;
-// only relevant for print events.
-function inferSection(personas: PersonaId[]): string | null {
-  return personas[0] ? PERSONAS[personas[0]].section : null;
 }
 
 // Build a KpiSlot list for a print: bottom-line = highest-severity affected
@@ -89,12 +124,54 @@ function kpiSlotsForPrint(item: BriefItem): KpiSlot[] {
   return slots;
 }
 
-function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; personas: PersonaId[] }) {
+// Today as YYYY-MM-DD in Europe/Warsaw — the server data layer normalises
+// every sitting date to Warsaw local (see warsawTodayDate in sittings.ts),
+// so the client comparator must use the same calendar to avoid
+// misclassifying a row as "future" vs "data_pending" around midnight for
+// users outside CET/CEST. The "sv-SE" locale conveniently emits the
+// YYYY-MM-DD format we already string-compare against.
+function todayIsoDate(): string {
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Warsaw" }).format(
+    new Date(),
+  );
+}
+
+type PrintStatus = "started" | "future" | "data_pending";
+
+function pointStatus(item: BriefItem, sitting: SittingInfo, today: string): PrintStatus {
+  if (item.voting || item.topQuote) return "started";
+  // Sitting is in the future or still ongoing — point hasn't been
+  // debated yet.
+  if (today <= sitting.lastDate) return "future";
+  // Sitting wrapped up but data hasn't surfaced — likely lag from the
+  // Sejm transcripts ingest.
+  return "data_pending";
+}
+
+function ItemView({
+  item,
+  idx,
+  personas,
+  sitting,
+  today,
+}: {
+  item: BriefItem;
+  idx: number;
+  personas: PersonaId[];
+  sitting: SittingInfo;
+  today: string;
+}) {
   const [expanded, setExpanded] = useState(idx === 0);
   const isFirst = idx === 0;
+  const status = pointStatus(item, sitting, today);
+  const isStarted = status === "started";
+  const statusBadge =
+    status === "future"
+      ? "OBRADY NIE ROZPOCZĘTE"
+      : status === "data_pending"
+        ? "DANE DOSTĘPNE WKRÓTCE"
+        : null;
   const matchedPersonas = item.personas.filter((p) => personas.includes(p));
-  const sectionLabel = inferSection(item.personas);
-  const sectionColor = item.personas[0] ? PERSONAS[item.personas[0]].color : "var(--destructive)";
 
   const personaPills = matchedPersonas.length > 0 ? (
     <div className="flex flex-wrap gap-1 mb-3">
@@ -107,6 +184,58 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
           {PERSONAS[p].icon} {PERSONAS[p].label}
         </span>
       ))}
+    </div>
+  ) : null;
+
+  // Topic chips live under the index (aside) on /tygodnik — frees the main
+  // column for the title + summary. Render below persona pills.
+  const asideExtra = (
+    <>
+      {personaPills}
+      {item.topics.length > 0 && (
+        <TopicChips topicIds={item.topics} size="sm" className="mb-3" />
+      )}
+    </>
+  );
+
+  // Editorial stage badges shown in the kicker slot of NumberedRow.
+  // Sponsor authority badge already encodes the project's kind
+  // ("PROJEKT RZĄDOWY") so no separate "NOWY PROJEKT" tag, and no
+  // StanceSponsorChip "wniósł" line below the title — the badge alone
+  // carries it.
+  const sponsorLabel = item.sponsorAuthority
+    ? SPONSOR_BADGE_LABEL[item.sponsorAuthority]
+    : "PROJEKT";
+  const stageLabel = item.currentStageType
+    ? (STAGE_TYPE_LABEL[item.currentStageType] ?? item.currentStageType).toUpperCase()
+    : null;
+  const stageBadges = (
+    <div className="flex gap-1.5 flex-wrap items-center">
+      <StageBadge>{sponsorLabel}</StageBadge>
+      {stageLabel && <StageBadge>{stageLabel}</StageBadge>}
+      <PrintRef term={item.term} number={item.number} />
+    </div>
+  );
+
+  // Status pill rendered at the top of the body column when the print
+  // has no data yet — sits next to the title so it can't be missed.
+  // Uses warning amber for visual contrast vs the neutral stage badges
+  // above and the destructive-deep accent of editorial chrome.
+  const statusPill = statusBadge ? (
+    <div className="mb-3">
+      <span
+        className="font-mono uppercase inline-block"
+        style={{
+          fontSize: 10,
+          color: "var(--warning)",
+          border: "1px solid var(--warning)",
+          background: "color-mix(in srgb, var(--warning) 8%, transparent)",
+          padding: "3px 9px",
+          letterSpacing: "0.14em",
+        }}
+      >
+        {statusBadge}
+      </span>
     </div>
   ) : null;
 
@@ -125,45 +254,91 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
     });
   }
 
+  // Right-side editorial card: voting result when available, else the
+  // best floor quote linked to this print, else nothing.
+  let rightCard: ReactNode = undefined;
+  if (item.voting) {
+    rightCard = (
+      <VoteResultCard
+        result={deriveVerdict(item.voting.yes, item.voting.no, item.voting.motionPolarity)}
+        subtitle={item.voting.topic}
+        yes={item.voting.yes}
+        no={item.voting.no}
+        abstain={item.voting.abstain}
+        absent={item.voting.notParticipating}
+        margin={Math.abs(item.voting.yes - item.voting.no)}
+        motionPolarity={item.voting.motionPolarity}
+        clubTally={item.voting.clubTally}
+        detailHref={`/glosowanie/${item.voting.votingId}`}
+      />
+    );
+  } else if (item.topQuote) {
+    rightCard = (
+      <QuoteCard
+        text={item.topQuote.text}
+        speaker={item.topQuote.speakerName}
+        speakerFunction={item.topQuote.function}
+        club={item.topQuote.klub}
+        viralScore={
+          item.topQuote.viralScore != null
+            ? item.topQuote.viralScore.toFixed(2)
+            : null
+        }
+      />
+    );
+  }
+
   return (
     <NumberedRow
       idx={idx}
       indexSize={64}
-      indexColor="var(--destructive)"
+      indexColor={isStarted ? "var(--destructive)" : "var(--muted-foreground)"}
       pad="loose"
-      kicker={
-        sectionLabel ? (
-          <span style={{ color: sectionColor }}>{sectionLabel}</span>
-        ) : null
-      }
-      asideExtra={personaPills}
+      className={isStarted ? undefined : "opacity-85"}
+      kicker={stageBadges}
+      asideExtra={asideExtra}
       meta={
         <>
-          <div>druk <span className="text-foreground">{item.number}</span></div>
           <div>kadencja <span className="text-foreground">{item.term}</span></div>
           <div className="mt-1">{formatDate(item.changeDate)}</div>
         </>
       }
+      rightCard={rightCard}
     >
+      {statusPill}
       <CardTitle
         size={isFirst ? "hero" : "default"}
         href={`/proces/${item.term}/${item.number}`}
-        subtitle={
-          item.title && item.shortTitle && item.shortTitle !== item.title
-            ? item.title
-            : null
-        }
       >
         {item.shortTitle || item.title}
       </CardTitle>
 
-      <TopicChips topicIds={item.topics} className="mb-3" />
-
-      <StanceSponsorChip
-        stance={item.stance}
-        stanceConfidence={item.stanceConfidence}
-        sponsorAuthority={item.sponsorAuthority}
-      />
+      {item.title && item.shortTitle && item.shortTitle !== item.title && (
+        <details className="mb-3">
+          <summary
+            className="cursor-pointer font-mono uppercase"
+            style={{
+              fontSize: 10,
+              color: "var(--muted-foreground)",
+              letterSpacing: "0.14em",
+              listStyle: "none",
+            }}
+          >
+            ▸ pełny urzędowy tytuł
+          </summary>
+          <p
+            className="font-serif italic mt-2 mb-0"
+            style={{
+              fontSize: 13,
+              color: "var(--muted-foreground)",
+              lineHeight: 1.5,
+              maxWidth: 720,
+            }}
+          >
+            „{item.title}”
+          </p>
+        </details>
+      )}
 
       <ProcessStageBar
         currentStageType={item.currentStageType}
@@ -173,8 +348,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       <DotyczyCallout size={isFirst ? "large" : "default"}>
         “<CitationText term={item.term}>{item.impactPunch}</CitationText>”
       </DotyczyCallout>
-
-      {item.voting && <VoteResultBar result={item.voting} />}
 
       <KpiStrip slots={kpiSlotsForPrint(item)} />
 
@@ -187,8 +360,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
         </p>
       )}
 
-      {expanded && <AffectedGroups groups={item.affectedGroups} />}
-
       <CitizenAction text={item.citizenAction} />
 
       <FooterLinks links={links} />
@@ -197,19 +368,42 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
 }
 
 // ---------- Section chrome ----------
+//
+// Roman-numeral editorial header — mirrors the chrome used on
+// /posiedzenie/[number]. Section numbers are static (I…VI) so empty
+// sections leave gaps rather than shifting numbering across the feed,
+// matching the printed-volume convention.
+//
+// I — Nowe projekty
+// II — Pozostałe głosowania
+// III — Wchodzi w życie
+// IV — Aktualizacje prawa (feature-flagged)
+// V — Opóźnione odpowiedzi ministrów
+// VI — Powiedziane w Sejmie
 
-function SectionHeader({ icon, label, count }: { icon: string; label: string; count: number }) {
+function SectionHeader({
+  num,
+  label,
+  count,
+}: {
+  num: number;
+  label: string;
+  count: number;
+}) {
+  // Polish plural: 1 → pozycja; 2–4 / 22–24 / 32–34 (skip teens 12–14) →
+  // pozycje; else → pozycji.
+  const tens = count % 100;
+  const ones = count % 10;
+  const plural =
+    count === 1
+      ? "pozycja"
+      : ones >= 2 && ones <= 4 && (tens < 12 || tens > 14)
+        ? "pozycje"
+        : "pozycji";
+  const sub = `${count} ${plural}`;
   return (
-    <div className="border-t border-rule pt-4 md:pt-8 pb-2 px-1">
-      <div className="flex items-baseline gap-3">
-        <span className="text-[18px] md:text-[22px]" style={{ color: "var(--destructive)" }}>{icon}</span>
-        <h3 className="font-mono text-[10.5px] md:text-[11px] tracking-[0.18em] uppercase text-foreground m-0">
-          {label}
-        </h3>
-        <span className="font-mono text-[10px] text-muted-foreground ml-auto">
-          {count}
-        </span>
-      </div>
+    <div className="pt-4 md:pt-8">
+      <SectionHead num={num} title={label} sub={sub} />
     </div>
   );
 }
@@ -291,7 +485,7 @@ function EliInforceSections({
   if (!flagOn) {
     return (
       <>
-        <SectionHeader icon="⏱" label="Wchodzi w życie" count={events.length} />
+        <SectionHeader num={3} label="Wchodzi w życie" count={events.length} />
         {events.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
       </>
     );
@@ -309,13 +503,13 @@ function EliInforceSections({
     <>
       {newLaw.length > 0 && (
         <>
-          <SectionHeader icon="⏱" label="Wchodzi w życie" count={newLaw.length} />
+          <SectionHeader num={3} label="Wchodzi w życie" count={newLaw.length} />
           {newLaw.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
         </>
       )}
       {updates.length > 0 && (
         <>
-          <SectionHeader icon="📎" label="Aktualizacje prawa" count={updates.length} />
+          <SectionHeader num={4} label="Aktualizacje prawa" count={updates.length} />
           {updates.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
         </>
       )}
@@ -573,6 +767,10 @@ export function BriefList({
 }) {
   const { personas, topics, hydrated } = useProfile();
   const [showAll, setShowAll] = useState(false);
+  // Computed once per render — drives the "OBRADY NIE ROZPOCZĘTE" vs
+  // "DANE DOSTĘPNE WKRÓTCE" badge logic on print rows that have no
+  // voting and no top quote yet.
+  const today = useMemo(() => todayIsoDate(), []);
 
   const partitioned = useMemo(() => partitionEvents(events), [events]);
 
@@ -600,6 +798,8 @@ export function BriefList({
           notParticipating: v.payload.not_participating,
           majorityVotes: v.payload.majority_votes ?? null,
           motionPolarity: v.payload.motion_polarity ?? null,
+          clubTally: v.payload.club_tally ?? [],
+          topic: v.payload.topic ?? null,
         };
       } else {
         unmerged.push(v);
@@ -737,11 +937,11 @@ export function BriefList({
       <div className="px-4 md:px-8 lg:px-14 max-w-[1240px] mx-auto">
         {filteredPrints.length > 0 && (
           <>
-            <SectionHeader icon="📜" label="Nowe projekty" count={filteredPrints.length} />
+            <SectionHeader num={1} label="Nowe projekty" count={filteredPrints.length} />
             <ul role="list" className="contents">
               {filteredPrints.map((it, i) => (
                 <li key={it.id} className="contents">
-                  <ItemView item={it} idx={i} personas={personas} />
+                  <ItemView item={it} idx={i} personas={personas} sitting={sitting} today={today} />
                 </li>
               ))}
             </ul>
@@ -761,7 +961,7 @@ export function BriefList({
 
         {unmergedVotes.length > 0 && (
           <>
-            <SectionHeader icon="⚖" label="Pozostałe głosowania" count={unmergedVotes.length} />
+            <SectionHeader num={2} label="Pozostałe głosowania" count={unmergedVotes.length} />
             <ul role="list" className="contents">
               {unmergedVotes.map((ev, i) => (
                 <li key={ev.payload.voting_id} className="contents">
@@ -798,7 +998,7 @@ export function BriefList({
 
         {partitioned.lateInterpellations.length > 0 && (
           <>
-            <SectionHeader icon="🔥" label="Opóźnione odpowiedzi ministrów" count={partitioned.lateInterpellations.length} />
+            <SectionHeader num={5} label="Opóźnione odpowiedzi ministrów" count={partitioned.lateInterpellations.length} />
             <ul role="list" className="contents">
               {partitioned.lateInterpellations.map((ev, i) => (
                 <li key={ev.payload.question_id} className="contents">
@@ -811,7 +1011,7 @@ export function BriefList({
 
         {partitioned.viralQuotes.length > 0 && (
           <>
-            <SectionHeader icon="📺" label="Powiedziane w Sejmie" count={partitioned.viralQuotes.length} />
+            <SectionHeader num={6} label="Powiedziane w Sejmie" count={partitioned.viralQuotes.length} />
             <ul role="list" className="contents">
               {partitioned.viralQuotes.map((ev, i) => (
                 <li key={ev.payload.statement_id} className="contents">

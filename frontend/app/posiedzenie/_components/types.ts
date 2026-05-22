@@ -32,6 +32,11 @@ export type Vote = {
   votingNumber: number;
   result: "PRZYJĘTA" | "ODRZUCONA" | "WNIOSEK PRZYJĘTY" | "WNIOSEK ODRZUCONY";
   subtitle?: string | null;
+  /** Motion question — "wniosek o odrzucenie projektu", "głosowanie nad
+   *  całością projektu", "wniosek o skierowanie do Komisji", etc.
+   *  Sourced from `votings.topic` and shown under the verdict to make
+   *  the kind of vote unambiguous. */
+  topic?: string | null;
   yes: number;
   no: number;
   abstain: number;

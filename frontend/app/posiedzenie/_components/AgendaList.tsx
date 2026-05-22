@@ -3,14 +3,39 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { MPAvatarPhoto } from "@/components/tygodnik/MPAvatar";
-import { ClubBadge } from "@/components/clubs/ClubBadge";
-import { TopicChips } from "@/components/tygodnik/atoms/TopicChips";
-import { ToneBadge } from "@/components/statement/ToneBadge";
-import type { AgendaPoint, SittingView, Tone, ViralQuote, Vote as VoteType } from "./types";
-import { TONE_INK, TONE_LABEL, verdictInk } from "./tokens";
-import { Kicker, SectionHead } from "./SectionHead";
+import {
+  TopicChips,
+  StageBadge,
+  PrintRef,
+  ProcessRef,
+  VoteResultCard,
+  QuoteCard,
+  SectionHead,
+  Kicker,
+} from "@/components/tygodnik/atoms";
+import type { ClubTallyRaw } from "@/lib/events-types";
+import type { AgendaPoint, SittingView, ViralQuote, Vote as VoteType } from "./types";
+
+// Convert the local /posiedzenie Vote.byClub map to the shared
+// ClubTallyRaw[] shape consumed by ClubResultBar / VoteResultCard.
+function byClubToTally(byClub: NonNullable<VoteType["byClub"]>): ClubTallyRaw[] {
+  const out: ClubTallyRaw[] = [];
+  for (const [club, counts] of Object.entries(byClub)) {
+    if (!counts) continue;
+    const total = counts.yes + counts.no + counts.abstain + Math.max(0, counts.absent);
+    if (total === 0) continue;
+    out.push({
+      club_short: club,
+      club_name: club,
+      yes: counts.yes,
+      no: counts.no,
+      abstain: counts.abstain,
+      not_voting: counts.absent,
+      total,
+    });
+  }
+  return out;
+}
 
 type FilterId = "all" | "done" | "planned" | "vote" | "flagship";
 
@@ -22,217 +47,11 @@ const FILTERS: { id: FilterId; label: (n: number) => string; pred: (p: AgendaPoi
   { id: "flagship", label: (n) => `kluczowe · ${n}`, pred: (p) => p.importance === "flagship" },
 ];
 
-function StageBadge({ label }: { label: string }) {
-  return (
-    <span
-      className="font-mono uppercase"
-      style={{
-        fontSize: 9.5,
-        color: "var(--background)",
-        background: "var(--foreground)",
-        padding: "3px 8px",
-        letterSpacing: "0.14em",
-      }}
-    >
-      {label}
-    </span>
-  );
-}
-
-function PrintRef({ number, term }: { term: number; number: string }) {
-  return (
-    <Link
-      href={`/proces/${term}/${number}`}
-      className="font-mono uppercase no-underline hover:bg-muted transition-colors"
-      style={{
-        fontSize: 9.5,
-        color: "var(--secondary-foreground)",
-        padding: "3px 8px",
-        letterSpacing: "0.14em",
-        border: "1px solid var(--border)",
-      }}
-    >
-      druk {number}
-    </Link>
-  );
-}
-
-function ProcessRef({ number, term }: { term: number; number: string }) {
-  return (
-    <Link
-      href={`/proces/${term}/${number}`}
-      className="font-mono uppercase no-underline hover:bg-muted transition-colors"
-      style={{
-        fontSize: 9.5,
-        color: "var(--destructive-deep)",
-        padding: "3px 8px",
-        letterSpacing: "0.14em",
-        border: "1px solid var(--destructive-deep)",
-      }}
-    >
-      proces {number}
-    </Link>
-  );
-}
-
-function ToneBar({ tones }: { tones: Partial<Record<Tone, number>> }) {
-  const sum = Object.values(tones).reduce<number>((s, v) => s + (v ?? 0), 0);
-  if (sum === 0) return null;
-  return (
-    <div className="mt-4">
-      <div
-        className="flex"
-        style={{ height: 8, background: "var(--secondary)", border: "1px solid var(--border)" }}
-        aria-hidden
-      >
-        {Object.entries(tones).map(([k, v]) => (
-          <div
-            key={k}
-            style={{
-              width: `${((v ?? 0) / sum) * 100}%`,
-              background: TONE_INK[k as Tone],
-            }}
-            title={`${TONE_LABEL[k as Tone]}: ${v}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function VoteMini({ v }: { v: VoteType }) {
-  const accent = verdictInk(v.result, v.motionPolarity);
-  return (
-    <div
-      className="block no-underline text-inherit"
-      style={{
-        padding: "14px 16px",
-        border: "1.5px solid var(--foreground)",
-        background: "var(--background)",
-      }}
-    >
-      <Kicker className="mb-1.5">głosowanie · {v.time}</Kicker>
-      <div
-        className="font-serif italic font-medium"
-        style={{
-          fontSize: 22,
-          color: accent,
-          letterSpacing: "-0.02em",
-          lineHeight: 1,
-          marginBottom: 4,
-        }}
-      >
-        {v.result}
-      </div>
-      {v.subtitle && (
-        <div
-          className="font-sans"
-          style={{
-            fontSize: 11,
-            color: "var(--muted-foreground)",
-            marginBottom: 8,
-          }}
-        >
-          {v.subtitle}
-        </div>
-      )}
-      <div
-        className="font-sans"
-        style={{ fontSize: 12, color: "var(--secondary-foreground)", marginBottom: 10 }}
-      >
-        większością <b>{v.yes}–{v.no}</b>, różnica {v.margin}
-      </div>
-
-      <div
-        className="flex"
-        style={{ height: 8, border: "1px solid var(--border)" }}
-        aria-hidden
-      >
-        <div style={{ width: `${(v.yes / 460) * 100}%`, background: "var(--success)" }} />
-        <div style={{ width: `${(v.no / 460) * 100}%`, background: "var(--destructive)" }} />
-        <div style={{ width: `${(v.abstain / 460) * 100}%`, background: "var(--warning)" }} />
-        <div style={{ width: `${(v.absent / 460) * 100}%`, background: "var(--border)" }} />
-      </div>
-
-      {v.byClub && (
-        <div className="mt-3 grid gap-1.5" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-          {Object.entries(v.byClub).map(([club, cb]) => {
-            if (!cb) return null;
-            const total = (cb.yes + cb.no + cb.abstain + Math.max(0, cb.absent)) || 1;
-            return (
-              <div key={club} title={`${club}: ZA ${cb.yes}, PR ${cb.no}, WS ${cb.abstain}`}>
-                <div
-                  className="font-mono"
-                  style={{
-                    fontSize: 8.5,
-                    color: "var(--secondary-foreground)",
-                    fontWeight: 700,
-                    marginBottom: 2,
-                  }}
-                >
-                  {club.slice(0, 4)}
-                </div>
-                <div className="flex" style={{ height: 4 }} aria-hidden>
-                  <div style={{ width: `${(cb.yes / total) * 100}%`, background: "var(--success)" }} />
-                  <div style={{ width: `${(cb.no / total) * 100}%`, background: "var(--destructive)" }} />
-                  <div style={{ width: `${(cb.abstain / total) * 100}%`, background: "var(--warning)" }} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div
-        className="mt-3 font-mono uppercase"
-        style={{
-          fontSize: 10,
-          color: "var(--destructive-deep)",
-          letterSpacing: "0.14em",
-        }}
-      >
-        całe głosowanie →
-      </div>
-    </div>
-  );
-}
-
-function QuoteMini({ q }: { q: ViralQuote }) {
-  return (
-    <div
-      style={{
-        padding: "14px 16px",
-        borderLeft: "3px solid var(--destructive-deep)",
-        background: "var(--secondary)",
-      }}
-    >
-      <Kicker className="mb-2">cytat punktu</Kicker>
-      <p
-        className="font-serif italic m-0 mb-2.5"
-        style={{
-          fontSize: 15,
-          lineHeight: 1.4,
-          color: "var(--foreground)",
-          textWrap: "pretty",
-        }}
-      >
-        „{q.text}”
-      </p>
-      <div className="flex items-center gap-2 flex-wrap">
-        <MPAvatarPhoto name={q.speaker} size={28} />
-        <div
-          className="font-sans"
-          style={{ fontSize: 11.5, color: "var(--secondary-foreground)" }}
-        >
-          <b style={{ color: "var(--foreground)" }}>{q.speaker}</b>
-          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-            <span style={{ color: "var(--muted-foreground)" }}>{q.function}</span>
-            {q.club && <ClubBadge klub={q.club} size="xs" />}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+// Local viral-score extractor for QuoteCard's kicker — ViralQuote.reason
+// is free-form ("controversy score 0.71"), we surface the numeric value.
+function viralScoreOf(q: ViralQuote): string | null {
+  const m = q.reason?.match(/(\d+\.\d+)/);
+  return m ? m[1] : null;
 }
 
 function PlannedMini({ p }: { p: AgendaPoint }) {
@@ -333,9 +152,26 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
 
         <div>
           {p.vote ? (
-            <VoteMini v={p.vote} />
+            <VoteResultCard
+              time={p.vote.time}
+              result={p.vote.result}
+              subtitle={p.vote.topic ?? p.vote.subtitle}
+              yes={p.vote.yes}
+              no={p.vote.no}
+              abstain={p.vote.abstain}
+              absent={p.vote.absent}
+              margin={p.vote.margin}
+              motionPolarity={p.vote.motionPolarity}
+              clubTally={p.vote.byClub ? byClubToTally(p.vote.byClub) : undefined}
+            />
           ) : p.viralQuote ? (
-            <QuoteMini q={p.viralQuote} />
+            <QuoteCard
+              text={p.viralQuote.text}
+              speaker={p.viralQuote.speaker}
+              speakerFunction={p.viralQuote.function}
+              club={p.viralQuote.club}
+              viralScore={viralScoreOf(p.viralQuote)}
+            />
           ) : p.planned ? (
             <PlannedMini p={p} />
           ) : null}
@@ -391,9 +227,26 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
         <AgendaCenter p={p} />
         <div className="mt-5">
           {p.vote ? (
-            <VoteMini v={p.vote} />
+            <VoteResultCard
+              time={p.vote.time}
+              result={p.vote.result}
+              subtitle={p.vote.topic ?? p.vote.subtitle}
+              yes={p.vote.yes}
+              no={p.vote.no}
+              abstain={p.vote.abstain}
+              absent={p.vote.absent}
+              margin={p.vote.margin}
+              motionPolarity={p.vote.motionPolarity}
+              clubTally={p.vote.byClub ? byClubToTally(p.vote.byClub) : undefined}
+            />
           ) : p.viralQuote ? (
-            <QuoteMini q={p.viralQuote} />
+            <QuoteCard
+              text={p.viralQuote.text}
+              speaker={p.viralQuote.speaker}
+              speakerFunction={p.viralQuote.function}
+              club={p.viralQuote.club}
+              viralScore={viralScoreOf(p.viralQuote)}
+            />
           ) : p.planned ? (
             <PlannedMini p={p} />
           ) : null}
@@ -408,7 +261,7 @@ function AgendaCenter({ p }: { p: AgendaPoint }) {
     <div className="min-w-0">
       <div className="flex gap-1.5 mb-2.5 flex-wrap">
         {p.stages.map((s) => (
-          <StageBadge key={s} label={s} />
+          <StageBadge key={s}>{s}</StageBadge>
         ))}
         {p.prints.map((d) => (
           <PrintRef key={`${d.term}-${d.number}`} term={d.term} number={d.number} />
@@ -506,7 +359,6 @@ function AgendaCenter({ p }: { p: AgendaPoint }) {
         </div>
       )}
 
-      {!p.planned && <ToneBar tones={p.tones} />}
     </div>
   );
 }

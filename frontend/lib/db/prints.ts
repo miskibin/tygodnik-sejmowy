@@ -83,6 +83,25 @@ export type BriefItem = {
     // Optional semantics for verdict labeling in compact vote bars.
     majorityVotes?: number | null;
     motionPolarity?: import("@/lib/promiseAlignment").MotionPolarity | null;
+    // Per-club tally for the right-side party-color bar in /tygodnik.
+    // Attached from VoteEventPayload.club_tally at merge time.
+    clubTally?: import("@/lib/events-types").ClubTallyRaw[];
+    // Motion question — "wniosek o odrzucenie projektu", "głosowanie
+    // nad całością projektu", "wniosek o skierowanie do Komisji", etc.
+    // Surfaces the vote kind on the editorial right-side card.
+    topic?: string | null;
+  } | null;
+  // Best floor quote linked to this print in the current sitting —
+  // used as the right-side QuoteCard when there's no voting yet.
+  topQuote: {
+    statementId: number;
+    mpId: number | null;
+    speakerName: string;
+    function: string | null;
+    text: string;
+    viralScore: number | null;
+    photoUrl: string | null;
+    klub: string | null;
   } | null;
 };
 
@@ -763,6 +782,7 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     currentStageType: null,
     processPassed: null,
     voting: null,
+    topQuote: null,
   };
 
   return {
@@ -901,6 +921,7 @@ export async function getBriefItemsBySitting(term: number, sittingNum: number): 
     currentStageType: null,
     processPassed: null,
     voting: null,
+    topQuote: null,
   }));
 
   items.sort((a, b) => {
@@ -977,6 +998,7 @@ export async function getBriefItems(): Promise<BriefItem[]> {
     currentStageType: null,
     processPassed: null,
     voting: null,
+    topQuote: null,
   }));
 
   // 4. Final sort: homepage_score DESC, then change_date DESC.

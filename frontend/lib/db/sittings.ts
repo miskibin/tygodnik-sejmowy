@@ -172,6 +172,7 @@ type VotingRow = {
   motion_polarity:
     | "pass" | "reject" | "amendment" | "minority" | "procedural" | "other" | null;
   short_title: string | null;
+  topic: string | null;
 };
 
 type VoteRow = {
@@ -196,6 +197,16 @@ type AgendaItemProcessRow = {
   agenda_item_id: number;
   term: number;
   process_id: string;
+};
+
+// Returned by the embedded-resource query on `processes` below. We pivot
+// process_stages through processes(term, number) because
+// agenda_item_processes.process_id references processes.number (text),
+// while process_stages.process_id references processes.id (bigint).
+type ProcessWithStagesRow = {
+  term: number;
+  number: string;
+  process_stages: { stage_name: string | null }[] | null;
 };
 
 type MpRow = { mp_id: number; photo_url: string | null };
@@ -269,6 +280,7 @@ function buildVote(v: VotingRow, voteRows: VoteRow[]): Vote {
     motionPolarity,
     byClub: Object.keys(byClub).length > 0 ? byClub : undefined,
     subtitle: v.short_title,
+    topic: v.topic,
   };
 }
 
@@ -344,7 +356,7 @@ async function loadSitting(
     sb
       .from("votings")
       .select(
-        "id, voting_number, date, title, yes, no, abstain, not_participating, majority_votes, motion_polarity, short_title",
+        "id, voting_number, date, title, yes, no, abstain, not_participating, majority_votes, motion_polarity, short_title, topic",
       )
       .eq("term", term)
       .eq("sitting", sittingNum)
@@ -392,13 +404,47 @@ async function loadSitting(
     ]),
   );
 
-  const [votesRes, linksRes, mpsRes, memRes] = await Promise.all([
-    votingIds.length > 0
-      ? sb
-          .from("votes")
-          .select("voting_id, mp_id, club_ref, vote")
-          .in("voting_id", votingIds)
-      : Promise.resolve({ data: [] as VoteRow[], error: null }),
+  const processIdsForStages = Array.from(
+    new Set(agendaProcesses.map((p) => p.process_id)),
+  );
+  const processTermsForStages = Array.from(
+    new Set(agendaProcesses.map((p) => p.term)),
+  );
+
+  // PostgREST `max-rows` on this deployment is 1000, so a full sitting
+  // (≈40 votings × 459 votes ≈ 18k rows) needs pagination — otherwise
+  // per-club voting breakdowns silently disappear past the first ~2
+  // votings.
+  const fetchAllVotes = async (): Promise<{
+    data: VoteRow[];
+    error: { message: string } | null;
+  }> => {
+    if (votingIds.length === 0) return { data: [], error: null };
+    const all: VoteRow[] = [];
+    const PAGE = 1000;
+    let offset = 0;
+    while (true) {
+      const res = await sb
+        .from("votes")
+        .select("voting_id, mp_id, club_ref, vote")
+        .in("voting_id", votingIds)
+        // Deterministic order required for .range() pagination — without
+        // it PostgREST can return overlapping or missing rows per page,
+        // corrupting the per-club tally on the right-side vote card.
+        .order("voting_id", { ascending: true })
+        .order("mp_id", { ascending: true })
+        .range(offset, offset + PAGE - 1);
+      if (res.error) return { data: [], error: res.error };
+      const rows = (res.data ?? []) as VoteRow[];
+      all.push(...rows);
+      if (rows.length < PAGE) break;
+      offset += PAGE;
+    }
+    return { data: all, error: null };
+  };
+
+  const [votesRes, linksRes, mpsRes, memRes, stagesRes] = await Promise.all([
+    fetchAllVotes(),
     statementIds.length > 0
       ? sb
           .from("statement_print_links")
@@ -419,16 +465,25 @@ async function loadSitting(
           .eq("term", term)
           .in("mp_id", mpIds)
       : Promise.resolve({ data: [] as MembershipRow[], error: null }),
+    processIdsForStages.length > 0
+      ? sb
+          .from("processes")
+          .select("term, number, process_stages(stage_name)")
+          .in("term", processTermsForStages)
+          .in("number", processIdsForStages)
+      : Promise.resolve({ data: [] as ProcessWithStagesRow[], error: null }),
   ]);
   if (votesRes.error) throw votesRes.error;
   if (linksRes.error) throw linksRes.error;
   if (mpsRes.error) throw mpsRes.error;
   if (memRes.error) throw memRes.error;
+  if (stagesRes.error) throw stagesRes.error;
 
   const votes = (votesRes.data ?? []) as VoteRow[];
   const links = (linksRes.data ?? []) as StatementPrintLinkRow[];
   const mpRows = (mpsRes.data ?? []) as MpRow[];
   const memRows = (memRes.data ?? []) as MembershipRow[];
+  const processWithStages = (stagesRes.data ?? []) as ProcessWithStagesRow[];
 
   const mpPhotos = new Map<number, string | null>();
   for (const m of mpRows) mpPhotos.set(m.mp_id, m.photo_url);
@@ -527,6 +582,25 @@ async function loadSitting(
     const list = processesByAgendaId.get(p.agenda_item_id) ?? [];
     list.push({ term: p.term, number: p.process_id });
     processesByAgendaId.set(p.agenda_item_id, list);
+  }
+
+  // Highest reached czytanie (I/II/III) per process, extracted from
+  // process_stages.stage_name. The Sejm API returns full Polish prose
+  // ("I czytanie na posiedzeniu Sejmu", "III czytanie w komisjach", ...).
+  // We surface the ordinal as a stage badge on the agenda row.
+  const CZYTANIE_RE = /\b(I{1,3})\s+czytanie\b/i;
+  const czytanieByProcess = new Map<string, 1 | 2 | 3>();
+  for (const proc of processWithStages) {
+    const key = `${proc.term}:${proc.number}`;
+    for (const s of proc.process_stages ?? []) {
+      if (!s.stage_name) continue;
+      const m = s.stage_name.match(CZYTANIE_RE);
+      if (!m) continue;
+      const roman = m[1].toUpperCase();
+      const ord: 1 | 2 | 3 = roman === "III" ? 3 : roman === "II" ? 2 : 1;
+      const prev = czytanieByProcess.get(key) ?? 0;
+      if (ord > prev) czytanieByProcess.set(key, ord);
+    }
   }
 
   // Votings grouped by their Pkt-ord.
@@ -652,6 +726,21 @@ async function loadSitting(
       && new Date(earliestStart).getTime() <= now
       && new Date(latestEnd).getTime() >= now;
 
+    // Stage badges: highest czytanie across linked processes, plus
+    // GŁOSOWANIE whenever a primary voting is attached.
+    const linkedProcesses = processesByAgendaId.get(a.id) ?? [];
+    let maxCzytanie: 1 | 2 | 3 | 0 = 0;
+    for (const proc of linkedProcesses) {
+      const ord = czytanieByProcess.get(`${proc.term}:${proc.number}`) ?? 0;
+      if (ord > maxCzytanie) maxCzytanie = ord as 1 | 2 | 3;
+    }
+    const stages: string[] = [];
+    if (maxCzytanie > 0) {
+      const roman = maxCzytanie === 3 ? "III" : maxCzytanie === 2 ? "II" : "I";
+      stages.push(`${roman} CZYTANIE`);
+    }
+    if (vote) stages.push("GŁOSOWANIE");
+
     return {
       ord: a.ord,
       date: pointDate,
@@ -661,7 +750,7 @@ async function loadSitting(
       title: a.title,
       shortTitle: shortenTitle(a.title),
       plainSummary: "",
-      stages: [],
+      stages,
       prints: printsByAgendaId.get(a.id) ?? [],
       processes: processesByAgendaId.get(a.id) ?? [],
       stats: {
