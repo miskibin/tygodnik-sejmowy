@@ -93,23 +93,27 @@ export function VoteResultCard({
       )}
       <div
         className="font-sans"
-        style={{ fontSize: 12, color: "var(--secondary-foreground)", marginBottom: 10 }}
+        style={{ fontSize: 12, color: "var(--secondary-foreground)", marginBottom: 4 }}
       >
         większością <b>{yes}–{no}</b>, różnica {margin}
       </div>
 
-      <div
-        className="flex"
-        style={{ height: 8, border: "1px solid var(--border)" }}
-        aria-hidden
-      >
-        <div style={{ width: `${(yes / 460) * 100}%`, background: "var(--success)" }} />
-        <div style={{ width: `${(no / 460) * 100}%`, background: "var(--destructive)" }} />
-        <div style={{ width: `${(abstain / 460) * 100}%`, background: "var(--warning)" }} />
-        <div style={{ width: `${(absent / 460) * 100}%`, background: "var(--border)" }} />
-      </div>
-
-      {clubTally && clubTally.length > 0 && <ClubResultBar clubTally={clubTally} />}
+      {clubTally && clubTally.length > 0 ? (
+        <ClubResultBar clubTally={clubTally} />
+      ) : (
+        // Fallback global yes/no/abstain/absent bar when per-club tally
+        // isn't available — keeps a visual signal even on sparse data.
+        <div
+          className="flex mt-3"
+          style={{ height: 8, border: "1px solid var(--border)" }}
+          aria-hidden
+        >
+          <div style={{ width: `${(yes / 460) * 100}%`, background: "var(--success)" }} />
+          <div style={{ width: `${(no / 460) * 100}%`, background: "var(--destructive)" }} />
+          <div style={{ width: `${(abstain / 460) * 100}%`, background: "var(--warning)" }} />
+          <div style={{ width: `${(absent / 460) * 100}%`, background: "var(--border)" }} />
+        </div>
+      )}
 
       {detailHref ? (
         <Link

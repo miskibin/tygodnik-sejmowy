@@ -211,14 +211,36 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       <CardTitle
         size={isFirst ? "hero" : "default"}
         href={`/proces/${item.term}/${item.number}`}
-        subtitle={
-          item.title && item.shortTitle && item.shortTitle !== item.title
-            ? item.title
-            : null
-        }
       >
         {item.shortTitle || item.title}
       </CardTitle>
+
+      {item.title && item.shortTitle && item.shortTitle !== item.title && (
+        <details className="mb-3">
+          <summary
+            className="cursor-pointer font-mono uppercase"
+            style={{
+              fontSize: 10,
+              color: "var(--muted-foreground)",
+              letterSpacing: "0.14em",
+              listStyle: "none",
+            }}
+          >
+            ▸ pełny urzędowy tytuł
+          </summary>
+          <p
+            className="font-serif italic mt-2 mb-0"
+            style={{
+              fontSize: 13,
+              color: "var(--muted-foreground)",
+              lineHeight: 1.5,
+              maxWidth: 720,
+            }}
+          >
+            „{item.title}”
+          </p>
+        </details>
+      )}
 
       <TopicChips topicIds={item.topics} className="mb-3" />
 

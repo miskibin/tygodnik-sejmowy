@@ -1,4 +1,4 @@
-import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
+import { KLUB_LABELS } from "@/lib/atlas/constants";
 import type { ClubTallyRaw } from "@/lib/events-types";
 
 // Fixed left-to-right ordering of clubs in the per-party voting bar.
@@ -32,6 +32,12 @@ function orderClubs(rows: ClubTallyRaw[]): ClubTallyRaw[] {
   return ordered;
 }
 
+// Single horizontal bar where each club gets a segment proportional to
+// its size, and inside each segment a yes (green) / no (red) / abstain
+// (amber) sub-bar shows how that club actually voted. This replaces
+// the redundant global yes/no/abstain bar that used to sit above —
+// the per-club breakdown carries all the same information plus the
+// partisan distribution.
 export function ClubResultBar({ clubTally }: { clubTally: ClubTallyRaw[] }) {
   const entries = orderClubs(clubTally).filter((c) => c.total > 0);
   const grandTotal = entries.reduce((s, e) => s + e.total, 0);
@@ -41,19 +47,49 @@ export function ClubResultBar({ clubTally }: { clubTally: ClubTallyRaw[] }) {
     <div className="mt-3">
       <div
         className="flex"
-        style={{ height: 10, border: "1px solid var(--border)" }}
+        style={{ height: 12, border: "1px solid var(--border)" }}
         aria-hidden
       >
-        {entries.map((c) => (
-          <div
-            key={c.club_short}
-            style={{
-              width: `${(c.total / grandTotal) * 100}%`,
-              background: KLUB_COLORS[c.club_short] ?? "var(--muted-foreground)",
-            }}
-            title={`${c.club_name}: ZA ${c.yes}, PR ${c.no}, WS ${c.abstain}`}
-          />
-        ))}
+        {entries.map((c, i) => {
+          const w = (c.total / grandTotal) * 100;
+          // Exclude not_voting from the internal breakdown — the segment
+          // already represents people who showed up; "ZA / PR / WS" should
+          // sum to a club's voting present, leaving absent implicit.
+          const inner = c.yes + c.no + c.abstain || 1;
+          return (
+            <div
+              key={c.club_short}
+              className="flex"
+              style={{
+                width: `${w}%`,
+                // Thin background-coloured divider between consecutive clubs
+                // gives the segments the same visual separation the
+                // printed-volume bar uses.
+                borderLeft: i > 0 ? "1px solid var(--background)" : "none",
+              }}
+              title={`${c.club_name}: ZA ${c.yes}, PR ${c.no}, WS ${c.abstain}`}
+            >
+              <div
+                style={{
+                  width: `${(c.yes / inner) * 100}%`,
+                  background: "var(--success)",
+                }}
+              />
+              <div
+                style={{
+                  width: `${(c.no / inner) * 100}%`,
+                  background: "var(--destructive)",
+                }}
+              />
+              <div
+                style={{
+                  width: `${(c.abstain / inner) * 100}%`,
+                  background: "var(--warning)",
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
       <div className="flex mt-1">
         {entries.map((c) => {
