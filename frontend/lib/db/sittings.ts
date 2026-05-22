@@ -428,6 +428,11 @@ async function loadSitting(
         .from("votes")
         .select("voting_id, mp_id, club_ref, vote")
         .in("voting_id", votingIds)
+        // Deterministic order required for .range() pagination — without
+        // it PostgREST can return overlapping or missing rows per page,
+        // corrupting the per-club tally on the right-side vote card.
+        .order("voting_id", { ascending: true })
+        .order("mp_id", { ascending: true })
         .range(offset, offset + PAGE - 1);
       if (res.error) return { data: [], error: res.error };
       const rows = (res.data ?? []) as VoteRow[];

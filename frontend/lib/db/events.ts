@@ -227,14 +227,14 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
     // print rows that don't have a merged voting. Statements are scoped
     // to *this sitting* via the proceeding inner join so the "cytat z
     // sali" is always from the same week the print appears in.
-    const { data: linkRows } = await sb
+    const linkRes = await sb
       .from("statement_print_links")
       .select("print_id, statement_id")
       .in("print_id", printIds);
+    if (linkRes.error) throw linkRes.error;
     type LinkRow = { print_id: number; statement_id: number };
-    const stmtIds = Array.from(
-      new Set(((linkRows ?? []) as LinkRow[]).map((r) => r.statement_id)),
-    );
+    const linkRows = (linkRes.data ?? []) as LinkRow[];
+    const stmtIds = Array.from(new Set(linkRows.map((r) => r.statement_id)));
     if (stmtIds.length > 0) {
       type StmtRow = {
         id: number;
@@ -247,7 +247,11 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
           | { proceeding: { number: number | null } | null }
           | null;
       };
-      const { data: stmtRows } = await sb
+      // No .limit() — a global cap can truncate before we pick a top
+      // candidate per print, leaving some prints quote-less even when
+      // a viable statement exists further down the list. The earlier
+      // statement_print_links filter already scopes us to relevant ids.
+      const stmtRes = await sb
         .from("proceeding_statements")
         .select(
           "id, mp_id, speaker_name, function, viral_quote, viral_score, proceeding_day:proceeding_days!inner(proceeding:proceedings!inner(number))",
@@ -255,8 +259,9 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
         .in("id", stmtIds)
         .eq("term", term)
         .not("viral_quote", "is", null)
-        .order("viral_score", { ascending: false, nullsFirst: false })
-        .limit(200);
+        .order("viral_score", { ascending: false, nullsFirst: false });
+      if (stmtRes.error) throw stmtRes.error;
+      const stmtRows = stmtRes.data;
       const inSitting = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
         (r) =>
           r.viral_quote &&
@@ -269,7 +274,7 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
       // Group statements by print, ordered by viral_score desc (already
       // sorted from the query). Pick top-1 per print.
       const topByPrint = new Map<number, StmtRow>();
-      for (const link of (linkRows ?? []) as LinkRow[]) {
+      for (const link of linkRows) {
         const s = stmtById.get(link.statement_id);
         if (!s) continue;
         const prev = topByPrint.get(link.print_id);

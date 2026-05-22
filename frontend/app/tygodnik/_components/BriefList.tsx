@@ -61,15 +61,21 @@ const SPONSOR_BADGE_LABEL: Record<NonNullable<SponsorAuthority>, string> = {
 
 // Derive the verdict label shown on the right-side VoteResultCard. The
 // print/vote payload only carries yes/no/abstain counts + motionPolarity,
-// not the final verdict text — compute it the same way the dedicated
-// glosowanie page does.
+// not the final verdict text — match sittings.ts deriveResult() so that
+// reject/minority motions also surface as "WNIOSEK PRZYJĘTY/ODRZUCONY"
+// rather than "PRZYJĘTA/ODRZUCONA" (a failed "wniosek o odrzucenie" must
+// NOT read as "ustawa odrzucona" — see issue #25).
 function deriveVerdict(
   yes: number,
   no: number,
   motionPolarity?: string | null,
 ): VoteResultKind {
   const passed = yes > no;
-  if (motionPolarity === "procedural") {
+  const isWniosek =
+    motionPolarity === "procedural" ||
+    motionPolarity === "reject" ||
+    motionPolarity === "minority";
+  if (isWniosek) {
     return passed ? "WNIOSEK PRZYJĘTY" : "WNIOSEK ODRZUCONY";
   }
   return passed ? "PRZYJĘTA" : "ODRZUCONA";
@@ -118,15 +124,16 @@ function kpiSlotsForPrint(item: BriefItem): KpiSlot[] {
   return slots;
 }
 
-// Today as YYYY-MM-DD in local time — string-comparable with sitting
-// dates which arrive as date-only strings. Computed once per render
-// outside the component so SSR + client agree on the same boundary.
+// Today as YYYY-MM-DD in Europe/Warsaw — the server data layer normalises
+// every sitting date to Warsaw local (see warsawTodayDate in sittings.ts),
+// so the client comparator must use the same calendar to avoid
+// misclassifying a row as "future" vs "data_pending" around midnight for
+// users outside CET/CEST. The "sv-SE" locale conveniently emits the
+// YYYY-MM-DD format we already string-compare against.
 function todayIsoDate(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Warsaw" }).format(
+    new Date(),
+  );
 }
 
 type PrintStatus = "started" | "future" | "data_pending";
@@ -383,7 +390,17 @@ function SectionHeader({
   label: string;
   count: number;
 }) {
-  const sub = `${count} ${count === 1 ? "pozycja" : count < 5 ? "pozycje" : "pozycji"}`;
+  // Polish plural: 1 → pozycja; 2–4 / 22–24 / 32–34 (skip teens 12–14) →
+  // pozycje; else → pozycji.
+  const tens = count % 100;
+  const ones = count % 10;
+  const plural =
+    count === 1
+      ? "pozycja"
+      : ones >= 2 && ones <= 4 && (tens < 12 || tens > 14)
+        ? "pozycje"
+        : "pozycji";
+  const sub = `${count} ${plural}`;
   return (
     <div className="pt-4 md:pt-8">
       <SectionHead num={num} title={label} sub={sub} />
