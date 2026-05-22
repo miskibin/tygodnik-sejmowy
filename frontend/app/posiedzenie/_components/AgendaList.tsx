@@ -131,23 +131,29 @@ function ClubResultBar({
         ))}
       </div>
       <div className="flex mt-1">
-        {entries.map(({ club, total }) => (
-          <div
-            key={club}
-            className="font-mono"
-            style={{
-              width: `${(total / grandTotal) * 100}%`,
-              fontSize: 9,
-              color: "var(--secondary-foreground)",
-              letterSpacing: "0.06em",
-              textAlign: "center",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {KLUB_LABELS[club] ?? club}
-          </div>
-        ))}
+        {entries.map(({ club, total }) => {
+          const pct = (total / grandTotal) * 100;
+          // Hide label entirely on tight segments so neighbours don't
+          // overlap — the segment is still hoverable for the tooltip.
+          const showLabel = pct >= 7;
+          return (
+            <div
+              key={club}
+              className="font-mono"
+              style={{
+                width: `${pct}%`,
+                fontSize: 8.5,
+                color: "var(--secondary-foreground)",
+                letterSpacing: "0.04em",
+                textAlign: "center",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {showLabel ? KLUB_LABELS[club] ?? club : ""}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
