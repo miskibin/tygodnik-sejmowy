@@ -92,6 +92,30 @@ def cmd_backfill_statement_print_links(dry_run: bool = typer.Option(False, "--dr
     _print_counts("statement-print-links", backfill_statement_print_links(dry_run=dry_run))
 
 
+@backfill_app.command("statement-primary-print")
+def cmd_backfill_statement_primary_print(
+    term: int = typer.Option(10, "--term"),
+    sitting_min: int = typer.Option(
+        55, "--sitting-min", help="Only sittings >= this number"
+    ),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+    limit: int = typer.Option(None, "--limit", help="Cap for testing"),
+):
+    """Attribute each statement to ONE specific print (primary_print_id).
+
+    Pass 1: single-print agenda items → deterministic. No LLM cost.
+    Pass 2: joint debates (2+ prints in same agenda item) → deepseek-flash
+            picks the main subject. ~$0.001 per joint-debate statement.
+    """
+    from supagraf.enrich.statement_primary_print import backfill_primary_print
+    _print_counts(
+        "statement-primary-print",
+        backfill_primary_print(
+            term=term, sitting_min=sitting_min, dry_run=dry_run, limit=limit
+        ),
+    )
+
+
 @backfill_app.command("is-procedural-substantive")
 def cmd_backfill_procedural(dry_run: bool = typer.Option(False, "--dry-run")):
     """Fix is_procedural for misclassified bills + procedural categories."""

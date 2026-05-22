@@ -262,91 +262,68 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
     }
 
     // Top viral statement per print — feeds the right-side QuoteCard on
-    // print rows that don't have a merged voting. Statements are scoped
-    // to *this sitting* via the proceeding inner join so the "cytat z
-    // sali" is always from the same week the print appears in.
-    const linkRes = await sb
-      .from("statement_print_links")
-      .select("print_id, statement_id")
-      .in("print_id", printIds);
-    if (linkRes.error) throw linkRes.error;
-    type LinkRow = { print_id: number; statement_id: number };
-    const linkRows = (linkRes.data ?? []) as LinkRow[];
-    const stmtIds = Array.from(new Set(linkRows.map((r) => r.statement_id)));
-    if (stmtIds.length > 0) {
-      type StmtRow = {
-        id: number;
-        mp_id: number | null;
-        speaker_name: string | null;
-        function: string | null;
-        viral_quote: string | null;
-        viral_score: number | string | null;
-        proceeding_day:
-          | { proceeding: { number: number | null } | null }
-          | null;
+    // print rows that don't have a merged voting. Uses the
+    // proceeding_statements.primary_print_id attribution (migration 0103,
+    // populated by supagraf.enrich.statement_primary_print) so each
+    // statement is anchored to exactly one draft, even in joint debates.
+    // Inner join through proceeding_days → proceedings scopes results
+    // to THIS sitting's actual floor activity.
+    type StmtRow = {
+      id: number;
+      mp_id: number | null;
+      speaker_name: string | null;
+      function: string | null;
+      viral_quote: string | null;
+      viral_score: number | string | null;
+      primary_print_id: number;
+      proceeding_day:
+        | { proceeding: { number: number | null } | null }
+        | null;
+    };
+    const stmtRes = await sb
+      .from("proceeding_statements")
+      .select(
+        "id, mp_id, speaker_name, function, viral_quote, viral_score, primary_print_id, proceeding_day:proceeding_days!inner(proceeding:proceedings!inner(number))",
+      )
+      .in("primary_print_id", printIds)
+      .eq("term", term)
+      .not("viral_quote", "is", null)
+      .order("viral_score", { ascending: false, nullsFirst: false });
+    if (stmtRes.error) throw stmtRes.error;
+    const inSitting = ((stmtRes.data ?? []) as unknown as StmtRow[]).filter(
+      (r) =>
+        r.viral_quote &&
+        r.viral_quote.trim().length > 0 &&
+        r.proceeding_day?.proceeding?.number === sittingNum,
+    );
+    // Pick top-1 per print (rows already sorted by viral_score desc).
+    // Each statement has at most one primary_print_id so there's
+    // nothing to dedupe — the previous greedy-claim pass is obsolete.
+    const topByPrint = new Map<number, StmtRow>();
+    for (const r of inSitting) {
+      if (!topByPrint.has(r.primary_print_id)) {
+        topByPrint.set(r.primary_print_id, r);
+      }
+    }
+
+    for (const ev of printEvents) {
+      const s = topByPrint.get(ev.payload.print_id);
+      if (!s || !s.viral_quote) {
+        ev.payload.top_quote = null;
+        continue;
+      }
+      const score =
+        typeof s.viral_score === "string"
+          ? parseFloat(s.viral_score)
+          : s.viral_score ?? null;
+      ev.payload.top_quote = {
+        statement_id: s.id,
+        mp_id: s.mp_id,
+        speaker_name: s.speaker_name ?? "—",
+        function: s.function,
+        viral_quote: s.viral_quote.trim(),
+        viral_score: score,
       };
-      // No .limit() — a global cap can truncate before we pick a top
-      // candidate per print, leaving some prints quote-less even when
-      // a viable statement exists further down the list. The earlier
-      // statement_print_links filter already scopes us to relevant ids.
-      const stmtRes = await sb
-        .from("proceeding_statements")
-        .select(
-          "id, mp_id, speaker_name, function, viral_quote, viral_score, proceeding_day:proceeding_days!inner(proceeding:proceedings!inner(number))",
-        )
-        .in("id", stmtIds)
-        .eq("term", term)
-        .not("viral_quote", "is", null)
-        .order("viral_score", { ascending: false, nullsFirst: false });
-      if (stmtRes.error) throw stmtRes.error;
-      const stmtRows = stmtRes.data;
-      const inSitting = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
-        (r) =>
-          r.viral_quote &&
-          r.viral_quote.trim().length > 0 &&
-          r.proceeding_day?.proceeding?.number === sittingNum,
-      );
-      const stmtById = new Map<number, StmtRow>();
-      for (const r of inSitting) stmtById.set(r.id, r);
-
-      // Group statements by print, ordered by viral_score desc (already
-      // sorted from the query). Pick top-1 per print.
-      const topByPrint = new Map<number, StmtRow>();
-      for (const link of linkRows) {
-        const s = stmtById.get(link.statement_id);
-        if (!s) continue;
-        const prev = topByPrint.get(link.print_id);
-        const sScore =
-          typeof s.viral_score === "string"
-            ? parseFloat(s.viral_score)
-            : s.viral_score ?? 0;
-        const prevScore = prev
-          ? typeof prev.viral_score === "string"
-            ? parseFloat(prev.viral_score)
-            : prev.viral_score ?? 0
-          : -Infinity;
-        if (sScore > prevScore) topByPrint.set(link.print_id, s);
-      }
-
-      for (const ev of printEvents) {
-        const s = topByPrint.get(ev.payload.print_id);
-        if (!s || !s.viral_quote) {
-          ev.payload.top_quote = null;
-          continue;
-        }
-        const score =
-          typeof s.viral_score === "string"
-            ? parseFloat(s.viral_score)
-            : s.viral_score ?? null;
-        ev.payload.top_quote = {
-          statement_id: s.id,
-          mp_id: s.mp_id,
-          speaker_name: s.speaker_name ?? "—",
-          function: s.function,
-          viral_quote: s.viral_quote.trim(),
-          viral_score: score,
-        };
-      }
     }
   }
 
