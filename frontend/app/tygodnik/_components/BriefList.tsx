@@ -933,8 +933,10 @@ export function BriefList({
         </div>
       </div>
 
-      {/* Sections */}
-      <div className="px-4 md:px-8 lg:px-14 max-w-[1240px] mx-auto">
+      {/* Sections — widen at 2xl so the print rows can host their
+          right-side vote/quote sidebar without compressing the main
+          column. Below 2xl the sidebar is hidden entirely. */}
+      <div className="px-4 md:px-8 lg:px-14 max-w-[1240px] 2xl:max-w-[1640px] mx-auto">
         {filteredPrints.length > 0 && (
           <>
             <SectionHeader num={1} label="Nowe projekty" count={filteredPrints.length} />

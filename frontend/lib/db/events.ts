@@ -48,28 +48,66 @@ export function getSittingsIndex(term = 10): Promise<SittingInfo[]> {
   )();
 }
 
+type TygodnikSittingRow = {
+  term: number;
+  sitting_num: number;
+  sitting_title: string | null;
+  first_date: string | null;
+  last_date: string | null;
+  print_count: number | null;
+  event_count: number | null;
+  top_topics: string[] | null;
+};
+
+function mapTygodnikSittingRow(row: TygodnikSittingRow): SittingInfo {
+  return {
+    term: row.term,
+    sittingNum: row.sitting_num,
+    title: row.sitting_title ?? "",
+    firstDate: row.first_date ?? "",
+    lastDate: row.last_date ?? "",
+    printCount: row.print_count ?? 0,
+    eventCount: row.event_count ?? 0,
+    topTopics: topicsFromDb(row.top_topics),
+  };
+}
+
 async function loadLatestSittingWithEvents(term: number): Promise<SittingInfo | null> {
   const sb = supabase();
-  const { data, error } = await sb
+  const today = warsawToday();
+  const cols =
+    "term, sitting_num, sitting_title, first_date, last_date, print_count, event_count, top_topics";
+
+  // Prefer the most recent sitting whose final day is already behind us —
+  // that's the latest week with actually-finished items (votes wrapped,
+  // floor quotes ingested) rather than a queued-but-not-yet-debated
+  // future agenda. Print events alone (event_count > 0) aren't enough
+  // because Sejm publishes drafts days before the sitting opens.
+  const finishedRes = await sb
     .from("tygodnik_sittings")
-    .select("term, sitting_num, sitting_title, first_date, last_date, print_count, event_count, top_topics")
+    .select(cols)
+    .eq("term", term)
+    .gt("event_count", 0)
+    .lt("last_date", today)
+    .order("sitting_num", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (finishedRes.error) throw finishedRes.error;
+  if (finishedRes.data) return mapTygodnikSittingRow(finishedRes.data as TygodnikSittingRow);
+
+  // Fallback for the very start of a term when no sitting has wrapped
+  // yet — better to show the upcoming sitting than nothing at all.
+  const fallbackRes = await sb
+    .from("tygodnik_sittings")
+    .select(cols)
     .eq("term", term)
     .gt("event_count", 0)
     .order("sitting_num", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (error) throw error;
-  if (!data) return null;
-  return {
-    term: data.term as number,
-    sittingNum: data.sitting_num as number,
-    title: (data.sitting_title as string) ?? "",
-    firstDate: (data.first_date as string) ?? "",
-    lastDate: (data.last_date as string) ?? "",
-    printCount: (data.print_count as number) ?? 0,
-    eventCount: (data.event_count as number) ?? 0,
-    topTopics: topicsFromDb(data.top_topics as string[] | null),
-  };
+  if (fallbackRes.error) throw fallbackRes.error;
+  if (!fallbackRes.data) return null;
+  return mapTygodnikSittingRow(fallbackRes.data as TygodnikSittingRow);
 }
 
 export function getLatestSittingWithEvents(term = 10): Promise<SittingInfo | null> {
