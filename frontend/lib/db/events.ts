@@ -309,23 +309,42 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
       const stmtById = new Map<number, StmtRow>();
       for (const r of inSitting) stmtById.set(r.id, r);
 
-      // Group statements by print, ordered by viral_score desc (already
-      // sorted from the query). Pick top-1 per print.
-      const topByPrint = new Map<number, StmtRow>();
+      const scoreOf = (s: StmtRow): number =>
+        typeof s.viral_score === "string"
+          ? parseFloat(s.viral_score)
+          : s.viral_score ?? 0;
+
+      // statement_print_links is many-to-many: a single statement that
+      // mentions two drafts ("w sprawie druków 2287 i 2396…") gets
+      // linked to both prints, which would otherwise surface the same
+      // quote card twice in the feed (issue #67). Walk all (print,
+      // statement) candidates ordered by viral_score desc and greedily
+      // claim each statement for one print only — that print gets the
+      // best uniquely-available quote, the other falls through to its
+      // next-best candidate or to no quote.
+      type Candidate = { printId: number; stmt: StmtRow; score: number };
+      const candidates: Candidate[] = [];
       for (const link of linkRows) {
         const s = stmtById.get(link.statement_id);
         if (!s) continue;
-        const prev = topByPrint.get(link.print_id);
-        const sScore =
-          typeof s.viral_score === "string"
-            ? parseFloat(s.viral_score)
-            : s.viral_score ?? 0;
-        const prevScore = prev
-          ? typeof prev.viral_score === "string"
-            ? parseFloat(prev.viral_score)
-            : prev.viral_score ?? 0
-          : -Infinity;
-        if (sScore > prevScore) topByPrint.set(link.print_id, s);
+        candidates.push({ printId: link.print_id, stmt: s, score: scoreOf(s) });
+      }
+      // Sort by score desc, break ties by print_id then statement id so
+      // the same input always yields the same assignment.
+      candidates.sort(
+        (a, b) =>
+          b.score - a.score ||
+          a.printId - b.printId ||
+          a.stmt.id - b.stmt.id,
+      );
+
+      const topByPrint = new Map<number, StmtRow>();
+      const claimedStmts = new Set<number>();
+      for (const c of candidates) {
+        if (topByPrint.has(c.printId)) continue;
+        if (claimedStmts.has(c.stmt.id)) continue;
+        topByPrint.set(c.printId, c.stmt);
+        claimedStmts.add(c.stmt.id);
       }
 
       for (const ev of printEvents) {
