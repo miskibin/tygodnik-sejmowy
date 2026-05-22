@@ -60,7 +60,7 @@ class PrimaryPrintOutput(BaseModel):
 
     primary_print_number: Optional[str] = Field(default=None)
     confidence: float = Field(ge=0.0, le=1.0, default=0.0)
-    reason: str = Field(default="", max_length=400)
+    reason: str = Field(default="", max_length=200)
 
 
 @with_model_run(
@@ -137,7 +137,16 @@ def _fetch_candidates(
         "%(sitting_min)s", str(int(sitting_min))
     )
     res = sb.rpc("exec_sql", {"query": sql_inline}).execute()
-    return list(res.data or [])
+    payload = res.data
+    # exec_sql returns its SQL failures in-band as a JSON envelope rather
+    # than via HTTP error, so list(payload) on a dict would silently turn
+    # {"status":"error",...} into a list of keys ['status','message',...].
+    if isinstance(payload, dict) and payload.get("status") == "error":
+        raise RuntimeError(
+            f"exec_sql failed: {payload.get('message')!r} "
+            f"(sqlstate={payload.get('sqlstate')!r})"
+        )
+    return list(payload or [])
 
 
 def _resolve_print_number(
@@ -160,7 +169,13 @@ def _write_primary_print(*, statement_id: int, print_id: int) -> None:
 
 
 def _process_joint(
-    *, row: dict, dry_run: bool, counts: dict[str, int], counts_lock: threading.Lock
+    *,
+    row: dict,
+    dry_run: bool,
+    counts: dict[str, int],
+    counts_lock: threading.Lock,
+    prompt_version: int,
+    prompt_sha256: str,
 ) -> None:
     """Pass 2 worker: LLM disambiguation for one joint-debate row."""
     statement_id = int(row["statement_id"])
@@ -175,6 +190,8 @@ def _process_joint(
             entity_id=str(statement_id),
             body_text=row.get("body_text") or "",
             prints_block=prints_block,
+            prompt_version=prompt_version,
+            prompt_sha256=prompt_sha256,
         )
     except Exception:
         logger.exception(f"LLM call failed for statement {statement_id}")
@@ -222,6 +239,14 @@ def backfill_primary_print(
     Returns counts: {single_print, joint_resolved, joint_null,
                      hallucinated, llm_error, total}
     """
+    if workers < 1:
+        raise ValueError(f"workers must be >= 1, got {workers}")
+
+    # Resolve the prompt ONCE so every Pass 2 LLM call records the same
+    # version+sha into model_runs (preserves audit reproducibility).
+    from supagraf.enrich.llm import _resolve_prompt
+    prompt = _resolve_prompt(PROMPT_NAME)
+
     rows = _fetch_candidates(term=term, sitting_min=sitting_min)
     if limit:
         rows = rows[:limit]
@@ -263,14 +288,21 @@ def backfill_primary_print(
                 dry_run=dry_run,
                 counts=counts,
                 counts_lock=counts_lock,
+                prompt_version=prompt.version,
+                prompt_sha256=prompt.sha256,
             )
             for row in joint_rows
         ]
         for fut in as_completed(futures):
             done += 1
             if done % 25 == 0:
+                # Snapshot under the same lock that workers mutate under;
+                # without it, dict() can race with concurrent increments
+                # and raise RuntimeError("dictionary changed size...").
+                with counts_lock:
+                    snapshot = dict(counts)
                 logger.info(
-                    f"  pass 2 progress {done}/{len(joint_rows)} — {dict(counts)}"
+                    f"  pass 2 progress {done}/{len(joint_rows)} — {snapshot}"
                 )
             try:
                 fut.result()

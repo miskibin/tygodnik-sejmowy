@@ -111,15 +111,23 @@ def cmd_backfill_statement_primary_print(
             picks the main subject. ~$0.001 per joint-debate statement.
     """
     from supagraf.enrich.statement_primary_print import backfill_primary_print
-    _print_counts(
-        "statement-primary-print",
-        backfill_primary_print(
-            term=term,
-            sitting_min=sitting_min,
-            dry_run=dry_run,
-            limit=limit,
-            workers=workers,
-        ),
+    counts = backfill_primary_print(
+        term=term,
+        sitting_min=sitting_min,
+        dry_run=dry_run,
+        limit=limit,
+        workers=workers,
+    )
+    # backfill_primary_print returns its own counter keys (single_print,
+    # joint_resolved, joint_null, ...) — don't reuse _print_counts which
+    # only knows inserted/updated/skipped and would log zeros.
+    print(
+        f"\nbackfill statement-primary-print: total={counts.get('total', 0)} "
+        f"single_print={counts.get('single_print', 0)} "
+        f"joint_resolved={counts.get('joint_resolved', 0)} "
+        f"joint_null={counts.get('joint_null', 0)} "
+        f"hallucinated={counts.get('hallucinated', 0)} "
+        f"llm_error={counts.get('llm_error', 0)}"
     )
 
 

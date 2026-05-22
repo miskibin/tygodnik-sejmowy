@@ -280,6 +280,10 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
         | { proceeding: { number: number | null } | null }
         | null;
     };
+    // Scope to THIS sitting at the SQL layer via the embedded-resource
+    // filter on proceedings.number — without it, the inner join still
+    // matches every sitting the print belongs to and over-fetches
+    // statements that the JS pass would just discard.
     const stmtRes = await sb
       .from("proceeding_statements")
       .select(
@@ -287,14 +291,12 @@ async function loadEventsBySitting(term: number, sittingNum: number): Promise<We
       )
       .in("primary_print_id", printIds)
       .eq("term", term)
+      .eq("proceeding_day.proceeding.number", sittingNum)
       .not("viral_quote", "is", null)
       .order("viral_score", { ascending: false, nullsFirst: false });
     if (stmtRes.error) throw stmtRes.error;
     const inSitting = ((stmtRes.data ?? []) as unknown as StmtRow[]).filter(
-      (r) =>
-        r.viral_quote &&
-        r.viral_quote.trim().length > 0 &&
-        r.proceeding_day?.proceeding?.number === sittingNum,
+      (r) => r.viral_quote && r.viral_quote.trim().length > 0,
     );
     // Pick top-1 per print (rows already sorted by viral_score desc).
     // Each statement has at most one primary_print_id so there's
