@@ -155,7 +155,7 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
             <VoteResultCard
               time={p.vote.time}
               result={p.vote.result}
-              subtitle={p.vote.subtitle}
+              subtitle={p.vote.topic ?? p.vote.subtitle}
               yes={p.vote.yes}
               no={p.vote.no}
               abstain={p.vote.abstain}
@@ -230,7 +230,7 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
             <VoteResultCard
               time={p.vote.time}
               result={p.vote.result}
-              subtitle={p.vote.subtitle}
+              subtitle={p.vote.topic ?? p.vote.subtitle}
               yes={p.vote.yes}
               no={p.vote.no}
               abstain={p.vote.abstain}

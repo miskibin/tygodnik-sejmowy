@@ -116,6 +116,7 @@ export function VotingHemicycleCard({
     <VoteResultCard
       time={formatTime(voting.date)}
       result={deriveVerdict(voting.yes, voting.no, voting.motion_polarity ?? null)}
+      subtitle={voting.topic ?? null}
       yes={voting.yes}
       no={voting.no}
       abstain={voting.abstain}
@@ -152,33 +153,6 @@ export function VotingHemicycleCard({
       >
         {primaryTitle}
       </CardTitle>
-
-      {voting.topic?.trim() && (
-        <div
-          className="font-serif italic"
-          style={{
-            fontSize: 13,
-            lineHeight: 1.45,
-            color: "var(--secondary-foreground)",
-            marginBottom: 12,
-          }}
-        >
-          <span
-            className="font-mono"
-            style={{
-              fontSize: 10,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "var(--muted-foreground)",
-              marginRight: 8,
-              fontStyle: "normal",
-            }}
-          >
-            pytanie:
-          </span>
-          „{voting.topic.trim()}”.
-        </div>
-      )}
 
       {linkedPrint?.impact_punch && (
         <DotyczyCallout>

@@ -181,6 +181,7 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
   const voteCard = item.voting ? (
     <VoteResultCard
       result={deriveVerdict(item.voting.yes, item.voting.no, item.voting.motionPolarity)}
+      subtitle={item.voting.topic}
       yes={item.voting.yes}
       no={item.voting.no}
       abstain={item.voting.abstain}
@@ -706,6 +707,7 @@ export function BriefList({
           majorityVotes: v.payload.majority_votes ?? null,
           motionPolarity: v.payload.motion_polarity ?? null,
           clubTally: v.payload.club_tally ?? [],
+          topic: v.payload.topic ?? null,
         };
       } else {
         unmerged.push(v);

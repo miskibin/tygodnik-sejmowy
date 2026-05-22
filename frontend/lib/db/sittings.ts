@@ -172,6 +172,7 @@ type VotingRow = {
   motion_polarity:
     | "pass" | "reject" | "amendment" | "minority" | "procedural" | "other" | null;
   short_title: string | null;
+  topic: string | null;
 };
 
 type VoteRow = {
@@ -279,6 +280,7 @@ function buildVote(v: VotingRow, voteRows: VoteRow[]): Vote {
     motionPolarity,
     byClub: Object.keys(byClub).length > 0 ? byClub : undefined,
     subtitle: v.short_title,
+    topic: v.topic,
   };
 }
 
@@ -354,7 +356,7 @@ async function loadSitting(
     sb
       .from("votings")
       .select(
-        "id, voting_number, date, title, yes, no, abstain, not_participating, majority_votes, motion_polarity, short_title",
+        "id, voting_number, date, title, yes, no, abstain, not_participating, majority_votes, motion_polarity, short_title, topic",
       )
       .eq("term", term)
       .eq("sitting", sittingNum)

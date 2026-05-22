@@ -86,6 +86,10 @@ export type BriefItem = {
     // Per-club tally for the right-side party-color bar in /tygodnik.
     // Attached from VoteEventPayload.club_tally at merge time.
     clubTally?: import("@/lib/events-types").ClubTallyRaw[];
+    // Motion question — "wniosek o odrzucenie projektu", "głosowanie
+    // nad całością projektu", "wniosek o skierowanie do Komisji", etc.
+    // Surfaces the vote kind on the editorial right-side card.
+    topic?: string | null;
   } | null;
 };
 
