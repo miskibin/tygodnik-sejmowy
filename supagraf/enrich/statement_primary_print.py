@@ -32,7 +32,9 @@ from __future__ import annotations
 
 import argparse
 import os
+import threading
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 from loguru import logger
@@ -157,17 +159,68 @@ def _write_primary_print(*, statement_id: int, print_id: int) -> None:
     ).eq("id", statement_id).execute()
 
 
+def _process_joint(
+    *, row: dict, dry_run: bool, counts: dict[str, int], counts_lock: threading.Lock
+) -> None:
+    """Pass 2 worker: LLM disambiguation for one joint-debate row."""
+    statement_id = int(row["statement_id"])
+    links: list[dict] = row["links"] or []
+    prints_block = "\n".join(
+        f"- druk {ln['number']}: \"{ln.get('short_title') or ln.get('title') or ''}\""
+        for ln in links
+    )
+    try:
+        parsed = _disambiguate_one(
+            entity_type="proceeding_statement",
+            entity_id=str(statement_id),
+            body_text=row.get("body_text") or "",
+            prints_block=prints_block,
+        )
+    except Exception:
+        logger.exception(f"LLM call failed for statement {statement_id}")
+        with counts_lock:
+            counts["llm_error"] += 1
+        return
+
+    if parsed.primary_print_number is None or parsed.confidence < 0.5:
+        with counts_lock:
+            counts["joint_null"] += 1
+        return
+
+    resolved = _resolve_print_number(
+        links=links, chosen_number=parsed.primary_print_number
+    )
+    if resolved is None:
+        with counts_lock:
+            counts["hallucinated"] += 1
+        logger.warning(
+            f"statement {statement_id}: LLM returned print "
+            f"{parsed.primary_print_number!r} not in candidate list"
+        )
+        return
+
+    with counts_lock:
+        counts["joint_resolved"] += 1
+    if not dry_run:
+        _write_primary_print(statement_id=statement_id, print_id=resolved)
+
+
 def backfill_primary_print(
     *,
     term: int = 10,
     sitting_min: int = 55,
     dry_run: bool = False,
     limit: int | None = None,
+    workers: int = 8,
 ) -> dict[str, int]:
     """Run two-pass attribution.
 
+    Pass 1 (deterministic) runs synchronously — cheap. Pass 2 (LLM
+    calls) parallelised across `workers` threads — each call is
+    I/O-bound on the deepseek HTTP roundtrip, ~10x speedup vs serial.
+
     Returns counts: {single_print, joint_resolved, joint_null,
-                     hallucinated, total}
+                     hallucinated, llm_error, total}
     """
     rows = _fetch_candidates(term=term, sitting_min=sitting_min)
     if limit:
@@ -175,56 +228,54 @@ def backfill_primary_print(
 
     counts: dict[str, int] = defaultdict(int)
     counts["total"] = len(rows)
+    counts_lock = threading.Lock()
     logger.info(f"primary_print backfill: {len(rows)} candidate statements")
 
-    for i, row in enumerate(rows, 1):
-        if i % 100 == 0:
-            logger.info(f"  progress {i}/{len(rows)} — {dict(counts)}")
-        statement_id = int(row["statement_id"])
+    # Pass 1 — deterministic. Single-print agenda items get assigned
+    # without any LLM call.
+    joint_rows: list[dict] = []
+    for row in rows:
         links: list[dict] = row["links"] or []
         if not links:
             continue
-        # Pass 1 — single-print agenda item.
         if len(links) == 1:
             counts["single_print"] += 1
             if not dry_run:
                 _write_primary_print(
-                    statement_id=statement_id,
+                    statement_id=int(row["statement_id"]),
                     print_id=int(links[0]["print_id"]),
                 )
-            continue
-        # Pass 2 — joint debate, LLM disambiguation.
-        prints_block = "\n".join(
-            f"- druk {ln['number']}: \"{ln.get('short_title') or ln.get('title') or ''}\""
-            for ln in links
-        )
-        try:
-            parsed = _disambiguate_one(
-                entity_type="proceeding_statement",
-                entity_id=str(statement_id),
-                body_text=row.get("body_text") or "",
-                prints_block=prints_block,
+        else:
+            joint_rows.append(row)
+
+    logger.info(
+        f"pass 1 done: {counts['single_print']} single-print writes; "
+        f"{len(joint_rows)} joint-debate statements queued for LLM"
+    )
+
+    # Pass 2 — LLM disambiguation, parallelised.
+    done = 0
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [
+            pool.submit(
+                _process_joint,
+                row=row,
+                dry_run=dry_run,
+                counts=counts,
+                counts_lock=counts_lock,
             )
-        except Exception:
-            logger.exception(f"LLM call failed for statement {statement_id}")
-            counts["llm_error"] += 1
-            continue
-        if parsed.primary_print_number is None or parsed.confidence < 0.5:
-            counts["joint_null"] += 1
-            continue
-        resolved = _resolve_print_number(
-            links=links, chosen_number=parsed.primary_print_number
-        )
-        if resolved is None:
-            counts["hallucinated"] += 1
-            logger.warning(
-                f"statement {statement_id}: LLM returned print "
-                f"{parsed.primary_print_number!r} not in candidate list"
-            )
-            continue
-        counts["joint_resolved"] += 1
-        if not dry_run:
-            _write_primary_print(statement_id=statement_id, print_id=resolved)
+            for row in joint_rows
+        ]
+        for fut in as_completed(futures):
+            done += 1
+            if done % 25 == 0:
+                logger.info(
+                    f"  pass 2 progress {done}/{len(joint_rows)} — {dict(counts)}"
+                )
+            try:
+                fut.result()
+            except Exception:
+                logger.exception("worker raised")
 
     logger.info(f"primary_print backfill done: {dict(counts)}")
     return dict(counts)
@@ -246,12 +297,19 @@ def main() -> None:
         default=None,
         help="Cap for testing; default = all candidates",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=8,
+        help="Parallel LLM workers in pass 2 (default 8)",
+    )
     args = parser.parse_args()
     backfill_primary_print(
         term=args.term,
         sitting_min=args.sitting_min,
         dry_run=args.dry_run,
         limit=args.limit,
+        workers=args.workers,
     )
 
 

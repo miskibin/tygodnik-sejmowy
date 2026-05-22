@@ -100,6 +100,9 @@ def cmd_backfill_statement_primary_print(
     ),
     dry_run: bool = typer.Option(False, "--dry-run"),
     limit: int = typer.Option(None, "--limit", help="Cap for testing"),
+    workers: int = typer.Option(
+        8, "--workers", help="Parallel LLM workers in pass 2 (default 8)"
+    ),
 ):
     """Attribute each statement to ONE specific print (primary_print_id).
 
@@ -111,7 +114,11 @@ def cmd_backfill_statement_primary_print(
     _print_counts(
         "statement-primary-print",
         backfill_primary_print(
-            term=term, sitting_min=sitting_min, dry_run=dry_run, limit=limit
+            term=term,
+            sitting_min=sitting_min,
+            dry_run=dry_run,
+            limit=limit,
+            workers=workers,
         ),
     )
 
