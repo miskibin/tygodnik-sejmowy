@@ -207,22 +207,30 @@ function ItemView({
       <StageBadge>{sponsorLabel}</StageBadge>
       {stageLabel && <StageBadge>{stageLabel}</StageBadge>}
       <PrintRef term={item.term} number={item.number} />
-      {statusBadge && (
-        <span
-          className="font-mono uppercase"
-          style={{
-            fontSize: 9.5,
-            color: "var(--muted-foreground)",
-            border: "1px dashed var(--border)",
-            padding: "3px 8px",
-            letterSpacing: "0.14em",
-          }}
-        >
-          {statusBadge}
-        </span>
-      )}
     </div>
   );
+
+  // Status pill rendered at the top of the body column when the print
+  // has no data yet — sits next to the title so it can't be missed.
+  // Uses warning amber for visual contrast vs the neutral stage badges
+  // above and the destructive-deep accent of editorial chrome.
+  const statusPill = statusBadge ? (
+    <div className="mb-3">
+      <span
+        className="font-mono uppercase inline-block"
+        style={{
+          fontSize: 10,
+          color: "var(--warning)",
+          border: "1px solid var(--warning)",
+          background: "color-mix(in srgb, var(--warning) 8%, transparent)",
+          padding: "3px 9px",
+          letterSpacing: "0.14em",
+        }}
+      >
+        {statusBadge}
+      </span>
+    </div>
+  ) : null;
 
   const links: FooterLink[] = [
     {
@@ -279,7 +287,7 @@ function ItemView({
       indexSize={64}
       indexColor={isStarted ? "var(--destructive)" : "var(--muted-foreground)"}
       pad="loose"
-      className={isStarted ? undefined : "opacity-60"}
+      className={isStarted ? undefined : "opacity-85"}
       kicker={stageBadges}
       asideExtra={asideExtra}
       meta={
@@ -290,6 +298,7 @@ function ItemView({
       }
       rightCard={rightCard}
     >
+      {statusPill}
       <CardTitle
         size={isFirst ? "hero" : "default"}
         href={`/proces/${item.term}/${item.number}`}
