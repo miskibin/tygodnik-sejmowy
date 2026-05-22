@@ -65,7 +65,7 @@ export function NumberedRow({
   // Grid layout stays 2-col (aside | body) on every breakpoint so the
   // main body keeps its full width regardless of whether a rightCard is
   // present. The card itself lives inside the body cell and only
-  // unmasks on xl as a floating sidebar — see comment below.
+  // unmasks at 2xl (≥1536 px) as a floating sidebar — see comment below.
   const gridCols = "grid-cols-1 md:grid-cols-[140px_1fr] xl:grid-cols-[180px_1fr]";
 
   const inner = (
