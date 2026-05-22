@@ -7,9 +7,9 @@ import Link from "next/link";
 import { MPAvatarPhoto } from "@/components/tygodnik/MPAvatar";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { TopicChips } from "@/components/tygodnik/atoms/TopicChips";
-import { ToneBadge } from "@/components/statement/ToneBadge";
-import type { AgendaPoint, SittingView, Tone, ViralQuote, Vote as VoteType } from "./types";
-import { TONE_INK, TONE_LABEL, verdictInk } from "./tokens";
+import { KLUB_COLORS, KLUB_LABELS } from "@/lib/atlas/constants";
+import type { AgendaPoint, Club, SittingView, ViralQuote, Vote as VoteType } from "./types";
+import { verdictInk } from "./tokens";
 import { Kicker, SectionHead } from "./SectionHead";
 
 type FilterId = "all" | "done" | "planned" | "vote" | "flagship";
@@ -75,25 +75,78 @@ function ProcessRef({ number, term }: { term: number; number: string }) {
   );
 }
 
-function ToneBar({ tones }: { tones: Partial<Record<Tone, number>> }) {
-  const sum = Object.values(tones).reduce<number>((s, v) => s + (v ?? 0), 0);
-  if (sum === 0) return null;
+// Fixed left-to-right ordering of clubs in the per-party voting bar.
+// Matches the editorial convention on the printed sitting report.
+const CLUB_ORDER: Club[] = [
+  "PiS",
+  "KO",
+  "Polska2050",
+  "PSL-TD",
+  "Lewica",
+  "Konfederacja",
+  "Konfederacja_KP",
+  "Razem",
+  "Republikanie",
+  "niez.",
+];
+
+function ClubResultBar({
+  byClub,
+}: {
+  byClub: NonNullable<VoteType["byClub"]>;
+}) {
+  type Entry = {
+    club: Club;
+    cb: { yes: number; no: number; abstain: number; absent: number };
+    total: number;
+  };
+  const entries: Entry[] = [];
+  for (const club of CLUB_ORDER) {
+    const cb = byClub[club];
+    if (!cb) continue;
+    const total = cb.yes + cb.no + cb.abstain + Math.max(0, cb.absent);
+    if (total === 0) continue;
+    entries.push({ club, cb, total });
+  }
+
+  const grandTotal = entries.reduce((s, e) => s + e.total, 0);
+  if (grandTotal === 0) return null;
+
   return (
-    <div className="mt-4">
+    <div className="mt-3">
       <div
         className="flex"
-        style={{ height: 8, background: "var(--secondary)", border: "1px solid var(--border)" }}
+        style={{ height: 10, border: "1px solid var(--border)" }}
         aria-hidden
       >
-        {Object.entries(tones).map(([k, v]) => (
+        {entries.map(({ club, cb, total }) => (
           <div
-            key={k}
+            key={club}
             style={{
-              width: `${((v ?? 0) / sum) * 100}%`,
-              background: TONE_INK[k as Tone],
+              width: `${(total / grandTotal) * 100}%`,
+              background: KLUB_COLORS[club] ?? "var(--muted-foreground)",
             }}
-            title={`${TONE_LABEL[k as Tone]}: ${v}`}
+            title={`${club}: ZA ${cb.yes}, PR ${cb.no}, WS ${cb.abstain}`}
           />
+        ))}
+      </div>
+      <div className="flex mt-1">
+        {entries.map(({ club, total }) => (
+          <div
+            key={club}
+            className="font-mono"
+            style={{
+              width: `${(total / grandTotal) * 100}%`,
+              fontSize: 9,
+              color: "var(--secondary-foreground)",
+              letterSpacing: "0.06em",
+              textAlign: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {KLUB_LABELS[club] ?? club}
+          </div>
         ))}
       </div>
     </div>
@@ -154,34 +207,7 @@ function VoteMini({ v }: { v: VoteType }) {
         <div style={{ width: `${(v.absent / 460) * 100}%`, background: "var(--border)" }} />
       </div>
 
-      {v.byClub && (
-        <div className="mt-3 grid gap-1.5" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-          {Object.entries(v.byClub).map(([club, cb]) => {
-            if (!cb) return null;
-            const total = (cb.yes + cb.no + cb.abstain + Math.max(0, cb.absent)) || 1;
-            return (
-              <div key={club} title={`${club}: ZA ${cb.yes}, PR ${cb.no}, WS ${cb.abstain}`}>
-                <div
-                  className="font-mono"
-                  style={{
-                    fontSize: 8.5,
-                    color: "var(--secondary-foreground)",
-                    fontWeight: 700,
-                    marginBottom: 2,
-                  }}
-                >
-                  {club.slice(0, 4)}
-                </div>
-                <div className="flex" style={{ height: 4 }} aria-hidden>
-                  <div style={{ width: `${(cb.yes / total) * 100}%`, background: "var(--success)" }} />
-                  <div style={{ width: `${(cb.no / total) * 100}%`, background: "var(--destructive)" }} />
-                  <div style={{ width: `${(cb.abstain / total) * 100}%`, background: "var(--warning)" }} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {v.byClub && <ClubResultBar byClub={v.byClub} />}
 
       <div
         className="mt-3 font-mono uppercase"
@@ -198,6 +224,10 @@ function VoteMini({ v }: { v: VoteType }) {
 }
 
 function QuoteMini({ q }: { q: ViralQuote }) {
+  // ViralQuote.reason carries free-form text like "controversy score 0.71".
+  // Surface the numeric score in the kicker when present.
+  const viralMatch = q.reason?.match(/(\d+\.\d+)/);
+  const viralScore = viralMatch ? viralMatch[1] : null;
   return (
     <div
       style={{
@@ -206,7 +236,9 @@ function QuoteMini({ q }: { q: ViralQuote }) {
         background: "var(--secondary)",
       }}
     >
-      <Kicker className="mb-2">cytat punktu</Kicker>
+      <Kicker className="mb-2">
+        cytat punktu{viralScore ? ` · viral ${viralScore}` : ""}
+      </Kicker>
       <p
         className="font-serif italic m-0 mb-2.5"
         style={{
@@ -506,7 +538,6 @@ function AgendaCenter({ p }: { p: AgendaPoint }) {
         </div>
       )}
 
-      {!p.planned && <ToneBar tones={p.tones} />}
     </div>
   );
 }

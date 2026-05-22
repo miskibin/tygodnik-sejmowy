@@ -198,6 +198,12 @@ type AgendaItemProcessRow = {
   process_id: string;
 };
 
+type ProcessStageRow = {
+  term: number;
+  process_id: string;
+  stage_name: string | null;
+};
+
 type MpRow = { mp_id: number; photo_url: string | null };
 type MembershipRow = { mp_id: number; club_id: string };
 
@@ -392,7 +398,14 @@ async function loadSitting(
     ]),
   );
 
-  const [votesRes, linksRes, mpsRes, memRes] = await Promise.all([
+  const processIdsForStages = Array.from(
+    new Set(agendaProcesses.map((p) => p.process_id)),
+  );
+  const processTermsForStages = Array.from(
+    new Set(agendaProcesses.map((p) => p.term)),
+  );
+
+  const [votesRes, linksRes, mpsRes, memRes, stagesRes] = await Promise.all([
     votingIds.length > 0
       ? sb
           .from("votes")
@@ -419,16 +432,25 @@ async function loadSitting(
           .eq("term", term)
           .in("mp_id", mpIds)
       : Promise.resolve({ data: [] as MembershipRow[], error: null }),
+    processIdsForStages.length > 0
+      ? sb
+          .from("process_stages")
+          .select("term, process_id, stage_name")
+          .in("term", processTermsForStages)
+          .in("process_id", processIdsForStages)
+      : Promise.resolve({ data: [] as ProcessStageRow[], error: null }),
   ]);
   if (votesRes.error) throw votesRes.error;
   if (linksRes.error) throw linksRes.error;
   if (mpsRes.error) throw mpsRes.error;
   if (memRes.error) throw memRes.error;
+  if (stagesRes.error) throw stagesRes.error;
 
   const votes = (votesRes.data ?? []) as VoteRow[];
   const links = (linksRes.data ?? []) as StatementPrintLinkRow[];
   const mpRows = (mpsRes.data ?? []) as MpRow[];
   const memRows = (memRes.data ?? []) as MembershipRow[];
+  const stageRows = (stagesRes.data ?? []) as ProcessStageRow[];
 
   const mpPhotos = new Map<number, string | null>();
   for (const m of mpRows) mpPhotos.set(m.mp_id, m.photo_url);
@@ -527,6 +549,23 @@ async function loadSitting(
     const list = processesByAgendaId.get(p.agenda_item_id) ?? [];
     list.push({ term: p.term, number: p.process_id });
     processesByAgendaId.set(p.agenda_item_id, list);
+  }
+
+  // Highest reached czytanie (I/II/III) per process, extracted from
+  // process_stages.stage_name. The Sejm API returns full Polish prose
+  // ("I czytanie na posiedzeniu Sejmu", "III czytanie w komisjach", ...).
+  // We surface the ordinal as a stage badge on the agenda row.
+  const CZYTANIE_RE = /\b(I{1,3})\s+czytanie\b/i;
+  const czytanieByProcess = new Map<string, 1 | 2 | 3>();
+  for (const s of stageRows) {
+    if (!s.stage_name) continue;
+    const m = s.stage_name.match(CZYTANIE_RE);
+    if (!m) continue;
+    const roman = m[1].toUpperCase();
+    const ord: 1 | 2 | 3 = roman === "III" ? 3 : roman === "II" ? 2 : 1;
+    const key = `${s.term}:${s.process_id}`;
+    const prev = czytanieByProcess.get(key) ?? 0;
+    if (ord > prev) czytanieByProcess.set(key, ord);
   }
 
   // Votings grouped by their Pkt-ord.
@@ -652,6 +691,21 @@ async function loadSitting(
       && new Date(earliestStart).getTime() <= now
       && new Date(latestEnd).getTime() >= now;
 
+    // Stage badges: highest czytanie across linked processes, plus
+    // GŁOSOWANIE whenever a primary voting is attached.
+    const linkedProcesses = processesByAgendaId.get(a.id) ?? [];
+    let maxCzytanie: 1 | 2 | 3 | 0 = 0;
+    for (const proc of linkedProcesses) {
+      const ord = czytanieByProcess.get(`${proc.term}:${proc.number}`) ?? 0;
+      if (ord > maxCzytanie) maxCzytanie = ord as 1 | 2 | 3;
+    }
+    const stages: string[] = [];
+    if (maxCzytanie > 0) {
+      const roman = maxCzytanie === 3 ? "III" : maxCzytanie === 2 ? "II" : "I";
+      stages.push(`${roman} CZYTANIE`);
+    }
+    if (vote) stages.push("GŁOSOWANIE");
+
     return {
       ord: a.ord,
       date: pointDate,
@@ -661,7 +715,7 @@ async function loadSitting(
       title: a.title,
       shortTitle: shortenTitle(a.title),
       plainSummary: "",
-      stages: [],
+      stages,
       prints: printsByAgendaId.get(a.id) ?? [],
       processes: processesByAgendaId.get(a.id) ?? [],
       stats: {
