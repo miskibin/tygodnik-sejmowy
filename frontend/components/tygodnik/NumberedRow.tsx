@@ -62,11 +62,11 @@ export function NumberedRow({
   const linkClass =
     `block ${padClass} border-b border-border transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-destructive ${className ?? ""}`.trim();
 
-  // 2-col when there's no right card; promote to 3-col when an editorial
-  // sidebar (vote/quote summary) needs to sit next to the body on desktop.
-  const gridCols = rightCard
-    ? "grid-cols-1 md:grid-cols-[140px_1fr_320px] xl:grid-cols-[180px_1fr_360px]"
-    : "grid-cols-1 md:grid-cols-[140px_1fr] xl:grid-cols-[180px_1fr]";
+  // Grid layout stays 2-col (aside | body) on every breakpoint so the
+  // main body keeps its full width regardless of whether a rightCard is
+  // present. The card itself lives inside the body cell and only
+  // unmasks on xl as a floating sidebar — see comment below.
+  const gridCols = "grid-cols-1 md:grid-cols-[140px_1fr] xl:grid-cols-[180px_1fr]";
 
   const inner = (
     <div className={`grid gap-4 md:gap-8 ${gridCols}`}>
@@ -93,8 +93,19 @@ export function NumberedRow({
           )}
         </div>
       </aside>
-      <div className={rightCard ? "min-w-0" : "min-w-0 max-w-[820px]"}>{children}</div>
-      {rightCard && <div className="min-w-0">{rightCard}</div>}
+      <div className="min-w-0 2xl:flex 2xl:items-start 2xl:gap-8">
+        {/* Body content keeps its long-form max-width so the prose
+            column doesn't dilate when a sidebar appears next to it. */}
+        <div className="min-w-0 max-w-[820px] 2xl:flex-1">{children}</div>
+        {/* Sidebar (vote/quote summary): only on 2xl desktops (≥1536px)
+            so the main column never has to shrink to host it.
+            Container widens at 2xl too — see BriefList sections wrap. */}
+        {rightCard && (
+          <div className="hidden 2xl:block 2xl:w-[320px] 2xl:shrink-0">
+            {rightCard}
+          </div>
+        )}
+      </div>
     </div>
   );
 
