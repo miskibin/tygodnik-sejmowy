@@ -118,9 +118,52 @@ function kpiSlotsForPrint(item: BriefItem): KpiSlot[] {
   return slots;
 }
 
-function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; personas: PersonaId[] }) {
+// Today as YYYY-MM-DD in local time — string-comparable with sitting
+// dates which arrive as date-only strings. Computed once per render
+// outside the component so SSR + client agree on the same boundary.
+function todayIsoDate(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+type PrintStatus = "started" | "future" | "data_pending";
+
+function pointStatus(item: BriefItem, sitting: SittingInfo, today: string): PrintStatus {
+  if (item.voting || item.topQuote) return "started";
+  // Sitting is in the future or still ongoing — point hasn't been
+  // debated yet.
+  if (today <= sitting.lastDate) return "future";
+  // Sitting wrapped up but data hasn't surfaced — likely lag from the
+  // Sejm transcripts ingest.
+  return "data_pending";
+}
+
+function ItemView({
+  item,
+  idx,
+  personas,
+  sitting,
+  today,
+}: {
+  item: BriefItem;
+  idx: number;
+  personas: PersonaId[];
+  sitting: SittingInfo;
+  today: string;
+}) {
   const [expanded, setExpanded] = useState(idx === 0);
   const isFirst = idx === 0;
+  const status = pointStatus(item, sitting, today);
+  const isStarted = status === "started";
+  const statusBadge =
+    status === "future"
+      ? "OBRADY NIE ROZPOCZĘTE"
+      : status === "data_pending"
+        ? "DANE DOSTĘPNE WKRÓTCE"
+        : null;
   const matchedPersonas = item.personas.filter((p) => personas.includes(p));
 
   const personaPills = matchedPersonas.length > 0 ? (
@@ -164,6 +207,20 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       <StageBadge>{sponsorLabel}</StageBadge>
       {stageLabel && <StageBadge>{stageLabel}</StageBadge>}
       <PrintRef term={item.term} number={item.number} />
+      {statusBadge && (
+        <span
+          className="font-mono uppercase"
+          style={{
+            fontSize: 9.5,
+            color: "var(--muted-foreground)",
+            border: "1px dashed var(--border)",
+            padding: "3px 8px",
+            letterSpacing: "0.14em",
+          }}
+        >
+          {statusBadge}
+        </span>
+      )}
     </div>
   );
 
@@ -220,8 +277,9 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
     <NumberedRow
       idx={idx}
       indexSize={64}
-      indexColor="var(--destructive)"
+      indexColor={isStarted ? "var(--destructive)" : "var(--muted-foreground)"}
       pad="loose"
+      className={isStarted ? undefined : "opacity-60"}
       kicker={stageBadges}
       asideExtra={asideExtra}
       meta={
@@ -683,6 +741,10 @@ export function BriefList({
 }) {
   const { personas, topics, hydrated } = useProfile();
   const [showAll, setShowAll] = useState(false);
+  // Computed once per render — drives the "OBRADY NIE ROZPOCZĘTE" vs
+  // "DANE DOSTĘPNE WKRÓTCE" badge logic on print rows that have no
+  // voting and no top quote yet.
+  const today = useMemo(() => todayIsoDate(), []);
 
   const partitioned = useMemo(() => partitionEvents(events), [events]);
 
@@ -853,7 +915,7 @@ export function BriefList({
             <ul role="list" className="contents">
               {filteredPrints.map((it, i) => (
                 <li key={it.id} className="contents">
-                  <ItemView item={it} idx={i} personas={personas} />
+                  <ItemView item={it} idx={i} personas={personas} sitting={sitting} today={today} />
                 </li>
               ))}
             </ul>
