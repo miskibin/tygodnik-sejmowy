@@ -28,7 +28,6 @@ import {
   DotyczyCallout,
   KpiStrip,
   FooterLinks,
-  AffectedGroups,
   CitizenAction,
   EliTimelineStrip,
   DelayStamp,
@@ -138,6 +137,17 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
     </div>
   ) : null;
 
+  // Topic chips live under the index (aside) on /tygodnik — frees the main
+  // column for the title + summary. Render below persona pills.
+  const asideExtra = (
+    <>
+      {personaPills}
+      {item.topics.length > 0 && (
+        <TopicChips topicIds={item.topics} size="sm" className="mb-3" />
+      )}
+    </>
+  );
+
   // Editorial stage badges shown in the kicker slot of NumberedRow.
   // Sponsor authority badge already encodes the project's kind
   // ("PROJEKT RZĄDOWY") so no separate "NOWY PROJEKT" tag, and no
@@ -213,7 +223,7 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       indexColor="var(--destructive)"
       pad="loose"
       kicker={stageBadges}
-      asideExtra={personaPills}
+      asideExtra={asideExtra}
       meta={
         <>
           <div>kadencja <span className="text-foreground">{item.term}</span></div>
@@ -256,8 +266,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
         </details>
       )}
 
-      <TopicChips topicIds={item.topics} className="mb-3" />
-
       <ProcessStageBar
         currentStageType={item.currentStageType}
         processPassed={item.processPassed}
@@ -277,8 +285,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
           <CitationText term={item.term}>{item.summaryPlain}</CitationText>
         </p>
       )}
-
-      {expanded && <AffectedGroups groups={item.affectedGroups} />}
 
       <CitizenAction text={item.citizenAction} />
 
