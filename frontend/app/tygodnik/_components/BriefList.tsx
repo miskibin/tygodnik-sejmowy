@@ -33,12 +33,55 @@ import {
   CitizenAction,
   EliTimelineStrip,
   DelayStamp,
-  VoteResultBar,
   type KpiSlot,
   TopicChips,
   type FooterLink,
+  StageBadge,
+  PrintRef,
+  VoteResultCard,
+  type VoteResultKind,
+  SectionHead,
 } from "@/components/tygodnik/atoms";
+import { STAGE_TYPE_LABEL } from "@/lib/stages";
+import type { SponsorAuthority } from "@/lib/db/prints";
 import { FilterBar } from "./FilterBar";
+
+// Polish uppercase labels for the sponsor-authority stage badge on print cards.
+const SPONSOR_BADGE_LABEL: Record<NonNullable<SponsorAuthority>, string> = {
+  rzad: "RZĄD",
+  prezydent: "PREZYDENT",
+  klub_poselski: "KLUB",
+  senat: "SENAT",
+  komisja: "KOMISJA",
+  prezydium: "PREZYDIUM",
+  obywatele: "OBYWATELE",
+  inne: "INNE",
+};
+
+// Polish motion-polarity labels for the right-side editorial vote card —
+// procedural → "WNIOSEK FORMALNY", reject → "WNIOSEK O ODRZUCENIE", etc.
+const MOTION_BADGE_LABEL: Record<string, string> = {
+  procedural: "WNIOSEK FORMALNY",
+  amendment: "POPRAWKA",
+  reject: "WNIOSEK O ODRZUCENIE",
+  minority: "WNIOSEK MNIEJSZOŚCI",
+};
+
+// Derive the verdict label shown on the right-side VoteResultCard. The
+// print/vote payload only carries yes/no/abstain counts + motionPolarity,
+// not the final verdict text — compute it the same way the dedicated
+// glosowanie page does.
+function deriveVerdict(
+  yes: number,
+  no: number,
+  motionPolarity?: string | null,
+): VoteResultKind {
+  const passed = yes > no;
+  if (motionPolarity === "procedural") {
+    return passed ? "WNIOSEK PRZYJĘTY" : "WNIOSEK ODRZUCONY";
+  }
+  return passed ? "PRZYJĘTA" : "ODRZUCONA";
+}
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
@@ -58,12 +101,6 @@ function formatDateRange(first: string, last: string): string {
   }
   const firstFmt = f.toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
   return `${firstFmt} – ${lastFmt}`;
-}
-
-// Section label = first matched persona's category. Same logic as before;
-// only relevant for print events.
-function inferSection(personas: PersonaId[]): string | null {
-  return personas[0] ? PERSONAS[personas[0]].section : null;
 }
 
 // Build a KpiSlot list for a print: bottom-line = highest-severity affected
@@ -93,8 +130,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
   const [expanded, setExpanded] = useState(idx === 0);
   const isFirst = idx === 0;
   const matchedPersonas = item.personas.filter((p) => personas.includes(p));
-  const sectionLabel = inferSection(item.personas);
-  const sectionColor = item.personas[0] ? PERSONAS[item.personas[0]].color : "var(--destructive)";
 
   const personaPills = matchedPersonas.length > 0 ? (
     <div className="flex flex-wrap gap-1 mb-3">
@@ -109,6 +144,24 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
       ))}
     </div>
   ) : null;
+
+  // Editorial stage badges shown in the kicker slot of NumberedRow.
+  // Order mirrors the reference screenshot: type → sponsor → process
+  // stage → outlined druk reference.
+  const sponsorLabel = item.sponsorAuthority
+    ? SPONSOR_BADGE_LABEL[item.sponsorAuthority]
+    : null;
+  const stageLabel = item.currentStageType
+    ? (STAGE_TYPE_LABEL[item.currentStageType] ?? item.currentStageType).toUpperCase()
+    : null;
+  const stageBadges = (
+    <div className="flex gap-1.5 flex-wrap items-center">
+      <StageBadge>NOWY PROJEKT</StageBadge>
+      {sponsorLabel && <StageBadge>{sponsorLabel}</StageBadge>}
+      {stageLabel && <StageBadge>{stageLabel}</StageBadge>}
+      <PrintRef term={item.term} number={item.number} />
+    </div>
+  );
 
   const links: FooterLink[] = [
     {
@@ -125,25 +178,35 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
     });
   }
 
+  const voteCard = item.voting ? (
+    <VoteResultCard
+      result={deriveVerdict(item.voting.yes, item.voting.no, item.voting.motionPolarity)}
+      yes={item.voting.yes}
+      no={item.voting.no}
+      abstain={item.voting.abstain}
+      absent={item.voting.notParticipating}
+      margin={Math.abs(item.voting.yes - item.voting.no)}
+      motionPolarity={item.voting.motionPolarity}
+      clubTally={item.voting.clubTally}
+      detailHref={`/glosowanie/${item.voting.votingId}`}
+    />
+  ) : undefined;
+
   return (
     <NumberedRow
       idx={idx}
       indexSize={64}
       indexColor="var(--destructive)"
       pad="loose"
-      kicker={
-        sectionLabel ? (
-          <span style={{ color: sectionColor }}>{sectionLabel}</span>
-        ) : null
-      }
+      kicker={stageBadges}
       asideExtra={personaPills}
       meta={
         <>
-          <div>druk <span className="text-foreground">{item.number}</span></div>
           <div>kadencja <span className="text-foreground">{item.term}</span></div>
           <div className="mt-1">{formatDate(item.changeDate)}</div>
         </>
       }
+      rightCard={voteCard}
     >
       <CardTitle
         size={isFirst ? "hero" : "default"}
@@ -174,8 +237,6 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
         “<CitationText term={item.term}>{item.impactPunch}</CitationText>”
       </DotyczyCallout>
 
-      {item.voting && <VoteResultBar result={item.voting} />}
-
       <KpiStrip slots={kpiSlotsForPrint(item)} />
 
       {expanded && item.summaryPlain && (
@@ -197,19 +258,32 @@ function ItemView({ item, idx, personas }: { item: BriefItem; idx: number; perso
 }
 
 // ---------- Section chrome ----------
+//
+// Roman-numeral editorial header — mirrors the chrome used on
+// /posiedzenie/[number]. Section numbers are static (I…VI) so empty
+// sections leave gaps rather than shifting numbering across the feed,
+// matching the printed-volume convention.
+//
+// I — Nowe projekty
+// II — Pozostałe głosowania
+// III — Wchodzi w życie
+// IV — Aktualizacje prawa (feature-flagged)
+// V — Opóźnione odpowiedzi ministrów
+// VI — Powiedziane w Sejmie
 
-function SectionHeader({ icon, label, count }: { icon: string; label: string; count: number }) {
+function SectionHeader({
+  num,
+  label,
+  count,
+}: {
+  num: number;
+  label: string;
+  count: number;
+}) {
+  const sub = `${count} ${count === 1 ? "pozycja" : count < 5 ? "pozycje" : "pozycji"}`;
   return (
-    <div className="border-t border-rule pt-4 md:pt-8 pb-2 px-1">
-      <div className="flex items-baseline gap-3">
-        <span className="text-[18px] md:text-[22px]" style={{ color: "var(--destructive)" }}>{icon}</span>
-        <h3 className="font-mono text-[10.5px] md:text-[11px] tracking-[0.18em] uppercase text-foreground m-0">
-          {label}
-        </h3>
-        <span className="font-mono text-[10px] text-muted-foreground ml-auto">
-          {count}
-        </span>
-      </div>
+    <div className="pt-4 md:pt-8">
+      <SectionHead num={num} title={label} sub={sub} />
     </div>
   );
 }
@@ -291,7 +365,7 @@ function EliInforceSections({
   if (!flagOn) {
     return (
       <>
-        <SectionHeader icon="⏱" label="Wchodzi w życie" count={events.length} />
+        <SectionHeader num={3} label="Wchodzi w życie" count={events.length} />
         {events.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
       </>
     );
@@ -309,13 +383,13 @@ function EliInforceSections({
     <>
       {newLaw.length > 0 && (
         <>
-          <SectionHeader icon="⏱" label="Wchodzi w życie" count={newLaw.length} />
+          <SectionHeader num={3} label="Wchodzi w życie" count={newLaw.length} />
           {newLaw.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
         </>
       )}
       {updates.length > 0 && (
         <>
-          <SectionHeader icon="📎" label="Aktualizacje prawa" count={updates.length} />
+          <SectionHeader num={4} label="Aktualizacje prawa" count={updates.length} />
           {updates.map((ev, i) => <EliCard key={ev.payload.act_id} ev={ev} idx={i} />)}
         </>
       )}
@@ -412,11 +486,20 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
       )
     : null;
 
+  const toneLabel = s.tone?.trim().toUpperCase();
+  const kicker = (
+    <div className="flex gap-1.5 flex-wrap items-center">
+      <StageBadge>CYTAT</StageBadge>
+      {toneLabel && <StageBadge>{toneLabel}</StageBadge>}
+    </div>
+  );
+
   return (
     <NumberedRow
       idx={idx}
       pad="loose"
       showOrdinal={false}
+      kicker={kicker}
       asideExtra={
         <div className="mb-2 w-full min-w-0">
           <MPAvatar
@@ -600,6 +683,7 @@ export function BriefList({
           notParticipating: v.payload.not_participating,
           majorityVotes: v.payload.majority_votes ?? null,
           motionPolarity: v.payload.motion_polarity ?? null,
+          clubTally: v.payload.club_tally ?? [],
         };
       } else {
         unmerged.push(v);
@@ -737,7 +821,7 @@ export function BriefList({
       <div className="px-4 md:px-8 lg:px-14 max-w-[1240px] mx-auto">
         {filteredPrints.length > 0 && (
           <>
-            <SectionHeader icon="📜" label="Nowe projekty" count={filteredPrints.length} />
+            <SectionHeader num={1} label="Nowe projekty" count={filteredPrints.length} />
             <ul role="list" className="contents">
               {filteredPrints.map((it, i) => (
                 <li key={it.id} className="contents">
@@ -761,7 +845,7 @@ export function BriefList({
 
         {unmergedVotes.length > 0 && (
           <>
-            <SectionHeader icon="⚖" label="Pozostałe głosowania" count={unmergedVotes.length} />
+            <SectionHeader num={2} label="Pozostałe głosowania" count={unmergedVotes.length} />
             <ul role="list" className="contents">
               {unmergedVotes.map((ev, i) => (
                 <li key={ev.payload.voting_id} className="contents">
@@ -798,7 +882,7 @@ export function BriefList({
 
         {partitioned.lateInterpellations.length > 0 && (
           <>
-            <SectionHeader icon="🔥" label="Opóźnione odpowiedzi ministrów" count={partitioned.lateInterpellations.length} />
+            <SectionHeader num={5} label="Opóźnione odpowiedzi ministrów" count={partitioned.lateInterpellations.length} />
             <ul role="list" className="contents">
               {partitioned.lateInterpellations.map((ev, i) => (
                 <li key={ev.payload.question_id} className="contents">
@@ -811,7 +895,7 @@ export function BriefList({
 
         {partitioned.viralQuotes.length > 0 && (
           <>
-            <SectionHeader icon="📺" label="Powiedziane w Sejmie" count={partitioned.viralQuotes.length} />
+            <SectionHeader num={6} label="Powiedziane w Sejmie" count={partitioned.viralQuotes.length} />
             <ul role="list" className="contents">
               {partitioned.viralQuotes.map((ev, i) => (
                 <li key={ev.payload.statement_id} className="contents">

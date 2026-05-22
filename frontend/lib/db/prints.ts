@@ -83,6 +83,9 @@ export type BriefItem = {
     // Optional semantics for verdict labeling in compact vote bars.
     majorityVotes?: number | null;
     motionPolarity?: import("@/lib/promiseAlignment").MotionPolarity | null;
+    // Per-club tally for the right-side party-color bar in /tygodnik.
+    // Attached from VoteEventPayload.club_tally at merge time.
+    clubTally?: import("@/lib/events-types").ClubTallyRaw[];
   } | null;
 };
 

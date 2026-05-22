@@ -31,6 +31,9 @@ export type NumberedRowProps = {
   pad?: "default" | "loose";
   /** When false, hide the large left ordinal (e.g. viral quote rows). */
   showOrdinal?: boolean;
+  /** Optional 320-360px sidebar card to the right of body (desktop). On
+   *  mobile it stacks below body. Used for the editorial vote/quote card. */
+  rightCard?: ReactNode;
 };
 
 const PAD = {
@@ -51,6 +54,7 @@ export function NumberedRow({
   className,
   pad = "default",
   showOrdinal = true,
+  rightCard,
 }: NumberedRowProps) {
   const padClass = PAD[pad];
   const wrapperClass =
@@ -58,8 +62,14 @@ export function NumberedRow({
   const linkClass =
     `block ${padClass} border-b border-border transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-destructive ${className ?? ""}`.trim();
 
+  // 2-col when there's no right card; promote to 3-col when an editorial
+  // sidebar (vote/quote summary) needs to sit next to the body on desktop.
+  const gridCols = rightCard
+    ? "grid-cols-1 md:grid-cols-[140px_1fr_320px] xl:grid-cols-[180px_1fr_360px]"
+    : "grid-cols-1 md:grid-cols-[140px_1fr] xl:grid-cols-[180px_1fr]";
+
   const inner = (
-    <div className="grid gap-4 md:gap-8 grid-cols-1 md:grid-cols-[140px_1fr] xl:grid-cols-[180px_1fr]">
+    <div className={`grid gap-4 md:gap-8 ${gridCols}`}>
       <aside className="min-w-0 font-sans text-[11px] text-muted-foreground tracking-wide flex md:block items-start gap-4">
         {showOrdinal && (
           <div
@@ -83,7 +93,8 @@ export function NumberedRow({
           )}
         </div>
       </aside>
-      <div className="min-w-0 max-w-[820px]">{children}</div>
+      <div className={rightCard ? "min-w-0" : "min-w-0 max-w-[820px]"}>{children}</div>
+      {rightCard && <div className="min-w-0">{rightCard}</div>}
     </div>
   );
 
