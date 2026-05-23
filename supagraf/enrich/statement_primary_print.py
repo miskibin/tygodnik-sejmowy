@@ -1,0 +1,349 @@
+"""Attribute each proceeding_statement to ONE specific print.
+
+Distinct from statement_print_links (many-to-many catalogue of every
+draft a speech references). This module picks the SINGLE draft the
+speech actually debates, persisted as proceeding_statements.primary_print_id
+(migration 0103). Powers:
+
+  * /tygodnik print top_quote — no greedy dedup needed; each statement
+    is naturally claimed by exactly one print.
+  * /proces/[term]/[number] — "all wypowiedzi z dyskusji o TEJ ustawie"
+    filtered by primary_print_id without joins.
+
+Two-pass strategy (skipped LLM where deterministic):
+
+  Pass 1 — single-print agenda items: a statement linked via
+  statement_print_links(source='agenda_item') to one and only one
+  print → that print is assigned outright. No LLM cost. Covers ~30 %
+  of agenda-linked statements (sample: 3255 / 10463 term 10).
+
+  Pass 2 — joint debates: the same statement linked to 2+ prints via
+  source='agenda_item' (joint sprawozdania, projekt + autopoprawka,
+  rival drafts in one point). Call deepseek-flash with the prints'
+  titles + statement body and have it pick the main subject.
+  Returning null is OK — surfaces as "could not attribute".
+
+NULL primary_print_id stays when:
+  * statement has no source='agenda_item' link (procedural / Marshal /
+    pure-debate agenda items without a druk)
+  * LLM in pass 2 returns null (couldn't decide)
+"""
+from __future__ import annotations
+
+import argparse
+import os
+import threading
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Optional
+
+from loguru import logger
+from pydantic import BaseModel, ConfigDict, Field
+
+from supagraf.db import supabase
+from supagraf.enrich import LLM_MODELS
+from supagraf.enrich.audit import with_model_run
+from supagraf.enrich.llm import call_structured
+
+JOB_NAME = "statement_primary_print"
+PROMPT_NAME = "statement_primary_print"
+
+MAX_INPUT_CHARS = 4000
+
+PRIMARY_PRINT_LLM_MODEL = os.environ.get(
+    "SUPAGRAF_PRIMARY_PRINT_LLM_MODEL", LLM_MODELS["flash"]
+)
+
+
+class PrimaryPrintOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    primary_print_number: Optional[str] = Field(default=None)
+    confidence: float = Field(ge=0.0, le=1.0, default=0.0)
+    reason: str = Field(default="", max_length=200)
+
+
+@with_model_run(
+    fn_name=JOB_NAME,
+    model=PRIMARY_PRINT_LLM_MODEL,
+    entity_type_arg="entity_type",
+    entity_id_arg="entity_id",
+    prompt_version_arg="prompt_version",
+    prompt_sha256_arg="prompt_sha256",
+)
+def _disambiguate_one(
+    *,
+    entity_type: str,
+    entity_id: str,
+    body_text: str,
+    prints_block: str,
+    prompt_version: int | None = None,
+    prompt_sha256: str | None = None,
+    llm_model: str = PRIMARY_PRINT_LLM_MODEL,
+    model_run_id: int | None = None,
+) -> PrimaryPrintOutput:
+    """LLM call for ONE statement in a joint debate.
+
+    `prints_block` is the formatted list of candidate prints (number +
+    short_title) the speaker is choosing from; the body text is the
+    speech itself (truncated to MAX_INPUT_CHARS).
+    """
+    user_input = f"DRUKI OMAWIANE W PUNKCIE:\n{prints_block}\n\nWYPOWIEDŹ:\n{body_text[:MAX_INPUT_CHARS]}"
+    call = call_structured(
+        model=llm_model,
+        prompt_name=PROMPT_NAME,
+        user_input=user_input,
+        output_model=PrimaryPrintOutput,
+        prompt_version=prompt_version,
+    )
+    return call.parsed  # type: ignore[return-value]
+
+
+def _fetch_candidates(
+    *, term: int, sitting_min: int
+) -> list[dict]:
+    """Pull every term-10 statement in sittings >= sitting_min along
+    with its agenda_item-source linked prints. One row per statement
+    with `links` list aggregated.
+
+    Uses exec_sql RPC to bypass PostgREST's per-request row limit; the
+    aggregate keeps the result set small (one row per statement).
+    """
+    sb = supabase()
+    sql = """
+        select ps.id as statement_id,
+               ps.body_text,
+               array_agg(jsonb_build_object(
+                 'print_id', p.id,
+                 'number', p.number,
+                 'short_title', p.short_title,
+                 'title', p.title
+               ) order by p.number) as links
+        from proceeding_statements ps
+        join proceeding_days pd on pd.id = ps.proceeding_day_id
+        join proceedings pc     on pc.id = pd.proceeding_id
+        join statement_print_links spl on spl.statement_id = ps.id
+        join prints p on p.id = spl.print_id
+        where ps.term = %(term)s
+          and pc.number >= %(sitting_min)s
+          and spl.source = 'agenda_item'
+          and ps.primary_print_id is null
+        group by ps.id, ps.body_text
+        order by ps.id
+    """
+    # supabase-py exec_sql RPC doesn't bind params — interpolate the
+    # ints inline (safe: validated to int by argparse).
+    sql_inline = sql.replace("%(term)s", str(int(term))).replace(
+        "%(sitting_min)s", str(int(sitting_min))
+    )
+    res = sb.rpc("exec_sql", {"query": sql_inline}).execute()
+    payload = res.data
+    # exec_sql returns its SQL failures in-band as a JSON envelope rather
+    # than via HTTP error, so list(payload) on a dict would silently turn
+    # {"status":"error",...} into a list of keys ['status','message',...].
+    if isinstance(payload, dict) and payload.get("status") == "error":
+        raise RuntimeError(
+            f"exec_sql failed: {payload.get('message')!r} "
+            f"(sqlstate={payload.get('sqlstate')!r})"
+        )
+    return list(payload or [])
+
+
+def _resolve_print_number(
+    *, links: list[dict], chosen_number: str | None
+) -> int | None:
+    """Map LLM-chosen druk number back to prints.id, defensive against
+    hallucinations (numbers not in the candidate list)."""
+    if chosen_number is None:
+        return None
+    for link in links:
+        if str(link["number"]) == chosen_number:
+            return int(link["print_id"])
+    return None
+
+
+def _write_primary_print(*, statement_id: int, print_id: int) -> None:
+    supabase().table("proceeding_statements").update(
+        {"primary_print_id": print_id}
+    ).eq("id", statement_id).execute()
+
+
+def _process_joint(
+    *,
+    row: dict,
+    dry_run: bool,
+    counts: dict[str, int],
+    counts_lock: threading.Lock,
+    prompt_version: int,
+    prompt_sha256: str,
+) -> None:
+    """Pass 2 worker: LLM disambiguation for one joint-debate row."""
+    statement_id = int(row["statement_id"])
+    links: list[dict] = row["links"] or []
+    prints_block = "\n".join(
+        f"- druk {ln['number']}: \"{ln.get('short_title') or ln.get('title') or ''}\""
+        for ln in links
+    )
+    try:
+        parsed = _disambiguate_one(
+            entity_type="proceeding_statement",
+            entity_id=str(statement_id),
+            body_text=row.get("body_text") or "",
+            prints_block=prints_block,
+            prompt_version=prompt_version,
+            prompt_sha256=prompt_sha256,
+        )
+    except Exception:
+        logger.exception(f"LLM call failed for statement {statement_id}")
+        with counts_lock:
+            counts["llm_error"] += 1
+        return
+
+    if parsed.primary_print_number is None or parsed.confidence < 0.5:
+        with counts_lock:
+            counts["joint_null"] += 1
+        return
+
+    resolved = _resolve_print_number(
+        links=links, chosen_number=parsed.primary_print_number
+    )
+    if resolved is None:
+        with counts_lock:
+            counts["hallucinated"] += 1
+        logger.warning(
+            f"statement {statement_id}: LLM returned print "
+            f"{parsed.primary_print_number!r} not in candidate list"
+        )
+        return
+
+    with counts_lock:
+        counts["joint_resolved"] += 1
+    if not dry_run:
+        _write_primary_print(statement_id=statement_id, print_id=resolved)
+
+
+def backfill_primary_print(
+    *,
+    term: int = 10,
+    sitting_min: int = 55,
+    dry_run: bool = False,
+    limit: int | None = None,
+    workers: int = 8,
+) -> dict[str, int]:
+    """Run two-pass attribution.
+
+    Pass 1 (deterministic) runs synchronously — cheap. Pass 2 (LLM
+    calls) parallelised across `workers` threads — each call is
+    I/O-bound on the deepseek HTTP roundtrip, ~10x speedup vs serial.
+
+    Returns counts: {single_print, joint_resolved, joint_null,
+                     hallucinated, llm_error, total}
+    """
+    if workers < 1:
+        raise ValueError(f"workers must be >= 1, got {workers}")
+
+    # Resolve the prompt ONCE so every Pass 2 LLM call records the same
+    # version+sha into model_runs (preserves audit reproducibility).
+    from supagraf.enrich.llm import _resolve_prompt
+    prompt = _resolve_prompt(PROMPT_NAME)
+
+    rows = _fetch_candidates(term=term, sitting_min=sitting_min)
+    if limit:
+        rows = rows[:limit]
+
+    counts: dict[str, int] = defaultdict(int)
+    counts["total"] = len(rows)
+    counts_lock = threading.Lock()
+    logger.info(f"primary_print backfill: {len(rows)} candidate statements")
+
+    # Pass 1 — deterministic. Single-print agenda items get assigned
+    # without any LLM call.
+    joint_rows: list[dict] = []
+    for row in rows:
+        links: list[dict] = row["links"] or []
+        if not links:
+            continue
+        if len(links) == 1:
+            counts["single_print"] += 1
+            if not dry_run:
+                _write_primary_print(
+                    statement_id=int(row["statement_id"]),
+                    print_id=int(links[0]["print_id"]),
+                )
+        else:
+            joint_rows.append(row)
+
+    logger.info(
+        f"pass 1 done: {counts['single_print']} single-print writes; "
+        f"{len(joint_rows)} joint-debate statements queued for LLM"
+    )
+
+    # Pass 2 — LLM disambiguation, parallelised.
+    done = 0
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [
+            pool.submit(
+                _process_joint,
+                row=row,
+                dry_run=dry_run,
+                counts=counts,
+                counts_lock=counts_lock,
+                prompt_version=prompt.version,
+                prompt_sha256=prompt.sha256,
+            )
+            for row in joint_rows
+        ]
+        for fut in as_completed(futures):
+            done += 1
+            if done % 25 == 0:
+                # Snapshot under the same lock that workers mutate under;
+                # without it, dict() can race with concurrent increments
+                # and raise RuntimeError("dictionary changed size...").
+                with counts_lock:
+                    snapshot = dict(counts)
+                logger.info(
+                    f"  pass 2 progress {done}/{len(joint_rows)} — {snapshot}"
+                )
+            try:
+                fut.result()
+            except Exception:
+                logger.exception("worker raised")
+
+    logger.info(f"primary_print backfill done: {dict(counts)}")
+    return dict(counts)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--term", type=int, default=10)
+    parser.add_argument(
+        "--sitting-min",
+        type=int,
+        default=55,
+        help="Only statements from sittings >= this number (default 55)",
+    )
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Cap for testing; default = all candidates",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=8,
+        help="Parallel LLM workers in pass 2 (default 8)",
+    )
+    args = parser.parse_args()
+    backfill_primary_print(
+        term=args.term,
+        sitting_min=args.sitting_min,
+        dry_run=args.dry_run,
+        limit=args.limit,
+        workers=args.workers,
+    )
+
+
+if __name__ == "__main__":
+    main()

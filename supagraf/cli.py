@@ -92,6 +92,45 @@ def cmd_backfill_statement_print_links(dry_run: bool = typer.Option(False, "--dr
     _print_counts("statement-print-links", backfill_statement_print_links(dry_run=dry_run))
 
 
+@backfill_app.command("statement-primary-print")
+def cmd_backfill_statement_primary_print(
+    term: int = typer.Option(10, "--term"),
+    sitting_min: int = typer.Option(
+        55, "--sitting-min", help="Only sittings >= this number"
+    ),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+    limit: int = typer.Option(None, "--limit", help="Cap for testing"),
+    workers: int = typer.Option(
+        8, "--workers", help="Parallel LLM workers in pass 2 (default 8)"
+    ),
+):
+    """Attribute each statement to ONE specific print (primary_print_id).
+
+    Pass 1: single-print agenda items → deterministic. No LLM cost.
+    Pass 2: joint debates (2+ prints in same agenda item) → deepseek-flash
+            picks the main subject. ~$0.001 per joint-debate statement.
+    """
+    from supagraf.enrich.statement_primary_print import backfill_primary_print
+    counts = backfill_primary_print(
+        term=term,
+        sitting_min=sitting_min,
+        dry_run=dry_run,
+        limit=limit,
+        workers=workers,
+    )
+    # backfill_primary_print returns its own counter keys (single_print,
+    # joint_resolved, joint_null, ...) — don't reuse _print_counts which
+    # only knows inserted/updated/skipped and would log zeros.
+    print(
+        f"\nbackfill statement-primary-print: total={counts.get('total', 0)} "
+        f"single_print={counts.get('single_print', 0)} "
+        f"joint_resolved={counts.get('joint_resolved', 0)} "
+        f"joint_null={counts.get('joint_null', 0)} "
+        f"hallucinated={counts.get('hallucinated', 0)} "
+        f"llm_error={counts.get('llm_error', 0)}"
+    )
+
+
 @backfill_app.command("is-procedural-substantive")
 def cmd_backfill_procedural(dry_run: bool = typer.Option(False, "--dry-run")):
     """Fix is_procedural for misclassified bills + procedural categories."""
