@@ -134,6 +134,73 @@ def test_capture_processes_natural_id_is_process_number(tmp_path: Path):
     ]
 
 
+def test_capture_processes_refetches_detail_when_changedate_advances(tmp_path: Path):
+    """An open process that gained a stage upstream must re-fetch its detail.
+
+    The detail fixture is cached forever under refresh=False; comparing the
+    list-endpoint `changeDate` against the cached fixture's `changeDate` is
+    what unsticks a frozen timeline (e.g. a bill stuck at "I czytanie
+    pending" after the reading already happened). Regression for the
+    /proces/10/2453 stale-timeline report.
+    """
+    base = "/sejm/term10"
+    processes_dir = tmp_path / "sejm" / "processes"
+    processes_dir.mkdir(parents=True)
+    # Pre-seed a stale cached fixture: only the early referral stage.
+    from supagraf.fixtures.storage import write_json
+
+    write_json(
+        processes_dir / "2453.json",
+        {"number": "2453", "changeDate": "2026-04-17T12:00:00", "stages": [{"stageType": "Start"}]},
+    )
+
+    fresh_detail = {
+        "number": "2453",
+        "changeDate": "2026-05-15T15:31:16",
+        "stages": [{"stageType": "Start"}, {"stageType": "SejmReading"}],
+    }
+    client = _StubClient({
+        # List carries the bumped changeDate signalling a new stage.
+        f"{base}/processes": [{"number": "2453", "changeDate": "2026-05-15T15:31:16"}],
+        f"{base}/processes/2453": fresh_detail,
+    })
+    recorded, cb = _collector()
+    _run(sejm_src.capture_processes(
+        client, tmp_path, term=10, year=2026,
+        refresh=False, no_binaries=True, limit=None, on_record=cb,
+    ))
+
+    # Detail endpoint must have been hit despite the cached fixture existing.
+    assert f"{base}/processes/2453" in client.calls
+    # The streamed payload is the fresh detail (2 stages), not the stale cache.
+    assert recorded[0][1] == fresh_detail
+
+
+def test_capture_processes_reuses_cache_when_changedate_unchanged(tmp_path: Path):
+    """An unchanged process must NOT re-fetch — keeps the daily run cheap."""
+    base = "/sejm/term10"
+    processes_dir = tmp_path / "sejm" / "processes"
+    processes_dir.mkdir(parents=True)
+    from supagraf.fixtures.storage import write_json
+
+    cached = {"number": "100", "changeDate": "2026-03-01T09:00:00", "stages": []}
+    write_json(processes_dir / "100.json", cached)
+
+    client = _StubClient({
+        f"{base}/processes": [{"number": "100", "changeDate": "2026-03-01T09:00:00"}],
+        # If the detail were fetched it would return this — but it must not be.
+        f"{base}/processes/100": {"number": "100", "changeDate": "9999-01-01", "stages": ["x"]},
+    })
+    recorded, cb = _collector()
+    _run(sejm_src.capture_processes(
+        client, tmp_path, term=10, year=2026,
+        refresh=False, no_binaries=True, limit=None, on_record=cb,
+    ))
+
+    assert f"{base}/processes/100" not in client.calls
+    assert recorded[0][1] == cached
+
+
 def test_capture_videos_natural_id_is_unid(tmp_path: Path):
     base = "/sejm/term10"
     client = _StubClient({

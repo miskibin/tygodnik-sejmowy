@@ -109,6 +109,43 @@ async def _maybe_save_json(
     return data
 
 
+def _list_change_date(item: Any) -> Optional[str]:
+    """ISO `changeDate` string from a list-endpoint item, when present."""
+    if isinstance(item, dict):
+        v = item.get("changeDate")
+        if isinstance(v, str) and v:
+            return v
+    return None
+
+
+def _detail_stale(dest: Path, list_change_date: Optional[str]) -> bool:
+    """True when the cached detail fixture is missing or older than upstream.
+
+    The `/processes` list carries a per-process `changeDate` that bumps
+    whenever a stage is appended upstream. The detail fixture (the full
+    `stages` array) is otherwise cached forever under `refresh=False`, which
+    freezes an *open* process at whatever stage it had when first captured —
+    a bill stuck at "I czytanie pending" long after the reading happened.
+    Comparing ISO timestamps lexicographically (zero-padded, so string order
+    == chronological order) lets us re-fetch only the processes that actually
+    moved, instead of refreshing every detail every day.
+    """
+    if not exists(dest):
+        return True
+    if not list_change_date:
+        return False
+    from ..storage import load_json
+
+    try:
+        cached = load_json(dest)
+    except Exception:
+        return True
+    cached_cd = _list_change_date(cached)
+    if not cached_cd:
+        return True
+    return list_change_date > cached_cd
+
+
 async def _maybe_save_binary(
     client: SejmClient, path: str, dest: Path, refresh: bool
 ) -> bool:
@@ -579,7 +616,13 @@ async def capture_processes(
         sid = _safe_id(num)
         captured.append(sid)
         dest = dest_dir / f"{sid}.json"
-        detail = await _maybe_save_json(client, f"{base}/processes/{num}", dest, refresh)
+        # Re-fetch the detail when upstream advanced past the cached fixture.
+        # Without this, an open process's stages stay frozen at first capture
+        # under refresh=False — the timeline lags the real legislative stage
+        # (e.g. quotes from a first-reading debate while the path still shows
+        # "I czytanie pending").
+        eff_refresh = refresh or _detail_stale(dest, _list_change_date(p))
+        detail = await _maybe_save_json(client, f"{base}/processes/{num}", dest, eff_refresh)
         # natural_id for _stage_processes is `process.number`.
         _fire(on_record, str(num), detail, _rel(dest, out_root))
         if not no_binaries and isinstance(detail, dict) and _take("processes"):
