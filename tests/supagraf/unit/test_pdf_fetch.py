@@ -218,3 +218,31 @@ def test_cleanup_pdf_protects_fixtures(isolated_cache):
     legacy.write_bytes(b"%PDF-1.4")
     m.cleanup_pdf(legacy, force=True)
     assert legacy.exists()
+
+
+def test_metadata_404_raises_print_gone(isolated_cache):
+    """A print that 404s on its own metadata endpoint (withdrawn/renumbered)
+    is a permanent skip, not a nightly failure."""
+    m, cache, fixtures = isolated_cache
+
+    def fake_get(url, *args, **kwargs):
+        r = MagicMock(spec=httpx.Response)
+        status = 404 if url.endswith("/prints/1041-004") else 500
+        r.raise_for_status = MagicMock(
+            side_effect=httpx.HTTPStatusError(
+                str(status),
+                request=MagicMock(),
+                response=MagicMock(status_code=status),
+            )
+        )
+        r.response = MagicMock(status_code=status)
+        return r
+
+    client = MagicMock()
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=False)
+    client.get = MagicMock(side_effect=fake_get)
+
+    with patch("supagraf.enrich.pdf_fetch.httpx.Client", return_value=client):
+        with pytest.raises(m.PrintGoneError):
+            m.resolve_print_pdf("sejm/prints/1041-004__1041-004.pdf", term=10)

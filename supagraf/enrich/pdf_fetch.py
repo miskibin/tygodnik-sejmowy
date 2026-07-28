@@ -57,6 +57,15 @@ class PdfFetchError(RuntimeError):
     """PDF could not be fetched from upstream (network / 404 / non-pdf body)."""
 
 
+class PrintGoneError(PdfFetchError):
+    """The print itself is no longer served — its metadata endpoint 404s.
+
+    Distinct from a transient fetch failure: withdrawn/renumbered prints (e.g.
+    1041-004) will never come back, so callers should skip them rather than
+    count a failure on every run.
+    """
+
+
 def _cache_key(term: int, number: str, filename: str) -> str:
     return hashlib.sha256(
         f"t{term}::{number}::{filename}".encode("utf-8")
@@ -125,12 +134,22 @@ def upstream_attachments(term: int, number: str) -> list[str]:
     lists `1849-001.pdf`, but the loader recorded `1816-001.pdf` — every fetch
     then 404s. Re-reading the print metadata is the authoritative repair.
     Returns [] on any failure; the caller keeps its original error.
+
+    Raises PrintGoneError if the metadata endpoint itself 404s — the print no
+    longer exists upstream and no filename will ever work.
     """
     url = SEJM_PRINT_META_URL.format(term=term, number=quote(number.strip(), safe=""))
     try:
         r = _get(url)
         r.raise_for_status()
         data = r.json()
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 404:
+            raise PrintGoneError(
+                f"print {number} no longer served upstream ({url} -> 404)"
+            ) from e
+        logger.warning("upstream_attachments: {} failed: {!r}", url, e)
+        return []
     except (httpx.HTTPError, ValueError) as e:
         logger.warning("upstream_attachments: {} failed: {!r}", url, e)
         return []

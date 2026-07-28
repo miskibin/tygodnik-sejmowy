@@ -1298,8 +1298,14 @@ def _run_kind_for_prints(kind: EnrichKind, prints_rows: list[dict]) -> tuple[int
             # failures (LLM/network/schema), not an inherent property of the
             # source. The audit row is still written by @with_model_run with
             # status='failed' for traceability.
+            from supagraf.enrich.pdf_fetch import PrintGoneError
+
             msg = str(e)
-            if "0 chars" in msg or "scanned PDF" in msg or "no .pdf attachment" in msg:
+            if isinstance(e, PrintGoneError):
+                # Withdrawn/renumbered upstream — nothing to retry tomorrow.
+                logger.warning("enrich {} {} skipped (gone upstream): {}", kind.value, row["number"], e)
+                skipped += 1
+            elif "0 chars" in msg or "scanned PDF" in msg or "no .pdf attachment" in msg:
                 logger.warning("enrich {} {} skipped (no text layer): {}", kind.value, row["number"], type(e).__name__)
                 skipped += 1
             else:
