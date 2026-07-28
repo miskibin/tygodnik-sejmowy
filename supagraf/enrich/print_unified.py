@@ -29,6 +29,7 @@ that don't substring-match).
 """
 from __future__ import annotations
 
+import os
 import re
 from typing import Literal
 
@@ -101,7 +102,14 @@ def pick_model(meta_row: dict) -> str:
     Sub-prints (opinions/OSR/etc.) and the procedural categories above route
     to flash; everything else (projekt_ustawy, sprawozdanie_komisji) routes
     to pro because that's where the citizen-facing fields actually carry
-    meaningful content."""
+    meaningful content.
+
+    `SUPAGRAF_LLM_MODEL` pins every print to one model, bypassing the routing —
+    the documented escape hatch for cost-capped catch-up runs, where paying pro
+    rates on a backlog matters more than the reasoning headroom."""
+    override = os.environ.get("SUPAGRAF_LLM_MODEL")
+    if override:
+        return override
     if meta_row.get("is_meta_document"):
         return LLM_MODELS["flash"]
     if meta_row.get("document_category") in _FLASH_CATEGORIES:
