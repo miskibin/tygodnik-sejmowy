@@ -275,3 +275,50 @@ def test_resolve_relpath_skips_guid_numbered_prints():
 
     row = _row("3D10FECA9709FEFEC1258CD8004D1770", [_pdf_att("997-s.pdf")])
     assert _resolve_pdf_relpath(row) is None
+
+
+def test_fetch_outage_aborts_the_phase(monkeypatch):
+    """When api.sejm.gov.pl's document backend is down every attachment 502s
+    after a 60s hang. Grinding through hundreds of prints that way wastes
+    hours and enriches nothing — bail out and leave them pending."""
+    from supagraf import cli
+    from supagraf.enrich.pdf_fetch import PdfFetchError
+
+    monkeypatch.setattr(cli, "_FETCH_OUTAGE_THRESHOLD", 3)
+
+    attempts = []
+
+    def boom(**kwargs):
+        attempts.append(kwargs["entity_id"])
+        raise PdfFetchError("failed to fetch ...: ReadTimeout")
+
+    monkeypatch.setattr(cli, "_runner_for", lambda kind: boom)
+
+    rows = [_row(str(n), [_pdf_att(f"{n}.pdf")]) for n in range(20)]
+    ok, failed, skipped = cli._run_kind_for_prints(cli.EnrichKind.unified, rows)
+
+    assert len(attempts) == 3, "should stop at the threshold, not walk all 20"
+    assert ok == 0
+
+
+def test_isolated_fetch_failures_do_not_abort(monkeypatch):
+    """A run where fetches fail intermittently must still process everything."""
+    from supagraf import cli
+    from supagraf.enrich.pdf_fetch import PdfFetchError
+
+    monkeypatch.setattr(cli, "_FETCH_OUTAGE_THRESHOLD", 3)
+
+    seen = []
+
+    def flaky(**kwargs):
+        seen.append(kwargs["entity_id"])
+        if int(kwargs["entity_id"]) % 2:
+            raise PdfFetchError("failed to fetch ...: ReadTimeout")
+
+    monkeypatch.setattr(cli, "_runner_for", lambda kind: flaky)
+
+    rows = [_row(str(n), [_pdf_att(f"{n}.pdf")]) for n in range(10)]
+    ok, failed, skipped = cli._run_kind_for_prints(cli.EnrichKind.unified, rows)
+
+    assert len(seen) == 10
+    assert ok == 5 and failed == 5

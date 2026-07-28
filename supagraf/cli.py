@@ -1260,6 +1260,11 @@ def _runner_for(kind: EnrichKind) -> Callable:
     raise ValueError(f"no single runner for {kind}")
 
 
+# Consecutive attachment-fetch failures that mean "upstream is down, stop
+# trying" rather than "these particular prints are bad".
+_FETCH_OUTAGE_THRESHOLD = int(os.environ.get("SUPAGRAF_FETCH_OUTAGE_THRESHOLD", "8"))
+
+
 def _run_kind_for_prints(kind: EnrichKind, prints_rows: list[dict]) -> tuple[int, int, int]:
     """Returns (ok, failed, skipped). Failures logged + continue per plan:
     one bad print does not abort the loop — the @with_model_run decorator
@@ -1271,8 +1276,9 @@ def _run_kind_for_prints(kind: EnrichKind, prints_rows: list[dict]) -> tuple[int
     """
     runner = _runner_for(kind)
     ok = failed = skipped = 0
+    consecutive_fetch_failures = 0
     needs_pdf = kind != EnrichKind.embed  # embed reads summary from DB; others need PDF
-    for row in prints_rows:
+    for i, row in enumerate(prints_rows):
         try:
             kwargs = {
                 "entity_type": "print",
@@ -1292,15 +1298,33 @@ def _run_kind_for_prints(kind: EnrichKind, prints_rows: list[dict]) -> tuple[int
             else:
                 runner(**kwargs)
             ok += 1
+            consecutive_fetch_failures = 0
         except Exception as e:
             # Scanned PDFs (no text layer) raise from pymupdf+pypdf. Treat as
             # 'skipped' rather than 'failed' so totals reflect actionable
             # failures (LLM/network/schema), not an inherent property of the
             # source. The audit row is still written by @with_model_run with
             # status='failed' for traceability.
-            from supagraf.enrich.pdf_fetch import PrintGoneError
+            from supagraf.enrich.pdf_fetch import PdfFetchError, PrintGoneError
 
             msg = str(e)
+            # Upstream-wide outage guard. When api.sejm.gov.pl's document
+            # backend goes down it 502s after a 60 s hang on EVERY attachment
+            # (metadata keeps answering instantly), so the loop would spend
+            # minutes per print for hours and finish with nothing enriched.
+            # Bail out and leave the rest pending for the next run.
+            if isinstance(e, PdfFetchError) and not isinstance(e, PrintGoneError):
+                consecutive_fetch_failures += 1
+                if consecutive_fetch_failures >= _FETCH_OUTAGE_THRESHOLD:
+                    logger.error(
+                        "enrich {}: {} consecutive fetch failures — upstream looks "
+                        "down, aborting this phase ({} prints left pending)",
+                        kind.value, consecutive_fetch_failures, len(prints_rows) - i,
+                    )
+                    failed += 1
+                    break
+            else:
+                consecutive_fetch_failures = 0
             if isinstance(e, PrintGoneError):
                 # Withdrawn/renumbered upstream — nothing to retry tomorrow.
                 logger.warning("enrich {} {} skipped (gone upstream): {}", kind.value, row["number"], e)
