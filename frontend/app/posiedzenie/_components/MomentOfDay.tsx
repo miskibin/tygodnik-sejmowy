@@ -20,7 +20,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
             anchor="moment"
           />
           <p
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 16,
               color: "var(--muted-foreground)",
@@ -49,7 +49,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr]">
           <div>
             <div
-              className="font-serif italic"
+              className="italic"
               style={{
                 fontSize: 110,
                 lineHeight: 0.7,
@@ -61,7 +61,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
               „
             </div>
             <blockquote
-              className="font-serif m-0"
+              className="m-0"
               style={{
                 fontSize: 30,
                 lineHeight: 1.28,
@@ -81,7 +81,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
               <MPAvatarPhoto name={top.speaker} size={48} />
               <div className="min-w-0">
                 <div
-                  className="font-serif font-medium"
+                  className="font-medium"
                   style={{ fontSize: 18, color: "var(--foreground)" }}
                 >
                   {top.speaker}
@@ -98,7 +98,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
               <div className="ml-auto text-right">
                 <Kicker className="mb-1.5">cytat dnia</Kicker>
                 <div
-                  className="font-serif italic font-medium"
+                  className="italic font-medium"
                   style={{
                     fontSize: 26,
                     color: "var(--destructive-deep)",
@@ -148,7 +148,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
               <Kicker className="mb-3">w którym punkcie</Kicker>
               <div className="flex items-baseline gap-4 mb-3">
                 <span
-                  className="font-serif italic font-medium"
+                  className="italic font-medium"
                   style={{
                     fontSize: 60,
                     lineHeight: 0.9,
@@ -158,11 +158,10 @@ export function MomentOfDay({ data }: { data: SittingView }) {
                   {point.ord}
                 </span>
                 <div
-                  className="font-mono uppercase"
+                  className="font-medium"
                   style={{
-                    fontSize: 10.5,
+                    fontSize: 11,
                     color: "var(--muted-foreground)",
-                    letterSpacing: "0.14em",
                     lineHeight: 1.5,
                   }}
                 >
@@ -172,7 +171,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
                 </div>
               </div>
               <h3
-                className="font-serif font-medium m-0 mb-2.5"
+                className="font-medium m-0 mb-2.5"
                 style={{
                   fontSize: 21,
                   lineHeight: 1.22,
@@ -184,7 +183,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
               </h3>
               {point.plainSummary && (
                 <p
-                  className="font-serif m-0"
+                  className="m-0"
                   style={{
                     fontSize: 14.5,
                     lineHeight: 1.55,
@@ -204,7 +203,7 @@ export function MomentOfDay({ data }: { data: SittingView }) {
                   <Kicker className="mb-1.5">wynik głosowania</Kicker>
                   <div className="flex items-baseline gap-4 flex-wrap">
                     <span
-                      className="font-serif italic font-medium"
+                      className="italic font-medium"
                       style={{
                         fontSize: 24,
                         color: verdictInk(point.vote.result, point.vote.motionPolarity),
@@ -218,7 +217,6 @@ export function MomentOfDay({ data }: { data: SittingView }) {
                       style={{
                         fontSize: 11.5,
                         color: "var(--muted-foreground)",
-                        letterSpacing: "0.1em",
                       }}
                     >
                       {point.vote.yes}–{point.vote.no} · różnica{" "}

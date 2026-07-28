@@ -21,21 +21,19 @@ function DecisionCard({ p }: { p: AgendaPoint }) {
     >
       <div className="flex items-baseline justify-between mb-2.5 gap-2 flex-wrap">
         <span
-          className="font-mono uppercase"
+          className="font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.14em",
           }}
         >
           pkt {p.ord} · {p.timeStart}–{p.timeEnd}
         </span>
         <span
-          className="font-mono uppercase"
+          className="font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: accent,
-            letterSpacing: "0.14em",
             fontWeight: 700,
           }}
         >
@@ -44,7 +42,7 @@ function DecisionCard({ p }: { p: AgendaPoint }) {
       </div>
 
       <div
-        className="font-serif italic font-medium"
+        className="italic font-medium"
         style={{
           fontSize: 26,
           color: accent,
@@ -57,11 +55,10 @@ function DecisionCard({ p }: { p: AgendaPoint }) {
       </div>
       {v.subtitle && (
         <div
-          className="font-mono uppercase mb-3"
+          className="mb-3 font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.1em",
           }}
         >
           {v.subtitle}
@@ -69,7 +66,7 @@ function DecisionCard({ p }: { p: AgendaPoint }) {
       )}
 
       <h3
-        className="font-serif font-medium m-0 mt-2 mb-2"
+        className="font-medium m-0 mt-2 mb-2"
         style={{
           fontSize: 19,
           lineHeight: 1.22,
@@ -81,7 +78,7 @@ function DecisionCard({ p }: { p: AgendaPoint }) {
       </h3>
       {(v.plainNote || p.plainSummary) && (
         <p
-          className="font-serif m-0 mb-4"
+          className="m-0 mb-4"
           style={{
             fontSize: 13.5,
             lineHeight: 1.5,
@@ -125,9 +122,8 @@ function VoteBar({ v }: { v: Vote }) {
       <div
         className="mt-1.5 flex justify-between font-mono"
         style={{
-          fontSize: 10,
+          fontSize: 11,
           color: "var(--muted-foreground)",
-          letterSpacing: "0.08em",
         }}
       >
         <span>
@@ -170,7 +166,7 @@ export function WhatPassed({
             anchor="decyzje"
           />
           <p
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 17,
               color: "var(--secondary-foreground)",

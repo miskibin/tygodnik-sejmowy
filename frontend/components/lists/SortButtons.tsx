@@ -19,7 +19,7 @@ export function SortButtons<Id extends string>({
 }) {
   return (
     <div className="flex items-center gap-0 flex-wrap">
-      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground mr-2">
+      <span className="text-[11px] text-muted-foreground mr-2 font-medium">
         {label}
       </span>
       {options.map((o) => {

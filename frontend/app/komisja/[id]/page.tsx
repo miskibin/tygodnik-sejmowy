@@ -137,7 +137,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
   const ranks = Array.from(grouped.keys()).sort((a, b) => a - b);
 
   return (
-    <main className="bg-background text-foreground font-serif pb-20">
+    <main className="bg-background text-foreground pb-20">
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9">
         <PageBreadcrumb
           items={[
@@ -185,7 +185,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
         {/* Upcoming sittings — only if any are planned */}
         {upcomingSittings.length > 0 && (
           <section>
-            <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-foreground mb-1">
+            <div className="font-sans text-[11px] text-foreground mb-1 font-medium">
               ✶ Najbliższe posiedzenia · {futureSittings.length}
             </div>
             <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-5 leading-relaxed">
@@ -197,7 +197,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
 
         {/* Past sittings feed */}
         <section>
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-1">
+          <div className="font-sans text-[11px] text-muted-foreground mb-1 font-medium">
             ✶ Ostatnie posiedzenia
           </div>
           <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-5 leading-relaxed">
@@ -205,7 +205,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
           </p>
 
           {topSittings.length === 0 ? (
-            <p className="font-serif italic text-muted-foreground">
+            <p className="text-muted-foreground">
               Brak zarejestrowanych posiedzeń.
             </p>
           ) : (
@@ -218,7 +218,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
 
           {archiveSittings.length > 0 && (
             <details className="mt-6 border border-border">
-              <summary className="cursor-pointer px-4 py-3 font-sans text-[11px] tracking-[0.14em] uppercase text-muted-foreground hover:text-destructive hover:border-destructive">
+              <summary className="cursor-pointer px-4 py-3 font-sans text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground font-medium">
                 Wszystkie odbyte posiedzenia · {pastSittings.length}
               </summary>
               <ul className="px-4 pb-2">
@@ -233,7 +233,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
         {/* Linked prints */}
         {prints.length > 0 && (
           <section>
-            <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-1">
+            <div className="font-sans text-[11px] text-muted-foreground mb-1 font-medium">
               ✶ Druki nad którymi pracuje komisja
             </div>
             <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-4 leading-relaxed">
@@ -246,15 +246,15 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
                     href={`/proces/${p.term}/${encodeURIComponent(p.number)}`}
                     className="flex items-baseline gap-x-3 gap-y-1 px-4 py-3 hover:bg-muted/40 transition-colors"
                   >
-                    <span className="font-mono text-[11px] tracking-wide text-destructive w-16 shrink-0">
+                    <span className="font-mono text-[11px] tracking-wide text-muted-foreground w-16 shrink-0">
                       {p.number}
                     </span>
-                    <span className="font-serif text-[14.5px] leading-snug flex-1 min-w-0">
+                    <span className="text-[14.5px] leading-snug flex-1 min-w-0">
                       {p.shortTitle ?? p.title}
                     </span>
                     {p.hadReport && (
                       <span
-                        className="font-sans text-[10px] tracking-[0.14em] uppercase border border-foreground/40 text-foreground px-1.5 py-0.5 shrink-0"
+                        className="font-sans text-[11px] border border-foreground/40 text-foreground px-1.5 py-0.5 shrink-0 font-medium"
                         title="Komisja wydała sprawozdanie"
                       >
                         ✓ sprawozd.
@@ -273,7 +273,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
         {/* Subcommittees */}
         {subcommittees.length > 0 && (
           <section>
-            <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-1">
+            <div className="font-sans text-[11px] text-muted-foreground mb-1 font-medium">
               ✶ Podkomisje · {subcommittees.length}
             </div>
             <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-4 leading-relaxed">
@@ -287,14 +287,14 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
                   <li key={sc.id}>
                     <Link
                       href={`/komisja/${sc.id}`}
-                      className="block border border-border hover:border-destructive transition-colors px-3 py-2.5"
+                      className="block border border-border hover:border-foreground transition-colors px-3 py-2.5"
                     >
                       <div className="flex items-baseline gap-x-3">
-                        <span className="font-mono text-[10.5px] tracking-wide text-destructive uppercase shrink-0">
+                        <span className="text-[11px] tracking-wide text-muted-foreground shrink-0 font-medium">
                           {sc.code}
                         </span>
                         <span
-                          className={`font-serif text-[14px] leading-snug min-w-0 flex-1 ${
+                          className={`text-[14px] leading-snug min-w-0 flex-1 ${
                             hasName ? "" : "italic text-muted-foreground"
                           }`}
                         >
@@ -316,12 +316,12 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
 
         {/* Composition */}
         <section>
-          <div className="font-sans text-[11px] tracking-[0.16em] uppercase text-destructive mb-5">
+          <div className="font-sans text-[11px] text-muted-foreground mb-5 font-medium">
             ✶ Skład komisji
           </div>
 
           {members.length === 0 ? (
-            <p className="font-serif italic text-muted-foreground">
+            <p className="text-muted-foreground">
               Skład zostanie uzupełniony.
             </p>
           ) : (
@@ -331,7 +331,7 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
                 if (group.length === 0) return null;
                 return (
                   <div key={rank}>
-                    <div className="font-sans text-[10.5px] tracking-[0.14em] uppercase text-muted-foreground mb-3">
+                    <div className="font-sans text-[11px] text-muted-foreground mb-3 font-medium">
                       {RANK_LABEL[rank] ?? "Członkowie"} · {group.length}
                     </div>
                     <ul className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -360,16 +360,16 @@ export default async function KomisjaPage({ params }: { params: Promise<{ id: st
         <section className="border-t border-border pt-5 font-sans text-[11.5px] text-muted-foreground">
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             <span>
-              <span className="uppercase tracking-[0.12em] text-[10px] mr-1">Powołana:</span>
+              <span className="text-[11px] mr-1 font-medium">Powołana:</span>
               {formatDate(committee.appointmentDate)}
             </span>
             <span>
-              <span className="uppercase tracking-[0.12em] text-[10px] mr-1">Skład z dnia:</span>
+              <span className="text-[11px] mr-1 font-medium">Skład z dnia:</span>
               {formatDate(committee.compositionDate)}
             </span>
             {committee.phone && (
               <span>
-                <span className="uppercase tracking-[0.12em] text-[10px] mr-1">Tel.:</span>
+                <span className="text-[11px] mr-1 font-medium">Tel.:</span>
                 <span className="font-mono">{committee.phone}</span>
               </span>
             )}
@@ -412,12 +412,12 @@ function UpcomingTimeline({ sittings }: { sittings: CommitteeSitting[] }) {
               }`}
             />
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-2">
-              <span className="font-serif text-[16px] md:text-[17px] font-medium leading-none tracking-[-0.01em]">
+              <span className="text-[16px] md:text-[17px] font-medium leading-none tracking-[-0.01em]">
                 {dateLabel}
               </span>
               {relative && (
                 <span
-                  className={`font-sans text-[11px] tracking-[0.04em] uppercase ${
+                  className={`font-sans text-[11px] font-medium ${
                     isFirst ? "text-destructive" : "text-foreground"
                   }`}
                 >
@@ -436,14 +436,14 @@ function UpcomingTimeline({ sittings }: { sittings: CommitteeSitting[] }) {
                 return (
                   <li key={s.id} className="border border-border bg-background px-3 py-2.5">
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <span className="font-sans text-[10px] tracking-[0.14em] uppercase border border-foreground/40 text-foreground px-1.5 py-0.5">
+                      <span className="font-sans text-[11px] border border-foreground/40 text-foreground px-1.5 py-0.5 font-medium">
                         planowane
                       </span>
                       <span className="font-sans text-[10.5px] text-muted-foreground tracking-[0.08em]">
                         nr {s.num}
                       </span>
                       {s.remote && (
-                        <span className="font-sans text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+                        <span className="font-sans text-[11px] text-muted-foreground font-medium">
                           zdalne
                         </span>
                       )}
@@ -454,7 +454,7 @@ function UpcomingTimeline({ sittings }: { sittings: CommitteeSitting[] }) {
                       )}
                     </div>
                     {oneLine && (
-                      <p className="font-serif text-[13.5px] leading-snug text-secondary-foreground mt-1.5 max-w-[820px]">
+                      <p className="text-[13.5px] leading-snug text-secondary-foreground mt-1.5 max-w-[820px]">
                         {oneLine}
                       </p>
                     )}
@@ -494,9 +494,9 @@ function ArchiveSittingRow({ s }: { s: CommitteeSitting }) {
   return (
     <li className="border-b border-border last:border-b-0 py-3">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="font-serif text-[14px]">{dateLabel}</span>
+        <span className="text-[14px]">{dateLabel}</span>
         <span className="font-sans text-[10.5px] text-muted-foreground tracking-[0.08em]">nr {s.num}</span>
-        <span className={`font-sans text-[9.5px] tracking-[0.14em] uppercase border px-1.5 py-0.5 ${STATUS_CLASS[status] ?? STATUS_CLASS.FINISHED}`}>
+        <span className={`font-sans text-[11px] font-medium border px-1.5 py-0.5 ${STATUS_CLASS[status] ?? STATUS_CLASS.FINISHED}`}>
           {STATUS_LABEL[status] ?? status.toLowerCase()}
         </span>
         {s.videoPlayerLink && (
@@ -504,14 +504,14 @@ function ArchiveSittingRow({ s }: { s: CommitteeSitting }) {
             href={s.videoPlayerLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto font-sans text-[11px] underline decoration-dotted underline-offset-4 hover:text-destructive"
+            className="ml-auto font-sans text-[11px] underline decoration-dotted underline-offset-4 hover:text-foreground"
           >
             ▶ wideo
           </a>
         )}
       </div>
       {oneLine && (
-        <p className="font-serif text-[13px] leading-snug text-muted-foreground mt-1 max-w-[820px]">
+        <p className="text-[13px] leading-snug text-muted-foreground mt-1 max-w-[820px]">
           {oneLine}
         </p>
       )}
@@ -529,9 +529,9 @@ function Tile({ k, v, sub, pos }: { k: string; v: string; sub: string; pos: numb
         paddingRight: pos < 3 ? 16 : 0,
       }}
     >
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1">{k}</div>
+      <div className="font-sans text-[11px] text-muted-foreground mb-1 font-medium">{k}</div>
       <div
-        className="font-serif font-medium leading-none mb-1 tracking-[-0.02em]"
+        className="font-medium leading-none mb-1 tracking-[-0.02em]"
         style={{ fontSize: "clamp(1.05rem, 2.2vw, 1.4rem)" }}
       >
         {v}

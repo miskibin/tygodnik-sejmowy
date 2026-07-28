@@ -29,7 +29,7 @@ export function ViewMethodologyFooter({
       <div className={`grid gap-7 sm:gap-8 grid-cols-1 ${gridCols} font-sans text-[12px] sm:text-[12.5px] leading-[1.55] text-muted-foreground`}>
         {columns.map((c, i) => (
           <div key={i} className="min-w-0">
-            <div className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase text-destructive mb-2.5">
+            <div className="text-[11px] text-muted-foreground mb-2.5 font-medium">
               {c.kicker}
             </div>
             <div className="text-pretty break-words">{c.children}</div>

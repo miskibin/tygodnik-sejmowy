@@ -30,7 +30,7 @@ export function SittingViewClient({ data }: { data: SittingView }) {
   const day = data.days[activeDay] ?? data.days[0] ?? null;
 
   return (
-    <main className="bg-background font-serif text-foreground">
+    <main className="bg-background text-foreground">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 pt-5">
         <PageBreadcrumb
           items={[

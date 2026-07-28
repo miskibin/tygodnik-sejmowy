@@ -114,7 +114,7 @@ export default async function DrukPage({
   const processStillOpen = !outcome?.passed && !print.currentStageType?.match(/^(End|Withdrawn|Rejected)$/);
 
   return (
-    <div className="bg-background text-foreground font-serif pb-20">
+    <div className="bg-background text-foreground pb-20">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9">
         <PageBreadcrumb
           items={[
@@ -142,7 +142,7 @@ export default async function DrukPage({
                 {" "}Dotyczy{" "}
                 <a
                   href={`/proces/${print.term}/${encodeURIComponent(print.parentNumber)}`}
-                  className="text-destructive underline decoration-dotted underline-offset-4"
+                  className="text-foreground underline decoration-dotted underline-offset-4"
                 >
                   druku nr {print.parentNumber}
                 </a>
@@ -176,10 +176,10 @@ export default async function DrukPage({
               className="px-4 py-3.5 border-l-2 max-w-[820px]"
               style={{ borderColor: "var(--success)", background: "var(--muted)" }}
             >
-              <div className="font-sans text-[10px] tracking-[0.16em] uppercase text-success mb-1.5">
+              <div className="font-sans text-[11px] text-success mb-1.5 font-medium">
                 ✓ W Dzienniku Ustaw
               </div>
-              <div className="font-serif text-[18px] text-foreground leading-snug mb-1">
+              <div className="text-[18px] text-foreground leading-snug mb-1">
                 {outcome.act.displayAddress}
               </div>
               {outcome.act.status && (
@@ -195,7 +195,7 @@ export default async function DrukPage({
                   href={outcome.act.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                  className="font-sans text-[12px] text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
                 >
                   ↗ Zobacz tekst ustawy w ISAP
                 </a>
@@ -206,7 +206,7 @@ export default async function DrukPage({
 
         {subPrints.length > 0 && (
           <section className="py-10 border-b border-border">
-            <div className="text-[10px] tracking-[0.16em] uppercase text-destructive mb-4 font-sans">
+            <div className="text-[11px] text-muted-foreground mb-4 font-sans font-medium">
               ✶ Dokumenty towarzyszące ({subPrints.length})
             </div>
             <ul className="font-sans text-[13px]">
@@ -230,7 +230,7 @@ export default async function DrukPage({
 
         {matchedPromises.length > 0 && (
           <section className="py-10 border-b border-border">
-            <div className="text-[10px] tracking-[0.16em] uppercase text-destructive mb-4 font-sans">
+            <div className="text-[11px] text-muted-foreground mb-4 font-sans font-medium">
               ✶ Powiązane obietnice wyborcze ({matchedPromises.length})
             </div>
             <ul className="font-sans text-[13px]">
@@ -241,7 +241,7 @@ export default async function DrukPage({
                     key={m.promiseId}
                     className="py-3.5 border-b border-dotted border-border"
                   >
-                    <div className="flex items-baseline gap-3 mb-1 text-[10px] tracking-[0.16em] uppercase">
+                    <div className="flex items-baseline gap-3 mb-1 text-[11px] font-medium">
                       {m.partyCode && (
                         <span className="text-warning">{m.partyCode}</span>
                       )}
@@ -251,11 +251,11 @@ export default async function DrukPage({
                         </span>
                       )}
                     </div>
-                    <div className="font-serif text-[15px] leading-snug text-foreground">
+                    <div className="text-[15px] leading-snug text-foreground">
                       {m.title}
                     </div>
                     {m.rationale && (
-                      <div className="font-serif italic text-[12.5px] text-muted-foreground mt-1 leading-snug">
+                      <div className="text-[12.5px] text-muted-foreground mt-1 leading-snug">
                         {m.rationale}
                       </div>
                     )}

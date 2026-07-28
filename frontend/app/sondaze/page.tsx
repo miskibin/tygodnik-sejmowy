@@ -64,7 +64,7 @@ export default async function SondazePage() {
   ];
 
   return (
-    <main className="bg-background text-foreground font-serif px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-12 sm:pb-16 min-w-0">
+    <main className="bg-background text-foreground px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-12 sm:pb-16 min-w-0">
       <div className="max-w-[1280px] mx-auto min-w-0">
         <PageBreadcrumb items={[{ label: "Sondaże" }]} />
         <SondazeHero rows={averages} lastUpdateLabel={formatDataUpdate(lastUpdate)} />
@@ -114,7 +114,7 @@ export default async function SondazePage() {
                     href="https://github.com/miskibin/tygodnik-sejmowy/blob/main/frontend/lib/timeline-events.ts"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                    className="underline decoration-dotted underline-offset-2 hover:text-foreground"
                   >
                     lib/timeline-events.ts
                   </a>
@@ -123,7 +123,7 @@ export default async function SondazePage() {
                     href="https://github.com/miskibin/tygodnik-sejmowy/issues/new"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline decoration-dotted underline-offset-2 hover:text-destructive"
+                    className="underline decoration-dotted underline-offset-2 hover:text-foreground"
                   >
                     Zgłoś na GitHubie
                   </a>

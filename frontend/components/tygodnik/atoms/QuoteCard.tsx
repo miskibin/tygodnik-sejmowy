@@ -30,7 +30,7 @@ export function QuoteCard({
         cytat punktu{viralScore ? ` · viral ${viralScore}` : ""}
       </Kicker>
       <p
-        className="font-serif italic m-0 mb-2.5"
+        className="italic m-0 mb-2.5"
         style={{
           fontSize: 15,
           lineHeight: 1.4,

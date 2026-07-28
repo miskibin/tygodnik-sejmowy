@@ -25,7 +25,7 @@ function QuoteRow({ q }: { q: TopQuote }) {
       >
         <div>
           <div
-            className="font-serif italic font-medium"
+            className="italic font-medium"
             style={{
               fontSize: 64,
               lineHeight: 0.9,
@@ -40,7 +40,7 @@ function QuoteRow({ q }: { q: TopQuote }) {
         <div className="grid gap-7 md:gap-10 md:grid-cols-[1fr_280px]">
           <div>
             <p
-              className="font-serif m-0"
+              className="m-0"
               style={{
                 fontSize: first ? 25 : 21,
                 lineHeight: 1.32,
@@ -73,7 +73,7 @@ function QuoteRow({ q }: { q: TopQuote }) {
           >
             <Kicker className="mb-1.5">w punkcie</Kicker>
             <div
-              className="font-serif mb-3.5"
+              className="mb-3.5"
               style={{
                 fontSize: 15.5,
                 lineHeight: 1.3,
@@ -100,7 +100,7 @@ function QuoteRow({ q }: { q: TopQuote }) {
               <ToneBadge tone={q.tone} />
             </div>
             <div
-              className="font-serif italic pt-3"
+              className="italic pt-3"
               style={{
                 fontSize: 12.5,
                 color: "var(--muted-foreground)",
@@ -132,7 +132,7 @@ export function TopQuotes({ data }: { data: SittingView }) {
             anchor="cytaty"
           />
           <p
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 15, color: "var(--muted-foreground)" }}
           >
             Wypowiedzi z tego posiedzenia czekają na wzbogacenie — ranking

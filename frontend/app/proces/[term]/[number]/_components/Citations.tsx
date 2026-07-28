@@ -6,7 +6,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
   return (
     <div className="mb-5 flex items-baseline gap-4 border-b border-border pb-3">
       <h2
-        className="font-serif font-medium text-foreground m-0"
+        className="font-medium text-foreground m-0"
         style={{ fontSize: 22, lineHeight: 1, letterSpacing: "-0.015em" }}
       >
         {title}
@@ -78,8 +78,8 @@ function CitationCard({ c }: { c: ProcessCitation }) {
           size={40}
           shape="squircle"
         />
-        <span className="ml-auto font-mono uppercase text-muted-foreground shrink-0"
-          style={{ fontSize: 10, letterSpacing: "0.12em" }}
+        <span className="ml-auto text-muted-foreground shrink-0 font-medium"
+          style={{ fontSize: 10 }}
         >
           {dateLabel}
         </span>
@@ -87,7 +87,7 @@ function CitationCard({ c }: { c: ProcessCitation }) {
       {!hideRole && (
         <div
           className="font-sans text-muted-foreground"
-          style={{ fontSize: 11, letterSpacing: "0.02em" }}
+          style={{ fontSize: 11 }}
         >
           {role}
         </div>
@@ -98,7 +98,7 @@ function CitationCard({ c }: { c: ProcessCitation }) {
         aria-label={`Otwórz pełną wypowiedź — ${c.speakerName ?? "wypowiedź sejmowa"}`}
       >
         <blockquote
-          className="font-serif italic m-0 relative text-foreground group-hover:text-foreground/90"
+          className="italic m-0 relative text-foreground group-hover:text-foreground/90"
           style={{
             fontSize: 18,
             lineHeight: 1.4,
@@ -109,7 +109,7 @@ function CitationCard({ c }: { c: ProcessCitation }) {
         >
           <span
             aria-hidden
-            className="font-serif text-destructive absolute"
+            className="text-destructive absolute"
             style={{
               fontSize: 44,
               lineHeight: 0.8,

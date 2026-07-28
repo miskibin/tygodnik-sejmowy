@@ -28,14 +28,14 @@ export function CommitteeRow({ c, activity }: CommitteeRowProps) {
   return (
     <Link
       href={`/komisja/${c.id}`}
-      className="block border border-border hover:border-destructive bg-background transition-colors px-4 py-3"
+      className="block border border-border hover:border-foreground bg-background transition-colors px-4 py-3"
     >
       <div className="grid items-baseline gap-x-3 gap-y-1 grid-cols-[14px_60px_1fr_auto] md:grid-cols-[14px_60px_1fr_150px_120px]">
         <div className="flex items-center justify-center pt-[3px]">
           <ActivityDot tier={tier} />
         </div>
-        <div className="font-mono text-[11px] tracking-wide text-destructive uppercase">{c.code}</div>
-        <div className="font-serif text-[15px] leading-snug min-w-0 break-words">{c.name}</div>
+        <div className="text-[11px] tracking-wide text-muted-foreground font-medium">{c.code}</div>
+        <div className="text-[15px] leading-snug min-w-0 break-words">{c.name}</div>
         <div
           className={`font-mono text-[11px] text-right md:text-left tabular-nums ${activityClass(tier)}`}
           aria-label="Posiedzenia w ostatnich 30 dniach"

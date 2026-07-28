@@ -24,7 +24,7 @@ export async function TydzienAsync({ mpId }: { mpId: number }) {
   const thisWeek = await getMpThisWeek(mpId, 10, 8);
   if (thisWeek.length === 0) {
     return (
-      <p className="font-serif italic text-muted-foreground text-center py-12">
+      <p className="text-muted-foreground text-center py-12">
         W bazie nie ma jeszcze wystąpień ani interpelacji przypisanych do tej osoby w tej kadencji.
       </p>
     );
@@ -44,17 +44,17 @@ export async function TydzienAsync({ mpId }: { mpId: number }) {
         const bodyEl = (
           <div className="min-w-0">
             <div
-              className="font-sans text-[10px] uppercase tracking-[0.14em] mb-1.5"
+              className="font-sans text-[11px] mb-1.5 font-medium"
               style={{ color: e.kind === "question" ? "var(--warning)" : "var(--destructive)" }}
             >
               {e.kind === "question" ? "Interpelacja" : "Wystąpienie"}
             </div>
             {e.title ? (
-              <div className="font-serif text-[16px] sm:text-[18px] font-medium leading-snug mb-1 tracking-[-0.005em] break-words">
+              <div className="text-[16px] sm:text-[18px] font-medium leading-snug mb-1 tracking-[-0.005em] break-words">
                 {e.title}
               </div>
             ) : (
-              <div className="font-serif italic text-[14px] text-muted-foreground mb-1">brak treści wystąpienia</div>
+              <div className="text-[14px] text-muted-foreground mb-1">brak treści wystąpienia</div>
             )}
             {e.subtitle && (
               <div className="font-sans text-[12px] text-muted-foreground break-words">{e.subtitle}</div>

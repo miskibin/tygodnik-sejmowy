@@ -102,7 +102,7 @@ export function CitationText({
               <a
                 key={i}
                 href={`/proces/${term}/${encodeURIComponent(tok.numbers[0])}`}
-                className="text-destructive underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                className="text-foreground underline decoration-dotted underline-offset-2 hover:decoration-solid"
                 title={`Otwórz druk nr ${tok.numbers[0]}`}
               >
                 {tok.raw}
@@ -118,7 +118,7 @@ export function CitationText({
                   <a
                     key={j}
                     href={`/proces/${term}/${encodeURIComponent(part)}`}
-                    className="text-destructive underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                    className="text-foreground underline decoration-dotted underline-offset-2 hover:decoration-solid"
                     title={`Otwórz druk nr ${part}`}
                   >
                     {part}
@@ -135,7 +135,7 @@ export function CitationText({
             <a
               key={i}
               href={`/mowa/${tok.id}`}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm font-mono text-[10px] tracking-[0.05em] uppercase text-destructive hover:bg-muted"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[11px] text-muted-foreground hover:bg-muted font-medium"
               style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
               title={`Wypowiedź ${tok.id}`}
             >
@@ -149,7 +149,7 @@ export function CitationText({
             href={isapLink(tok.publisher, tok.year, tok.pos)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-destructive underline decoration-dotted underline-offset-2 hover:decoration-solid"
+            className="text-foreground underline decoration-dotted underline-offset-2 hover:decoration-solid"
             title={`Akt w ISAP — ${tok.raw}`}
           >
             {tok.raw}

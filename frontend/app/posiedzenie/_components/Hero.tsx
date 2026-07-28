@@ -7,7 +7,7 @@ function StatTile({ value, label }: { value: number; label: string }) {
   return (
     <div className="text-right">
       <div
-        className="font-serif font-medium text-foreground"
+        className="font-medium text-foreground"
         style={{ fontSize: 36, lineHeight: 0.95, letterSpacing: "-0.02em" }}
       >
         {value}
@@ -44,18 +44,17 @@ function DayTab({
     >
       <div className="flex items-baseline gap-3 flex-wrap">
         <span
-          className="font-serif font-medium"
+          className="font-medium"
           style={{ fontSize: 26, letterSpacing: "-0.02em", lineHeight: 1 }}
         >
           Dzień {day.idx + 1}
         </span>
         {day.status === "live" && (
           <span
-            className="font-mono uppercase inline-flex items-center gap-1.5"
+            className="inline-flex items-center gap-1.5 font-medium"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--destructive-deep)",
-              letterSpacing: "0.14em",
             }}
           >
             <span
@@ -68,11 +67,10 @@ function DayTab({
         )}
         {day.status === "planned" && (
           <span
-            className="font-mono uppercase"
+            className="font-medium"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.14em",
             }}
           >
             ○ zaplanowany
@@ -80,8 +78,8 @@ function DayTab({
         )}
       </div>
       <div
-        className="font-mono uppercase mt-1.5"
-        style={{ fontSize: 11, letterSpacing: "0.08em" }}
+        className="mt-1.5 font-medium"
+        style={{ fontSize: 11 }}
       >
         {day.weekday} · {day.short} · {day.open ?? "—"}—{day.close ?? "…"}
       </div>
@@ -127,7 +125,7 @@ export function Hero({
 
         <div className="grid gap-x-14 gap-y-10 md:grid-cols-[1.5fr_1fr] items-end">
           <h1
-            className="font-serif font-medium m-0"
+            className="font-medium m-0"
             style={{
               fontSize: "clamp(2.5rem, 6vw, 4rem)",
               lineHeight: 1,

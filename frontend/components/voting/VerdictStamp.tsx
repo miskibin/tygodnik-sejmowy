@@ -30,7 +30,7 @@ export function VerdictStamp({
   return (
     <div className="flex items-center flex-wrap gap-4 sm:gap-6 mb-7">
       <div
-        className="font-serif flex flex-col"
+        className="flex flex-col"
         style={{ lineHeight: 0.9 }}
       >
         <div

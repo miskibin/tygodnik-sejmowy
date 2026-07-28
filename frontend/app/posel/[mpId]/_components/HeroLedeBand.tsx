@@ -35,7 +35,7 @@ export async function HeroLedeBand({ mpId, firstLastName }: { mpId: number; firs
       style={{ background: "color-mix(in oklab, var(--highlight) 38%, var(--background))" }}
     >
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 py-6 sm:py-8 grid gap-4 sm:gap-8 items-baseline grid-cols-1 sm:grid-cols-[140px_1fr]">
-        <div className="font-mono text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-destructive leading-[1.3]">
+        <div className="text-[11px] text-muted-foreground leading-[1.3] font-medium">
           ✶ Ostatnia<br />aktywność{" "}
           {latest.date && (
             <span className="text-muted-foreground normal-case tracking-normal font-mono text-[11px] block mt-1">
@@ -44,15 +44,15 @@ export async function HeroLedeBand({ mpId, firstLastName }: { mpId: number; firs
           )}
         </div>
         <div className="min-w-0">
-          <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+          <div className="font-sans text-[11px] text-muted-foreground mb-2 font-medium">
             {kindLabel}
           </div>
           <h2
-            className="font-serif font-medium m-0 leading-[1.15] tracking-[-0.015em] text-balance"
+            className="font-medium m-0 leading-[1.15] tracking-[-0.015em] text-balance"
             style={{ fontSize: "clamp(1.25rem, 3.6vw, 2rem)" }}
           >
             {latest.kind === "statement" && latest.statementId != null ? (
-              <a href={`/mowa/${latest.statementId}`} className="hover:text-destructive">
+              <a href={`/mowa/${latest.statementId}`} className="hover:text-foreground">
                 {latest.title}
               </a>
             ) : (

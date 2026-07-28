@@ -32,7 +32,7 @@ export function ViralQuote({
   return (
     <figure className="my-5 md:my-8 max-w-[760px] mx-auto" aria-label="Cytat wiralowy">
       <blockquote
-        className="vqu-block relative font-serif italic text-foreground leading-[1.2]"
+        className="vqu-block relative italic text-foreground leading-[1.2]"
         style={{
           fontSize: "clamp(1.25rem, 2.6vw, 1.75rem)",
           letterSpacing: "-0.01em",
@@ -41,7 +41,7 @@ export function ViralQuote({
       >
         <span
           aria-hidden
-          className="absolute -left-2 md:-left-4 -top-1 select-none font-serif italic"
+          className="absolute -left-2 md:-left-4 -top-1 select-none italic"
           style={{
             fontSize: "clamp(2.25rem, 5vw, 3.25rem)",
             color: accent,

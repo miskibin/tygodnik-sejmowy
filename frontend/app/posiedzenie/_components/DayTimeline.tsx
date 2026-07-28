@@ -73,13 +73,12 @@ export function DayTimeline({
         {liveMin !== null && (
           <div className="relative mb-2" style={{ height: 18 }}>
             <span
-              className="absolute font-mono uppercase whitespace-nowrap"
+              className="absolute whitespace-nowrap font-medium"
               style={{
                 left: `${(liveMin / span) * 100}%`,
                 transform: "translateX(-50%)",
-                fontSize: 10,
+                fontSize: 11,
                 color: "var(--destructive-deep)",
-                letterSpacing: "0.14em",
               }}
             >
               ▼ {data.liveAt} na żywo
@@ -95,9 +94,8 @@ export function DayTimeline({
               style={{
                 left: `${((h * 60 - startMin) / span) * 100}%`,
                 transform: "translateX(-50%)",
-                fontSize: 10,
+                fontSize: 11,
                 color: "var(--muted-foreground)",
-                letterSpacing: "0.08em",
               }}
             >
               {String(h).padStart(2, "0")}:00
@@ -185,10 +183,9 @@ export function DayTimeline({
                 title={`Pkt ${p.ord} · ${p.shortTitle} · ${p.timeStart}–${p.timeEnd}${dom ? ` · ${TONE_LABEL[dom]}` : ""}`}
               >
                 <div
-                  className="font-mono uppercase"
+                  className="font-medium"
                   style={{
-                    fontSize: 9,
-                    letterSpacing: "0.08em",
+                    fontSize: 11,
                     opacity: 0.85,
                   }}
                 >

@@ -24,7 +24,6 @@ const PILL: React.CSSProperties = {
   background: "transparent",
   textDecoration: "none",
   fontFamily: "var(--font-jetbrains-mono), monospace",
-  letterSpacing: "0.04em",
   whiteSpace: "nowrap" as const,
 };
 
@@ -66,7 +65,7 @@ export default function VotingSources({
 
         <div
           className="font-mono"
-          style={{ fontSize: 10, color: "#3d3530", letterSpacing: "0.18em", marginBottom: 18, textTransform: "uppercase" }}
+          style={{ fontSize: 11, color: "#3d3530", marginBottom: 18 }}
         >
           {slug}
         </div>
@@ -111,7 +110,7 @@ export default function VotingSources({
 
         <div
           className="font-mono"
-          style={{ marginTop: 28, fontSize: 9, color: "#2a2520", letterSpacing: "0.2em", textTransform: "uppercase" }}
+          style={{ marginTop: 28, fontSize: 11, color: "#2a2520" }}
         >
           sejmograf.vercel.app
         </div>

@@ -63,17 +63,16 @@ export function VotingMeaning({ linkedPrint, clubs, passed }: Props) {
       >
         <div className="mx-auto px-4 sm:px-8 md:px-14 py-10" style={{ maxWidth: 1100 }}>
           <div
-            className="font-mono uppercase mb-4"
+            className="mb-4 font-medium"
             style={{
               fontSize: 11,
               color: "var(--destructive-deep)",
-              letterSpacing: "0.2em",
             }}
           >
             ✶ &nbsp; co to znaczy w praktyce &nbsp; ✶
           </div>
           <p
-            className="font-serif m-0"
+            className="m-0"
             style={{ fontSize: 17, lineHeight: 1.5, color: "var(--secondary-foreground)" }}
           >
             {punch}
@@ -100,11 +99,10 @@ export function VotingMeaning({ linkedPrint, clubs, passed }: Props) {
     >
       <div className="mx-auto px-4 sm:px-8 md:px-14 py-12 sm:py-14" style={{ maxWidth: 1100 }}>
         <div
-          className="font-mono uppercase mb-[18px]"
+          className="mb-[18px] font-medium"
           style={{
             fontSize: 11,
             color: "var(--destructive-deep)",
-            letterSpacing: "0.2em",
           }}
         >
           ✶ &nbsp; co to znaczy w praktyce &nbsp; ✶
@@ -124,7 +122,7 @@ export function VotingMeaning({ linkedPrint, clubs, passed }: Props) {
               }}
             >
               <div
-                className="font-serif italic absolute"
+                className="italic absolute"
                 style={{
                   fontSize: 32,
                   lineHeight: 0.9,
@@ -136,7 +134,7 @@ export function VotingMeaning({ linkedPrint, clubs, passed }: Props) {
                 {i + 1}
               </div>
               <p
-                className="font-serif m-0"
+                className="m-0"
                 style={{
                   fontSize: 19,
                   lineHeight: 1.45,
@@ -164,17 +162,16 @@ export function VotingMeaning({ linkedPrint, clubs, passed }: Props) {
             {affected && (
               <div>
                 <div
-                  className="font-mono uppercase mb-1.5"
+                  className="mb-1.5 font-medium"
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     color: "var(--muted-foreground)",
-                    letterSpacing: "0.16em",
                   }}
                 >
                   kogo to dotyczy
                 </div>
                 <p
-                  className="font-serif m-0"
+                  className="m-0"
                   style={{
                     fontSize: 16,
                     lineHeight: 1.55,
@@ -188,17 +185,16 @@ export function VotingMeaning({ linkedPrint, clubs, passed }: Props) {
             {opposition && (
               <div>
                 <div
-                  className="font-mono uppercase mb-1.5"
+                  className="mb-1.5 font-medium"
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     color: "var(--muted-foreground)",
-                    letterSpacing: "0.16em",
                   }}
                 >
                   {opposingLabel}
                 </div>
                 <p
-                  className="font-serif m-0"
+                  className="m-0"
                   style={{
                     fontSize: 16,
                     lineHeight: 1.55,

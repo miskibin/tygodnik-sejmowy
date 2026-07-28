@@ -56,7 +56,7 @@ function HitVariant(props: Extract<PrintCardProps, { variant: "hit" }>) {
       href={`/proces/${props.term}/${props.number}`}
       className="block py-5 px-1 border-b border-border hover:bg-muted"
     >
-      <div className="flex items-baseline justify-between gap-4 mb-2 font-sans text-[10px] tracking-[0.18em] uppercase">
+      <div className="flex items-baseline justify-between gap-4 mb-2 font-sans text-[11px] font-medium">
         <span className="text-destructive">
           Druk · {props.term}/{props.number}
         </span>
@@ -64,11 +64,11 @@ function HitVariant(props: Extract<PrintCardProps, { variant: "hit" }>) {
           {props.hitMeta ?? formatDate(props.changeDate)}
         </span>
       </div>
-      <div className="font-serif text-[19px] font-medium leading-snug tracking-[-0.005em] mb-1">
+      <div className="text-[19px] font-medium leading-snug tracking-[-0.005em] mb-1">
         {headline}
       </div>
       {sub && (
-        <div className="font-serif italic text-[14px] text-secondary-foreground leading-snug">
+        <div className="italic text-[14px] text-secondary-foreground leading-snug">
           {sub}
         </div>
       )}
@@ -95,7 +95,7 @@ function RowVariant(props: Extract<PrintCardProps, { variant: "row" }>) {
       )}
       <a
         href={`/proces/${props.term}/${encodeURIComponent(props.number)}`}
-        className="text-foreground hover:text-destructive underline decoration-dotted underline-offset-4 flex-1 leading-snug"
+        className="text-foreground hover:text-foreground underline decoration-dotted underline-offset-4 flex-1 leading-snug"
       >
         {headline}
       </a>

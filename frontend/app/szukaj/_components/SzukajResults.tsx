@@ -30,14 +30,14 @@ function HitRow({ hit }: { hit: FtsHit }) {
   const inner = (
     <div className="py-3 border-b border-rule">
       <div className="flex items-baseline justify-between gap-3 mb-1">
-        <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-destructive">
+        <span className="text-[11px] text-muted-foreground font-medium">
           {FTS_KIND_LABEL[hit.kind]}
         </span>
         {hit.meta && (
           <span className="font-mono text-[10px] text-muted-foreground shrink-0">{hit.meta}</span>
         )}
       </div>
-      <div className="font-serif text-[16px] leading-snug text-foreground line-clamp-2">
+      <div className="text-[16px] leading-snug text-foreground line-clamp-2">
         {hit.label}
       </div>
       {hit.headline && hit.headline !== hit.label && (
@@ -142,7 +142,7 @@ export function SzukajResults({
           <button
             type="button"
             onClick={() => setShown((s) => s + PER_TAB)}
-            className="mt-4 text-[12px] text-muted-foreground hover:text-foreground font-mono uppercase tracking-[0.1em]"
+            className="mt-4 text-[12px] text-muted-foreground hover:text-foreground font-medium"
           >
             Pokaż kolejne {Math.min(remaining, PER_TAB)} ({remaining} pozostało)
           </button>

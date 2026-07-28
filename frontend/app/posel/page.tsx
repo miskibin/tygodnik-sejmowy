@@ -36,7 +36,7 @@ export default async function PoselIndexPage() {
   });
 
   return (
-    <main className="bg-background text-foreground font-serif pb-12 sm:pb-16 min-w-0">
+    <main className="bg-background text-foreground pb-12 sm:pb-16 min-w-0">
       <div className="max-w-[1280px] mx-auto px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 min-w-0">
         <PageBreadcrumb
           items={[{ label: "Posłowie" }]}

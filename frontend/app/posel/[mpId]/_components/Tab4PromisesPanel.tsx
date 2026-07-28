@@ -54,12 +54,12 @@ function KpiTile({
 }) {
   return (
     <div className="py-4 px-4 border border-border" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1.5 flex items-center gap-1.5">
+      <div className="font-sans text-[11px] text-muted-foreground mb-1.5 flex items-center gap-1.5 font-medium">
         {color && <span className="inline-block w-2 h-2 rounded-sm" style={{ background: color }} />}
         {label}
       </div>
       <div
-        className="font-serif font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
+        className="font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
         style={{ fontSize: "clamp(1.6rem, 3vw, 2.1rem)" }}
       >
         {value}
@@ -72,14 +72,14 @@ function KpiTile({
 export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
   if (!data.partyCode) {
     return (
-      <p className="font-serif italic text-muted-foreground text-center py-12">
+      <p className="text-muted-foreground text-center py-12">
         Brak mapowania klubu posła na partię z bazą obietnic.
       </p>
     );
   }
   if (data.rows.length === 0) {
     return (
-      <p className="font-serif italic text-muted-foreground text-center py-12">
+      <p className="text-muted-foreground text-center py-12">
         Brak potwierdzonych dopasowań obietnic do druków dla klubu tego posła w bieżącej kadencji.
       </p>
     );
@@ -113,7 +113,7 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
       </div>
 
       <div className="border border-border p-5" style={{ background: "var(--muted)" }}>
-        <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-4">
+        <div className="font-sans text-[11px] text-muted-foreground mb-4 font-medium">
           Obietnice partii vs głosy posła
         </div>
         <ul>
@@ -124,7 +124,7 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
               style={{ gridTemplateColumns: "minmax(0, 1.6fr) minmax(0, 1fr)" }}
             >
               <div className="min-w-0">
-                <div className="font-serif italic text-[15px] text-foreground leading-snug">
+                <div className="italic text-[15px] text-foreground leading-snug">
                   &ldquo;{row.promiseTitle}&rdquo;
                 </div>
                 <div className="font-mono text-[10px] text-muted-foreground mt-1 tracking-wide">
@@ -200,7 +200,7 @@ export function Tab4PromisesPanel({ data }: { data: MpPromiseAlignments }) {
       </div>
 
       <aside
-        className="font-serif text-[13.5px] leading-[1.65] text-secondary-foreground p-4"
+        className="text-[13.5px] leading-[1.65] text-secondary-foreground p-4"
         style={{ borderLeft: "3px solid var(--warning)", background: "var(--muted)" }}
       >
         <p className="m-0">

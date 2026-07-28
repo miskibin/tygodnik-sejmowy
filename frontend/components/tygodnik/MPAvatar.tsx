@@ -102,8 +102,8 @@ export function MPAvatar({
         <span
           className={
             layout === "stacked"
-              ? "font-serif text-[14px] text-foreground break-words"
-              : "font-serif text-[14px] text-foreground truncate"
+              ? "text-[14px] text-foreground break-words"
+              : "text-[14px] text-foreground truncate"
           }
         >
           {name ?? "—"}

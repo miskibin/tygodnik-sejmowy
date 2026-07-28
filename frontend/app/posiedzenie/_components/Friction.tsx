@@ -16,21 +16,19 @@ function ClashCard({ s }: { s: Clash }) {
     >
       <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
         <span
-          className="font-mono uppercase"
+          className="font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.14em",
           }}
         >
           pkt {s.pointOrd} · {s.pointShort}
         </span>
         <span
-          className="font-mono uppercase"
+          className="font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--destructive-deep)",
-            letterSpacing: "0.14em",
           }}
         >
           ↯ {s.exchanges} starcia
@@ -43,7 +41,7 @@ function ClashCard({ s }: { s: Clash }) {
       >
         <div className="text-right">
           <div
-            className="font-serif font-medium"
+            className="font-medium"
             style={{ fontSize: 17, color: "var(--foreground)" }}
           >
             {s.a}
@@ -53,7 +51,7 @@ function ClashCard({ s }: { s: Clash }) {
           </div>
         </div>
         <div
-          className="font-serif italic"
+          className="italic"
           style={{
             fontSize: 22,
             color: "var(--destructive-deep)",
@@ -65,7 +63,7 @@ function ClashCard({ s }: { s: Clash }) {
         </div>
         <div>
           <div
-            className="font-serif font-medium"
+            className="font-medium"
             style={{ fontSize: 17, color: "var(--foreground)" }}
           >
             {s.b}
@@ -77,7 +75,7 @@ function ClashCard({ s }: { s: Clash }) {
       </div>
 
       <p
-        className="font-serif italic m-0"
+        className="italic m-0"
         style={{
           fontSize: 14,
           lineHeight: 1.5,
@@ -111,7 +109,7 @@ function RebelRow({ r, first }: { r: Rebel; first: boolean }) {
         <MPAvatarPhoto name={r.name} size={40} />
         <div className="flex-1 min-w-0">
           <div
-            className="font-serif font-medium"
+            className="font-medium"
             style={{ fontSize: 17, color: "var(--foreground)", lineHeight: 1.1 }}
           >
             {r.name}
@@ -149,7 +147,7 @@ function RebelRow({ r, first }: { r: Rebel; first: boolean }) {
         </div>
       </div>
       <p
-        className="font-serif italic m-0 pl-[54px]"
+        className="italic m-0 pl-[54px]"
         style={{
           fontSize: 13.5,
           color: "var(--secondary-foreground)",
@@ -177,7 +175,7 @@ export function Friction({ data }: { data: SittingView }) {
 
         {empty ? (
           <p
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 15,
               color: "var(--muted-foreground)",
@@ -198,7 +196,7 @@ export function Friction({ data }: { data: SittingView }) {
               </Kicker>
               {data.clashes.length === 0 ? (
                 <p
-                  className="font-serif italic"
+                  className="italic"
                   style={{ fontSize: 14, color: "var(--muted-foreground)" }}
                 >
                   Brak danych o starciach.
@@ -221,7 +219,7 @@ export function Friction({ data }: { data: SittingView }) {
               </Kicker>
               {data.rebels.length === 0 ? (
                 <p
-                  className="font-serif italic"
+                  className="italic"
                   style={{ fontSize: 14, color: "var(--muted-foreground)" }}
                 >
                   Wszyscy posłowie głosowali z klubem.

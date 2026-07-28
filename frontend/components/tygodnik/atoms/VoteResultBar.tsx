@@ -56,7 +56,7 @@ export function VoteResultBar({ result }: { result: VoteResult }) {
   return (
     <div className="my-5" style={{ minHeight: 76 }}>
       <div className="flex items-baseline justify-between mb-2 gap-2" style={{ minHeight: 20 }}>
-        <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground">
+        <span className="text-[11px] text-muted-foreground font-medium">
           wynik głosowania nr {result.votingNumber}
           {motionLabel && (
             <span className="normal-case tracking-normal font-sans text-[11px] ml-1.5">
@@ -65,7 +65,7 @@ export function VoteResultBar({ result }: { result: VoteResult }) {
           )}
         </span>
         <span
-          className="font-mono text-[10px] tracking-[0.18em] uppercase font-semibold px-2.5 py-0.5 rounded-full border"
+          className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border"
           style={{ color: v.color, borderColor: v.color }}
         >
           {v.label}
@@ -80,34 +80,34 @@ export function VoteResultBar({ result }: { result: VoteResult }) {
 
       <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1 mt-2 font-sans text-[12px]">
         <span>
-          <span className="font-serif text-[16px] font-medium" style={{ color: "var(--success)" }}>
+          <span className="text-[16px] font-medium" style={{ color: "var(--success)" }}>
             {result.yes}
           </span>
-          <span className="ml-1 font-mono text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+          <span className="ml-1 text-[11px] text-muted-foreground font-medium">
             za
           </span>
         </span>
         <span>
-          <span className="font-serif text-[16px] font-medium" style={{ color: "var(--destructive)" }}>
+          <span className="text-[16px] font-medium" style={{ color: "var(--destructive)" }}>
             {result.no}
           </span>
-          <span className="ml-1 font-mono text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+          <span className="ml-1 text-[11px] text-muted-foreground font-medium">
             przeciw
           </span>
         </span>
         <span>
-          <span className="font-serif text-[16px] font-medium text-secondary-foreground">
+          <span className="text-[16px] font-medium text-secondary-foreground">
             {result.abstain}
           </span>
-          <span className="ml-1 font-mono text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+          <span className="ml-1 text-[11px] text-muted-foreground font-medium">
             wstrz.
           </span>
         </span>
         <span>
-          <span className="font-serif text-[16px] font-medium text-muted-foreground">
+          <span className="text-[16px] font-medium text-muted-foreground">
             {result.notParticipating}
           </span>
-          <span className="ml-1 font-mono text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+          <span className="ml-1 text-[11px] text-muted-foreground font-medium">
             nb.
           </span>
         </span>

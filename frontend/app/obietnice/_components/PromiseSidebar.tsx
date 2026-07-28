@@ -64,7 +64,7 @@ function SidebarRack({
   return (
     <div className="space-y-5">
       <div>
-        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+        <div className="text-[11px] text-muted-foreground mb-2 font-medium">
           Aktywność
         </div>
         <div className="space-y-0.5">
@@ -103,7 +103,7 @@ function SidebarRack({
       </div>
 
       <div>
-        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+        <div className="text-[11px] text-muted-foreground mb-2 font-medium">
           Partia
         </div>
         <div className="space-y-0.5">
@@ -150,7 +150,7 @@ function SidebarRack({
         <button
           type="button"
           onClick={onReset}
-          className="font-sans text-[11px] text-destructive underline decoration-dotted underline-offset-4 cursor-pointer"
+          className="font-sans text-[11px] text-foreground underline decoration-dotted underline-offset-4 cursor-pointer"
         >
           wyczyść filtry
         </button>
@@ -193,7 +193,7 @@ export function PromiseSidebar({ counts }: { counts: HubCounts }) {
           onClick={() => setOpen(true)}
           aria-expanded={open}
           aria-haspopup="dialog"
-          className="cursor-pointer w-full inline-flex items-center justify-between gap-2 rounded-full border border-border bg-muted px-4 py-2 font-sans text-[13px] text-foreground transition-colors hover:border-destructive"
+          className="cursor-pointer w-full inline-flex items-center justify-between gap-2 rounded-full border border-border bg-muted px-4 py-2 font-sans text-[13px] text-foreground transition-colors hover:border-foreground"
         >
           <span className="inline-flex items-center gap-2">
             <span className="text-destructive">⌕</span>
@@ -222,7 +222,7 @@ export function PromiseSidebar({ counts }: { counts: HubCounts }) {
           className="bg-background text-foreground max-h-[85vh] overflow-y-auto rounded-t-2xl border-t-2 border-rule"
         >
           <SheetHeader className="pt-5 pb-1">
-            <SheetTitle id={titleId} className="font-serif text-foreground" style={{ fontSize: 20 }}>
+            <SheetTitle id={titleId} className="text-foreground" style={{ fontSize: 20 }}>
               {activeCount > 0 ? `Filtry (${activeCount})` : "Filtruj obietnice"}
             </SheetTitle>
             <SheetDescription className="font-sans text-[12px] text-muted-foreground">

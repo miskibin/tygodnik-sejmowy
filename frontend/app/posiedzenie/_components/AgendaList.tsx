@@ -65,7 +65,7 @@ function PlannedMini({ p }: { p: AgendaPoint }) {
     >
       <Kicker className="mb-1.5">zaplanowane</Kicker>
       <div
-        className="font-serif italic"
+        className="italic"
         style={{ fontSize: 14.5, lineHeight: 1.4 }}
       >
         Punkt rozpocznie się ok.{" "}
@@ -97,7 +97,7 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
       >
         <div>
           <div
-            className="font-serif italic font-medium"
+            className="italic font-medium"
             style={{
               fontSize: 56,
               lineHeight: 0.9,
@@ -110,9 +110,8 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
           <div
             className="font-mono mt-2"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.1em",
               lineHeight: 1.5,
             }}
           >
@@ -124,11 +123,10 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
           </div>
           {p.ongoing && (
             <div
-              className="font-mono uppercase mt-3"
+              className="mt-3 font-medium"
               style={{
-                fontSize: 9.5,
+                fontSize: 11,
                 color: "var(--destructive-deep)",
-                letterSpacing: "0.16em",
               }}
             >
               ● trwa
@@ -136,11 +134,10 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
           )}
           {p.planned && (
             <div
-              className="font-mono uppercase mt-3"
+              className="mt-3 font-medium"
               style={{
-                fontSize: 9.5,
+                fontSize: 11,
                 color: "var(--muted-foreground)",
-                letterSpacing: "0.16em",
               }}
             >
               ○ planowany
@@ -181,7 +178,7 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
       <div className="md:hidden">
         <div className="flex items-baseline gap-3 mb-3">
           <span
-            className="font-serif italic font-medium"
+            className="italic font-medium"
             style={{
               fontSize: 40,
               lineHeight: 0.9,
@@ -193,9 +190,8 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
           <div
             className="font-mono"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.1em",
               lineHeight: 1.5,
             }}
           >
@@ -205,7 +201,6 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
                 className="ml-2 uppercase"
                 style={{
                   color: "var(--destructive-deep)",
-                  letterSpacing: "0.16em",
                 }}
               >
                 ● trwa
@@ -216,7 +211,6 @@ function AgendaRow({ p }: { p: AgendaPoint }) {
                 className="ml-2 uppercase"
                 style={{
                   color: "var(--muted-foreground)",
-                  letterSpacing: "0.16em",
                 }}
               >
                 ○ planowany
@@ -272,7 +266,7 @@ function AgendaCenter({ p }: { p: AgendaPoint }) {
       </div>
 
       <h3
-        className="font-serif font-medium m-0 mb-2"
+        className="font-medium m-0 mb-2"
         style={{
           fontSize: 22,
           lineHeight: 1.2,
@@ -285,7 +279,7 @@ function AgendaCenter({ p }: { p: AgendaPoint }) {
       </h3>
       {p.plainSummary && (
         <p
-          className="font-serif m-0 mb-3.5"
+          className="m-0 mb-3.5"
           style={{
             fontSize: 14.5,
             lineHeight: 1.55,
@@ -299,18 +293,17 @@ function AgendaCenter({ p }: { p: AgendaPoint }) {
 
       <details className="mb-4">
         <summary
-          className="cursor-pointer font-mono uppercase"
+          className="cursor-pointer font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.14em",
             listStyle: "none",
           }}
         >
           ▸ pełny urzędowy tytuł
         </summary>
         <p
-          className="font-serif italic mt-2 mb-0"
+          className="italic mt-2 mb-0"
           style={{
             fontSize: 13,
             color: "var(--muted-foreground)",
@@ -324,11 +317,10 @@ function AgendaCenter({ p }: { p: AgendaPoint }) {
 
       {!p.planned && (
         <div
-          className="flex items-center gap-x-5 gap-y-2 flex-wrap font-mono uppercase"
+          className="flex items-center gap-x-5 gap-y-2 flex-wrap font-medium"
           style={{
-            fontSize: 10.5,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.1em",
           }}
         >
           <span>
@@ -388,11 +380,10 @@ export function AgendaList({ data }: { data: SittingView }) {
 
         <div className="flex gap-2.5 mb-7 flex-wrap font-sans" style={{ fontSize: 12.5 }}>
           <span
-            className="font-mono uppercase self-center mr-1"
+            className="self-center mr-1 font-medium"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.16em",
             }}
           >
             filtruj

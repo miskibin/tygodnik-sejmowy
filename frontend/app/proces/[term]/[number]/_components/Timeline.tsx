@@ -280,7 +280,7 @@ export function Timeline({
       <section className="px-0 py-10 border-b border-border" style={{ background: "var(--muted)" }}>
         <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
           <SectionHead title="Ścieżka projektu" />
-          <p className="font-serif italic text-muted-foreground">
+          <p className="text-muted-foreground">
             Brak etapów procesu legislacyjnego dla tego druku.
           </p>
         </div>
@@ -340,7 +340,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
   return (
       <div className="mb-6 md:mb-7 flex items-baseline gap-4 border-b border-border pb-3">
       <h2
-        className="font-serif font-medium text-foreground m-0"
+        className="font-medium text-foreground m-0"
         style={{ fontSize: 22, lineHeight: 1, letterSpacing: "-0.015em" }}
       >
         {title}
@@ -408,11 +408,10 @@ function StationCell({
               aria-label={`Przejdź do głosowania nr ${s.branch.vote}${
                 s.branch.date ? ` z dnia ${shortDate(s.branch.date)}` : ""
               }`}
-              className="absolute top-0 left-1/2 -translate-x-1/2 font-mono uppercase px-2 py-1 leading-[1.2] text-center hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-1"
+              className="absolute top-0 left-1/2 -translate-x-1/2 px-2 py-1 leading-[1.2] text-center hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-1 font-medium"
               style={{
-                fontSize: 9.5,
+                fontSize: 11,
                 color: "var(--destructive-deep)",
-                letterSpacing: "0.1em",
                 background: "var(--muted)",
                 width: "calc(100% - 8px)",
                 maxWidth: 180,
@@ -436,9 +435,8 @@ function StationCell({
         className="text-center font-mono"
         style={{
           height: 12,
-          fontSize: 9,
+          fontSize: 11,
           color: current ? "var(--destructive)" : "var(--muted-foreground)",
-          letterSpacing: "0.12em",
         }}
       >
         {String(index + 1).padStart(2, "0")}
@@ -446,7 +444,7 @@ function StationCell({
 
       {/* Stage label */}
       <div
-        className="px-1.5 text-center font-serif font-medium flex items-start justify-center"
+        className="px-1.5 text-center font-medium flex items-start justify-center"
         style={{
           height: 42,
           fontSize: 14.5,
@@ -463,9 +461,8 @@ function StationCell({
         className="text-center font-mono"
         style={{
           height: 16,
-          fontSize: 9.5,
+          fontSize: 11,
           color: currentTone,
-          letterSpacing: "0.16em",
         }}
       >
         {current ? "▼ TU JESTEŚMY" : ""}
@@ -507,7 +504,6 @@ function StationCell({
         style={{
           fontSize: 11,
           color: done ? "var(--foreground)" : current ? currentTone : "var(--muted-foreground)",
-          letterSpacing: "0.04em",
           fontWeight: current ? 600 : 400,
         }}
       >
@@ -555,10 +551,9 @@ function StationRowMobile({
         }}
       />
       <div
-        className="font-mono uppercase mb-1"
+        className="mb-1 font-medium"
         style={{
-          fontSize: 10,
-          letterSpacing: "0.12em",
+          fontSize: 11,
           color: current ? currentTone : "var(--muted-foreground)",
         }}
       >
@@ -566,7 +561,7 @@ function StationRowMobile({
         {current && <> &nbsp;·&nbsp; TU JESTEŚMY</>}
       </div>
       <div
-        className="font-serif font-medium leading-tight"
+        className="font-medium leading-tight"
         style={{
           fontSize: 17,
           color: done || current ? "var(--foreground)" : "var(--muted-foreground)",
@@ -606,24 +601,23 @@ function ActiveDetail({ s }: { s: Station }) {
       }}
     >
       <div
-        className="font-mono uppercase mb-1"
+        className="mb-1 font-medium"
         style={{
           fontSize: 11,
           color: s.status === "current" ? "var(--destructive)" : "var(--muted-foreground)",
-          letterSpacing: "0.16em",
         }}
       >
         {shortDate(s.date)}
         {s.actor && <> &nbsp;·&nbsp; {s.actor}</>}
       </div>
       <div
-        className="font-serif font-medium text-foreground mb-1.5"
+        className="font-medium text-foreground mb-1.5"
         style={{ fontSize: 22, lineHeight: 1.2 }}
       >
         {s.stage}.
       </div>
       <p
-        className="font-serif text-foreground m-0"
+        className="text-foreground m-0"
         style={{
           fontSize: 15.5,
           lineHeight: 1.55,
@@ -639,11 +633,10 @@ function ActiveDetail({ s }: { s: Station }) {
           aria-label={`Przejdź do głosowania nr ${s.branch.vote}${
             s.branch.date ? ` z dnia ${shortDate(s.branch.date)}` : ""
           }`}
-          className="mt-3 inline-flex items-center gap-2.5 font-mono uppercase px-2.5 py-1.5 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-2"
+          className="mt-3 inline-flex items-center gap-2.5 px-2.5 py-1.5 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-2 font-medium"
           style={{
             fontSize: 11,
             color: "var(--destructive-deep)",
-            letterSpacing: "0.1em",
             background: "var(--highlight)",
             minHeight: 44,
           }}

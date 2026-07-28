@@ -26,7 +26,7 @@ export function StanceSponsorChip({
   return (
     <div className="flex flex-wrap items-center gap-2 mb-3 font-sans text-[11px]">
       <span className="inline-flex items-center gap-1.5 text-secondary-foreground">
-        <span className="font-mono text-[9px] tracking-[0.14em] uppercase text-muted-foreground">
+        <span className="text-[11px] text-muted-foreground font-medium">
           wniósł
         </span>
         <span>{sponsorText}</span>

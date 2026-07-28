@@ -50,15 +50,15 @@ export function SondazeHero({ rows, lastUpdateLabel }: { rows: PollAverageRow[];
   return (
     <section className="grid gap-8 md:gap-12 lg:gap-16 md:grid-cols-[1.25fr_1fr] items-start pb-10 md:pb-12 border-b border-border">
       <div className="min-w-0">
-        <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-destructive mb-4">
+        <div className="font-sans text-[11px] text-muted-foreground mb-4 font-medium">
           ✶ &nbsp; Gdyby wybory były w niedzielę
         </div>
         <h1
-          className="font-serif font-medium m-0 leading-[0.98] tracking-[-0.035em] text-balance"
+          className="font-medium m-0 leading-[0.98] tracking-[-0.035em] text-balance"
           style={{ fontSize: "clamp(2.25rem, 7vw, 4.75rem)" }}
         >
           <em
-            className="not-italic font-serif italic"
+            className="not-italic italic"
             style={{ color: dominantBloc.color }}
           >
             {dominantBloc.label}
@@ -76,7 +76,7 @@ export function SondazeHero({ rows, lastUpdateLabel }: { rows: PollAverageRow[];
           )}
         </h1>
         <p
-          className="font-serif text-secondary-foreground mt-5 sm:mt-6 mb-0 leading-[1.5] sm:leading-[1.55] text-[16px] sm:text-[19px] max-w-[620px] text-pretty"
+          className="text-secondary-foreground mt-5 sm:mt-6 mb-0 leading-[1.5] sm:leading-[1.55] text-[16px] sm:text-[19px] max-w-[620px] text-pretty"
         >
           Średnia ważona z ostatnich 30 dni — świeższe sondaże ważą więcej. Próg do Sejmu {SEJM_THRESHOLD_PCT}%
           dla partii, 8% dla koalicji. Większość bezwzględna: 231 z 460 mandatów.
@@ -88,7 +88,7 @@ export function SondazeHero({ rows, lastUpdateLabel }: { rows: PollAverageRow[];
           <BlocStat label="Pozostałe" pct={otherPct} color="var(--muted-foreground)" />
         </div>
 
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5 sm:gap-x-5 mt-6 sm:mt-7 font-mono text-[10px] sm:text-[11px] uppercase text-muted-foreground tracking-wide sm:tracking-wider">
+        <div className="flex flex-wrap gap-x-3 gap-y-1.5 sm:gap-x-5 mt-6 sm:mt-7 text-[11px] text-muted-foreground tracking-wide sm:tracking-wider font-medium">
           <span>Aktualizacja: {lastUpdateLabel}</span>
           {latestPoll && (
             <>
@@ -106,7 +106,7 @@ export function SondazeHero({ rows, lastUpdateLabel }: { rows: PollAverageRow[];
         className="bg-muted border border-rule p-3 sm:p-5 relative"
         style={{ boxShadow: "6px 6px 0 var(--rule)" }}
       >
-        <div className="font-sans text-[10px] tracking-[0.18em] uppercase text-destructive mb-3">
+        <div className="font-sans text-[11px] text-muted-foreground mb-3 font-medium">
           Prognozowany Sejm
         </div>
         <SeatProjection rows={rows} compact />
@@ -135,12 +135,12 @@ export function SondazeHero({ rows, lastUpdateLabel }: { rows: PollAverageRow[];
 function BlocStat({ label, pct, color }: { label: string; pct: number; color: string }) {
   return (
     <div>
-      <div className="font-mono text-[9.5px] sm:text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-1.5">
+      <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
         {label}
       </div>
       <div className="flex items-baseline gap-1">
         <span
-          className="font-serif font-medium text-[clamp(1.5rem,4vw,2rem)] leading-none tabular-nums"
+          className="font-medium text-[clamp(1.5rem,4vw,2rem)] leading-none tabular-nums"
           style={{ color, letterSpacing: "-0.02em" }}
         >
           {fmtPct(pct)}

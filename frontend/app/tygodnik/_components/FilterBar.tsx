@@ -49,12 +49,12 @@ function ChipRack({
     <>
       <div className={stacked ? "" : "flex items-center gap-1.5 flex-wrap font-sans text-[12px]"}>
         {!stacked && (
-          <span className="text-muted-foreground tracking-[0.1em] uppercase text-[10px] mr-1">
+          <span className="text-muted-foreground text-[11px] mr-1 font-medium">
             tematy:
           </span>
         )}
         {stacked && (
-          <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2.5">
+          <div className="text-[11px] text-muted-foreground mb-2.5 font-medium">
             tematy
           </div>
         )}
@@ -89,7 +89,7 @@ function ChipRack({
         <button
           onClick={() => onToggleShowPersonas(!showPersonas)}
           aria-expanded={showPersonas}
-          className="cursor-pointer font-sans text-[10.5px] tracking-[0.16em] uppercase text-muted-foreground hover:text-destructive transition-colors"
+          className="cursor-pointer font-sans text-[11px] text-muted-foreground hover:text-foreground transition-colors font-medium"
         >
           {showPersonas ? "▾" : "▸"} Filtry osobiste — kim jestem
           {!showPersonas && hydrated && personas.length > 0 && (
@@ -207,7 +207,7 @@ export function FilterBar() {
           onClick={() => setOpen(true)}
           aria-expanded={open}
           aria-haspopup="dialog"
-          className="cursor-pointer w-full inline-flex items-center justify-between gap-2 rounded-full border border-border bg-muted px-4 py-2 font-sans text-[13px] text-foreground transition-colors hover:border-destructive"
+          className="cursor-pointer w-full inline-flex items-center justify-between gap-2 rounded-full border border-border bg-muted px-4 py-2 font-sans text-[13px] text-foreground transition-colors hover:border-foreground"
         >
           <span className="inline-flex items-center gap-2">
             <span className="text-destructive">⌕</span>
@@ -240,7 +240,7 @@ export function FilterBar() {
           <SheetHeader className="pt-5 pb-1">
             <SheetTitle
               id={titleId}
-              className="font-serif text-foreground"
+              className="text-foreground"
               style={{ fontSize: 20 }}
             >
               {activeCount > 0 ? `Filtry (${activeCount})` : "Filtruj tematy"}

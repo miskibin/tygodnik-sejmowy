@@ -15,7 +15,7 @@ export function DotyczyCallout({
 }) {
   return (
     <div
-      className="font-serif italic text-foreground my-5"
+      className="italic text-foreground my-5"
       style={{
         fontSize: size === "large" ? 21 : 19,
         lineHeight: 1.5,
@@ -26,7 +26,7 @@ export function DotyczyCallout({
       }}
     >
       {kicker && (
-        <div className="font-sans not-italic font-medium text-[10px] tracking-[0.18em] uppercase text-destructive mb-2">
+        <div className="font-sans not-italic font-medium text-[11px] text-muted-foreground mb-2">
           {kicker}
         </div>
       )}

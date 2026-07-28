@@ -46,11 +46,10 @@ export function RebelCard({ rebel, term }: { rebel: Rebel; term: number }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div
-          className="flex items-center gap-2 font-mono uppercase"
+          className="flex items-center gap-2 font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.14em",
             marginBottom: 10,
           }}
         >
@@ -70,7 +69,7 @@ export function RebelCard({ rebel, term }: { rebel: Rebel; term: number }) {
       </div>
 
       <h3
-        className="font-serif"
+        className=""
         style={{
           fontSize: 22,
           fontWeight: 500,
@@ -127,7 +126,7 @@ export function RebelCard({ rebel, term }: { rebel: Rebel; term: number }) {
 
       {rebel.priorRebellions > 0 && (
         <p
-          className="font-serif italic"
+          className="italic"
           style={{
             fontSize: 14,
             lineHeight: 1.5,

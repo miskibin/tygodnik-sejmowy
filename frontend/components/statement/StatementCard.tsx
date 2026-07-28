@@ -102,9 +102,9 @@ function FeedVariant(
         {sittingLine && <div className="mt-0.5">{sittingLine}</div>}
       </div>
       <div className="min-w-0">
-        <div className="font-serif text-[17px] font-medium leading-snug tracking-[-0.005em]">
+        <div className="text-[17px] font-medium leading-snug tracking-[-0.005em]">
           {props.mpId != null ? (
-            <Link href={`/posel/${props.mpId}`} className="hover:text-destructive">
+            <Link href={`/posel/${props.mpId}`} className="hover:text-foreground">
               {props.speakerName ?? "—"}
             </Link>
           ) : (
@@ -117,24 +117,24 @@ function FeedVariant(
           )}
         </div>
         {props.function && (
-          <div className="font-sans text-[11px] text-muted-foreground mb-1.5 mt-0.5 uppercase tracking-[0.12em]">
+          <div className="font-sans text-[11px] text-muted-foreground mb-1.5 mt-0.5 font-medium">
             {props.function}
           </div>
         )}
         {agendaTopic && (
-          <div className="font-serif text-[12.5px] italic text-secondary-foreground mt-1 mb-0.5 leading-snug">
-            <span className="not-italic font-sans text-[10px] uppercase tracking-[0.16em] text-muted-foreground mr-1.5">
+          <div className="text-[12.5px] italic text-secondary-foreground mt-1 mb-0.5 leading-snug">
+            <span className="not-italic font-sans text-[11px] text-muted-foreground mr-1.5 font-medium">
               Punkt
             </span>
             {agendaTopic}
           </div>
         )}
         {props.processTitle && props.processTitle !== agendaTopic && (
-          <div className="font-serif text-[11.5px] text-muted-foreground leading-snug">
+          <div className="text-[11.5px] text-muted-foreground leading-snug">
             {props.processTitle}
           </div>
         )}
-        <p className="font-serif italic text-[15px] text-foreground leading-snug m-0 mt-1.5">
+        <p className="italic text-[15px] text-foreground leading-snug m-0 mt-1.5">
           {props.excerpt}
         </p>
         {printRefs.length > 0 && (
@@ -145,7 +145,7 @@ function FeedVariant(
                 <Link
                   key={`${p.printTerm}/${p.printNumber}/${p.source}`}
                   href={`/proces/${p.printTerm}/${p.printNumber}`}
-                  className="px-1.5 py-0.5 rounded-sm tracking-wide hover:text-destructive"
+                  className="px-1.5 py-0.5 rounded-sm tracking-wide hover:text-foreground"
                   title={p.shortTitle ?? `druk ${p.printNumber}`}
                   style={{
                     border: `1px solid ${dim ? "var(--border)" : "var(--secondary-foreground)"}`,
@@ -170,7 +170,7 @@ function FeedVariant(
         <div className="flex gap-4 flex-wrap mt-2.5 font-sans text-[11px]">
           <Link
             href={`/mowa/${props.id}`}
-            className="text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
+            className="text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
           >
             Czytaj całość →
           </Link>
@@ -179,7 +179,7 @@ function FeedVariant(
               href={props.transcriptUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-destructive"
+              className="text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground"
             >
               ↗ Stenogram (sejm.gov.pl)
             </a>
@@ -212,7 +212,7 @@ function InlineVariant(
         <div className="flex flex-wrap items-baseline gap-2 mb-1.5">
           {props.rapporteur && (
             <span
-              className="font-sans text-[10px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-sm"
+              className="font-sans text-[11px] px-1.5 py-0.5 rounded-sm font-medium"
               style={{ color: "var(--destructive)", border: "1px solid var(--destructive)" }}
             >
               sprawozdawca
@@ -220,21 +220,21 @@ function InlineVariant(
           )}
           {props.secretary && (
             <span
-              className="font-sans text-[10px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-sm"
+              className="font-sans text-[11px] px-1.5 py-0.5 rounded-sm font-medium"
               style={{ color: "var(--warning)", border: "1px solid var(--warning)" }}
             >
               sekretarz
             </span>
           )}
           {props.function && !props.rapporteur && !props.secretary && (
-            <span className="font-sans text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="font-sans text-[11px] text-muted-foreground font-medium">
               {props.function}
             </span>
           )}
         </div>
         <Link
           href={`/mowa/${props.id}`}
-          className="font-serif text-[15.5px] leading-snug text-foreground hover:text-destructive block"
+          className="text-[15.5px] leading-snug text-foreground hover:text-foreground block"
         >
           {props.excerpt || "(brak tekstu wystąpienia)"}
         </Link>
@@ -250,7 +250,7 @@ function HitVariant(props: Extract<StatementCardProps, { variant: "hit" }>) {
         href={`/mowa/${props.id}`}
         className="block py-5 px-1 hover:bg-muted"
       >
-        <div className="flex items-baseline justify-between gap-4 mb-2 font-sans text-[10px] tracking-[0.18em] uppercase">
+        <div className="flex items-baseline justify-between gap-4 mb-2 font-sans text-[11px] font-medium">
           <span className="text-secondary-foreground">
             Wystąpienie · kad. {props.term}
             {props.speakerName ? ` · ${props.speakerName}` : ""}
@@ -262,7 +262,7 @@ function HitVariant(props: Extract<StatementCardProps, { variant: "hit" }>) {
         {props.function && (
           <div className="font-sans text-[11px] text-muted-foreground mb-1">{props.function}</div>
         )}
-        <div className="font-serif italic text-[15px] text-foreground leading-snug">
+        <div className="italic text-[15px] text-foreground leading-snug">
           {props.excerpt}
         </div>
       </Link>
@@ -272,7 +272,7 @@ function HitVariant(props: Extract<StatementCardProps, { variant: "hit" }>) {
             href={props.transcriptUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-sans text-[10.5px] text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-destructive"
+            className="font-sans text-[10.5px] text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground"
           >
             ↗ stenogram (PDF)
           </a>
@@ -300,7 +300,7 @@ function RelatedVariant(
         </div>
         {props.viralQuote && (
           <p
-            className="font-serif italic text-foreground m-0 leading-snug group-hover:text-destructive transition-colors"
+            className="italic text-foreground m-0 leading-snug group-hover:text-foreground transition-colors"
             style={{ fontSize: 16, textWrap: "balance" }}
           >
             „{props.viralQuote}”

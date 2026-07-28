@@ -82,7 +82,7 @@ export default async function MowaPage() {
         <PageBreadcrumb
           items={[{ label: "Mowa sejmowa" }]}
           subtitle={
-            <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted-foreground">
+            <span className="text-[11px] text-muted-foreground font-medium">
               cytaty rezonansowe · X kadencja
             </span>
           }
@@ -96,12 +96,12 @@ export default async function MowaPage() {
           <div className="max-w-[1100px] mx-auto">
             <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 mb-8">
               <h2
-                className="font-serif font-medium tracking-[-0.025em] leading-none m-0"
+                className="font-medium tracking-[-0.025em] leading-none m-0"
                 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)" }}
               >
                 Pozostałe <span className="italic text-destructive">cytaty</span>
               </h2>
-              <p className="font-serif italic text-[14px] text-secondary-foreground m-0">
+              <p className="italic text-[14px] text-secondary-foreground m-0">
                 Każdy klikalny — prowadzi do pełnej wypowiedzi.
               </p>
             </div>
@@ -126,7 +126,7 @@ export default async function MowaPage() {
                       className="absolute left-0 top-0 h-full w-[3px]"
                       style={{ background: klubColor, opacity: 0.6 }}
                     />
-                    <div className="flex items-center justify-between mb-3 font-mono text-[10px] tracking-[0.16em] uppercase">
+                    <div className="flex items-center justify-between mb-3 text-[11px] font-medium">
                       <span style={{ color: klubColor }}>
                         {klubLabel ?? "—"}
                       </span>
@@ -135,12 +135,12 @@ export default async function MowaPage() {
                       )}
                     </div>
                     <blockquote
-                      className="font-serif italic text-foreground leading-[1.25] line-clamp-4 mb-3"
+                      className="italic text-foreground leading-[1.25] line-clamp-4 mb-3"
                       style={{ fontSize: 15, textWrap: "balance" }}
                     >
                       <span
                         aria-hidden
-                        className="select-none mr-1 font-serif italic"
+                        className="select-none mr-1 italic"
                         style={{ color: klubColor, opacity: 0.4 }}
                       >
                         “
@@ -151,7 +151,7 @@ export default async function MowaPage() {
                       <span className="font-sans text-[12px] text-foreground/85 truncate pr-2">
                         {q.speakerName ?? "anonim"}
                       </span>
-                      <span className="font-mono text-[10px] tracking-wide text-muted-foreground group-hover:text-destructive transition-colors shrink-0">
+                      <span className="font-mono text-[10px] tracking-wide text-muted-foreground group-hover:text-foreground transition-colors shrink-0">
                         →
                       </span>
                     </div>

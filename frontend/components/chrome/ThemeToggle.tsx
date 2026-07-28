@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { ContrastIcon, MoonIcon, SunIcon } from "lucide-react";
+import { MoonIcon, SunIcon } from "lucide-react";
 
 type Variant = "masthead" | "mobile";
 
@@ -13,9 +13,8 @@ type CycleStep = {
 };
 
 const CYCLE: Record<string, CycleStep> = {
-  light: { next: "dark",  Icon: MoonIcon,     label: "Włącz tryb ciemny" },
-  dark:  { next: "slate", Icon: ContrastIcon, label: "Włącz tryb stonowany" },
-  slate: { next: "light", Icon: SunIcon,      label: "Włącz tryb jasny" },
+  light: { next: "dark",  Icon: MoonIcon, label: "Włącz tryb ciemny" },
+  dark:  { next: "light", Icon: SunIcon,  label: "Włącz tryb jasny" },
 };
 
 export function ThemeToggle({ variant = "masthead" }: { variant?: Variant }) {

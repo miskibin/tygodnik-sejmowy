@@ -19,7 +19,7 @@ export function SearchHero({
     <div className="relative mb-5">
       <span
         aria-hidden
-        className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 font-serif text-destructive pointer-events-none"
+        className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-destructive pointer-events-none"
         style={{ fontSize: "clamp(20px, 5vw, 26px)" }}
       >
         ⌕
@@ -29,7 +29,7 @@ export function SearchHero({
         value={value}
         onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-transparent outline-none font-serif text-foreground placeholder:italic placeholder:text-muted-foreground"
+        className="w-full bg-transparent outline-none text-foreground placeholder:italic placeholder:text-muted-foreground"
         style={{
           fontSize: "clamp(16px, 3.2vw, 22px)",
           padding: "14px 96px 14px 40px",

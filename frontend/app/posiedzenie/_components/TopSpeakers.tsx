@@ -18,7 +18,7 @@ export function TopSpeakers({ data }: { data: SittingView }) {
             anchor="mowcy"
           />
           <p
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 14.5, color: "var(--muted-foreground)" }}
           >
             Ranking mówców pojawi się po zaindeksowaniu stenogramów.
@@ -40,13 +40,12 @@ export function TopSpeakers({ data }: { data: SittingView }) {
         />
 
         <div
-          className="hidden md:grid items-center pb-2.5 mb-2 font-mono uppercase"
+          className="hidden md:grid items-center pb-2.5 mb-2 font-medium"
           style={{
             gridTemplateColumns: "40px minmax(220px, 1fr) minmax(240px, 1.2fr) 80px 160px minmax(220px, 1.4fr)",
             gap: 16,
-            fontSize: 9.5,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.14em",
             borderBottom: "1px solid var(--rule)",
           }}
         >
@@ -69,7 +68,7 @@ export function TopSpeakers({ data }: { data: SittingView }) {
             }}
           >
             <div
-              className="font-serif italic font-medium"
+              className="italic font-medium"
               style={{
                 fontSize: 24,
                 color:
@@ -86,7 +85,7 @@ export function TopSpeakers({ data }: { data: SittingView }) {
               <MPAvatarPhoto name={s.name} size={36} />
               <div className="min-w-0">
                 <div
-                  className="font-serif font-medium truncate"
+                  className="font-medium truncate"
                   style={{
                     fontSize: 16,
                     color: "var(--foreground)",
@@ -141,7 +140,7 @@ export function TopSpeakers({ data }: { data: SittingView }) {
             </div>
 
             <div
-              className="font-serif italic"
+              className="italic"
               style={{
                 fontSize: 13,
                 color: "var(--secondary-foreground)",
@@ -165,7 +164,7 @@ export function TopSpeakers({ data }: { data: SittingView }) {
             >
               <div className="flex items-center gap-3 mb-2">
                 <span
-                  className="font-serif italic font-medium"
+                  className="italic font-medium"
                   style={{
                     fontSize: 24,
                     color: i === 0
@@ -180,7 +179,7 @@ export function TopSpeakers({ data }: { data: SittingView }) {
                 <MPAvatarPhoto name={s.name} size={36} />
                 <div className="min-w-0 flex-1">
                   <div
-                    className="font-serif font-medium"
+                    className="font-medium"
                     style={{
                       fontSize: 16,
                       color: "var(--foreground)",
@@ -222,7 +221,7 @@ export function TopSpeakers({ data }: { data: SittingView }) {
                 <ToneBadge tone={s.dominantTone} />
               </div>
               <p
-                className="font-serif italic m-0"
+                className="italic m-0"
                 style={{
                   fontSize: 13,
                   color: "var(--secondary-foreground)",

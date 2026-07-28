@@ -108,14 +108,14 @@ export default async function StatementPage({
             />
           ) : (
             s.summaryOneLine && (
-              <p className="my-10 max-w-[720px] mx-auto font-serif italic text-secondary-foreground leading-snug" style={{ fontSize: 22, textWrap: "pretty" }}>
+              <p className="my-10 max-w-[720px] mx-auto italic text-secondary-foreground leading-snug" style={{ fontSize: 22, textWrap: "pretty" }}>
                 {s.summaryOneLine}
               </p>
             )
           )}
 
           {s.viralQuote && s.summaryOneLine && (
-            <p className="font-serif text-secondary-foreground m-0 mb-2 leading-snug max-w-[680px] mx-auto" style={{ fontSize: 17, textWrap: "pretty" }}>
+            <p className="text-secondary-foreground m-0 mb-2 leading-snug max-w-[680px] mx-auto" style={{ fontSize: 17, textWrap: "pretty" }}>
               {s.summaryOneLine}
             </p>
           )}
@@ -149,11 +149,11 @@ export default async function StatementPage({
                 className="my-12 px-5 py-6 border-l-2 border-destructive"
                 style={{ background: "var(--muted)" }}
               >
-                <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-destructive mb-2">
+                <div className="text-[11px] text-muted-foreground mb-2 font-medium">
                   Treść niedostępna
                 </div>
                 <p
-                  className="font-serif text-secondary-foreground m-0 leading-snug"
+                  className="text-secondary-foreground m-0 leading-snug"
                   style={{ fontSize: 17 }}
                 >
                   Pełna transkrypcja tej wypowiedzi nie została jeszcze pobrana ze
@@ -165,7 +165,7 @@ export default async function StatementPage({
                         href={s.transcriptUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                        className="text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
                       >
                         PDF stenogramu
                       </a>
@@ -198,7 +198,7 @@ export default async function StatementPage({
                   label="Kluczowe tezy"
                   subtitle="Wyciągnięte przez model językowy"
                 />
-                <ul className="my-3 pl-5 font-serif text-foreground" style={{ fontSize: 15, lineHeight: 1.55 }}>
+                <ul className="my-3 pl-5 text-foreground" style={{ fontSize: 15, lineHeight: 1.55 }}>
                   {s.keyClaims.slice(0, 3).map((c, i) => (
                     <li key={i} className="mb-2 marker:text-destructive">{c}</li>
                   ))}
@@ -214,12 +214,12 @@ export default async function StatementPage({
                   subtitle="Dokumenty omawiane w wypowiedzi"
                 />
                 <div className="my-3 p-4 border-l-2 border-destructive" style={{ background: "var(--muted)" }}>
-                  <ul className="font-serif" style={{ fontSize: 14, lineHeight: 1.5 }}>
+                  <ul className="" style={{ fontSize: 14, lineHeight: 1.5 }}>
                     {s.printRefs.map((p) => (
                       <li key={`${p.printTerm}-${p.printNumber}`} className="mb-1.5">
                         <Link
                           href={`/proces/${p.printTerm}/${encodeURIComponent(p.printNumber)}`}
-                          className="text-foreground hover:text-destructive underline decoration-dotted underline-offset-4"
+                          className="text-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
                         >
                           druk {p.printNumber}
                           {p.shortTitle && `: ${p.shortTitle}`}
@@ -239,7 +239,7 @@ export default async function StatementPage({
           <footer className="pt-6 mt-12 border-t border-border font-mono text-[10px] tracking-wide text-muted-foreground leading-relaxed">
             Źródło: stenogram posiedzenia Sejmu RP X kadencji.{" "}
             {s.transcriptUrl && (
-              <a href={s.transcriptUrl} target="_blank" rel="noopener noreferrer" className="text-destructive underline decoration-dotted">
+              <a href={s.transcriptUrl} target="_blank" rel="noopener noreferrer" className="text-foreground underline decoration-dotted">
                 Pełny stenogram (PDF)
               </a>
             )}

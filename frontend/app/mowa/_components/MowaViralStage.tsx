@@ -90,7 +90,7 @@ export function MowaViralStage({ quotes, intervalMs = 5500 }: Props) {
 
       <div className="relative max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-10 md:pt-14 pb-12 md:pb-16">
         <div className="flex items-baseline justify-between flex-wrap gap-3 mb-6">
-          <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-destructive">
+          <div className="text-[11px] text-muted-foreground font-medium">
             ✶ Najgłośniej w Sejmie
           </div>
           <div className="font-mono text-[10px] tracking-wide text-muted-foreground">
@@ -110,7 +110,7 @@ export function MowaViralStage({ quotes, intervalMs = 5500 }: Props) {
               aria-hidden
             />
             <span
-              className="font-mono text-[11px] tracking-[0.18em] uppercase"
+              className="text-[11px] font-medium"
               style={{ color: klubColor }}
             >
               {klubLabel ?? "—"}
@@ -126,7 +126,7 @@ export function MowaViralStage({ quotes, intervalMs = 5500 }: Props) {
           </div>
 
           <blockquote
-            className="font-serif italic text-foreground leading-[1.08] m-0"
+            className="italic text-foreground leading-[1.08] m-0"
             style={{
               fontSize: "clamp(1.75rem, 5.5vw, 3.75rem)",
               letterSpacing: "-0.02em",
@@ -135,7 +135,7 @@ export function MowaViralStage({ quotes, intervalMs = 5500 }: Props) {
           >
             <span
               aria-hidden
-              className="select-none mr-2 font-serif italic"
+              className="select-none mr-2 italic"
               style={{ color: klubColor, opacity: 0.35 }}
             >
               “
@@ -144,7 +144,7 @@ export function MowaViralStage({ quotes, intervalMs = 5500 }: Props) {
           </blockquote>
 
           <figcaption className="mt-6 flex items-baseline gap-3 flex-wrap">
-            <span className="font-serif text-[18px] md:text-[20px] text-foreground/90">
+            <span className="text-[18px] md:text-[20px] text-foreground/90">
               — {q.speakerName ?? "anonim"}
             </span>
             {q.function && (
@@ -152,7 +152,7 @@ export function MowaViralStage({ quotes, intervalMs = 5500 }: Props) {
                 {q.function}
               </span>
             )}
-            <span className="ml-auto font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground group-hover:text-destructive transition-colors">
+            <span className="ml-auto text-[11px] text-muted-foreground group-hover:text-foreground transition-colors font-medium">
               przeczytaj wypowiedź →
             </span>
           </figcaption>

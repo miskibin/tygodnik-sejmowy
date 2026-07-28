@@ -74,7 +74,7 @@ export function LandingHero({
       <div className="max-w-[1100px] mx-auto grid gap-10 md:gap-14 grid-cols-1 md:[grid-template-columns:1.1fr_1fr] items-center">
         {/* Left — pitch */}
         <div>
-          <div className="font-sans text-[11px] tracking-[0.2em] uppercase text-destructive mb-4">
+          <div className="font-sans text-[11px] text-muted-foreground mb-4 font-medium">
             ✶ tygodnik obywatelski
           </div>
           <h1
@@ -82,11 +82,11 @@ export function LandingHero({
             style={{ fontSize: "clamp(2rem, 5vw, 3.25rem)" }}
           >
             Sejm{" - "}
-            <span className="italic text-destructive">co tydzień.</span>
+            <span className="italic">co tydzień.</span>
           </h1>
-          <p className="font-serif italic text-[15px] md:text-[17px] text-secondary-foreground leading-[1.5] m-0 max-w-[480px]">
+          <p className="italic text-[15px] md:text-[17px] text-secondary-foreground leading-[1.5] m-0 max-w-[480px]">
             Krótko, jasno. Wydanie piątkowe na&nbsp;stronie i&nbsp;przez{" "}
-            <a href="/rss.xml" className="not-italic font-mono text-[13px] tracking-wide text-destructive hover:underline">RSS</a>.
+            <a href="/rss.xml" className="not-italic font-mono text-[13px] tracking-wide text-foreground hover:underline">RSS</a>.
           </p>
 
           {viralQuotes.length > 0 && (
@@ -105,7 +105,7 @@ export function LandingHero({
         {/* Right — entry form */}
         <div className="bg-muted border border-rule rounded-lg p-5 md:p-6">
           <div className="block">
-            <div className="font-sans text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+            <div className="font-sans text-[11px] text-muted-foreground mb-2 font-medium">
               Kod pocztowy
             </div>
             <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -118,18 +118,18 @@ export function LandingHero({
                 aria-label="Kod pocztowy"
               >
                 <InputOTPGroup>
-                  <InputOTPSlot index={0} className="size-10 text-[18px] font-serif" />
-                  <InputOTPSlot index={1} className="size-10 text-[18px] font-serif" />
+                  <InputOTPSlot index={0} className="size-10 text-[18px]" />
+                  <InputOTPSlot index={1} className="size-10 text-[18px]" />
                 </InputOTPGroup>
                 <InputOTPSeparator />
                 <InputOTPGroup>
-                  <InputOTPSlot index={2} className="size-10 text-[18px] font-serif" />
-                  <InputOTPSlot index={3} className="size-10 text-[18px] font-serif" />
-                  <InputOTPSlot index={4} className="size-10 text-[18px] font-serif" />
+                  <InputOTPSlot index={2} className="size-10 text-[18px]" />
+                  <InputOTPSlot index={3} className="size-10 text-[18px]" />
+                  <InputOTPSlot index={4} className="size-10 text-[18px]" />
                 </InputOTPGroup>
               </InputOTP>
               {district && (
-                <span className="font-serif text-[13px] italic text-destructive truncate">
+                <span className="text-[13px] italic text-foreground truncate">
                   okręg <strong className="not-italic font-semibold">{district.num}</strong> · {district.name}
                 </span>
               )}
@@ -147,8 +147,8 @@ export function LandingHero({
               so this matches what's actually in the corpus. */}
           <div className="mt-5">
             <div className="flex justify-between items-baseline mb-2">
-              <span className="font-sans text-[10px] tracking-[0.16em] uppercase text-muted-foreground">Czego dotyczy</span>
-              <span className="font-mono text-[10px] tracking-wide" style={{ color: topics.length ? "var(--destructive)" : "var(--muted-foreground)" }}>
+              <span className="font-sans text-[11px] text-muted-foreground font-medium">Czego dotyczy</span>
+              <span className="font-mono text-[10px] tracking-wide" style={{ color: topics.length ? "var(--foreground)" : "var(--muted-foreground)" }}>
                 {topics.length}/{TOPIC_IDS.length}
               </span>
             </div>
@@ -183,11 +183,11 @@ export function LandingHero({
           <div className="mt-4">
             <button
               onClick={() => setShowPersonas(!showPersonas)}
-              className="cursor-pointer font-sans text-[10.5px] tracking-[0.16em] uppercase text-muted-foreground hover:text-destructive transition-colors"
+              className="cursor-pointer font-sans text-[11px] text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               {showPersonas ? "▾" : "▸"} Filtry osobiste — kim jestem
               {!showPersonas && personas.length > 0 && (
-                <span className="ml-2 normal-case tracking-wide text-destructive">({personas.length})</span>
+                <span className="ml-2 normal-case tracking-wide text-muted-foreground">({personas.length})</span>
               )}
             </button>
             {showPersonas && (
@@ -223,7 +223,7 @@ export function LandingHero({
 
           <button
             onClick={() => router.push("/tygodnik")}
-            className="mt-5 w-full text-center cursor-pointer bg-foreground text-background hover:bg-destructive transition-colors py-3 px-4 rounded-full font-sans text-[13.5px] tracking-wide"
+            className="mt-5 w-full text-center cursor-pointer bg-foreground text-background hover:opacity-90 transition-opacity py-3 px-4 rounded-full font-sans text-[13.5px] tracking-wide"
           >
             Zobacz mój Tygodnik &nbsp;→
           </button>

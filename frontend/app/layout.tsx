@@ -16,10 +16,13 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
 });
 
+// Source Serif is now the display face only — the masthead wordmark, which is
+// `font-medium` with an italic second word. Loading the full 400/500/600/700 ×
+// normal/italic matrix shipped 8 font files for one span.
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["500"],
   style: ["normal", "italic"],
 });
 
@@ -96,8 +99,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fdfcf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#161310" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
   ],
 };
 
@@ -141,7 +144,7 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          themes={["light", "dark", "slate"]}
+          themes={["light", "dark"]}
           enableSystem={false}
           disableTransitionOnChange
         >

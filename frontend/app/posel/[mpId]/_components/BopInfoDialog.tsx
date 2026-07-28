@@ -24,17 +24,17 @@ export function BopInfoDialog() {
       </DialogTrigger>
       <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-serif font-medium text-xl tracking-[-0.015em]">
+          <DialogTitle className="font-medium text-xl tracking-[-0.015em]">
             Sprawozdania wydatków biur poselskich
           </DialogTitle>
-          <DialogDescription className="font-serif italic text-muted-foreground">
+          <DialogDescription className="text-muted-foreground">
             Jak działa ryczałt na biuro i co kontrolujemy.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="font-serif text-[14px] leading-[1.6] space-y-4 text-foreground">
+        <div className="text-[14px] leading-[1.6] space-y-4 text-foreground">
           <section>
-            <h3 className="font-mono uppercase tracking-[0.14em] text-[10.5px] text-muted-foreground mb-1.5">
+            <h3 className="text-[11px] text-muted-foreground mb-1.5 font-medium">
               Skąd pieniądze
             </h3>
             <p>
@@ -47,7 +47,7 @@ export function BopInfoDialog() {
           </section>
 
           <section>
-            <h3 className="font-mono uppercase tracking-[0.14em] text-[10.5px] text-muted-foreground mb-1.5">
+            <h3 className="text-[11px] text-muted-foreground mb-1.5 font-medium">
               Na co można wydać
             </h3>
             <p>
@@ -64,7 +64,7 @@ export function BopInfoDialog() {
           </section>
 
           <section>
-            <h3 className="font-mono uppercase tracking-[0.14em] text-[10.5px] text-muted-foreground mb-1.5">
+            <h3 className="text-[11px] text-muted-foreground mb-1.5 font-medium">
               Twarde limity per kategoria
             </h3>
             <ul className="list-disc pl-5 space-y-1.5">
@@ -96,7 +96,7 @@ export function BopInfoDialog() {
           </section>
 
           <section>
-            <h3 className="font-mono uppercase tracking-[0.14em] text-[10.5px] text-muted-foreground mb-1.5">
+            <h3 className="text-[11px] text-muted-foreground mb-1.5 font-medium">
               Jak to się rozlicza
             </h3>
             <p>
@@ -117,7 +117,7 @@ export function BopInfoDialog() {
           </section>
 
           <section>
-            <h3 className="font-mono uppercase tracking-[0.14em] text-[10.5px] text-muted-foreground mb-1.5">
+            <h3 className="text-[11px] text-muted-foreground mb-1.5 font-medium">
               Skąd te dane
             </h3>
             <p>
@@ -142,7 +142,7 @@ export function BopInfoDialog() {
           </section>
 
           <section>
-            <h3 className="font-mono uppercase tracking-[0.14em] text-[10.5px] text-muted-foreground mb-1.5">
+            <h3 className="text-[11px] text-muted-foreground mb-1.5 font-medium">
               Podstawa prawna
             </h3>
             <ul className="list-disc pl-5 space-y-1 text-[12.5px] text-muted-foreground">

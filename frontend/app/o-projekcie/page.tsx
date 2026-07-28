@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Ornament } from "@/components/chrome/Ornament";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
@@ -77,13 +76,13 @@ function PatroniteUnavailableNotice() {
       }}
     >
       <div
-        className="font-mono text-[10px] tracking-[0.18em] uppercase mb-1.5"
+        className="text-[11px] mb-1.5 font-medium"
         style={{ color: "var(--warning)" }}
       >
         ✶ &nbsp; Wpływy chwilowo niedostępne &nbsp; ✶
       </div>
       <p
-        className="font-serif text-[15px] leading-[1.55] m-0 text-foreground"
+        className="text-[15px] leading-[1.55] m-0 text-foreground"
         style={{ maxWidth: 720 }}
       >
         Nie udało się pobrać danych z Patronite. Aktualny stan wpływów sprawdzisz wprost na{" "}
@@ -135,7 +134,7 @@ export default async function AboutProjectPage() {
   const patroniteUnavailable = !patron.ok;
 
   return (
-    <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
+    <main className="bg-background text-foreground px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
       <div className="max-w-[1100px] mx-auto">
         <PageBreadcrumb
           items={[{ label: "O projekcie" }]}
@@ -159,15 +158,15 @@ export default async function AboutProjectPage() {
                   ) : null}
                   <div className="flex gap-4">
                     <div className="w-10 shrink-0 flex flex-col items-center">
-                      <span className="w-10 h-10 rounded-full border border-rule bg-muted flex items-center justify-center font-mono text-[11px] text-destructive">
+                      <span className="w-10 h-10 rounded-full border border-rule bg-muted flex items-center justify-center font-mono text-[11px] text-muted-foreground">
                         {step.num}
                       </span>
                     </div>
                     <div className="flex-1 border border-border bg-muted/50 px-4 py-4 rounded-md">
-                      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+                      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
                         {step.kicker}
                       </div>
-                      <div className="font-serif text-[22px] font-medium tracking-[-0.02em] leading-tight">
+                      <div className="text-[22px] font-medium tracking-[-0.02em] leading-tight">
                         {step.title}
                       </div>
                       <p className="m-0 mt-2 font-sans text-[13px] leading-[1.65] text-secondary-foreground">
@@ -183,21 +182,21 @@ export default async function AboutProjectPage() {
           <div className="flex flex-col gap-4">
             <div className="border border-rule rounded-lg bg-muted/40 p-5">
               <div className="flex items-center justify-between gap-3 mb-3">
-                <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground">
+                <div className="text-[11px] text-muted-foreground font-medium">
                   Rola AI
                 </div>
                 <span className="px-2.5 py-1 rounded-full border border-border bg-background font-sans text-[11px] text-muted-foreground">
                   prawie nie dotyka źródeł
                 </span>
               </div>
-              <p className="m-0 font-serif text-[17px] leading-[1.55] text-foreground">
+              <p className="m-0 text-[17px] leading-[1.55] text-foreground">
                 AI pomaga przy klasyfikacji i redakcji. Nie ustala faktów, nie zastępuje dokumentów
                 i nie jest miejscem, z którego bierzemy prawdę o procesie.
               </p>
             </div>
 
             <div className="border border-border rounded-lg bg-background p-5">
-              <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3">
+              <div className="text-[11px] text-muted-foreground mb-3 font-medium">
                 Zasady
               </div>
               <div className="grid gap-3">
@@ -214,7 +213,6 @@ export default async function AboutProjectPage() {
           </div>
         </section>
 
-        <Ornament />
 
         <section className="mb-16">
           <SectionTitle
@@ -242,11 +240,11 @@ export default async function AboutProjectPage() {
                   </div>
                 </div>
                 <div className="min-w-0">
-                  <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+                  <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
                     {person.role}
                   </div>
                   <h3
-                    className="font-serif font-medium m-0 text-[20px] leading-tight"
+                    className="font-medium m-0 text-[20px] leading-tight"
                     style={{ letterSpacing: "-0.01em" }}
                   >
                     {person.name}
@@ -260,7 +258,6 @@ export default async function AboutProjectPage() {
           </div>
         </section>
 
-        <Ornament />
 
         {patroniteUnavailable ? <PatroniteUnavailableNotice /> : null}
 
@@ -270,7 +267,7 @@ export default async function AboutProjectPage() {
             title="Finanse projektu"
           />
           <p
-            className="font-serif text-[16px] leading-[1.65] text-secondary-foreground m-0 mb-8 max-w-[760px]"
+            className="text-[16px] leading-[1.65] text-secondary-foreground m-0 mb-8 max-w-[760px]"
           >
             Odpowiedzialność to też pokazywanie kosztów. Dlatego obok metody publikujemy bieżące
             wpływy, miesięczny burn i to, z czego składa się utrzymanie projektu.
@@ -301,7 +298,7 @@ export default async function AboutProjectPage() {
 
           <div className="grid md:grid-cols-2 gap-10">
             <div>
-              <h3 className="font-serif text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule">
+              <h3 className="text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule">
                 Koszty miesięczne
               </h3>
               {costRows.map(([label, zl]) => {
@@ -309,7 +306,7 @@ export default async function AboutProjectPage() {
                 return (
                   <div key={label} className="py-2 border-b border-dotted border-border">
                     <div className="flex items-baseline justify-between gap-3 mb-1.5">
-                      <span className="font-serif text-[15px] text-secondary-foreground">{label}</span>
+                      <span className="text-[15px] text-secondary-foreground">{label}</span>
                       <span className="font-mono text-[13px] font-medium tabular-nums">
                         {fmtPL(zl)} zł / mc
                       </span>
@@ -324,7 +321,7 @@ export default async function AboutProjectPage() {
                 );
               })}
               <div className="flex items-baseline justify-between pt-3 mt-2 border-t-2 border-foreground">
-                <span className="font-serif text-[16px] font-medium">Razem · 6 miesięcy</span>
+                <span className="text-[16px] font-medium">Razem · 6 miesięcy</span>
                 <span className="font-mono text-[16px] font-semibold text-destructive tabular-nums">
                   {fmtPL(totalSixMonths)} zł
                 </span>
@@ -332,7 +329,7 @@ export default async function AboutProjectPage() {
             </div>
 
             <div>
-              <h3 className="font-serif text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule">
+              <h3 className="text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule">
                 Skąd wpływy
               </h3>
               {patron.ok ? (
@@ -357,7 +354,7 @@ export default async function AboutProjectPage() {
                 />
               )}
               <p
-                className="font-serif text-[14px] text-secondary-foreground mt-6 leading-[1.55]"
+                className="text-[14px] text-secondary-foreground mt-6 leading-[1.55]"
                 style={{ maxWidth: 520 }}
               >
                 Patronite to nasz fundament — stała kwota, która pozwala planować rozwój i nie
@@ -390,11 +387,11 @@ function BigStat({
       className="bg-background border-2 border-foreground p-6"
       style={{ boxShadow: "5px 5px 0 var(--foreground)" }}
     >
-      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
         {kicker}
       </div>
       <div
-        className={`font-serif font-normal leading-none ${valueColor}`}
+        className={`font-normal leading-none ${valueColor}`}
         style={{ fontSize: "clamp(2.25rem, 9vw, 3.25rem)", letterSpacing: "-0.02em" }}
       >
         {value}
@@ -413,10 +410,10 @@ function SectionTitle({
 }) {
   return (
     <header className="mb-6 pb-3 border-b border-rule">
-      <div className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+      <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
         {kicker}
       </div>
-      <h2 className="font-serif font-medium m-0 text-[28px] leading-[1.05]" style={{ letterSpacing: "-0.01em" }}>
+      <h2 className="font-medium m-0 text-[28px] leading-[1.05]" style={{ letterSpacing: "-0.01em" }}>
         {title}
       </h2>
     </header>
@@ -436,7 +433,7 @@ function IncomeRow({
     <div
       className={`flex items-baseline justify-between gap-3 py-2 border-b border-dotted border-border ${muted ? "text-muted-foreground" : ""}`}
     >
-      <span className="font-serif text-[15px]">{label}</span>
+      <span className="text-[15px]">{label}</span>
       <span className="font-mono text-[13px] tabular-nums">{value}</span>
     </div>
   );

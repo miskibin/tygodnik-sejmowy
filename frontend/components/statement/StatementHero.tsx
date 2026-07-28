@@ -84,7 +84,7 @@ export function StatementHero({
         )}
         <div className="min-w-0">
           <h1
-            className="font-serif font-medium text-foreground m-0 mb-1.5 leading-[1.05]"
+            className="font-medium text-foreground m-0 mb-1.5 leading-[1.05]"
             style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", letterSpacing: "-0.02em" }}
           >
             {speakerName ?? "—"}

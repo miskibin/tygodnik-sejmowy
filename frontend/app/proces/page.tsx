@@ -37,7 +37,7 @@ export default async function ProcesIndexPage() {
   ];
 
   return (
-    <main className="bg-background text-foreground font-serif pb-20">
+    <main className="bg-background text-foreground pb-20">
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 md:pt-10">
         <PageBreadcrumb
           items={[{ label: "Procesy" }]}

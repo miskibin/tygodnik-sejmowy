@@ -1066,11 +1066,11 @@ function StatCell({
     <div className="p-3 md:p-4" style={{ background: "var(--background)" }}>
       <div className="flex items-baseline gap-1">
         <span
-          className="font-serif font-medium tabular-nums"
+          className="font-medium tabular-nums"
           style={{
             fontSize: "clamp(20px, 3.2vw, 30px)",
             lineHeight: 1,
-            color: "var(--destructive)",
+            color: "var(--foreground)",
             letterSpacing: "-0.02em",
           }}
         >
@@ -1100,7 +1100,7 @@ function PhaseLegend() {
   return (
     <div className="mt-8 mb-2 hidden md:flex flex-wrap items-center gap-x-4 gap-y-2">
       <span
-        className="font-mono uppercase tracking-[0.14em] text-muted-foreground"
+        className="text-muted-foreground font-medium"
         style={{ fontSize: 10 }}
       >
         Fazy procesu
@@ -1127,7 +1127,7 @@ function PhasePill({ phase }: { phase: PhaseKey }) {
   const p = PHASES[phase];
   return (
     <span
-      className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.1em] shrink-0"
+      className="inline-flex items-center gap-1.5 shrink-0 font-medium"
       style={{
         fontSize: 10,
         color: p.accent,
@@ -1180,7 +1180,7 @@ function BranchLine({ branch }: { branch: Branch }) {
     <li className="flex items-start gap-2 mb-1.5 last:mb-0">
       <Icon size={12} strokeWidth={2.5} style={{ color, marginTop: 4, flexShrink: 0 }} />
       <div className="text-[13.5px] leading-snug">
-        <span className="font-mono uppercase tracking-[0.06em] font-semibold" style={{ color }}>
+        <span className="font-semibold" style={{ color }}>
           {branch.label}
         </span>
         <span className="text-muted-foreground"> — {branch.detail}</span>
@@ -1193,11 +1193,11 @@ function SourcesLine({ items }: { items: string[] }) {
   return (
     <p
       className="mt-4 pt-3 font-mono text-[11px] text-muted-foreground leading-snug"
-      style={{ borderTop: "1px dashed var(--border)", letterSpacing: "0.02em" }}
+      style={{ borderTop: "1px dashed var(--border)" }}
     >
       <span
-        className="uppercase tracking-[0.12em] mr-2"
-        style={{ fontSize: 10, fontWeight: 600 }}
+        className="mr-2 font-medium"
+        style={{ fontSize: 11, fontWeight: 600 }}
       >
         Podstawa prawna
       </span>
@@ -1283,20 +1283,20 @@ export default function JakPowstajeUstawaPage() {
           <div className="grid gap-6 md:gap-8 items-center mb-8 md:mb-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
             <div>
               <span
-                className="font-mono uppercase tracking-[0.18em] text-destructive"
+                className="text-muted-foreground font-medium"
                 style={{ fontSize: 11, fontWeight: 600 }}
               >
                 Przewodnik
               </span>
               <h1
-                className="font-serif font-medium m-0 mt-3 mb-4 md:mb-5"
+                className="font-medium m-0 mt-3 mb-4 md:mb-5"
                 style={{ fontSize: "clamp(28px, 6vw, 56px)", letterSpacing: "-0.025em", lineHeight: 1.05 }}
               >
                 Jak powstaje{" "}
-                <span className="italic text-destructive">ustawa</span> w Sejmie
+                <span className="italic">ustawa</span> w Sejmie
               </h1>
               <p
-                className="font-serif text-secondary-foreground m-0 mb-4 md:mb-5"
+                className="text-secondary-foreground m-0 mb-4 md:mb-5"
                 style={{ fontSize: "clamp(15px, 4vw, 18px)", lineHeight: 1.55 }}
               >
                 Każda ustawa w Polsce przechodzi przez{" "}
@@ -1357,7 +1357,7 @@ export default function JakPowstajeUstawaPage() {
             style={{ background: "var(--muted)" }}
           >
             <h2
-              className="font-mono uppercase tracking-[0.12em] m-0 mb-3 text-muted-foreground"
+              className="m-0 mb-3 text-muted-foreground font-medium"
               style={{ fontSize: 11, fontWeight: 600 }}
             >
               Spis treści
@@ -1373,7 +1373,7 @@ export default function JakPowstajeUstawaPage() {
                   </span>
                   <Link
                     href={`#${s.slug}`}
-                    className="font-serif hover:text-foreground underline-offset-2 hover:underline"
+                    className="hover:text-foreground underline-offset-2 hover:underline"
                   >
                     {s.label.split(" — ")[0]}
                   </Link>
@@ -1383,7 +1383,7 @@ export default function JakPowstajeUstawaPage() {
                 <span className="font-mono text-muted-foreground tabular-nums shrink-0" style={{ width: 24 }}>
                   →
                 </span>
-                <Link href="#faq" className="font-serif hover:text-foreground underline-offset-2 hover:underline">
+                <Link href="#faq" className="hover:text-foreground underline-offset-2 hover:underline">
                   Najczęstsze pytania
                 </Link>
               </li>
@@ -1391,7 +1391,7 @@ export default function JakPowstajeUstawaPage() {
                 <span className="font-mono text-muted-foreground tabular-nums shrink-0" style={{ width: 24 }}>
                   →
                 </span>
-                <Link href="#slowniczek" className="font-serif hover:text-foreground underline-offset-2 hover:underline">
+                <Link href="#slowniczek" className="hover:text-foreground underline-offset-2 hover:underline">
                   Słowniczek pojęć
                 </Link>
               </li>
@@ -1419,7 +1419,7 @@ export default function JakPowstajeUstawaPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 md:gap-3 mb-1.5 md:mb-2 flex-wrap">
                       <span
-                        className="font-serif font-medium tabular-nums"
+                        className="font-medium tabular-nums"
                         style={{
                           fontSize: "clamp(22px, 4vw, 28px)",
                           color: phase.accent,
@@ -1431,7 +1431,7 @@ export default function JakPowstajeUstawaPage() {
                       </span>
                       <h2
                         id={`heading-${stage.slug}`}
-                        className="font-serif font-medium m-0"
+                        className="font-medium m-0"
                         style={{
                           fontSize: "clamp(18px, 4.5vw, 28px)",
                           letterSpacing: "-0.01em",
@@ -1444,7 +1444,7 @@ export default function JakPowstajeUstawaPage() {
                     <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                       <PhasePill phase={stage.phase} />
                       <span
-                        className="hidden md:inline font-mono uppercase tracking-[0.12em] text-muted-foreground"
+                        className="hidden md:inline text-muted-foreground font-medium"
                         style={{ fontSize: 9.5 }}
                       >
                         pasek: {stage.bucket}
@@ -1460,7 +1460,7 @@ export default function JakPowstajeUstawaPage() {
                 </div>
 
                 <div
-                  className="font-serif text-secondary-foreground space-y-4"
+                  className="text-secondary-foreground space-y-4"
                   style={{ fontSize: 16, lineHeight: 1.65, textWrap: "pretty" as never }}
                 >
                   {stage.paragraphs.map((p, i) => (
@@ -1474,7 +1474,7 @@ export default function JakPowstajeUstawaPage() {
                     style={{ background: phase.accentSoft, borderLeft: `2px solid ${phase.accent}` }}
                   >
                     <h3
-                      className="font-mono uppercase tracking-[0.12em] m-0 mb-3"
+                      className="m-0 mb-3 font-medium"
                       style={{ fontSize: 11, fontWeight: 600, color: phase.accent }}
                     >
                       Co dalej
@@ -1495,7 +1495,7 @@ export default function JakPowstajeUstawaPage() {
           {/* FAQ */}
           <section id="faq" className="mb-14 scroll-mt-20 mt-20 pt-10" style={{ borderTop: "1px solid var(--border)" }}>
             <h2
-              className="font-serif font-medium m-0 mb-6"
+              className="font-medium m-0 mb-6"
               style={{ fontSize: "clamp(26px, 4vw, 36px)", letterSpacing: "-0.015em", lineHeight: 1.15 }}
             >
               Najczęstsze pytania
@@ -1504,13 +1504,13 @@ export default function JakPowstajeUstawaPage() {
               {FAQ.map((f, i) => (
                 <div key={i} className="pb-6 border-b border-border last:border-b-0">
                   <h3
-                    className="font-serif font-medium m-0 mb-2"
+                    className="font-medium m-0 mb-2"
                     style={{ fontSize: 18, letterSpacing: "-0.005em", lineHeight: 1.3 }}
                   >
                     {f.q}
                   </h3>
                   <div
-                    className="font-serif text-secondary-foreground"
+                    className="text-secondary-foreground"
                     style={{ fontSize: 15, lineHeight: 1.6, textWrap: "pretty" as never }}
                   >
                     {f.a}
@@ -1523,7 +1523,7 @@ export default function JakPowstajeUstawaPage() {
           {/* Glossary */}
           <section id="slowniczek" className="mb-14 scroll-mt-20 mt-20 pt-10" style={{ borderTop: "1px solid var(--border)" }}>
             <h2
-              className="font-serif font-medium m-0 mb-6"
+              className="font-medium m-0 mb-6"
               style={{ fontSize: "clamp(26px, 4vw, 36px)", letterSpacing: "-0.015em", lineHeight: 1.15 }}
             >
               Słowniczek pojęć
@@ -1535,13 +1535,13 @@ export default function JakPowstajeUstawaPage() {
               {GLOSSARY.map((t) => (
                 <div key={t.term}>
                   <dt
-                    className="font-serif font-medium mb-1"
+                    className="font-medium mb-1"
                     style={{ fontSize: 15, letterSpacing: "-0.005em" }}
                   >
                     {t.term}
                   </dt>
                   <dd
-                    className="font-serif text-secondary-foreground m-0"
+                    className="text-secondary-foreground m-0"
                     style={{ fontSize: 14, lineHeight: 1.55 }}
                   >
                     {t.def}

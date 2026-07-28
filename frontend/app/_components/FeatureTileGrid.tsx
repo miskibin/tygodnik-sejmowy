@@ -126,10 +126,10 @@ export async function FeatureTileGrid() {
     <section className="px-4 md:px-8 lg:px-14 py-12 md:py-16">
       <div className="max-w-[1100px] mx-auto">
         <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 mb-8 md:mb-10">
-          <h2 className="font-serif font-medium tracking-[-0.025em] leading-none m-0" style={{ fontSize: "clamp(1.75rem, 4.5vw, 3rem)" }}>
-            Dalej <span className="italic text-destructive">w numerze</span>
+          <h2 className="font-medium tracking-[-0.025em] leading-none m-0" style={{ fontSize: "clamp(1.75rem, 4.5vw, 3rem)" }}>
+            Dalej <span className="italic">w numerze</span>
           </h2>
-          <p className="font-serif italic text-[14px] md:text-[15px] text-secondary-foreground m-0">
+          <p className="italic text-[14px] md:text-[15px] text-secondary-foreground m-0">
             Osiem pozostałych działów.
           </p>
         </div>
@@ -272,7 +272,7 @@ export async function FeatureTileGrid() {
             description="Każda ustawa — od druku przez czytania, komisje, głosowania, aż po publikację w Dzienniku Ustaw."
             preview={
               <div>
-                <div className="font-serif italic text-[13.5px] leading-snug text-foreground line-clamp-2 mb-3">
+                <div className="italic text-[13.5px] leading-snug text-foreground line-clamp-2 mb-3">
                   {thread
                     ? thread.shortTitle || thread.title || `Druk ${thread.number}`
                     : "Każda ustawa — od druku do publikacji w Dzienniku Ustaw."}
@@ -317,7 +317,7 @@ export async function FeatureTileGrid() {
             preview={
               mowaQuote ? (
                 <div className="pl-3 py-0.5 border-l-2" style={{ borderColor: mowaKlubColor }}>
-                  <div className="font-serif italic text-[13.5px] leading-snug text-foreground line-clamp-3 mb-2">
+                  <div className="italic text-[13.5px] leading-snug text-foreground line-clamp-3 mb-2">
                     „{mowaQuote.viralQuote}&rdquo;
                   </div>
                   <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-wide text-muted-foreground">
@@ -349,15 +349,15 @@ export async function FeatureTileGrid() {
               committees.length > 0 ? (
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                   <div>
-                    <div className="font-serif text-[22px] font-medium leading-none">{standing}</div>
+                    <div className="text-[22px] font-medium leading-none">{standing}</div>
                     <div className="font-sans text-[10.5px] text-muted-foreground mt-1">komisji stałych</div>
                   </div>
                   <div>
-                    <div className="font-serif text-[22px] font-medium leading-none">{committees.length}</div>
+                    <div className="text-[22px] font-medium leading-none">{committees.length}</div>
                     <div className="font-sans text-[10.5px] text-muted-foreground mt-1">łącznie</div>
                   </div>
                   <div>
-                    <div className="font-serif text-[22px] font-medium leading-none">{totalMembers}</div>
+                    <div className="text-[22px] font-medium leading-none">{totalMembers}</div>
                     <div className="font-sans text-[10.5px] text-muted-foreground mt-1">mandatów członkowskich</div>
                   </div>
                 </div>
@@ -379,7 +379,7 @@ export async function FeatureTileGrid() {
             preview={
               <div>
                 <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-serif text-[26px] font-medium leading-none">
+                  <span className="text-[26px] font-medium leading-none">
                     {fmtZl(raised)} zł
                   </span>
                   <span className="font-sans text-[12px] italic text-muted-foreground">
@@ -415,7 +415,7 @@ export async function FeatureTileGrid() {
                 {latestSitting ? (
                   <div>
                     <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-serif text-[24px] font-medium leading-none">
+                      <span className="text-[24px] font-medium leading-none">
                         {latestSitting.printCount}
                       </span>
                       <span className="font-sans text-[11.5px] text-muted-foreground">
@@ -431,7 +431,7 @@ export async function FeatureTileGrid() {
                   <div className="font-mono text-[11px] text-muted-foreground italic">brak danych</div>
                 )}
                 <div>
-                  <div className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+                  <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
                     kanały
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -440,7 +440,7 @@ export async function FeatureTileGrid() {
                         <a
                           key={c.name}
                           href={c.href}
-                          className="font-mono text-[10.5px] px-2 py-0.5 border border-destructive text-destructive rounded-sm hover:bg-destructive hover:text-background transition-colors"
+                          className="font-mono text-[10.5px] px-2 py-0.5 border border-border text-foreground rounded-sm hover:bg-muted transition-colors"
                         >
                           {c.name} ✓
                         </a>
@@ -500,7 +500,7 @@ export async function FeatureTileGrid() {
                         <Icon size={13} strokeWidth={1.75} />
                       </div>
                       <span
-                        className="font-mono text-[8.5px] tracking-tight uppercase"
+                        className="text-[8.5px] tracking-tight font-medium"
                         style={{
                           color: isActive ? "var(--destructive)" : "var(--muted-foreground)",
                           fontWeight: isActive ? 600 : 500,

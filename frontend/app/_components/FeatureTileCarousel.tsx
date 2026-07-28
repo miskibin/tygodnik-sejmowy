@@ -188,14 +188,14 @@ function CoverflowCarousel({ slides }: { slides: ReactNode[] }) {
 
       <button
         onClick={() => emblaApi?.scrollPrev()}
-        className="absolute left-1 md:-left-2 lg:-left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background border border-border shadow-sm flex items-center justify-center text-foreground hover:bg-muted hover:text-destructive transition-colors z-20 cursor-pointer"
+        className="absolute left-1 md:-left-2 lg:-left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background border border-border shadow-sm flex items-center justify-center text-foreground hover:bg-muted hover:text-foreground transition-colors z-20 cursor-pointer"
         aria-label="Poprzedni"
       >
         <ChevronLeft size={18} />
       </button>
       <button
         onClick={() => emblaApi?.scrollNext()}
-        className="absolute right-1 md:-right-2 lg:-right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background border border-border shadow-sm flex items-center justify-center text-foreground hover:bg-muted hover:text-destructive transition-colors z-20 cursor-pointer"
+        className="absolute right-1 md:-right-2 lg:-right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background border border-border shadow-sm flex items-center justify-center text-foreground hover:bg-muted hover:text-foreground transition-colors z-20 cursor-pointer"
         aria-label="Następny"
       >
         <ChevronRight size={18} />

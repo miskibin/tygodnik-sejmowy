@@ -89,7 +89,7 @@ function ReportIssueButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.14em] text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+      className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors font-medium"
     >
       <Flag size={12} strokeWidth={1.6} aria-hidden />
       Zgłoś niespójność
@@ -182,11 +182,11 @@ function KpiTile({
         : "var(--foreground)";
   return (
     <div className="py-4 px-4 border border-border" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1.5">
+      <div className="font-sans text-[11px] text-muted-foreground mb-1.5 font-medium">
         {label}
       </div>
       <div
-        className="font-serif font-medium leading-none mb-1.5 tabular-nums tracking-[-0.025em]"
+        className="font-medium leading-none mb-1.5 tabular-nums tracking-[-0.025em]"
         style={{ fontSize: "clamp(1.4rem, 2.6vw, 1.9rem)", color }}
       >
         {value}
@@ -272,7 +272,7 @@ function CategoryRow({
           <Icon size={18} strokeWidth={1.5} />
         </span>
         <span
-          className="font-serif text-[14px] sm:text-[15px] leading-snug flex-1 min-w-0 sm:truncate"
+          className="text-[14px] sm:text-[15px] leading-snug flex-1 min-w-0 sm:truncate"
           title={namePl}
         >
           {shortLabel}
@@ -308,7 +308,7 @@ function CategoryRow({
           <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             {deviationPct != null && (
               <span
-                className="font-mono text-[10px] uppercase tracking-[0.06em] whitespace-nowrap"
+                className="text-[11px] whitespace-nowrap font-medium"
                 style={{
                   color:
                     deviationPct > 0 ? "var(--destructive)" : "var(--success)",
@@ -357,7 +357,7 @@ export function Tab5OfficeExpensesPanel({
   if (!report) {
     return (
       <div className="py-12 max-w-[640px]">
-        <p className="font-serif italic text-muted-foreground text-center">
+        <p className="text-muted-foreground text-center">
           Sprawozdanie z wydatków biura poselskiego jeszcze nieprzetworzone.
         </p>
         <p className="font-sans text-[12px] text-muted-foreground text-center mt-3 leading-snug">
@@ -378,13 +378,13 @@ export function Tab5OfficeExpensesPanel({
       <div className="min-w-0">
         <div className="border border-border bg-background">
           <div className="border-b border-border bg-muted/40 px-3 sm:px-4 py-3 flex items-center gap-2">
-            <h3 className="font-serif text-[16px] sm:text-[18px] font-medium text-foreground m-0">
+            <h3 className="text-[16px] sm:text-[18px] font-medium text-foreground m-0">
               Wydatki biura w {report.year} roku
             </h3>
             <BopInfoDialog />
           </div>
           <div className="px-3 sm:px-5 py-6 sm:py-8 max-w-[640px]">
-            <p className="font-serif text-[14px] sm:text-[15px] leading-relaxed text-foreground m-0 mb-3">
+            <p className="text-[14px] sm:text-[15px] leading-relaxed text-foreground m-0 mb-3">
               Sprawozdanie wymaga weryfikacji.
             </p>
             <p className="font-sans text-[12px] text-muted-foreground leading-snug m-0 mb-4">
@@ -398,7 +398,7 @@ export function Tab5OfficeExpensesPanel({
                 href={report.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.14em] text-[10.5px] text-foreground border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
+                className="inline-flex items-center gap-1.5 text-[11px] text-foreground border border-border px-3 py-2 hover:bg-muted/40 transition-colors font-medium"
               >
                 Otwórz sprawozdanie (PDF, Sejm) →
               </a>
@@ -544,7 +544,7 @@ export function Tab5OfficeExpensesPanel({
       <div className="border border-border bg-background">
         {/* Table header */}
         <div className="border-b border-border bg-muted/40 px-3 sm:px-4 py-3 flex items-center gap-2">
-          <h3 className="font-serif text-[16px] sm:text-[18px] font-medium text-foreground m-0">
+          <h3 className="text-[16px] sm:text-[18px] font-medium text-foreground m-0">
             Wydatki biura w {report.year} roku
           </h3>
           <BopInfoDialog />
@@ -559,21 +559,21 @@ export function Tab5OfficeExpensesPanel({
               "minmax(0, 1.6fr) minmax(0, 1.4fr) auto auto",
           }}
         >
-          <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground">
+          <div className="text-[11px] text-muted-foreground font-medium">
             Kategoria wydatku
           </div>
           <div className="hidden sm:block" aria-hidden />
-          <div className="font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground text-right whitespace-nowrap">
+          <div className="text-[11px] text-muted-foreground text-right whitespace-nowrap font-medium">
             <span className="sm:hidden">Kwota / udział</span>
             <span className="hidden sm:inline">Kwota</span>
           </div>
-          <div className="hidden sm:block font-mono uppercase tracking-[0.12em] text-[9.5px] sm:text-[10px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem]">
+          <div className="hidden sm:block text-[11px] text-muted-foreground text-right whitespace-nowrap w-[3rem] sm:w-[3.5rem] font-medium">
             Udział
           </div>
         </div>
 
         {sortedNonZero.length === 0 ? (
-          <div className="py-8 text-center font-serif italic text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             Brak wykazanych wydatków.
           </div>
         ) : (
@@ -598,7 +598,7 @@ export function Tab5OfficeExpensesPanel({
         {zeroItems.length > 0 && (
           <details className="border-t border-border">
             <summary className="cursor-pointer list-none px-3 sm:px-4 py-3 font-sans text-[12px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-              <span className="font-mono uppercase tracking-[0.12em] text-[10px]">
+              <span className="text-[11px] font-medium">
                 Pokaż {zeroItems.length} kategorii bez wydatków
               </span>
               <span className="text-[10px] opacity-50" aria-hidden>▾</span>
@@ -655,7 +655,7 @@ export function Tab5OfficeExpensesPanel({
             href={report.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono uppercase tracking-[0.14em] text-[10px] underline underline-offset-2 hover:text-foreground"
+            className="text-[11px] underline underline-offset-2 hover:text-foreground font-medium"
           >
             Sprawozdanie (PDF, Sejm) →
           </a>

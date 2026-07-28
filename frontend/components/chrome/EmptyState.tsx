@@ -19,11 +19,11 @@ export function EmptyState({
   actions?: EmptyStateAction[];
 }) {
   return (
-    <main className="bg-background text-foreground font-serif pb-20">
+    <main className="bg-background text-foreground pb-20">
       <section className="border-b border-rule">
         <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 pb-5">
           {kicker && (
-            <div className="font-sans text-[10px] tracking-[0.18em] uppercase text-destructive mb-2">
+            <div className="font-sans text-[11px] text-muted-foreground mb-2 font-medium">
               {kicker}
             </div>
           )}
@@ -42,7 +42,7 @@ export function EmptyState({
           style={{ borderColor: "var(--border)", background: "var(--muted)" }}
         >
           {body && (
-            <div className="font-serif text-[16px] leading-[1.6] text-secondary-foreground [&>p]:mb-3 [&>p:last-child]:mb-0">
+            <div className="text-[16px] leading-[1.6] text-secondary-foreground [&>p]:mb-3 [&>p:last-child]:mb-0">
               {typeof body === "string" ? <p>{body}</p> : body}
             </div>
           )}
@@ -52,8 +52,8 @@ export function EmptyState({
               {actions.map((a, i) => {
                 const cls =
                   i === 0
-                    ? "text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
-                    : "text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-destructive";
+                    ? "text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                    : "text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground";
                 if (a.external) {
                   return (
                     <a

@@ -38,7 +38,7 @@ export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; ave
 
   return (
     <section className="min-w-0">
-      <div className="font-serif text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-6 text-pretty">
+      <div className="text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-6 text-pretty">
         {rows.length} najnowszych pomiarów. Każdy pasek to jeden sondaż — szerokość segmentu = procent
         poparcia. Pojedyncze sondaże mają błąd statystyczny ±3 pkt; w średniej powyżej szum znika.
       </div>
@@ -46,7 +46,7 @@ export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; ave
       <div className="border-t border-border">
         {/* Header row (desktop) */}
         <div
-          className="hidden md:grid items-baseline py-2.5 font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground border-b border-border"
+          className="hidden md:grid items-baseline py-2.5 text-[11px] text-muted-foreground border-b border-border font-medium"
           style={{ gridTemplateColumns: "minmax(120px, 1.3fr) 90px 60px minmax(220px, 2.4fr) minmax(80px, 0.9fr)", columnGap: 16 }}
         >
           <span>Pracownia</span>
@@ -70,7 +70,7 @@ export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; ave
               {/* Mobile: stacked */}
               <div className="md:hidden space-y-2.5 font-sans">
                 <div className="flex items-baseline justify-between gap-2 min-w-0">
-                  <span className="font-serif text-[15px] font-medium truncate">{p.pollster}</span>
+                  <span className="text-[15px] font-medium truncate">{p.pollster}</span>
                   <span className="font-mono text-[10.5px] text-muted-foreground shrink-0">
                     {fmtRange(p.conducted_at_start, p.conducted_at_end)}
                   </span>
@@ -93,7 +93,7 @@ export function RecentPollsList({ rows, averages }: { rows: RecentPollRow[]; ave
                 className="hidden md:grid items-center font-sans text-[13px]"
                 style={{ gridTemplateColumns: "minmax(120px, 1.3fr) 90px 60px minmax(220px, 2.4fr) minmax(80px, 0.9fr)", columnGap: 16 }}
               >
-                <span className="font-serif text-[16px] text-foreground truncate">{p.pollster}</span>
+                <span className="text-[16px] text-foreground truncate">{p.pollster}</span>
                 <span className="font-mono text-[11px] text-secondary-foreground tabular-nums">
                   {fmtRange(p.conducted_at_start, p.conducted_at_end)}
                 </span>

@@ -4,7 +4,7 @@ export function PollstersStrip({ rows }: { rows: PollsterSummary[] }) {
   const total = rows.reduce((acc, r) => acc + r.n_polls, 0);
   return (
     <section>
-      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-3">
+      <div className="text-[11px] text-muted-foreground mb-3 font-medium">
         Pracownie · łącznie {total.toLocaleString("pl-PL")} sondaży
       </div>
 
@@ -14,7 +14,7 @@ export function PollstersStrip({ rows }: { rows: PollsterSummary[] }) {
           return (
             <div key={r.code} className="p-3 sm:p-4 bg-muted border border-border min-w-0">
               <div className="flex justify-between items-baseline gap-3 mb-1.5 min-w-0">
-                <span className="font-serif text-[15px] font-medium text-foreground min-w-0 break-words">{r.name_full}</span>
+                <span className="text-[15px] font-medium text-foreground min-w-0 break-words">{r.name_full}</span>
                 <span className="font-mono text-[14px] font-semibold text-foreground shrink-0 tabular-nums">{r.n_polls}</span>
               </div>
               <div className="h-1 relative border border-border bg-background mb-2">

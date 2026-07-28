@@ -76,15 +76,15 @@ export function Masthead() {
             className="flex items-center gap-2 sm:gap-2.5 md:gap-3 cursor-pointer"
           >
             <TygodnikLogoMark className="h-7 w-7 sm:h-8 sm:w-8 shrink-0" />
-            <span className="hidden sm:inline font-serif text-[20px] sm:text-[24px] md:text-[26px] font-medium tracking-tight text-foreground leading-none whitespace-nowrap">
+            <span className="hidden sm:inline font-display text-[20px] sm:text-[24px] md:text-[26px] font-medium tracking-tight text-foreground leading-none whitespace-nowrap">
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
           </Link>
           {dateLabel && (
             <>
               <span className="hidden xl:inline w-px h-[18px] bg-border" />
-              <span className="hidden xl:inline font-mono text-[10px] text-muted-foreground tracking-[0.1em] uppercase">
-                <span className="text-destructive">●</span>&nbsp;{dateLabel.day}&nbsp;{dateLabel.full}
+              <span className="hidden xl:inline text-[11px] text-muted-foreground font-medium">
+                {dateLabel.day}&nbsp;{dateLabel.full}
               </span>
             </>
           )}
@@ -135,10 +135,10 @@ export function Masthead() {
                 style={{
                   top: "calc(100% + 8px)",
                   minWidth: 200,
-                  boxShadow: "0 12px 32px rgba(22,19,16,0.14), 0 2px 6px rgba(22,19,16,0.06)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)",
                 }}
               >
-                <div className="font-mono text-[9.5px] text-muted-foreground tracking-[0.16em] uppercase px-3 pt-2 pb-1.5">
+                <div className="text-[11px] text-muted-foreground px-3 pt-2 pb-1.5 font-medium">
                   Działy
                 </div>
                 {SECONDARY_NAV.map((s) => {
@@ -211,7 +211,7 @@ export function Masthead() {
           <PatroniteTrackedLink
             placement="masthead_desktop"
             aria-label="Wesprzyj"
-            className="hidden sm:inline-flex px-4 py-2 rounded-full bg-foreground text-background text-[12.5px] font-medium tracking-wide items-center gap-1.5 transition-colors hover:bg-destructive"
+            className="hidden sm:inline-flex px-4 py-2 rounded-full bg-foreground text-background text-[12.5px] font-medium tracking-wide items-center gap-1.5 transition-opacity hover:opacity-90"
           >
             Wesprzyj
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" /></svg>

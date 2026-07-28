@@ -47,7 +47,7 @@ export default async function ObietnicePage({
   });
 
   return (
-    <div className="bg-background text-foreground font-serif pb-20">
+    <div className="bg-background text-foreground pb-20">
       <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-6 md:pt-8">
         <PageBreadcrumb
           items={[{ label: "Obietnice" }]}

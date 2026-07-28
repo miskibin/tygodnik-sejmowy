@@ -89,7 +89,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
       />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
-        <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0">sortuj</span>
+        <span className="text-muted-foreground text-[11px] shrink-0 font-medium">sortuj</span>
         <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
@@ -199,7 +199,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
           />
         </div>
 
-        <aside className="min-w-0 font-serif text-[15px] leading-[1.6] text-secondary-foreground">
+        <aside className="min-w-0 text-[15px] leading-[1.6] text-secondary-foreground">
           {display ? (
             <div className="mb-4 p-4 border border-rule bg-background relative">
               {pinned && (
@@ -212,15 +212,15 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
                   ×
                 </button>
               )}
-              <div className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground mb-1.5 uppercase">para</div>
-              <div className="flex items-center gap-2 font-serif text-[24px] font-medium text-foreground leading-tight mb-2 flex-wrap">
+              <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">para</div>
+              <div className="flex items-center gap-2 text-[24px] font-medium text-foreground leading-tight mb-2 flex-wrap">
                 <ClubLogo klub={display.a} size={28} />
                 <span>{KLUB_LABELS[display.a] ?? display.a}</span>
                 <span className="text-destructive italic">×</span>
                 <ClubLogo klub={display.b} size={28} />
                 <span>{KLUB_LABELS[display.b] ?? display.b}</span>
               </div>
-              <div className="font-serif font-normal text-destructive leading-none mb-1" style={{ fontSize: 56 }}>
+              <div className="font-normal text-destructive leading-none mb-1" style={{ fontSize: 56 }}>
                 {Math.round(display.agreement * 100)}<span className="text-muted-foreground text-[26px]">%</span>
               </div>
               <div className="font-sans text-[12px] text-muted-foreground mb-3">
@@ -228,15 +228,15 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
               </div>
               <a
                 href={`/szukaj?scope=print&q=${encodeURIComponent(display.a + " " + display.b)}`}
-                className="inline-block font-sans text-[11px] text-destructive underline decoration-dotted underline-offset-4"
+                className="inline-block font-sans text-[11px] text-foreground underline decoration-dotted underline-offset-4"
               >
                 ↗ wspólne sprawy w wyszukiwarce
               </a>
             </div>
           ) : (
             <div className="mb-4 p-4 border border-border" style={{ background: "var(--muted)" }}>
-              <div className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground mb-1.5 uppercase">próba</div>
-              <div className="font-serif text-[26px] font-normal text-foreground leading-tight">
+              <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">próba</div>
+              <div className="text-[26px] font-normal text-foreground leading-tight">
                 {data.totalVotings.toLocaleString("pl-PL")}
                 <span className="text-muted-foreground text-[16px]"> głosowań</span>
               </div>
@@ -268,7 +268,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
 
       {/* Color legend — explicit gradient with %. */}
       <div className="mt-6 flex flex-wrap items-center gap-3 font-mono text-[10px] text-muted-foreground">
-        <span className="uppercase tracking-[0.14em]">skala</span>
+        <span className="font-medium">skala</span>
         <span>0%</span>
         <div
           className="h-2 flex-1 max-w-[280px] border border-border"

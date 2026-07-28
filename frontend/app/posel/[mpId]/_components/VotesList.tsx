@@ -62,7 +62,7 @@ export function VotesList({ rows, dissentCount }: { rows: MpVoteRow[]; dissentCo
   return (
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between mb-4 min-w-0">
-        <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] shrink-0">
+        <div className="font-sans text-[11px] text-muted-foreground shrink-0 font-medium">
           Lista głosowań
         </div>
         <div className="flex flex-wrap gap-1.5 font-sans text-[12px] min-w-0">
@@ -100,7 +100,7 @@ export function VotesList({ rows, dissentCount }: { rows: MpVoteRow[]; dissentCo
       </div>
 
       {filtered.length === 0 ? (
-        <p className="font-serif italic text-muted-foreground text-center py-8">
+        <p className="text-muted-foreground text-center py-8">
           {filter === "dissent"
             ? "Ten poseł nie odbiegał od linii klubu w żadnym głosowaniu."
             : "Brak głosowań."}
@@ -153,7 +153,7 @@ export function VotesList({ rows, dissentCount }: { rows: MpVoteRow[]; dissentCo
               <button
                 type="button"
                 onClick={() => setShown((s) => s + PAGE_SIZE)}
-                className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4 cursor-pointer"
+                className="font-sans text-[12px] text-foreground underline decoration-dotted underline-offset-4 cursor-pointer"
               >
                 Pokaż następne {Math.min(PAGE_SIZE, filtered.length - shown)} z {filtered.length - shown}
               </button>

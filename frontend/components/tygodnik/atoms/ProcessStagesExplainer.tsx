@@ -350,7 +350,7 @@ function BranchPill({ branch }: { branch: Branch }) {
       <Icon size={11} strokeWidth={2.5} style={{ color, marginTop: 4, flexShrink: 0 }} />
       <div className="flex-1 min-w-0">
         <div
-          className="font-mono uppercase tracking-[0.08em]"
+          className="font-medium"
           style={{ fontSize: 10.5, color, fontWeight: 600, marginBottom: 1 }}
         >
           {branch.label}
@@ -370,11 +370,11 @@ function LegalSources({ items, compact }: { items: string[]; compact?: boolean }
   return (
     <div
       className={`${compact ? "mt-2 pt-1.5" : "mt-3 pt-2"} font-mono text-[10px] text-muted-foreground leading-snug`}
-      style={{ borderTop: "1px dashed var(--border)", letterSpacing: "0.02em" }}
+      style={{ borderTop: "1px dashed var(--border)" }}
     >
       <span
-        className="uppercase tracking-[0.12em] mr-2"
-        style={{ fontSize: 9, fontWeight: 600 }}
+        className="mr-2 font-medium"
+        style={{ fontSize: 11, fontWeight: 600 }}
       >
         Podstawa prawna
       </span>
@@ -421,7 +421,7 @@ function DesktopBody() {
       <div className="px-8 pt-8 pb-5 text-center border-b border-border">
         <DialogHeader className="items-center">
           <DialogTitle
-            className="font-serif font-medium"
+            className="font-medium"
             style={{ fontSize: 32, letterSpacing: "-0.02em", lineHeight: 1.1 }}
           >
             Jak powstaje ustawa w Sejmie
@@ -493,13 +493,13 @@ function DesktopBody() {
                 <div className="min-w-0">
                   <div className="flex items-baseline gap-2 mb-1 flex-wrap">
                     <h3
-                      className="font-serif font-medium m-0"
+                      className="font-medium m-0"
                       style={{ fontSize: 19, letterSpacing: "-0.005em" }}
                     >
                       {row.label}
                     </h3>
                     <span
-                      className="font-mono uppercase tracking-[0.1em] text-muted-foreground"
+                      className="text-muted-foreground font-medium"
                       style={{ fontSize: 9.5 }}
                     >
                       pasek: {row.bucket}
@@ -509,7 +509,7 @@ function DesktopBody() {
                     {row.blurb}
                   </p>
                   <div
-                    className="font-serif text-secondary-foreground m-0"
+                    className="text-secondary-foreground m-0"
                     style={{
                       fontSize: 14,
                       lineHeight: 1.6,
@@ -527,7 +527,7 @@ function DesktopBody() {
                     style={{ background: "var(--muted)" }}
                   >
                     <div
-                      className="font-mono uppercase tracking-[0.12em] text-muted-foreground mb-3"
+                      className="text-muted-foreground mb-3 font-medium"
                       style={{ fontSize: 10, fontWeight: 600 }}
                     >
                       Co dalej
@@ -553,7 +553,7 @@ function DesktopBody() {
           className="mt-8 pt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11.5px] text-muted-foreground font-sans"
           style={{ borderTop: "1px solid var(--border)" }}
         >
-          <span className="font-mono uppercase tracking-[0.12em]" style={{ fontSize: 10 }}>
+          <span className="font-medium" style={{ fontSize: 10 }}>
             Legenda
           </span>
           <span className="inline-flex items-center gap-1.5">
@@ -629,7 +629,7 @@ function MobileBody() {
     <>
       <DrawerHeader className="text-left px-4 pt-2 pb-3">
         <DrawerTitle
-          className="font-serif font-medium"
+          className="font-medium"
           style={{ fontSize: 22, letterSpacing: "-0.01em", lineHeight: 1.15 }}
         >
           Jak powstaje ustawa w Sejmie
@@ -661,13 +661,13 @@ function MobileBody() {
             >
               <div className="flex items-baseline gap-2 mb-1 flex-wrap">
                 <h3
-                  className="font-serif font-medium m-0"
+                  className="font-medium m-0"
                   style={{ fontSize: 16, letterSpacing: "-0.005em" }}
                 >
                   {row.label}
                 </h3>
                 <span
-                  className="font-mono uppercase tracking-[0.1em] text-muted-foreground"
+                  className="text-muted-foreground font-medium"
                   style={{ fontSize: 9 }}
                 >
                   {row.bucket}
@@ -677,7 +677,7 @@ function MobileBody() {
                 {row.blurb}
               </p>
               <div
-                className="font-serif text-secondary-foreground"
+                className="text-secondary-foreground"
                 style={{ fontSize: 13, lineHeight: 1.55 }}
               >
                 {row.detail}
@@ -689,7 +689,7 @@ function MobileBody() {
                   style={{ borderTop: "1px dashed var(--border)" }}
                 >
                   <div
-                    className="font-mono uppercase tracking-[0.12em] text-muted-foreground mb-1.5"
+                    className="text-muted-foreground mb-1.5 font-medium"
                     style={{ fontSize: 9, fontWeight: 600 }}
                   >
                     Co dalej

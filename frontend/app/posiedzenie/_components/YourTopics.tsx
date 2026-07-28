@@ -83,7 +83,7 @@ export function YourTopics({ data }: { data: SittingView }) {
                   >
                     <span className="flex items-center gap-2.5">
                       <span
-                        className="font-serif"
+                        className=""
                         style={{
                           fontSize: 18,
                           color: on
@@ -105,7 +105,6 @@ export function YourTopics({ data }: { data: SittingView }) {
                         color: !has
                           ? "var(--border)"
                           : "var(--muted-foreground)",
-                        letterSpacing: "0.1em",
                       }}
                     >
                       {has ? `${points.length}` : "—"}
@@ -130,7 +129,7 @@ export function YourTopics({ data }: { data: SittingView }) {
           <div style={{ minHeight: 360 }}>
             <div className="flex items-baseline gap-4 mb-5 flex-wrap">
               <span
-                className="font-serif"
+                className=""
                 style={{
                   fontSize: 56,
                   lineHeight: 0.9,
@@ -141,7 +140,7 @@ export function YourTopics({ data }: { data: SittingView }) {
                 {TOPICS[selected].icon}
               </span>
               <h3
-                className="font-serif font-medium m-0"
+                className="font-medium m-0"
                 style={{
                   fontSize: 32,
                   letterSpacing: "-0.018em",
@@ -151,11 +150,10 @@ export function YourTopics({ data }: { data: SittingView }) {
                 {TOPICS[selected].label}.
               </h3>
               <span
-                className="font-mono uppercase ml-auto"
+                className="ml-auto font-medium"
                 style={{
                   fontSize: 11,
                   color: "var(--muted-foreground)",
-                  letterSpacing: "0.12em",
                 }}
               >
                 {current.length} {pointLabel(current.length)} dziś
@@ -176,7 +174,7 @@ export function YourTopics({ data }: { data: SittingView }) {
                 >
                   <div>
                     <div
-                      className="font-serif italic font-medium"
+                      className="italic font-medium"
                       style={{
                         fontSize: 34,
                         lineHeight: 0.9,
@@ -188,9 +186,8 @@ export function YourTopics({ data }: { data: SittingView }) {
                     <div
                       className="font-mono mt-1.5"
                       style={{
-                        fontSize: 9.5,
+                        fontSize: 11,
                         color: "var(--muted-foreground)",
-                        letterSpacing: "0.1em",
                       }}
                     >
                       {p.timeStart}
@@ -198,7 +195,7 @@ export function YourTopics({ data }: { data: SittingView }) {
                   </div>
                   <div>
                     <h4
-                      className="font-serif font-medium m-0 mb-1.5"
+                      className="font-medium m-0 mb-1.5"
                       style={{
                         fontSize: 18,
                         lineHeight: 1.22,
@@ -210,7 +207,7 @@ export function YourTopics({ data }: { data: SittingView }) {
                     </h4>
                     {p.plainSummary && (
                       <p
-                        className="font-serif m-0 mb-2.5"
+                        className="m-0 mb-2.5"
                         style={{
                           fontSize: 13.5,
                           lineHeight: 1.5,
@@ -221,11 +218,10 @@ export function YourTopics({ data }: { data: SittingView }) {
                       </p>
                     )}
                     <div
-                      className="flex items-center gap-x-4 gap-y-1 flex-wrap font-mono uppercase"
+                      className="flex items-center gap-x-4 gap-y-1 flex-wrap font-medium"
                       style={{
-                        fontSize: 10,
+                        fontSize: 11,
                         color: "var(--muted-foreground)",
-                        letterSpacing: "0.1em",
                       }}
                     >
                       {p.stages.map((e) => (
@@ -258,7 +254,7 @@ export function YourTopics({ data }: { data: SittingView }) {
               ))}
               {current.length === 0 && (
                 <p
-                  className="font-serif italic"
+                  className="italic"
                   style={{
                     fontSize: 14,
                     color: "var(--muted-foreground)",

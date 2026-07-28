@@ -1,64 +1,50 @@
-// Roman-numeral section markers + small-caps kicker. Shared across the
-// sitting view (/posiedzenie) and the weekly feed (/tygodnik) — both use the
-// same editorial chrome.
+// Section heading + kicker. Shared across the sitting view (/posiedzenie) and
+// the weekly feed (/tygodnik).
+//
+// `num` is retained in the signature because every call site passes it, but it
+// is no longer rendered — the Roman-numeral marker was part of the newspaper
+// skin. Delete the prop once the call sites are cleaned up.
 
 import type { ReactNode } from "react";
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-
 export function SectionHead({
-  num,
   title,
   sub,
   anchor,
   tone = "default",
 }: {
-  num: number;
+  num?: number;
   title: string;
   sub?: ReactNode;
   anchor?: string;
   tone?: "default" | "muted" | "inverted";
 }) {
-  const numColor =
-    tone === "inverted" ? "var(--highlight)" : "var(--destructive-deep)";
   const titleColor = tone === "inverted" ? "var(--background)" : "var(--foreground)";
   const subColor =
     tone === "inverted" ? "var(--border)" : "var(--muted-foreground)";
   const ruleColor =
-    tone === "inverted" ? "var(--muted-foreground)" : "var(--rule)";
+    tone === "inverted" ? "var(--muted-foreground)" : "var(--border)";
 
   return (
     <div
       id={anchor}
-      className="flex items-baseline gap-5 pb-4 mb-7 border-b-2"
+      className="flex items-baseline gap-5 pb-3 mb-6 border-b"
       style={{ borderColor: ruleColor, scrollMarginTop: 80 }}
     >
-      <span
-        className="font-serif italic font-medium shrink-0"
-        style={{
-          fontSize: 36,
-          lineHeight: 1,
-          color: numColor,
-          minWidth: 32,
-        }}
-        aria-hidden
-      >
-        {ROMAN[num - 1] ?? num}
-      </span>
       <h2
-        className="font-serif font-medium m-0"
+        className="font-semibold m-0"
         style={{
-          fontSize: 28,
-          lineHeight: 1.05,
-          letterSpacing: "-0.018em",
+          fontSize: 20,
+          lineHeight: 1.2,
+          letterSpacing: "-0.015em",
           color: titleColor,
         }}
       >
-        {title}.
+        {title}
       </h2>
       {sub && (
         <span
-          className="font-sans ml-auto text-right hidden md:block"
+          className="ml-auto text-right hidden md:block"
           style={{
             fontSize: 12.5,
             lineHeight: 1.4,
@@ -73,11 +59,11 @@ export function SectionHead({
   );
 }
 
+// `size` and `letterSpacing` are kept for call-site compatibility but ignored —
+// the kicker is now a plain small label, not wide-tracked mono small-caps.
 export function Kicker({
   children,
   color = "var(--muted-foreground)",
-  size = 10,
-  letterSpacing = "0.16em",
   className,
 }: {
   children: ReactNode;
@@ -88,8 +74,8 @@ export function Kicker({
 }) {
   return (
     <div
-      className={`font-mono uppercase ${className ?? ""}`}
-      style={{ fontSize: size, color, letterSpacing }}
+      className={`font-medium ${className ?? ""}`}
+      style={{ fontSize: 11, color }}
     >
       {children}
     </div>

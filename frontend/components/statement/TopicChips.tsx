@@ -45,7 +45,7 @@ export function AddresseeChip({ addressee }: { addressee: string | null }) {
   const label = ADDRESSEE_LABELS[addressee] ?? `do: ${addressee}`;
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-mono text-[10px] tracking-[0.14em] uppercase border border-border text-secondary-foreground"
+      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] border border-border text-secondary-foreground font-medium"
       title={label}
     >
       <span className="text-destructive" aria-hidden>→</span>

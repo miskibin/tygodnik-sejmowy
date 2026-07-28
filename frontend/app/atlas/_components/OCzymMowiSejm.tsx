@@ -166,10 +166,10 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
             aria-live="polite"
             className="static mt-3 sm:absolute sm:mt-0 sm:top-3 sm:right-6 sm:left-auto bg-background border border-rule p-3 font-sans text-[12px] w-full sm:min-w-[200px] sm:max-w-[min(100%,280px)] shadow-md z-10"
           >
-            <div className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase mb-1.5">
+            <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
               {hover.bucket.replace("-", " ")}
             </div>
-            <div className="font-serif text-[16px] text-foreground leading-tight mb-2 inline-flex items-center gap-2">
+            <div className="text-[16px] text-foreground leading-tight mb-2 inline-flex items-center gap-2">
               <span className="inline-block w-3 h-3 rounded-sm" style={{ background: TOPIC_COLOR[hover.topic] }} />
               {TOPIC_LABEL[hover.topic]}
             </div>
@@ -181,7 +181,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
             </div>
             <a
               href={`/szukaj?scope=print&q=${encodeURIComponent(TOPIC_LABEL[hover.topic])}`}
-              className="block mt-2.5 pt-2 border-t border-dotted border-border font-sans text-[11px] text-destructive underline decoration-dotted underline-offset-4"
+              className="block mt-2.5 pt-2 border-t border-dotted border-border font-sans text-[11px] text-foreground underline decoration-dotted underline-offset-4"
             >
               ↗ druki o tym temacie
             </a>
@@ -214,7 +214,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
         </div>
       </div>
       {biggestRise && biggestFall && biggestRise.topic !== biggestFall.topic && (
-        <p className="mt-4 font-serif text-[15px] leading-[1.6] text-secondary-foreground">
+        <p className="mt-4 text-[15px] leading-[1.6] text-secondary-foreground">
           Linia kropkowana — początek X kadencji.{" "}
           <strong className="text-foreground">{TOPIC_LABEL[biggestFall.topic]}</strong>
           {" "}spadły z&nbsp;{Math.round(biggestFall.from * 100)}% do&nbsp;{Math.round(biggestFall.to * 100)}%.{" "}

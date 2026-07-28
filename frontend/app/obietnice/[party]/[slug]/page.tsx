@@ -50,7 +50,7 @@ function EvidenceCard({ e, variant }: { e: PromiseEvidence; variant: "confirmed"
     >
       <Link
         href={`/proces/${e.printTerm}/${encodeURIComponent(e.printNumber)}`}
-        className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
+        className="text-foreground hover:text-foreground no-underline leading-snug block"
         style={{ fontSize: titleSize }}
       >
         {e.printShortTitle ?? e.printTitle ?? `Druk ${e.printNumber}/${e.printTerm}`}
@@ -60,7 +60,7 @@ function EvidenceCard({ e, variant }: { e: PromiseEvidence; variant: "confirmed"
         <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 font-sans text-[11.5px]">
           {sponsor && (
             <span className="inline-flex items-baseline gap-1.5">
-              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground">
+              <span className="text-[11px] text-muted-foreground font-medium">
                 Wniósł:
               </span>
               <span className="text-foreground">{sponsor}</span>
@@ -68,7 +68,7 @@ function EvidenceCard({ e, variant }: { e: PromiseEvidence; variant: "confirmed"
           )}
           {(e.currentStageType || e.processPassed) && (
             <span className="inline-flex items-baseline gap-1.5">
-              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground">
+              <span className="text-[11px] text-muted-foreground font-medium">
                 Status:
               </span>
               <span className="text-foreground">
@@ -96,17 +96,17 @@ function EvidenceCard({ e, variant }: { e: PromiseEvidence; variant: "confirmed"
 
       {v && (
         <div className="mb-3 inline-flex items-baseline gap-2 flex-wrap font-sans text-[12px]">
-          <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground">
+          <span className="text-[11px] text-muted-foreground font-medium">
             Głosowanie:
           </span>
           <Link
             href={`/glosowanie/${v.votingId}`}
-            className="text-foreground hover:text-destructive no-underline"
+            className="text-foreground hover:text-foreground no-underline"
           >
             za {v.yes} · przeciw {v.no}
           </Link>
           <span
-            className="font-mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-sm"
+            className="text-[11px] tracking-wider px-1.5 py-0.5 rounded-sm font-medium"
             style={{
               color:
                 v.result === "passed"
@@ -135,7 +135,7 @@ function EvidenceCard({ e, variant }: { e: PromiseEvidence; variant: "confirmed"
 
       {e.rationale && (
         <p
-          className="m-0 mt-1 font-serif text-secondary-foreground"
+          className="m-0 mt-1 text-secondary-foreground"
           style={{ fontSize: rationaleSize, lineHeight: 1.6, fontStyle: rationaleStyle }}
         >
           <MarkdownText text={e.rationale} />
@@ -278,7 +278,7 @@ export default async function PromiseDetailPage({
   }
 
   return (
-    <div className="bg-background text-foreground font-serif pb-24">
+    <div className="bg-background text-foreground pb-24">
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 md:pt-9">
         <PageBreadcrumb
           items={[
@@ -309,7 +309,7 @@ export default async function PromiseDetailPage({
           </div>
 
           <h1
-            className="font-serif font-medium m-0 leading-tight"
+            className="font-medium m-0 leading-tight"
             style={{
               fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
               textWrap: "balance",
@@ -320,7 +320,7 @@ export default async function PromiseDetailPage({
 
           {showQuoteAsContext && detail.sourceQuote && (
             <blockquote
-              className="m-0 mt-5 font-serif italic text-secondary-foreground"
+              className="m-0 mt-5 italic text-secondary-foreground"
               style={{
                 fontSize: "clamp(1rem, 1.6vw, 1.15rem)",
                 lineHeight: 1.5,
@@ -336,7 +336,7 @@ export default async function PromiseDetailPage({
           <div className="mt-6 flex items-center gap-x-4 gap-y-2 flex-wrap font-sans text-[13px]">
             {activityParts.length > 0 ? (
               <span className="inline-flex items-center gap-2">
-                <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground font-medium">
                   Ruch w Sejmie:
                 </span>
                 {activityParts.map((p, i) => (
@@ -359,7 +359,7 @@ export default async function PromiseDetailPage({
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 font-sans text-[12px] italic text-muted-foreground">
-                <span className="font-mono text-[10px] tracking-[0.14em] uppercase not-italic">
+                <span className="text-[11px] not-italic font-medium">
                   Ruch w Sejmie:
                 </span>
                 bez ruchu w Sejmie (na razie żaden druk nie został powiązany)
@@ -370,7 +370,7 @@ export default async function PromiseDetailPage({
                 href={detail.sourceUrl}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="ml-auto font-mono text-[11px] text-destructive underline decoration-dotted underline-offset-4"
+                className="ml-auto font-mono text-[11px] text-foreground underline decoration-dotted underline-offset-4"
               >
                 źródło: {host} ↗
               </a>
@@ -384,7 +384,7 @@ export default async function PromiseDetailPage({
               <section className="mb-10" aria-labelledby="evidence-heading">
                 <h2
                   id="evidence-heading"
-                  className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3"
+                  className="text-[11px] text-muted-foreground mb-3 font-medium"
                 >
                   Powiązane druki ({confirmedEvidence.length})
                 </h2>
@@ -400,7 +400,7 @@ export default async function PromiseDetailPage({
               <section className="mb-10" aria-labelledby="candidate-evidence-heading">
                 <h2
                   id="candidate-evidence-heading"
-                  className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1"
+                  className="text-[11px] text-muted-foreground mb-1 font-medium"
                 >
                   Możliwe powiązania ({candidateEvidence.length})
                 </h2>
@@ -419,7 +419,7 @@ export default async function PromiseDetailPage({
               <section aria-labelledby="voting-heading" className="mb-10">
                 <h2
                   id="voting-heading"
-                  className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3"
+                  className="text-[11px] text-muted-foreground mb-3 font-medium"
                 >
                   Oś głosowań ({detail.votings.length})
                 </h2>
@@ -445,11 +445,11 @@ export default async function PromiseDetailPage({
                         <span className="font-mono text-[11px] text-muted-foreground">
                           {formatDate(v.date)}
                         </span>
-                        <span className="font-serif text-foreground" style={{ fontSize: 15 }}>
+                        <span className="text-foreground" style={{ fontSize: 15 }}>
                           {v.title ?? v.printShortTitle ?? `Głosowanie #${v.votingId}`}
                         </span>
                         <span
-                          className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm"
+                          className="text-[11px] tracking-wider px-2 py-0.5 rounded-sm font-medium"
                           style={{ color: resultColor, border: `1px solid ${resultColor}55` }}
                         >
                           {resultLabel}
@@ -467,7 +467,7 @@ export default async function PromiseDetailPage({
                 style={{ borderColor: "var(--border)", background: "var(--muted)" }}
               >
                 <p
-                  className="m-0 font-serif text-secondary-foreground"
+                  className="m-0 text-secondary-foreground"
                   style={{ fontSize: 15.5, lineHeight: 1.6 }}
                 >
                   Nie znaleźliśmy druków sejmowych dopasowanych do tej obietnicy. Może to znaczyć, że
@@ -481,7 +481,7 @@ export default async function PromiseDetailPage({
           <aside className="lg:border-l lg:border-rule lg:pl-8 space-y-8">
             {detail.related.length > 0 && (
               <div>
-                <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-3">
+                <div className="text-[11px] text-muted-foreground mb-3 font-medium">
                   Inne obietnice {detail.partyCode ? partyShort(detail.partyCode) : ""}
                 </div>
                 <ul className="list-none p-0 m-0 space-y-3">
@@ -494,7 +494,7 @@ export default async function PromiseDetailPage({
                       <li key={r.id} className="border-b border-dotted border-border pb-3 last:border-0">
                         <Link
                           href={href}
-                          className="font-serif text-foreground hover:text-destructive no-underline leading-snug block"
+                          className="text-foreground hover:text-foreground no-underline leading-snug block"
                           style={{ fontSize: 14 }}
                         >
                           {r.title}
@@ -506,7 +506,7 @@ export default async function PromiseDetailPage({
                 {detail.partyCode && (
                   <Link
                     href={`/obietnice?parties=${encodeURIComponent(detail.partyCode)}`}
-                    className="block mt-4 font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4"
+                    className="block mt-4 font-sans text-[12px] text-foreground underline decoration-dotted underline-offset-4"
                   >
                     Wszystkie obietnice {partyShort(detail.partyCode)} →
                   </Link>

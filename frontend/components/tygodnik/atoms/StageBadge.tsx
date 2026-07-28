@@ -7,13 +7,12 @@ import type { ReactNode } from "react";
 export function StageBadge({ children }: { children: ReactNode }) {
   return (
     <span
-      className="font-mono uppercase"
+      className="font-medium"
       style={{
-        fontSize: 9.5,
+        fontSize: 11,
         color: "var(--background)",
         background: "var(--foreground)",
         padding: "3px 8px",
-        letterSpacing: "0.14em",
       }}
     >
       {children}

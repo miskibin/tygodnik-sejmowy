@@ -29,7 +29,7 @@ export function ComingSoonPage({
   return (
     <main
       role="status"
-      className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28"
+      className="bg-background text-foreground px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28"
     >
       <div className="max-w-[760px] mx-auto">
         <PageBreadcrumb
@@ -37,7 +37,7 @@ export function ComingSoonPage({
           subtitle={
             <span
               aria-label="Funkcja w przygotowaniu"
-              className="inline-block font-mono text-[10px] tracking-[0.18em] uppercase px-2 py-[3px] rounded-sm"
+              className="inline-block text-[11px] px-2 py-[3px] rounded-sm font-medium"
               style={{
                 background: "var(--destructive)",
                 color: "var(--background)",
@@ -49,7 +49,7 @@ export function ComingSoonPage({
         />
 
         <p
-          className="font-serif text-secondary-foreground max-w-[680px] mb-8"
+          className="text-secondary-foreground max-w-[680px] mb-8"
           style={{ fontSize: 19, lineHeight: 1.55 }}
         >
           {description}
@@ -57,10 +57,10 @@ export function ComingSoonPage({
 
         {plannedFeatures && plannedFeatures.length > 0 && (
           <>
-            <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-3">
+            <div className="text-[11px] text-muted-foreground mb-3 font-medium">
               Co planujemy
             </div>
-            <ul className="font-serif text-[16px] leading-[1.55] text-foreground m-0 p-0 list-none mb-10">
+            <ul className="text-[16px] leading-[1.55] text-foreground m-0 p-0 list-none mb-10">
               {plannedFeatures.map((f) => (
                 <li
                   key={f}
@@ -83,7 +83,7 @@ export function ComingSoonPage({
 
         <Link
           href={backLink.href}
-          className="font-mono text-[12px] tracking-[0.16em] uppercase text-destructive hover:underline decoration-dotted underline-offset-4"
+          className="text-[12px] text-destructive hover:underline decoration-dotted underline-offset-4 font-medium"
         >
           {backLink.label}
         </Link>

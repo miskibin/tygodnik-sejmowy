@@ -10,7 +10,7 @@ export function AgendaList({ items, max = 10 }: { items: AgendaItem[]; max?: num
     its.map((it, idx) => (
       <li
         key={idx}
-        className="font-serif text-[14.5px] leading-relaxed text-secondary-foreground"
+        className="text-[14.5px] leading-relaxed text-secondary-foreground"
         style={{ marginLeft: it.depth > 0 ? it.depth * 16 : 0 }}
       >
         {it.text}
@@ -30,7 +30,7 @@ export function AgendaList({ items, max = 10 }: { items: AgendaItem[]; max?: num
       )}
       {hidden.length > 0 && (
         <details className="mt-2">
-          <summary className="cursor-pointer font-sans text-[11px] tracking-[0.08em] uppercase text-muted-foreground hover:text-destructive">
+          <summary className="cursor-pointer font-sans text-[11px] text-muted-foreground hover:text-foreground font-medium">
             + {hidden.length} {hidden.length === 1 ? "punkt" : "pozostałych punktów"}
           </summary>
           <div className="mt-2">

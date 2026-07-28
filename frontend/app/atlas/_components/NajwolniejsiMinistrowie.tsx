@@ -55,7 +55,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
       />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
-        <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0">sortuj</span>
+        <span className="text-muted-foreground text-[11px] shrink-0 font-medium">sortuj</span>
         <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
@@ -71,7 +71,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
           ))}
         </ToggleGroup>
         </div>
-        <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0 sm:ml-1">filtr</span>
+        <span className="text-muted-foreground text-[11px] shrink-0 sm:ml-1 font-medium">filtr</span>
         <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
@@ -90,7 +90,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="font-serif italic text-muted-foreground py-6">
+        <div className="text-muted-foreground py-6">
           Brak ministrów spełniających filtr.
         </div>
       ) : (
@@ -110,7 +110,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
                     style={{ gridTemplateColumns: "minmax(0,260px) minmax(0,1fr) minmax(5.5rem,auto)" }}
                   >
                     <div className="min-w-0 md:col-start-1">
-                      <div className="font-serif text-[16px] text-foreground font-medium leading-tight">
+                      <div className="text-[16px] text-foreground font-medium leading-tight">
                         {m.name}
                       </div>
                       <div className="font-sans text-[11px] text-muted-foreground mt-0.5">
@@ -144,7 +144,7 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
                   </div>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-72 font-sans text-[13px] bg-background border-rule">
-                  <div className="font-serif text-[18px] text-foreground font-medium mb-1 leading-tight">
+                  <div className="text-[18px] text-foreground font-medium mb-1 leading-tight">
                     {m.name}
                   </div>
                   <div className="font-sans text-[11px] text-muted-foreground mb-3">

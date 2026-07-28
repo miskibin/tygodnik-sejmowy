@@ -106,7 +106,7 @@ export function VotingRow({
     <>
       {badge && (
         <span
-          className="font-sans text-[9.5px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 whitespace-nowrap"
+          className="font-sans text-[11px] px-2 py-0.5 rounded-sm shrink-0 whitespace-nowrap font-medium"
           style={{
             color: isFinal ? "var(--destructive)" : "var(--muted-foreground)",
             border: `1px solid ${isFinal ? "var(--destructive)" : "var(--border)"}`,
@@ -132,7 +132,7 @@ export function VotingRow({
 
       {mpVote && (
         <span
-          className="font-sans text-[10.5px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 min-w-[54px] text-center"
+          className="font-sans text-[11px] px-2 py-0.5 rounded-sm shrink-0 min-w-[54px] text-center font-medium"
           style={{
             color: VOTE_COLOR[mpVote],
             border: `1px solid ${VOTE_COLOR[mpVote]}`,
@@ -145,7 +145,7 @@ export function VotingRow({
 
       {verdict && (
         <span
-          className="font-sans text-[10px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm shrink-0 min-w-[64px] text-center"
+          className="font-sans text-[11px] px-2 py-0.5 rounded-sm shrink-0 min-w-[64px] text-center font-medium"
           style={{
             color: verdict.passed ? "var(--success)" : "var(--destructive)",
             border: `1px solid ${verdict.passed ? "var(--success)" : "var(--destructive)"}`,
@@ -186,7 +186,7 @@ export function VotingRow({
             <Link
               href={linkHref}
               {...linkExtras}
-              className="block font-serif text-[14px] leading-snug hover:text-destructive"
+              className="block text-[14px] leading-snug hover:text-foreground"
               style={{
                 color: "var(--foreground)",
                 fontWeight: isFinal ? 600 : 400,
@@ -200,7 +200,7 @@ export function VotingRow({
               {title}
             </Link>
             {agendaCaption && (
-              <div className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground mt-0.5 truncate">
+              <div className="text-[11px] text-muted-foreground mt-0.5 truncate font-medium">
                 {agendaCaption}
               </div>
             )}

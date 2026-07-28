@@ -56,12 +56,12 @@ function KpiTile({
   const pct = total > 0 ? (count / total) * 100 : 0;
   return (
     <div className="py-4 px-4 border border-border min-w-0" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1.5 flex items-center gap-1.5">
+      <div className="font-sans text-[11px] text-muted-foreground mb-1.5 flex items-center gap-1.5 font-medium">
         <span className="inline-block w-2 h-2 rounded-sm" style={{ background: color }} />
         {label}
       </div>
       <div
-        className="font-serif font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
+        className="font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
         style={{ fontSize: "clamp(1.6rem, 3vw, 2.1rem)" }}
       >
         {count.toLocaleString("pl-PL")}
@@ -96,7 +96,7 @@ function MonthlyChart({
 
   return (
     <div className="border border-border p-5 min-w-0 overflow-hidden" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
+      <div className="font-sans text-[11px] text-muted-foreground mb-3 font-medium">
         Rozkład głosów w czasie
       </div>
       <svg
@@ -200,7 +200,7 @@ export function Tab1VotesPanel({
 }) {
   if (data.rows.length === 0) {
     return (
-      <p className="font-serif italic text-muted-foreground text-center py-12">
+      <p className="text-muted-foreground text-center py-12">
         Brak danych o głosowaniach tego posła w tej kadencji.
       </p>
     );

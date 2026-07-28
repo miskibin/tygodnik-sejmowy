@@ -94,11 +94,11 @@ export function SeatProjection({ rows, compact = false }: { rows: PollAverageRow
     <section>
       {!compact && (
         <header className="mb-6 pb-3.5 border-b border-rule grid min-w-0 items-start gap-4 sm:items-baseline sm:gap-5 [grid-template-columns:minmax(0,44px)_minmax(0,1fr)] sm:[grid-template-columns:minmax(0,60px)_minmax(0,1fr)]">
-          <div className="font-serif italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">B</div>
+          <div className="italic font-normal text-destructive leading-[0.9] text-[clamp(2.25rem,9vw,3.5rem)] sm:text-[56px]">B</div>
           <div className="min-w-0">
-            <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5">Gdyby wybory dziś · projekcja 460 mandatów</div>
-            <h2 className="font-serif font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Projekcja sali</h2>
-            <p className="font-serif m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
+            <div className="font-sans text-[11px] text-muted-foreground mb-1.5 font-medium">Gdyby wybory dziś · projekcja 460 mandatów</div>
+            <h2 className="font-medium m-0 leading-[1.05] text-[clamp(1.5rem,5.5vw,2.25rem)] tracking-[-0.01em]">Projekcja sali</h2>
+            <p className="m-0 mt-2 text-secondary-foreground leading-[1.5] max-w-[720px] text-[15px] sm:text-base">
               Mandaty rozdzielone proporcjonalnie metodą największej reszty wśród partii powyżej {SEJM_THRESHOLD_PCT}% progu.
               Bez korekty geograficznej D&apos;Hondta — to przybliżenie, nie prognoza wyborów.
             </p>
@@ -219,19 +219,19 @@ function Block({ label, seats, threshold, hint }: { label: string; seats: number
   const overMajority = seats >= threshold;
   return (
     <div className="p-3 sm:p-4 bg-muted border border-border min-w-0">
-      <div className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.16em] uppercase text-muted-foreground mb-1.5 leading-snug">{label}</div>
+      <div className="text-[11px] text-muted-foreground mb-1.5 leading-snug font-medium">{label}</div>
       <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 mb-2">
-        <span className="font-serif text-[28px] sm:text-[32px] font-medium text-foreground leading-none tabular-nums" style={{ letterSpacing: "-0.02em" }}>{seats}</span>
+        <span className="text-[28px] sm:text-[32px] font-medium text-foreground leading-none tabular-nums" style={{ letterSpacing: "-0.02em" }}>{seats}</span>
         <span className="font-mono text-[12px] text-muted-foreground">/ {SEJM_SEATS}</span>
         {overMajority && (
-          <span className="sm:ml-auto font-mono text-[10px] tracking-[0.14em] uppercase text-success">Większość</span>
+          <span className="sm:ml-auto text-[11px] text-success font-medium">Większość</span>
         )}
       </div>
       <div className="h-1 relative border border-border bg-background mb-2">
         <div className="absolute left-0 top-0 bottom-0 bg-foreground" style={{ width: `${pct}%` }} />
         <div className="absolute top-[-2px] bottom-[-2px] border-l border-destructive" style={{ left: `${(threshold / SEJM_SEATS) * 100}%` }} title={`próg większości ${threshold}`} />
       </div>
-      <div className="font-serif text-[12px] text-secondary-foreground leading-[1.4]">{hint}</div>
+      <div className="text-[12px] text-secondary-foreground leading-[1.4]">{hint}</div>
     </div>
   );
 }

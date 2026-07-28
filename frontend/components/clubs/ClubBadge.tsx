@@ -124,7 +124,6 @@ export function ClubBadge({
         color: "var(--background)",
         fontSize: px * 0.4,
         fontWeight: 600,
-        letterSpacing: "0.02em",
       }}
     >
       {PLACEHOLDER_INITIALS[klub] ?? klub.slice(0, 2).toUpperCase()}

@@ -46,7 +46,7 @@ export function EliTimelineStrip({
           );
         })}
       </div>
-      <div className="grid grid-cols-3 gap-1 font-mono text-[9px] tracking-[0.12em] uppercase text-muted-foreground">
+      <div className="grid grid-cols-3 gap-1 text-[11px] text-muted-foreground font-medium">
         {steps.map((step) => (
           <div key={step.key} className="min-w-0">
             <div className={step.emphasised ? "text-destructive font-semibold" : ""}>

@@ -127,7 +127,7 @@ export function ExpensesShareButton({
         onClick={onClick}
         disabled={state === "working"}
         aria-label="Kopiuj wydatki biura jako PNG"
-        className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.14em] text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+        className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors font-medium"
       >
         {label}
       </button>

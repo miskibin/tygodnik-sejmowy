@@ -98,7 +98,7 @@ export function VotingHemicycleCard({
       <CardTitle
         href={titleHref}
         subtitle={
-          <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground">
+          <span className="text-[11px] text-muted-foreground font-medium">
             {agendaCaption}
           </span>
         }
@@ -108,7 +108,7 @@ export function VotingHemicycleCard({
 
       {voting.topic?.trim() && (
         <div
-          className="font-serif italic"
+          className="italic"
           style={{
             fontSize: 13,
             lineHeight: 1.45,
@@ -119,8 +119,7 @@ export function VotingHemicycleCard({
           <span
             className="font-mono"
             style={{
-              fontSize: 10,
-              letterSpacing: "0.12em",
+              fontSize: 11,
               textTransform: "uppercase",
               color: "var(--muted-foreground)",
               marginRight: 8,
@@ -153,7 +152,7 @@ export function VotingHemicycleCard({
 
       {topClubs.length > 0 && (
         <div className="font-sans text-[12px] text-muted-foreground mb-3 flex flex-wrap gap-x-4 gap-y-1.5 items-center">
-          <span className="font-mono text-[10px] tracking-[0.14em] uppercase">kluby:</span>
+          <span className="text-[11px] font-medium">kluby:</span>
           {topClubs.map((c) => {
             const a11y = `${c.club_name}: ${c.yes} za, ${c.no} przeciw`;
             return (

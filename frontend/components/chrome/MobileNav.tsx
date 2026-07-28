@@ -40,7 +40,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
           <Link
             href="/"
             onClick={close}
-            className="flex items-center gap-2.5 font-serif text-[22px] font-medium tracking-tight text-foreground leading-none"
+            className="flex items-center gap-2.5 text-[22px] font-medium tracking-tight text-foreground leading-none"
           >
             <TygodnikLogoMark className="h-8 w-8 shrink-0" />
             <span>
@@ -58,7 +58,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          <div className="font-mono text-[10px] text-muted-foreground tracking-[0.16em] uppercase px-3 pb-2">
+          <div className="text-[11px] text-muted-foreground px-3 pb-2 font-medium">
             Główne
           </div>
           {SIDEBAR_MAIN_NAV.map((item) => {
@@ -79,7 +79,7 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
             );
           })}
 
-          <div className="font-mono text-[10px] text-muted-foreground tracking-[0.16em] uppercase px-3 pt-5 pb-2">
+          <div className="text-[11px] text-muted-foreground px-3 pt-5 pb-2 font-medium">
             Działy
           </div>
           {SECONDARY_NAV.filter((s) => s.href !== "/atlas" && s.href !== "/sondaze").map((s) => {

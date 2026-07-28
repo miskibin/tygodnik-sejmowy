@@ -80,7 +80,7 @@ export function PromiseRow({ row, idx }: { row: PromiseHubRow; idx: number }) {
           </div>
           <h3
             id={`promise-title-${row.id}`}
-            className="font-serif font-medium m-0 leading-snug text-foreground"
+            className="font-medium m-0 leading-snug text-foreground"
             style={{ fontSize: "clamp(0.98rem, 1.6vw, 1.15rem)", textWrap: "balance" }}
           >
             {row.title}

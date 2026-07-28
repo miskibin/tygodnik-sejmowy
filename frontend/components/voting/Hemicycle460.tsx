@@ -285,12 +285,11 @@ export function Hemicycle460({ seats }: { seats: Seat[] }) {
       </div>
 
       <div
-        className="text-center font-mono uppercase"
+        className="text-center font-medium"
         style={{
           marginTop: 14,
-          fontSize: 10,
+          fontSize: 11,
           color: "var(--muted-foreground)",
-          letterSpacing: "0.16em",
         }}
       >
         sala plenarna · {SEAT_TOTAL} mandatów

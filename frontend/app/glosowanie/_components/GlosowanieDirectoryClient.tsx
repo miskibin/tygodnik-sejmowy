@@ -37,7 +37,7 @@ export function GlosowanieDirectoryClient({ rows }: { rows: VotingListItem[] }) 
       />
 
       {filtered.length === 0 ? (
-        <p className="font-serif italic text-muted-foreground text-center py-12">
+        <p className="text-muted-foreground text-center py-12">
           Brak wyników.
         </p>
       ) : (
@@ -61,7 +61,7 @@ export function GlosowanieDirectoryClient({ rows }: { rows: VotingListItem[] }) 
               <button
                 type="button"
                 onClick={() => setShown((s) => s + PAGE_SIZE)}
-                className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4 cursor-pointer"
+                className="font-sans text-[12px] text-foreground underline decoration-dotted underline-offset-4 cursor-pointer"
               >
                 Pokaż następne {Math.min(PAGE_SIZE, filtered.length - shown)} z {filtered.length - shown}
               </button>

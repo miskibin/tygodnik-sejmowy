@@ -5,7 +5,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
   return (
     <div className="mb-5 flex items-baseline gap-4 border-b border-border pb-3">
       <h2
-        className="font-serif font-medium text-foreground m-0"
+        className="font-medium text-foreground m-0"
         style={{ fontSize: 22, lineHeight: 1, letterSpacing: "-0.015em" }}
       >
         {title}
@@ -155,18 +155,17 @@ function KomisjaRow({ row }: { row: KomisjaRowData }) {
       <div className="pl-6">
         <div className="flex items-baseline gap-3 flex-wrap mb-1">
           <h3
-            className="font-serif font-medium m-0 text-foreground"
+            className="font-medium m-0 text-foreground"
             style={{ fontSize: 18, letterSpacing: "-0.005em" }}
           >
             {row.title}
           </h3>
           {row.stageTag && (
             <span
-              className="font-mono uppercase"
+              className="font-medium"
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 color: "var(--muted-foreground)",
-                letterSpacing: "0.12em",
               }}
             >
               {row.stageTag}
@@ -178,7 +177,6 @@ function KomisjaRow({ row }: { row: KomisjaRowData }) {
               style={{
                 fontSize: 11,
                 color: "var(--muted-foreground)",
-                letterSpacing: "0.02em",
               }}
             >
               {row.sourceTag}
@@ -187,7 +185,7 @@ function KomisjaRow({ row }: { row: KomisjaRowData }) {
         </div>
         {row.subtitle && (
           <p
-            className="font-serif m-0 mb-1.5"
+            className="m-0 mb-1.5"
             style={{
               fontSize: 14.5,
               lineHeight: 1.55,

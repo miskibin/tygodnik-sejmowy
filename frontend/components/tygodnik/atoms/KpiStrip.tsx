@@ -26,12 +26,12 @@ export function KpiStrip({ slots }: { slots: KpiSlot[] }) {
     >
       {filtered.map((s, i) => (
         <div key={i} className="min-w-0" style={{ minHeight: 60 }}>
-          <div className="font-mono text-[9px] tracking-[0.18em] uppercase text-muted-foreground mb-1">
+          <div className="text-[11px] text-muted-foreground mb-1 font-medium">
             {s.kicker}
           </div>
           <div className="flex items-baseline gap-1.5">
             <span
-              className="font-serif font-medium text-foreground"
+              className="font-medium text-foreground"
               style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", lineHeight: 1 }}
             >
               {s.value}

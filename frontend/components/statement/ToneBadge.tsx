@@ -20,7 +20,7 @@ export function ToneBadge({ tone }: { tone: string | null }) {
   const border = `color-mix(in oklab, ${meta.ink} 35%, transparent)`;
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm font-mono text-[10px] tracking-[0.14em] uppercase"
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm text-[11px] font-medium"
       style={{ background: bg, color: meta.ink, border: `1px solid ${border}` }}
       title={`Ton wypowiedzi: ${meta.label}`}
     >

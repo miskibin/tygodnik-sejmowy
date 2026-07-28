@@ -24,12 +24,12 @@ function KpiTile({
 }) {
   return (
     <div className="py-4 px-4 border border-border" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1.5 flex items-center gap-1.5">
+      <div className="font-sans text-[11px] text-muted-foreground mb-1.5 flex items-center gap-1.5 font-medium">
         {color && <span className="inline-block w-2 h-2 rounded-sm" style={{ background: color }} />}
         {label}
       </div>
       <div
-        className="font-serif font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
+        className="font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
         style={{ fontSize: "clamp(1.6rem, 3vw, 2.1rem)" }}
       >
         {value}
@@ -85,7 +85,7 @@ function ActivityChart({
 
   return (
     <div className="border border-border p-5" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
+      <div className="font-sans text-[11px] text-muted-foreground mb-3 font-medium">
         Wystąpienia w czasie
       </div>
       <svg
@@ -157,7 +157,7 @@ export function Tab3StatementsPanel({
 }) {
   if (stats.total === 0) {
     return (
-      <p className="font-serif italic text-muted-foreground text-center py-12">
+      <p className="text-muted-foreground text-center py-12">
         Ten poseł nie wystąpił jeszcze na posiedzeniach Sejmu w tej kadencji.
       </p>
     );
@@ -195,7 +195,7 @@ export function Tab3StatementsPanel({
       <ActivityChart monthly={stats.monthly} events={events} />
 
       <div>
-        <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
+        <div className="font-sans text-[11px] text-muted-foreground mb-3 font-medium">
           Wystąpienia chronologicznie
         </div>
         <PoselStatementsListClient mpId={mpId} initialRows={initialRows} total={stats.total} />

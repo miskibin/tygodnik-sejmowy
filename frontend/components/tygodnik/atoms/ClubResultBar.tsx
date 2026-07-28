@@ -105,7 +105,6 @@ export function ClubResultBar({ clubTally }: { clubTally: ClubTallyRaw[] }) {
                 width: `${pct}%`,
                 fontSize: 8.5,
                 color: "var(--secondary-foreground)",
-                letterSpacing: "0.04em",
                 textAlign: "center",
                 overflow: "hidden",
                 whiteSpace: "nowrap",

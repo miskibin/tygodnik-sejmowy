@@ -88,7 +88,6 @@ export function VotingResultBar({ header }: { header: VotingHeader }) {
                     padding: "0 10px",
                     fontSize: 11,
                     color: s.inkOnLight ? "var(--secondary-foreground)" : "var(--background)",
-                    letterSpacing: "0.06em",
                   }}
                 >
                   <span style={{ fontWeight: 600 }}>{s.label}</span>
@@ -106,7 +105,6 @@ export function VotingResultBar({ header }: { header: VotingHeader }) {
           style={{
             fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.04em",
           }}
           title={meta?.rule}
         >

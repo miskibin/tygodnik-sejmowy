@@ -42,7 +42,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
                     className="mb-5 cursor-pointer rounded-sm transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-destructive p-1"
                   >
                     <div className="flex justify-between items-baseline mb-1.5 gap-2 min-w-0">
-                      <span className="font-serif text-[18px] font-medium text-foreground inline-flex items-center gap-2 min-w-0">
+                      <span className="text-[18px] font-medium text-foreground inline-flex items-center gap-2 min-w-0">
                         <ClubLogo klub={d.klub} size={20} />
                         <span className="truncate">{klubLabel}</span>
                       </span>
@@ -66,7 +66,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
                   </div>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-72 font-sans text-[13px] bg-background border-rule">
-                  <div className="font-serif text-[18px] text-foreground font-medium mb-2 inline-flex items-center gap-2">
+                  <div className="text-[18px] text-foreground font-medium mb-2 inline-flex items-center gap-2">
                     <ClubLogo klub={d.klub} size={20} />
                     {klubLabel}
                   </div>
@@ -80,7 +80,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
                     <span className="text-muted-foreground">średnia obecność</span>
                     <span className="text-right text-foreground">~{Math.round(d.totalMembersAvg)} posłów</span>
                   </div>
-                  <div className="mt-2.5 pt-2.5 border-t border-dotted border-border font-serif text-[12px] italic text-muted-foreground leading-snug">
+                  <div className="mt-2.5 pt-2.5 border-t border-dotted border-border text-[12px] text-muted-foreground leading-snug">
                     {pct >= 90 && "Wysoka dyscyplina — głosowania klubowe zwykle przewidywalne."}
                     {pct >= 80 && pct < 90 && "Solidna dyscyplina, sporadyczne odstępstwa."}
                     {pct < 80 && "Klub się rozjeżdża — co piąty głos wbrew linii."}
@@ -91,7 +91,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
           })}
         </div>
         <aside
-          className="min-w-0 font-serif text-[15px] leading-[1.7] text-secondary-foreground p-4 sm:p-5 border-t-[3px] sm:border-t-0 sm:border-l-[3px] border-destructive"
+          className="min-w-0 text-[15px] leading-[1.7] text-secondary-foreground p-4 sm:p-5 border-t-[3px] sm:border-t-0 sm:border-l-[3px] border-destructive"
         >
           <p className="m-0 mb-3.5">
             <strong className="text-foreground">{KLUB_LABELS[top.klub] ?? top.klub} najbardziej zdyscyplinowany</strong>

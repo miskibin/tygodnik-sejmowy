@@ -54,11 +54,10 @@ export function VotingHero({ data }: { data: VotingPageData }) {
       >
         <div>
           <div
-            className="font-mono uppercase"
+            className="font-medium"
             style={{
               fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.16em",
               marginBottom: 18,
             }}
           >
@@ -67,7 +66,7 @@ export function VotingHero({ data }: { data: VotingPageData }) {
           </div>
 
           <h1
-            className="font-serif text-[32px] md:text-[56px]"
+            className="text-[32px] md:text-[56px]"
             style={{
               lineHeight: 1.04,
               fontWeight: 500,
@@ -82,7 +81,7 @@ export function VotingHero({ data }: { data: VotingPageData }) {
 
           <div style={{ margin: "0 0 36px", maxWidth: 560 }}>
             <p
-              className="font-serif text-[17px] sm:text-[19px] md:text-[21px]"
+              className="text-[17px] sm:text-[19px] md:text-[21px]"
               style={{
                 lineHeight: 1.5,
                 color: "var(--secondary-foreground)",
@@ -92,11 +91,10 @@ export function VotingHero({ data }: { data: VotingPageData }) {
               }}
             >
               <span
-                className="block font-mono uppercase"
+                className="block font-medium"
                 style={{
                   fontSize: 11,
                   color: "var(--muted-foreground)",
-                  letterSpacing: "0.1em",
                   marginBottom: 4,
                   fontStyle: "normal",
                 }}
@@ -112,7 +110,6 @@ export function VotingHero({ data }: { data: VotingPageData }) {
                   fontSize: 11,
                   color: "var(--muted-foreground)",
                   marginTop: 8,
-                  letterSpacing: "0.04em",
                   lineHeight: 1.45,
                 }}
               >

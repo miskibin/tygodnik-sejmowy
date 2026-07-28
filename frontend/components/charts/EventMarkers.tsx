@@ -184,7 +184,6 @@ function Tooltip({
           style={{
             fontFamily: "ui-monospace, monospace",
             fontSize: variant === "sparkline" ? 8.5 : 9,
-            letterSpacing: "0.14em",
             textTransform: "uppercase",
             color: accent,
           }}

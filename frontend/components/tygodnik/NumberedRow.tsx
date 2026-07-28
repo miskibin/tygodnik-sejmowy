@@ -73,7 +73,7 @@ export function NumberedRow({
       <aside className="min-w-0 font-sans text-[11px] text-muted-foreground tracking-wide flex md:block items-start gap-4">
         {showOrdinal && (
           <div
-            className="font-serif italic font-medium shrink-0 mb-0 md:mb-2"
+            className="italic font-medium shrink-0 mb-0 md:mb-2"
             style={{ fontSize: indexSize, lineHeight: 1, color: indexColor }}
           >
             {indexLabel ?? String(idx + 1).padStart(2, "0")}
@@ -81,7 +81,7 @@ export function NumberedRow({
         )}
         <div className="flex-1 min-w-0 flex flex-col gap-2 md:gap-0 md:contents">
           {kicker && (
-            <div className="text-[10px] tracking-[0.16em] uppercase md:mb-3.5 leading-snug">
+            <div className="text-[11px] md:mb-3.5 leading-snug font-medium">
               {kicker}
             </div>
           )}

@@ -73,26 +73,26 @@ export function PoselInterpellationsListClient({
               </span>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-2 mb-1">
-                  <span className="font-sans text-[10px] uppercase tracking-[0.12em] text-destructive">
+                  <span className="font-sans text-[11px] text-muted-foreground font-medium">
                     {kindLabel} #{r.num}
                   </span>
                   {delayed ? (
                     <span
-                      className="font-sans text-[10px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-sm"
+                      className="font-sans text-[11px] px-1.5 py-0.5 rounded-sm font-medium"
                       style={{ color: "var(--warning)", border: "1px solid var(--warning)" }}
                     >
                       spóźnione {r.answerDelayedDays} dni
                     </span>
                   ) : (
                     <span
-                      className="font-sans text-[10px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-sm"
+                      className="font-sans text-[11px] px-1.5 py-0.5 rounded-sm font-medium"
                       style={{ color: "var(--success)", border: "1px solid var(--success)" }}
                     >
                       w terminie
                     </span>
                   )}
                 </div>
-                <div className="font-serif text-[15.5px] leading-snug text-foreground mb-1 break-words">
+                <div className="text-[15.5px] leading-snug text-foreground mb-1 break-words">
                   {r.title}
                 </div>
                 {r.recipients.length > 0 && (

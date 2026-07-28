@@ -169,13 +169,13 @@ export function FullRosterGrid({ seats, total, counts, term }: Props) {
           }}
         >
           <span
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 36, color: "var(--destructive)", lineHeight: 1, fontWeight: 500 }}
           >
             IV
           </span>
           <h2
-            className="font-serif m-0"
+            className="m-0"
             style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.018em", lineHeight: 1, color: "var(--foreground)" }}
           >
             Imienna lista.
@@ -193,8 +193,8 @@ export function FullRosterGrid({ seats, total, counts, term }: Props) {
           style={{ gap: 14, marginBottom: 24, fontSize: 12 }}
         >
           <span
-            className="font-mono uppercase"
-            style={{ fontSize: 10, color: "var(--muted-foreground)", letterSpacing: "0.16em" }}
+            className="font-medium"
+            style={{ fontSize: 10, color: "var(--muted-foreground)" }}
           >
             Pokaż
           </span>
@@ -329,7 +329,7 @@ function RosterPopover({ state }: { state: HoverState }) {
         transform: "translate(-50%, -100%)",
         background: "var(--background)",
         border: "1px solid var(--rule)",
-        boxShadow: "0 6px 20px rgba(22,19,16,0.15)",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
         padding: 12,
         width: POPOVER_W,
         maxWidth: `calc(100vw - ${margin * 2}px)`,
@@ -360,7 +360,7 @@ function RosterPopover({ state }: { state: HoverState }) {
         )}
         <div style={{ minWidth: 0 }}>
           <div
-            className="font-serif"
+            className=""
             style={{ fontSize: 16, fontWeight: 500, lineHeight: 1.2, color: "var(--foreground)" }}
           >
             {seat.mp_name}
@@ -388,13 +388,12 @@ function RosterPopover({ state }: { state: HoverState }) {
         </div>
       </div>
       <div
-        className="font-mono uppercase"
+        className="font-medium"
         style={{
           marginTop: 10,
           paddingTop: 8,
           borderTop: "1px dashed var(--border)",
           fontSize: 11,
-          letterSpacing: "0.12em",
           color: "var(--muted-foreground)",
         }}
       >

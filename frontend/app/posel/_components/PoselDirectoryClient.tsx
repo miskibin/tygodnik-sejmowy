@@ -126,7 +126,7 @@ export function PoselDirectoryClient({ mps }: { mps: MpRow[] }) {
             Tylko Twój okręg {district.num}
           </button>
         ) : (
-          <span className="font-serif italic text-[12px] text-muted-foreground">
+          <span className="text-[12px] text-muted-foreground">
             Ustaw kod pocztowy na stronie głównej, żeby filtrować po Twoim okręgu.
           </span>
         )}
@@ -146,7 +146,7 @@ export function PoselDirectoryClient({ mps }: { mps: MpRow[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="font-serif italic text-muted-foreground py-12 text-center">
+        <p className="text-muted-foreground py-12 text-center">
           Brak posłów spełniających kryteria filtra.
         </p>
       ) : view === "grid" ? (
@@ -179,14 +179,14 @@ function GridView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
             style={{ background: isMine ? "color-mix(in oklab, var(--highlight) 35%, transparent)" : undefined }}
           >
             {isMine && (
-              <span className="absolute top-3 right-3 font-mono text-[9px] tracking-[0.16em] uppercase text-destructive font-semibold">
+              <span className="absolute top-3 right-3 text-[11px] text-muted-foreground font-semibold">
                 ★ Twój
               </span>
             )}
             <div className="grid items-start gap-3 min-w-0" style={{ gridTemplateColumns: "56px 1fr" }}>
               <Portrait name={m.firstLastName} photoUrl={m.photoUrl} clubRef={m.clubRef} />
               <div className="min-w-0">
-                <div className="font-serif text-[18px] font-medium leading-tight tracking-[-0.01em] break-words text-balance">
+                <div className="text-[18px] font-medium leading-tight tracking-[-0.01em] break-words text-balance">
                   {m.firstLastName}
                 </div>
                 <div className="font-sans text-[11.5px] text-secondary-foreground mt-1 flex items-center gap-1.5 flex-wrap">
@@ -213,7 +213,7 @@ function TableView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
   return (
     <div className="border-t-2 border-rule font-sans">
       <div
-        className="hidden md:grid items-baseline py-3 px-2 border-b border-border font-mono text-[9.5px] tracking-[0.12em] uppercase text-muted-foreground"
+        className="hidden md:grid items-baseline py-3 px-2 border-b border-border text-[11px] text-muted-foreground font-medium"
         style={{ gridTemplateColumns: "2fr 1.2fr 1.4fr 60px 60px 60px 60px", columnGap: 12 }}
       >
         <span>Imię i nazwisko</span>
@@ -237,7 +237,7 @@ function TableView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
             <div className="md:hidden flex items-center gap-3 min-w-0">
               <Portrait name={m.firstLastName} photoUrl={m.photoUrl} clubRef={m.clubRef} small />
               <div className="min-w-0 flex-1">
-                <div className="font-serif text-[15px] font-medium leading-tight truncate">
+                <div className="text-[15px] font-medium leading-tight truncate">
                   {isMine && <span className="text-destructive mr-1">★</span>}
                   {m.firstLastName}
                 </div>
@@ -257,7 +257,7 @@ function TableView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
               className="hidden md:grid items-center font-sans text-[13px]"
               style={{ gridTemplateColumns: "2fr 1.2fr 1.4fr 60px 60px 60px 60px", columnGap: 12 }}
             >
-              <span className="font-serif text-[16px] font-medium leading-tight tracking-[-0.005em] flex items-center gap-1.5 min-w-0">
+              <span className="text-[16px] font-medium leading-tight tracking-[-0.005em] flex items-center gap-1.5 min-w-0">
                 {isMine && <span className="text-destructive">★</span>}
                 <span className="truncate">{m.firstLastName}</span>
               </span>
@@ -287,9 +287,9 @@ function TableView({ mps, myDistrict }: { mps: MpRow[]; myDistrict?: number }) {
 function Stat({ label, value, color, bar }: { label: string; value: string; color: string; bar?: number | null }) {
   return (
     <div className="min-w-0">
-      <div className="font-mono text-[8.5px] uppercase tracking-[0.12em] text-muted-foreground mb-1">{label}</div>
+      <div className="text-[8.5px] text-muted-foreground mb-1 font-medium">{label}</div>
       <div
-        className="font-serif font-medium leading-none tabular-nums"
+        className="font-medium leading-none tabular-nums"
         style={{ fontSize: 17, color, letterSpacing: "-0.01em" }}
       >
         {value}
@@ -319,7 +319,7 @@ function Portrait({ name, photoUrl, clubRef, small = false }: { name: string; ph
         />
       ) : (
         <div className="w-full h-full border border-border bg-muted flex items-center justify-center">
-          <span className="font-serif italic text-muted-foreground opacity-60" style={{ fontSize: w * 0.32 }}>
+          <span className="text-muted-foreground opacity-60" style={{ fontSize: w * 0.32 }}>
             {name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2)}
           </span>
         </div>

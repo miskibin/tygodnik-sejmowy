@@ -6,13 +6,13 @@ export function PromiseList({ rows }: { rows: PromiseHubRow[] }) {
   if (rows.length === 0) {
     return (
       <div
-        className="py-20 text-center text-muted-foreground font-serif italic"
+        className="py-20 text-center text-muted-foreground"
         style={{ fontSize: 18 }}
       >
         Brak obietnic dla wybranych filtrów.{" "}
         <Link
           href="/obietnice"
-          className="text-destructive underline decoration-dotted underline-offset-4 not-italic"
+          className="text-foreground underline decoration-dotted underline-offset-4 not-italic"
         >
           wyczyść filtry
         </Link>

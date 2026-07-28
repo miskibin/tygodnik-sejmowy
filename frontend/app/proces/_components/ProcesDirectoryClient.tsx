@@ -150,7 +150,7 @@ export function ProcesDirectoryClient({ items }: { items: ProcesListItem[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="font-serif italic text-muted-foreground py-12 text-center">
+        <p className="text-muted-foreground py-12 text-center">
           Brak procesów spełniających kryteria filtra.
         </p>
       ) : (
@@ -179,7 +179,7 @@ function ProcessRow({ p }: { p: ProcesListItem }) {
         style={{ gridTemplateColumns: "minmax(0, 1fr) auto" }}
       >
         <div className="min-w-0">
-          <div className="font-sans text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5 flex items-center gap-2 flex-wrap">
+          <div className="font-sans text-[11px] text-muted-foreground mb-1.5 flex items-center gap-2 flex-wrap font-medium">
             <span className="font-mono tracking-wide normal-case text-destructive">
               druk {p.number}
             </span>
@@ -201,7 +201,7 @@ function ProcessRow({ p }: { p: ProcesListItem }) {
             )}
           </div>
           <h2
-            className="font-serif font-medium leading-[1.2] text-foreground group-hover:text-destructive transition-colors m-0"
+            className="font-medium leading-[1.2] text-foreground group-hover:text-foreground transition-colors m-0"
             style={{ fontSize: "clamp(1rem, 1.8vw, 1.25rem)", letterSpacing: "-0.015em" }}
           >
             {p.shortTitle || p.title || `Druk ${p.number}`}
@@ -210,7 +210,7 @@ function ProcessRow({ p }: { p: ProcesListItem }) {
             <div className="font-sans text-[11px] text-secondary-foreground mt-1.5 flex items-center gap-2 flex-wrap">
               {sponsorLabel && (
                 <span
-                  className="font-mono uppercase tracking-[0.12em] text-[9.5px] px-1.5 py-0.5 border border-border"
+                  className="text-[11px] px-1.5 py-0.5 border border-border font-medium"
                   style={{ color: "var(--secondary-foreground)" }}
                 >
                   {sponsorLabel}

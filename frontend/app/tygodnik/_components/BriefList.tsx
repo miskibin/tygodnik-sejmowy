@@ -6,7 +6,6 @@ import { useProfile } from "@/lib/profile";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
 import { dbTagsToTopics, type TopicId } from "@/lib/topics";
 import { personasImplyAnyTopic } from "@/lib/topic-persona-map";
-import { Ornament } from "@/components/chrome/Ornament";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { formatPopulation } from "@/lib/labels";
 import type { BriefItem } from "@/lib/db/prints";
@@ -224,14 +223,13 @@ function ItemView({
   const statusPill = statusBadge ? (
     <div className="mb-3">
       <span
-        className="font-mono uppercase inline-block"
+        className="inline-block font-medium"
         style={{
-          fontSize: 10,
+          fontSize: 11,
           color: "var(--warning)",
           border: "1px solid var(--warning)",
           background: "color-mix(in srgb, var(--warning) 8%, transparent)",
           padding: "3px 9px",
-          letterSpacing: "0.14em",
         }}
       >
         {statusBadge}
@@ -316,18 +314,17 @@ function ItemView({
       {item.title && item.shortTitle && item.shortTitle !== item.title && (
         <details className="mb-3">
           <summary
-            className="cursor-pointer font-mono uppercase"
+            className="cursor-pointer font-medium"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.14em",
               listStyle: "none",
             }}
           >
             ▸ pełny urzędowy tytuł
           </summary>
           <p
-            className="font-serif italic mt-2 mb-0"
+            className="italic mt-2 mb-0"
             style={{
               fontSize: 13,
               color: "var(--muted-foreground)",
@@ -353,7 +350,7 @@ function ItemView({
 
       {expanded && item.summaryPlain && (
         <p
-          className="font-serif text-secondary-foreground m-0 mb-4"
+          className="text-secondary-foreground m-0 mb-4"
           style={{ fontSize: 17, lineHeight: 1.65, textWrap: "pretty" }}
         >
           <CitationText term={item.term}>{item.summaryPlain}</CitationText>
@@ -544,7 +541,7 @@ function InterpellationCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType:
     >
       <CardTitle
         subtitle={
-          <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive font-medium">
+          <span className="text-[11px] text-muted-foreground font-medium">
             do: {recipient}
           </span>
         }
@@ -645,7 +642,7 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
 
       {s.viral_quote && (
         <blockquote
-          className="font-serif italic m-0 mb-4 relative"
+          className="italic m-0 mb-4 relative"
           style={{
             fontSize: 22,
             lineHeight: 1.4,
@@ -656,7 +653,7 @@ function ViralCard({ ev, idx }: { ev: Extract<WeeklyEvent, { eventType: "viral_q
         >
           <span
             aria-hidden
-            className="font-serif text-destructive absolute"
+            className="text-destructive absolute"
             style={{
               fontSize: 56,
               lineHeight: 0.8,
@@ -707,7 +704,7 @@ function ArchiveIndex({ sittings, currentSitting }: { sittings: SittingInfo[]; c
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+          className="text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-medium"
         >
           Archiwum · {count} {countLabel} {open ? "↑" : "↓"}
         </button>
@@ -726,8 +723,8 @@ function ArchiveIndex({ sittings, currentSitting }: { sittings: SittingInfo[]; c
                   }}
                 >
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-muted-foreground">Nr</span>
-                    <span className="font-serif italic" style={{ fontSize: 18, color: isCurrent ? "var(--destructive)" : "var(--foreground)" }}>
+                    <span className="text-[11px] text-muted-foreground font-medium">Nr</span>
+                    <span className="italic" style={{ fontSize: 18, color: isCurrent ? "var(--destructive)" : "var(--foreground)" }}>
                       {s.sittingNum}
                     </span>
                     <span className="font-mono text-[10px] text-muted-foreground ml-auto">
@@ -837,7 +834,7 @@ export function BriefList({
   const lightWeek = totalEvents > 0 && totalEvents < 6;
 
   return (
-    <main className="bg-background font-serif text-foreground">
+    <main className="bg-background text-foreground">
       {/* Masthead — issue identity + volume stats read as one editorial strip */}
       <div className="border-b border-rule">
         <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-6 pb-4 md:pt-8 md:pb-6">
@@ -859,7 +856,7 @@ export function BriefList({
               {olderSitting ? (
                 <Link
                   href={`/tygodnik/p/${olderSitting.sittingNum}`}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                   title={`Posiedzenie ${olderSitting.sittingNum} · ${formatDateRange(olderSitting.firstDate, olderSitting.lastDate)}`}
                   aria-label={`Poprzednie posiedzenie nr ${olderSitting.sittingNum}`}
                 >
@@ -869,11 +866,11 @@ export function BriefList({
                 <span className="text-border">← Nr —</span>
               )}
               <span className="text-foreground font-medium">
-                <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mr-1.5 md:mr-2">
+                <span className="text-[11px] text-muted-foreground mr-1.5 md:mr-2 font-medium">
                   Nr
                 </span>
                 <span
-                  className="font-serif italic text-destructive tabular-nums"
+                  className="italic text-destructive tabular-nums"
                   style={{ fontSize: "clamp(15px, 4vw, 18px)" }}
                 >
                   {sitting.sittingNum}
@@ -884,7 +881,7 @@ export function BriefList({
               {newerSitting ? (
                 <Link
                   href={`/tygodnik/p/${newerSitting.sittingNum}`}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                   title={`Posiedzenie ${newerSitting.sittingNum} · ${formatDateRange(newerSitting.firstDate, newerSitting.lastDate)}`}
                   aria-label={`Następne posiedzenie nr ${newerSitting.sittingNum}`}
                 >
@@ -908,7 +905,7 @@ export function BriefList({
                   {hydrated && filterActive && partitioned.prints.length > 0 && (
                     <button
                       onClick={() => setShowAll((v) => !v)}
-                      className="hidden md:inline cursor-pointer text-destructive underline decoration-dotted underline-offset-4 md:ml-3"
+                      className="hidden md:inline cursor-pointer text-foreground underline decoration-dotted underline-offset-4 md:ml-3"
                     >
                       {showAll ? "✓ wszystkie projekty" : "pokaż wszystkie projekty"}
                     </button>
@@ -920,7 +917,7 @@ export function BriefList({
 
           {lightWeek && (
             <div
-              className="font-serif italic text-secondary-foreground mt-4 mb-0 max-w-2xl"
+              className="italic text-secondary-foreground mt-4 mb-0 max-w-2xl"
               style={{ fontSize: 14, lineHeight: 1.55, textWrap: "pretty" }}
             >
               Tym razem to {totalEvents} {totalEvents === 1 ? "rzecz" : "rzeczy"}. W typowym tygodniu pojawia się od 5 do 20 rzeczy wartych przeczytania — żadnego wypełniacza.
@@ -952,7 +949,7 @@ export function BriefList({
               <div className="md:hidden mt-2 mb-2 px-1 text-center">
                 <button
                   onClick={() => setShowAll((v) => !v)}
-                  className="cursor-pointer font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4"
+                  className="cursor-pointer font-sans text-[12px] text-foreground underline decoration-dotted underline-offset-4"
                 >
                   {showAll ? "✓ wszystkie projekty" : "pokaż wszystkie projekty"}
                 </button>
@@ -1026,21 +1023,21 @@ export function BriefList({
       </div>
 
       {filteredPrints.length === 0 && partitioned.prints.length > 0 && (
-        <div className="px-4 md:px-8 lg:px-14 py-12 text-center text-muted-foreground font-serif italic" style={{ fontSize: 16 }}>
+        <div className="px-4 md:px-8 lg:px-14 py-12 text-center text-muted-foreground" style={{ fontSize: 16 }}>
           Brak projektów dla wybranych filtrów.{" "}
-          <button onClick={() => setShowAll(true)} className="text-destructive underline decoration-dotted underline-offset-4 cursor-pointer not-italic">
+          <button onClick={() => setShowAll(true)} className="text-foreground underline decoration-dotted underline-offset-4 cursor-pointer not-italic">
             pokaż wszystkie
           </button>
         </div>
       )}
 
       {totalEvents === 0 && (
-        <div className="px-4 md:px-8 lg:px-14 py-24 text-center text-muted-foreground font-serif italic" style={{ fontSize: 18 }}>
+        <div className="px-4 md:px-8 lg:px-14 py-24 text-center text-muted-foreground" style={{ fontSize: 18 }}>
           To posiedzenie nie ma jeszcze opracowanych wydarzeń.
           {olderSitting && (
             <>
               {" "}
-              <Link href={`/tygodnik/p/${olderSitting.sittingNum}`} className="text-destructive underline decoration-dotted underline-offset-4 not-italic">
+              <Link href={`/tygodnik/p/${olderSitting.sittingNum}`} className="text-foreground underline decoration-dotted underline-offset-4 not-italic">
                 Zobacz Nr {olderSitting.sittingNum}
               </Link>
             </>
@@ -1050,10 +1047,10 @@ export function BriefList({
 
       <ArchiveIndex sittings={sittings} currentSitting={sitting.sittingNum} />
 
-      <Ornament char="∼ ✶ ∼" pad={48} />
+      <div className="max-w-[700px] mx-auto px-4 md:px-8 lg:px-14 my-12 border-t border-border" />
 
       <div className="max-w-[700px] mx-auto px-4 md:px-8 lg:px-14 pb-20 text-center">
-        <p className="font-serif italic text-secondary-foreground m-0 mb-5" style={{ fontSize: 18, lineHeight: 1.6 }}>
+        <p className="italic text-secondary-foreground m-0 mb-5" style={{ fontSize: 18, lineHeight: 1.6 }}>
           To wszystko z bieżących prac Sejmu. Następny list w piątek po kolejnym posiedzeniu, około godziny 19:00.
         </p>
         <div className="font-sans text-xs text-muted-foreground tracking-wide flex justify-center gap-4 flex-wrap">

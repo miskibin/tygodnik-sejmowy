@@ -6,7 +6,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
   return (
     <div className="mb-5 flex items-baseline gap-4 border-b border-border pb-3">
       <h2
-        className="font-serif font-medium text-foreground m-0"
+        className="font-medium text-foreground m-0"
         style={{ fontSize: 22, lineHeight: 1, letterSpacing: "-0.015em" }}
       >
         {title}
@@ -120,8 +120,7 @@ function StageBadge({ label }: { label: string }) {
     <span
       className="font-sans uppercase shrink-0"
       style={{
-        fontSize: 10,
-        letterSpacing: "0.08em",
+        fontSize: 11,
         color: "var(--destructive-deep)",
         background: "var(--muted)",
         border: "1px solid var(--border)",
@@ -146,19 +145,19 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
     <li className="py-5 border-b border-border last:border-b-0">
       <div className="flex items-baseline gap-3 flex-wrap mb-3">
         <h3
-          className="font-serif font-medium m-0 text-foreground"
+          className="font-medium m-0 text-foreground"
           style={{ fontSize: 18, letterSpacing: "-0.005em" }}
         >
           <Link
             href={`/posiedzenie/${group.sittingNum}`}
-            className="hover:text-destructive hover:underline decoration-dotted underline-offset-4"
+            className="hover:text-foreground hover:underline decoration-dotted underline-offset-4"
           >
             Posiedzenie nr {group.sittingNum}
           </Link>
         </h3>
         <span
-          className="font-mono uppercase"
-          style={{ fontSize: 10, color: "var(--muted-foreground)", letterSpacing: "0.12em" }}
+          className="font-medium"
+          style={{ fontSize: 10, color: "var(--muted-foreground)" }}
         >
           {formatSittingDates(group.sittingDates)}
         </span>
@@ -185,14 +184,14 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
               {p.ord !== null && (
                 <Link
                   href={`/posiedzenie/${group.sittingNum}#punkt-${p.ord}`}
-                  className="font-mono text-muted-foreground shrink-0 hover:text-destructive hover:underline decoration-dotted underline-offset-4"
+                  className="font-mono text-muted-foreground shrink-0 hover:text-foreground hover:underline decoration-dotted underline-offset-4"
                   style={{ fontSize: 12, minWidth: 28 }}
                 >
                   pkt {p.ord}
                 </Link>
               )}
               <span
-                className="font-serif text-secondary-foreground flex-1"
+                className="text-secondary-foreground flex-1"
                 style={{ fontSize: 14.5, lineHeight: 1.5, textWrap: "pretty" as never }}
               >
                 {p.title}
@@ -200,7 +199,7 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
               {p.statementCount > 0 && (
                 <span
                   className="font-sans text-muted-foreground shrink-0"
-                  style={{ fontSize: 11, letterSpacing: "0.02em" }}
+                  style={{ fontSize: 11 }}
                 >
                   {pluralWypowiedzi(p.statementCount)}
                 </span>
@@ -210,7 +209,7 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
         })}
         {group.points.every((p) => p.agendaItemId === null) && (
           <li
-            className="font-serif italic text-muted-foreground"
+            className="text-muted-foreground"
             style={{ fontSize: 13, paddingLeft: 4 }}
           >
             Procedowany bez wpisu w porządku obrad — etapy procesu poniżej.

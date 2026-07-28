@@ -93,7 +93,7 @@ export function ProcessStageBar({
     return (
       <div className="mb-4">
         <span
-          className="inline-flex items-center gap-1.5 font-mono text-[9.5px] tracking-[0.14em] uppercase rounded-full border px-2.5 py-1"
+          className="inline-flex items-center gap-1.5 text-[11px] rounded-full border px-2.5 py-1 font-medium"
           style={{ color: "var(--muted-foreground)", borderColor: "var(--border)" }}
         >
           <span aria-hidden style={{ color: "var(--destructive)" }}>●</span>
@@ -127,7 +127,7 @@ export function ProcessStageBar({
             );
           })}
         </div>
-        <div className="flex items-center justify-between font-mono text-[9px] tracking-[0.12em] uppercase text-muted-foreground">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground font-medium">
           {STEPS.map((step, i) => {
             const current = i === currentIdx;
             return (

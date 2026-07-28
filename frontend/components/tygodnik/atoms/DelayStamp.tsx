@@ -5,7 +5,7 @@
 export function DelayStamp({ days }: { days: number }) {
   return (
     <div
-      className="relative inline-flex items-center justify-center font-serif italic text-destructive"
+      className="relative inline-flex items-center justify-center italic text-destructive"
       style={{
         width: 72,
         height: 72,
@@ -19,8 +19,7 @@ export function DelayStamp({ days }: { days: number }) {
       <span
         className="font-mono not-italic absolute"
         style={{
-          fontSize: 9,
-          letterSpacing: "0.16em",
+          fontSize: 11,
           textTransform: "uppercase",
           bottom: 12,
           color: "var(--destructive)",

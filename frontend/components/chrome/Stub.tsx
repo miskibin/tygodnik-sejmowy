@@ -1,11 +1,11 @@
 export function Stub({ kicker, title, blurb }: { kicker: string; title: string; blurb: string }) {
   return (
-    <main className="bg-background text-foreground font-serif pb-20">
+    <main className="bg-background text-foreground pb-20">
       <section className="border-b border-rule">
         <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 pb-5">
           <div className="flex items-baseline justify-between gap-4 flex-wrap">
             <div>
-              <div className="font-sans text-[10px] tracking-[0.18em] uppercase text-destructive mb-2">
+              <div className="font-sans text-[11px] text-muted-foreground mb-2 font-medium">
                 {kicker}
               </div>
               <h1
@@ -15,7 +15,7 @@ export function Stub({ kicker, title, blurb }: { kicker: string; title: string; 
                 {title}
               </h1>
             </div>
-            <p className="font-serif italic text-[12.5px] text-secondary-foreground max-w-[420px] m-0 leading-snug">
+            <p className="italic text-[12.5px] text-secondary-foreground max-w-[420px] m-0 leading-snug">
               {blurb}
             </p>
           </div>

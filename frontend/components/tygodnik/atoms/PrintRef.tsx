@@ -7,12 +7,11 @@ export function PrintRef({ term, number }: { term: number; number: string }) {
   return (
     <Link
       href={`/proces/${term}/${number}`}
-      className="font-mono uppercase no-underline hover:bg-muted transition-colors"
+      className="no-underline hover:bg-muted transition-colors font-medium"
       style={{
-        fontSize: 9.5,
+        fontSize: 11,
         color: "var(--secondary-foreground)",
         padding: "3px 8px",
-        letterSpacing: "0.14em",
         border: "1px solid var(--border)",
       }}
     >

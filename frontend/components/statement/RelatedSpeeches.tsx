@@ -5,7 +5,7 @@ export function RelatedSpeeches({ items }: { items: RelatedStatement[] }) {
   if (items.length === 0) return null;
   return (
     <section className="max-w-[820px] mx-auto my-12">
-      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-4">
+      <div className="text-[11px] text-muted-foreground mb-4 font-medium">
         Inne wypowiedzi tego posła
       </div>
       <ul className="space-y-3">

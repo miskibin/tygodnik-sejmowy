@@ -219,7 +219,7 @@ export function SankeyKluby({ data }: { data: SankeyData }) {
         className="hidden md:block border border-border px-3 py-5 sm:px-7 sm:py-8 relative min-w-0 overflow-x-auto"
         style={{ background: "var(--muted)" }}
       >
-        <div className="flex flex-col gap-1 sm:flex-row sm:justify-between font-mono text-[9px] sm:text-[10px] uppercase text-muted-foreground tracking-[0.12em] sm:tracking-[0.16em] mb-3 sm:mb-4">
+        <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-[11px] text-muted-foreground mb-3 sm:mb-4 font-medium">
           <span>Stan początkowy {quarterLabel}</span>
           <span>Stan końcowy {quarterLabel}</span>
         </div>
@@ -403,7 +403,7 @@ export function SankeyKluby({ data }: { data: SankeyData }) {
                   ) : (
                     <span className="inline-block w-[18px] h-[18px] rounded-full" style={{ background: m.fromColor }} />
                   )}
-                  <span className="font-serif text-[13px] truncate">{m.fromKlub}</span>
+                  <span className="text-[13px] truncate">{m.fromKlub}</span>
                 </span>
                 <span className="font-mono text-destructive">→</span>
                 <span className="inline-flex items-center gap-2 min-w-0">
@@ -412,7 +412,7 @@ export function SankeyKluby({ data }: { data: SankeyData }) {
                   ) : (
                     <span className="inline-block w-[18px] h-[18px] rounded-full" style={{ background: m.toColor }} />
                   )}
-                  <span className="font-serif text-[13px] truncate">{m.toKlub}</span>
+                  <span className="text-[13px] truncate">{m.toKlub}</span>
                 </span>
                 <span className="ml-auto font-mono text-[13px] font-bold text-foreground">
                   {m.n}

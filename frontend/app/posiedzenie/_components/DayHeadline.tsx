@@ -18,11 +18,10 @@ export function DayHeadline({ day }: { day: Day }) {
               nagłówek dnia
             </Kicker>
             <div
-              className="font-mono uppercase"
+              className="font-medium"
               style={{
                 fontSize: 12,
                 color: "var(--muted-foreground)",
-                letterSpacing: "0.12em",
                 lineHeight: 1.8,
               }}
             >
@@ -51,7 +50,7 @@ export function DayHeadline({ day }: { day: Day }) {
           <div>
             {hasHeadline ? (
               <p
-                className="font-serif m-0"
+                className="m-0"
                 style={{
                   fontSize: 28,
                   lineHeight: 1.25,
@@ -65,7 +64,7 @@ export function DayHeadline({ day }: { day: Day }) {
               </p>
             ) : (
               <p
-                className="font-serif italic m-0"
+                className="italic m-0"
                 style={{
                   fontSize: 18,
                   lineHeight: 1.4,

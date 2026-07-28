@@ -26,7 +26,7 @@ function SectionHead({
       }}
     >
       <span
-        className="font-serif"
+        className=""
         style={{
           fontStyle: "italic",
           fontSize: 36,
@@ -38,7 +38,7 @@ function SectionHead({
         {label}
       </span>
       <h2
-        className="font-serif"
+        className=""
         style={{
           fontSize: 32,
           fontWeight: 500,
@@ -84,7 +84,7 @@ export function RebelGrid({ rebels, term }: { rebels: Rebel[]; term: number }) {
 
         {rebels.length === 0 ? (
           <p
-            className="font-serif text-center"
+            className="text-center"
             style={{
               fontStyle: "italic",
               fontSize: 16,

@@ -23,7 +23,7 @@ function PlanCardTile({ p }: { p: PlannedAgendaPoint }) {
     >
       <div className="flex items-baseline gap-3 mb-2.5">
         <span
-          className="font-serif italic font-medium"
+          className="italic font-medium"
           style={{
             fontSize: 30,
             color: "var(--destructive-deep)",
@@ -35,7 +35,7 @@ function PlanCardTile({ p }: { p: PlannedAgendaPoint }) {
         <Kicker>punkt</Kicker>
       </div>
       <h3
-        className="font-serif font-medium m-0 mb-2"
+        className="font-medium m-0 mb-2"
         style={{
           fontSize: 19,
           lineHeight: 1.25,
@@ -46,7 +46,7 @@ function PlanCardTile({ p }: { p: PlannedAgendaPoint }) {
         {p.title}.
       </h3>
       <p
-        className="font-serif italic m-0"
+        className="italic m-0"
         style={{
           fontSize: 13,
           color: "var(--muted-foreground)",
@@ -91,7 +91,7 @@ export function Tomorrow({ data }: { data: SittingView }) {
             anchor="jutro"
           />
           <p
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 15,
               color: "var(--muted-foreground)",
@@ -120,7 +120,7 @@ export function Tomorrow({ data }: { data: SittingView }) {
 
         {planned.headline && (
           <p
-            className="font-serif m-0 mb-9"
+            className="m-0 mb-9"
             style={{
               fontSize: 22,
               lineHeight: 1.35,
@@ -141,7 +141,7 @@ export function Tomorrow({ data }: { data: SittingView }) {
           </div>
         ) : (
           <p
-            className="font-serif italic"
+            className="italic"
             style={{
               fontSize: 14,
               color: "var(--muted-foreground)",

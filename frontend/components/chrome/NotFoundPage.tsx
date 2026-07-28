@@ -39,12 +39,12 @@ export function NotFoundPage({
   return (
     <main
       aria-label="Strona nie znaleziona"
-      className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-14 pb-24 sm:pb-28"
+      className="bg-background text-foreground px-4 sm:px-8 md:px-14 pt-10 sm:pt-14 pb-24 sm:pb-28"
     >
       <div className="max-w-[760px] mx-auto">
         <div
           aria-hidden="true"
-          className="font-serif italic font-medium leading-none tracking-[-0.04em] mb-6"
+          className="italic font-medium leading-none tracking-[-0.04em] mb-6"
           style={{
             color: "var(--destructive)",
             fontSize: "clamp(5.5rem, 18vw, 11rem)",
@@ -54,7 +54,7 @@ export function NotFoundPage({
         </div>
 
         <h1
-          className="font-serif font-medium m-0"
+          className="font-medium m-0"
           style={{
             fontSize: "clamp(1.75rem, 4.5vw, 2.75rem)",
             lineHeight: 1.05,
@@ -65,13 +65,13 @@ export function NotFoundPage({
         </h1>
 
         {id != null && id !== "" && (
-          <div className="mt-3 font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
+          <div className="mt-3 text-[11px] text-muted-foreground font-medium">
             id <span className="text-foreground">{String(id)}</span>
           </div>
         )}
 
         <p
-          className="font-serif text-secondary-foreground max-w-[640px] mt-6 mb-10"
+          className="text-secondary-foreground max-w-[640px] mt-6 mb-10"
           style={{ fontSize: 18, lineHeight: 1.55 }}
         >
           {message ?? (
@@ -85,7 +85,7 @@ export function NotFoundPage({
 
         <Link
           href={backLink.href}
-          className="font-mono text-[12px] tracking-[0.16em] uppercase text-destructive hover:underline decoration-dotted underline-offset-4"
+          className="text-[12px] text-destructive hover:underline decoration-dotted underline-offset-4 font-medium"
         >
           {backLink.label}
         </Link>

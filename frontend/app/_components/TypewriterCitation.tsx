@@ -94,7 +94,7 @@ export function TypewriterCitation({
 
   return (
     <div className="mt-6 max-w-[560px]" aria-live="polite" aria-atomic="true">
-      <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-2">
+      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
         Z mównicy
       </div>
       <Link href={`/mowa/${current.id}`} className="group block">
@@ -109,7 +109,7 @@ export function TypewriterCitation({
               2. min-height locks page layout — quote-to-quote swaps no longer
                  shrink/grow the hero block. */}
         <blockquote
-          className="relative font-serif italic text-foreground leading-[1.3] m-0"
+          className="relative italic text-foreground leading-[1.3] m-0"
           style={{
             fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)",
             letterSpacing: "-0.005em",
@@ -137,7 +137,7 @@ export function TypewriterCitation({
           >
             <span
               aria-hidden
-              className="select-none mr-1 font-serif italic"
+              className="select-none mr-1 italic"
               style={{ color: klubColor, opacity: 0.45 }}
             >
               “
@@ -164,7 +164,7 @@ export function TypewriterCitation({
             transition: `opacity ${fadeMs}ms ease`,
           }}
         >
-          <p className="m-0 font-serif text-[16px] md:text-[17px] leading-snug text-foreground/90">
+          <p className="m-0 text-[16px] md:text-[17px] leading-snug text-foreground/90">
             — {current.speaker ?? "anonim"}
             {klub && (
               <>

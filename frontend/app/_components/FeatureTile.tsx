@@ -32,25 +32,25 @@ export function FeatureTile({
       className={`bg-background p-6 md:p-7 flex flex-col min-h-[280px] ${className}`}
     >
       <header className="flex items-baseline justify-between mb-4">
-        <span className="font-mono text-[11px] tracking-[0.18em] text-muted-foreground">
+        <span className="text-[11px] text-muted-foreground font-medium">
           {num}
         </span>
         <div className="flex items-baseline gap-2">
           {comingSoon ? (
             <Badge
               variant="outline"
-              className="font-mono text-[9.5px] tracking-[0.18em] uppercase"
+              className="text-[11px] font-medium"
             >
               wkrótce
             </Badge>
           ) : null}
-          <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-destructive">
+          <span className="text-[11px] text-muted-foreground font-medium">
             {kicker}
           </span>
         </div>
       </header>
 
-      <h2 className="font-serif text-[28px] md:text-[32px] font-medium tracking-[-0.02em] leading-none m-0 mb-5">
+      <h2 className="text-[28px] md:text-[32px] font-medium tracking-[-0.02em] leading-none m-0 mb-5">
         {title}
       </h2>
 
@@ -64,19 +64,19 @@ export function FeatureTile({
         {isLive ? (
           <Link
             href={href!}
-            className="font-sans text-[11.5px] tracking-wide text-destructive hover:underline"
+            className="font-sans text-[11.5px] tracking-wide text-foreground hover:underline"
           >
             {ctaLabel ?? "otwórz →"}
           </Link>
         ) : href ? (
           <Link
             href={href}
-            className="font-sans text-[11.5px] tracking-wide text-muted-foreground hover:text-destructive hover:underline"
+            className="font-sans text-[11.5px] tracking-wide text-muted-foreground hover:text-foreground hover:underline"
           >
             {ctaLabel ?? "co planujemy →"}
           </Link>
         ) : (
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="text-[11px] text-muted-foreground font-medium">
             wkrótce
           </span>
         )}

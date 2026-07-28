@@ -116,7 +116,7 @@ export function MapaOkregow({ data }: { data: MapData }) {
       />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
-        <span className="text-muted-foreground uppercase tracking-[0.14em] text-[10px] shrink-0">dataset</span>
+        <span className="text-muted-foreground text-[11px] shrink-0 font-medium">dataset</span>
         <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
@@ -289,10 +289,10 @@ export function MapaOkregow({ data }: { data: MapData }) {
         <aside className="min-w-0 font-sans text-[13px]">
           {sel ? (
             <div className="border border-rule p-4 bg-background">
-              <div className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase mb-1.5">
+              <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
                 okręg {String(sel.id).padStart(2, "0")}
               </div>
-              <div className="font-serif text-[24px] font-medium text-foreground leading-tight mb-3">
+              <div className="text-[24px] font-medium text-foreground leading-tight mb-3">
                 {sel.name}
               </div>
               <dl className="grid grid-cols-[1fr_auto] gap-y-2 text-[12px]">
@@ -316,12 +316,12 @@ export function MapaOkregow({ data }: { data: MapData }) {
                   </>
                 )}
               </dl>
-              <div className="mt-4 font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase">
+              <div className="mt-4 text-[11px] text-muted-foreground font-medium">
                 Kliknij okręg → pełne dossier
               </div>
             </div>
           ) : (
-            <div className="font-serif text-[14px] italic text-muted-foreground p-4 border border-dashed border-border">
+            <div className="text-[14px] text-muted-foreground p-4 border border-dashed border-border">
               Najedź na okręg, aby zobaczyć posłów i statystyki. Kliknij — pełne dossier.
             </div>
           )}

@@ -37,11 +37,10 @@ export function Sources({
     <section className="pt-7 pb-9 border-t border-border">
       <div className="max-w-[1280px] mx-auto flex items-baseline gap-4 flex-wrap" style={{ rowGap: 10 }}>
         <span
-          className="font-mono uppercase"
+          className="font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.16em",
             flex: "0 0 auto",
           }}
         >
@@ -52,7 +51,7 @@ export function Sources({
             <a
               key={i}
               href={it.href}
-              className="font-mono no-underline pb-px text-secondary-foreground hover:text-destructive"
+              className="font-mono no-underline pb-px text-secondary-foreground hover:text-foreground"
               style={{
                 fontSize: 12,
                 borderBottom: "1px solid var(--border)",

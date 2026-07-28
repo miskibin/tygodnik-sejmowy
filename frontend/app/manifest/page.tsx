@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Ornament } from "@/components/chrome/Ornament";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 export const metadata: Metadata = {
@@ -47,7 +46,7 @@ const ANTI: Array<[string, string]> = [
 
 export default function ManifestPage() {
   return (
-    <main className="bg-background text-foreground font-serif">
+    <main className="bg-background text-foreground">
       <div className="px-4 sm:px-8 md:px-14 pt-8" style={{ maxWidth: 980, margin: "0 auto" }}>
         <PageBreadcrumb
           items={[{ label: "Manifest" }]}
@@ -57,7 +56,7 @@ export default function ManifestPage() {
 
       {/* Dlaczego — short editorial */}
       <section
-        className="font-serif text-foreground px-4 sm:px-8 md:px-14 py-12 sm:py-15"
+        className="text-foreground px-4 sm:px-8 md:px-14 py-12 sm:py-15"
         style={{ maxWidth: 760, margin: "0 auto", fontSize: "clamp(17px, 2.4vw, 21px)", lineHeight: 1.65 }}
       >
         <p style={{ margin: "0 0 22px" }}>
@@ -79,18 +78,17 @@ export default function ManifestPage() {
         </p>
       </section>
 
-      <Ornament />
 
       {/* Anti-feature list */}
       <section
-        className="font-serif px-4 sm:px-8 md:px-14 pt-5 pb-12 sm:pb-15"
+        className="px-4 sm:px-8 md:px-14 pt-5 pb-12 sm:pb-15"
         style={{ maxWidth: 760, margin: "0 auto" }}
       >
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground m-0 mb-2">
+        <p className="text-[11px] text-muted-foreground m-0 mb-2 font-medium">
           Antyfeatury
         </p>
         <h2
-          className="font-serif font-medium m-0 mb-7"
+          className="font-medium m-0 mb-7"
           style={{ fontSize: 34, letterSpacing: "-0.015em" }}
         >
           Czego <em className="text-destructive">nie zrobimy</em> nigdy.
@@ -100,12 +98,12 @@ export default function ManifestPage() {
             <li key={i} className="relative" style={{ marginBottom: 22, paddingLeft: 36 }}>
               <span
                 aria-hidden
-                className="absolute left-0 top-0 font-serif italic text-destructive"
+                className="absolute left-0 top-0 italic text-destructive"
                 style={{ fontSize: 28, lineHeight: 1 }}
               >
                 ×
               </span>
-              <strong className="font-serif">{h}</strong>{" "}
+              <strong className="">{h}</strong>{" "}
               <span className="text-secondary-foreground" style={{ fontSize: 18, lineHeight: 1.55 }}>
                 {b}
               </span>
@@ -119,15 +117,15 @@ export default function ManifestPage() {
         className="border-t border-rule px-4 sm:px-8 md:px-14 py-12 sm:py-15"
         style={{ maxWidth: 1200, margin: "0 auto" }}
       >
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground m-0 mb-2">
+        <p className="text-[11px] text-muted-foreground m-0 mb-2 font-medium">
           Patronite
         </p>
         <h2
-          className="font-serif font-normal m-0 mb-9"
+          className="font-normal m-0 mb-9"
           style={{ fontSize: 38, letterSpacing: "-0.02em" }}
         >
           Trzy progi.{" "}
-          <em className="text-destructive not-italic font-serif italic">Wszystkie z tego samego powodu.</em>
+          <em className="text-destructive not-italic italic">Wszystkie z tego samego powodu.</em>
         </h2>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -146,22 +144,22 @@ export default function ManifestPage() {
               >
                 {t.tag && (
                   <span
-                    className="absolute font-mono uppercase bg-destructive text-background"
-                    style={{ top: -12, left: 22, padding: "3px 10px", fontSize: 9, letterSpacing: "0.14em" }}
+                    className="absolute bg-destructive text-background font-medium"
+                    style={{ top: -12, left: 22, padding: "3px 10px", fontSize: 9 }}
                   >
                     {t.tag}
                   </span>
                 )}
-                <h3 className="font-serif font-medium m-0 mb-2" style={{ fontSize: 22, lineHeight: 1.2 }}>
+                <h3 className="font-medium m-0 mb-2" style={{ fontSize: 22, lineHeight: 1.2 }}>
                   {t.name}
                 </h3>
                 <p
-                  className={"font-serif italic m-0 mb-4 " + (featured ? "text-highlight" : "text-destructive")}
+                  className={"italic m-0 mb-4" + (featured ? "text-highlight" : "text-destructive")}
                   style={{ fontSize: 30 }}
                 >
                   {t.price}
                 </p>
-                <p className="font-serif m-0" style={{ fontSize: 15, lineHeight: 1.55, opacity: 0.92 }}>
+                <p className="m-0" style={{ fontSize: 15, lineHeight: 1.55, opacity: 0.92 }}>
                   {t.desc}
                 </p>
               </article>

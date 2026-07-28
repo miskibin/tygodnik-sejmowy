@@ -50,7 +50,7 @@ function SittingRow({ r }: { r: SittingInfo }) {
 
         <div className="min-w-0 flex-1">
           <span
-            className="font-serif text-[14.5px] leading-snug text-foreground group-hover:text-destructive"
+            className="text-[14.5px] leading-snug text-foreground group-hover:text-foreground"
             style={{
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -61,7 +61,7 @@ function SittingRow({ r }: { r: SittingInfo }) {
           >
             {r.title || `Posiedzenie nr ${r.sittingNum}`}
           </span>
-          <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mt-0.5">
+          <div className="text-[11px] text-muted-foreground mt-0.5 font-medium">
             {formatSittingDates(r.firstDate, r.lastDate)}
             {rel && <span className="ml-2 normal-case tracking-normal">· {rel}</span>}
           </div>
@@ -110,7 +110,7 @@ export function PosiedzeniaDirectoryClient({ rows }: { rows: SittingInfo[] }) {
       />
 
       {filtered.length === 0 ? (
-        <p className="font-serif italic text-muted-foreground text-center py-12">
+        <p className="text-muted-foreground text-center py-12">
           Brak wyników.
         </p>
       ) : (
@@ -125,7 +125,7 @@ export function PosiedzeniaDirectoryClient({ rows }: { rows: SittingInfo[] }) {
               <button
                 type="button"
                 onClick={() => setShown((s) => s + PAGE_SIZE)}
-                className="font-sans text-[12px] text-destructive underline decoration-dotted underline-offset-4 cursor-pointer"
+                className="font-sans text-[12px] text-foreground underline decoration-dotted underline-offset-4 cursor-pointer"
               >
                 Pokaż następne {Math.min(PAGE_SIZE, filtered.length - shown)} z{" "}
                 {filtered.length - shown}

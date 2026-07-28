@@ -41,7 +41,7 @@ export default async function VotingDetailPage({
   const total = header.yes + header.no + header.abstain + header.not_participating;
 
   return (
-    <main className="bg-background text-foreground font-serif min-h-screen">
+    <main className="bg-background text-foreground min-h-screen">
       <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-6">
         <PageBreadcrumb
           items={[

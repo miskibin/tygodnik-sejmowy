@@ -18,8 +18,8 @@ const PHOTO_DIMS: Record<"sm" | "md", { w: number; h: number }> = {
 };
 
 const NAME_TEXT_CLASS: Record<"sm" | "md", string> = {
-  sm: "font-serif text-[14px] font-medium leading-tight truncate",
-  md: "font-serif text-sm font-medium leading-tight truncate",
+  sm: "text-[14px] font-medium leading-tight truncate",
+  md: "text-sm font-medium leading-tight truncate",
 };
 
 export type MPCardGridProps = {

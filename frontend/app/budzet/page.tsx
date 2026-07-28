@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Ornament } from "@/components/chrome/Ornament";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/budzet" },
@@ -30,7 +29,7 @@ function fmtPL(n: number): string {
 function MockChip() {
   return (
     <span
-      className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 border ml-3 align-middle"
+      className="text-[11px] px-1.5 py-0.5 border ml-3 align-middle font-medium"
       style={{ borderColor: "var(--warning)", color: "var(--warning)" }}
       title="Dane poglądowe — tabela jeszcze pusta, pokazujemy modelowe liczby"
     >
@@ -49,13 +48,13 @@ function MockNotice() {
       }}
     >
       <div
-        className="font-mono text-[10px] tracking-[0.18em] uppercase mb-1.5"
+        className="text-[11px] mb-1.5 font-medium"
         style={{ color: "var(--warning)" }}
       >
         ✶ &nbsp; Uwaga &nbsp; ✶
       </div>
       <p
-        className="font-serif text-[15px] leading-[1.55] m-0 text-foreground"
+        className="text-[15px] leading-[1.55] m-0 text-foreground"
         style={{ maxWidth: 720 }}
       >
         Wpływy z Patronite i koszty miesięczne — realne. Pierwsza pełna księga z fakturami w czerwcu 2026.
@@ -98,7 +97,7 @@ export default async function BudzetPage() {
   const anyMock = headlineIsMock || incomeIsMock;
 
   return (
-    <main className="bg-background text-foreground font-serif px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
+    <main className="bg-background text-foreground px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
       <div className="max-w-[1100px] mx-auto">
         <PageBreadcrumb
           items={[{ label: "Budżet" }]}
@@ -132,7 +131,6 @@ export default async function BudzetPage() {
           />
         </section>
 
-        <Ornament />
 
         {/* Costs breakdown */}
         <section className="mb-16">
@@ -147,7 +145,7 @@ export default async function BudzetPage() {
                 return (
                   <div key={label} className="py-2 border-b border-dotted border-border">
                     <div className="flex items-baseline justify-between gap-3 mb-1.5">
-                      <span className="font-serif text-[15px] text-secondary-foreground">{label}</span>
+                      <span className="text-[15px] text-secondary-foreground">{label}</span>
                       <span className="font-mono text-[13px] font-medium tabular-nums">
                         {fmtPL(zl)} zł / mc
                       </span>
@@ -162,7 +160,7 @@ export default async function BudzetPage() {
                 );
               })}
               <div className="flex items-baseline justify-between pt-3 mt-2 border-t-2 border-foreground">
-                <span className="font-serif text-[16px] font-medium">Razem · 6 miesięcy</span>
+                <span className="text-[16px] font-medium">Razem · 6 miesięcy</span>
                 <span className="font-mono text-[16px] font-semibold text-destructive tabular-nums">
                   {fmtPL(totalSixMonths)} zł
                 </span>
@@ -170,7 +168,7 @@ export default async function BudzetPage() {
             </div>
 
             <div>
-              <h3 className="font-serif text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule flex items-baseline">
+              <h3 className="text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule flex items-baseline">
                 <span>Skąd wpływy</span>
                 {incomeIsMock ? <MockChip /> : null}
               </h3>
@@ -196,7 +194,7 @@ export default async function BudzetPage() {
                 />
               )}
               <p
-                className="font-serif text-[14px] text-secondary-foreground mt-6 leading-[1.55]"
+                className="text-[14px] text-secondary-foreground mt-6 leading-[1.55]"
                 style={{ maxWidth: 520 }}
               >
                 Patronite to nasz fundament — stała kwota, która pozwala nam planować rok do przodu zamiast reagować z miesiąca na miesiąc.{patron.ok && (
@@ -207,7 +205,6 @@ export default async function BudzetPage() {
           </div>
         </section>
 
-        <Ornament />
 
         {/* Team */}
         <section className="mb-4">
@@ -259,7 +256,7 @@ function BigStat({
       className="bg-background border-2 border-foreground p-6"
       style={{ boxShadow: "5px 5px 0 var(--foreground)" }}
     >
-      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
         {kicker}
         {mock ? (
           <span
@@ -271,7 +268,7 @@ function BigStat({
         ) : null}
       </div>
       <div
-        className={`font-serif font-normal leading-none ${valueColor}`}
+        className={`font-normal leading-none ${valueColor}`}
         style={{ fontSize: "clamp(2.25rem, 9vw, 3.25rem)", letterSpacing: "-0.02em" }}
       >
         {value}
@@ -292,11 +289,11 @@ function SectionTitle({
 }) {
   return (
     <header className="mb-6 pb-3 border-b border-rule">
-      <div className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-1.5">
+      <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
         {kicker}
         {note}
       </div>
-      <h2 className="font-serif font-medium m-0 text-[28px] leading-[1.05]" style={{ letterSpacing: "-0.01em" }}>
+      <h2 className="font-medium m-0 text-[28px] leading-[1.05]" style={{ letterSpacing: "-0.01em" }}>
         {title}
       </h2>
     </header>
@@ -318,7 +315,7 @@ function IncomeRow({
     <div
       className={`flex items-baseline justify-between gap-3 py-2 border-b border-dotted border-border ${muted ? "text-muted-foreground" : ""}`}
     >
-      <span className="font-serif text-[15px]">{label}</span>
+      <span className="text-[15px]">{label}</span>
       <span
         className={`font-mono text-[13px] tabular-nums ${mock ? "italic text-muted-foreground" : ""}`}
       >
@@ -354,16 +351,16 @@ function TeamCard({
         />
       </div>
       <div className="min-w-0">
-        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-1.5">
+        <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
           {role}
         </div>
         <h3
-          className="font-serif font-medium m-0 mb-2 leading-tight"
+          className="font-medium m-0 mb-2 leading-tight"
           style={{ fontSize: "clamp(1.15rem, 2.2vw, 1.4rem)", letterSpacing: "-0.01em" }}
         >
           {name}
         </h3>
-        <p className="font-serif text-[14.5px] leading-[1.55] text-secondary-foreground m-0">
+        <p className="text-[14.5px] leading-[1.55] text-secondary-foreground m-0">
           {bio}
         </p>
       </div>

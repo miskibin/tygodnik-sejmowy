@@ -64,13 +64,13 @@ export function Hero({
 
   return (
     <section className="border-b border-border pt-1 pb-8">
-      <div className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted-foreground mb-3">
+      <div className="text-[11px] text-muted-foreground mb-3 font-medium">
         {category}
         {initiative && <> &nbsp;·&nbsp; inicjatywa {initiative}</>}
         {sponsor && !initiative && <> &nbsp;·&nbsp; {sponsor}</>}
       </div>
       <h1
-        className="font-serif font-medium text-foreground m-0 mb-3"
+        className="font-medium text-foreground m-0 mb-3"
         style={{
           fontSize: "clamp(28px, 4.4vw, 50px)",
           lineHeight: 1.04,
@@ -118,13 +118,13 @@ export function Hero({
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Otwórz stronę druku w serwisie Sejmu"
-          className="text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-destructive"
+          className="text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground"
         >
           ↗ strona druku w Sejmie
         </a>
         <span
-          className="ml-auto font-mono text-[11px] uppercase text-destructive"
-          style={{ letterSpacing: "0.12em" }}
+          className="ml-auto text-[11px] text-muted-foreground font-medium"
+          style={{  }}
         >
           ● {status}
         </span>

@@ -61,7 +61,7 @@ function SectionHead({
       }}
     >
       <span
-        className="font-serif italic"
+        className="italic"
         style={{
           fontSize: 36,
           color: "var(--destructive)",
@@ -72,7 +72,7 @@ function SectionHead({
         {label}
       </span>
       <h2
-        className="font-serif m-0"
+        className="m-0"
         style={{
           fontSize: 32,
           fontWeight: 500,
@@ -142,7 +142,6 @@ function StageItem({ stage }: { stage: PredictedStage }) {
         style={{
           fontSize: 11,
           color: "var(--destructive)",
-          letterSpacing: "0.12em",
           textTransform: "uppercase",
           marginBottom: 8,
         }}
@@ -153,9 +152,8 @@ function StageItem({ stage }: { stage: PredictedStage }) {
         <div
           className="font-mono"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--border)",
-            letterSpacing: "0.08em",
             marginBottom: 8,
           }}
         >
@@ -163,7 +161,7 @@ function StageItem({ stage }: { stage: PredictedStage }) {
         </div>
       )}
       <p
-        className="font-serif m-0"
+        className="m-0"
         style={{
           fontSize: 16,
           lineHeight: 1.5,
@@ -230,7 +228,7 @@ export default function WhatsNextTimeline({
             subtitle={copy.subtitle}
           />
           <p
-            className="font-serif italic m-0"
+            className="italic m-0"
             style={{
               fontSize: 18,
               lineHeight: 1.5,
@@ -278,7 +276,7 @@ export default function WhatsNextTimeline({
             }}
           >
             <p
-              className="font-serif italic m-0"
+              className="italic m-0"
               style={{
                 fontSize: 17,
                 lineHeight: 1.55,

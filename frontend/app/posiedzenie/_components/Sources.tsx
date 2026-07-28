@@ -82,7 +82,7 @@ export function Sources({ data }: { data: SittingView }) {
           <div>
             <Kicker className="mb-3.5">jak czytamy te dane</Kicker>
             <p
-              className="font-serif m-0"
+              className="m-0"
               style={{
                 fontSize: 14,
                 lineHeight: 1.55,
@@ -133,17 +133,16 @@ export function Sources({ data }: { data: SittingView }) {
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <span
-            className="font-serif italic"
+            className="italic"
             style={{ fontSize: 13, color: "var(--muted-foreground)" }}
           >
             Tygodnik Sejmowy porządkuje dane z sejm.gov.pl — nie zastępuje ich. Stenogram PDF jest źródłem prawa.
           </span>
           <span
-            className="font-mono uppercase"
+            className="font-medium"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.12em",
             }}
           >
             Posiedzenie {data.number} · ostatnia aktualizacja {lastUpdateDate}

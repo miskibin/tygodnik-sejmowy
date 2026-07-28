@@ -80,12 +80,12 @@ function Item({ label, value, suffix, delay, accent }: ItemProps) {
       className="ec-item flex items-baseline gap-2"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <span className="font-sans text-[10px] tracking-[0.18em] uppercase text-muted-foreground">
+      <span className="font-sans text-[11px] text-muted-foreground font-medium">
         {label}
       </span>
       <span
         className={
-          "font-serif text-[16px] md:text-[17px] tabular-nums leading-none " +
+          "text-[16px] md:text-[17px] tabular-nums leading-none" +
           (accent ? "text-destructive" : "text-foreground")
         }
       >
@@ -160,7 +160,7 @@ export function ElectionCountdown({
     >
       <div className="max-w-[1100px] mx-auto py-2.5 md:py-3 flex items-center gap-x-6 gap-y-1.5 flex-wrap">
         <div
-          className="ec-item flex items-center gap-2 font-sans text-[10px] tracking-[0.2em] uppercase text-destructive"
+          className="ec-item flex items-center gap-2 font-sans text-[11px] text-muted-foreground font-medium"
           style={{ animationDelay: "0ms" }}
         >
           <span aria-hidden className="ec-pulse inline-block size-1.5 rounded-full bg-destructive" />

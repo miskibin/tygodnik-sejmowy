@@ -14,10 +14,10 @@ const UPDATED_AT = "13 maja 2026";
 function Section({ kicker, title, children }: { kicker: string; title: string; children: React.ReactNode }) {
   return (
     <section className="mb-10">
-      <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-2">
+      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
         {kicker}
       </div>
-      <h2 className="font-serif text-[22px] font-medium tracking-[-0.02em] leading-tight text-foreground mt-0 mb-3">
+      <h2 className="text-[22px] font-medium tracking-[-0.02em] leading-tight text-foreground mt-0 mb-3">
         {title}
       </h2>
       <div className="font-sans text-[14.5px] leading-[1.7] text-secondary-foreground space-y-3">
@@ -36,7 +36,7 @@ export default function PolitykaPrywatnosciPage() {
           subtitle={`Ostatnia aktualizacja: ${UPDATED_AT}.`}
         />
 
-        <p className="font-serif italic text-[15px] leading-[1.6] text-foreground mb-10 max-w-[640px]">
+        <p className="italic text-[15px] leading-[1.6] text-foreground mb-10 max-w-[640px]">
           Tygodnik Sejmowy to niezarejestrowany projekt open source. Nie używamy plików cookies
           analitycznych ani marketingowych. Nie zbieramy danych osobowych. Nie potrzebujemy banera
           zgody.

@@ -27,7 +27,7 @@ function Bar({
 
 export function PageSkeleton() {
   return (
-    <div className="bg-background font-serif" style={{ minHeight: "100vh" }}>
+    <div className="bg-background" style={{ minHeight: "100vh" }}>
       <span className="sr-only">Wczytywanie…</span>
       <div className="border-b border-rule">
         <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 pb-6">

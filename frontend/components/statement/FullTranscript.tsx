@@ -26,7 +26,7 @@ export function FullTranscript({
   return (
     <section className="my-12 max-w-[820px] mx-auto">
       <div className="flex items-baseline justify-between gap-4 py-2.5 border-y border-border">
-        <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-destructive">
+        <span className="text-[11px] text-muted-foreground font-medium">
           Pełna wypowiedź
         </span>
         <span className="font-mono text-[10px] text-muted-foreground">
@@ -39,7 +39,7 @@ export function FullTranscript({
                 href={transcriptUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                className="text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
               >
                 ↗ Stenogram dnia (PDF)
               </a>
@@ -47,7 +47,7 @@ export function FullTranscript({
           )}
         </span>
       </div>
-      <div className="pt-6 font-serif text-secondary-foreground" style={{ fontSize: 17, lineHeight: 1.75 }}>
+      <div className="pt-6 text-secondary-foreground" style={{ fontSize: 17, lineHeight: 1.75 }}>
         {paragraphs.map((p, i) => (
           <p key={i} className="m-0 mb-4" style={{ textWrap: "pretty" }}>
             {p}

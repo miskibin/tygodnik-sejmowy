@@ -269,7 +269,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
   const ldJsonHtml = JSON.stringify(ldJson).replace(/</g, "\\u003c");
 
   return (
-    <div className="bg-background text-foreground font-serif pb-16 sm:pb-20 min-w-0 overflow-x-hidden">
+    <div className="bg-background text-foreground pb-16 sm:pb-20 min-w-0 overflow-x-hidden">
       {/* JSON-LD structured data for the MP profile + (if verified) the
           year's expense total. Surfaced in SERPs and Knowledge Graph. */}
       <script
@@ -306,7 +306,7 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={mp.photoUrl} alt={mp.firstLastName} className="w-full h-full object-cover" loading="eager" />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center font-serif italic text-muted-foreground opacity-50" style={{ fontSize: "clamp(36px, 5vw, 56px)" }}>
+              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground opacity-50" style={{ fontSize: "clamp(36px, 5vw, 56px)" }}>
                 {mp.firstLastName.split(" ").map((s) => s[0]).join("").slice(0, 2)}
               </div>
             )}
@@ -318,15 +318,15 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
           {/* Name + badges + lede */}
           <div className="min-w-0">
             <h1
-              className="font-serif font-medium m-0 leading-[0.96] tracking-[-0.035em] text-balance break-words"
+              className="font-medium m-0 leading-[0.96] tracking-[-0.035em] text-balance break-words"
               style={{ fontSize: "clamp(2.25rem, 7vw, 5.25rem)" }}
             >
               {first ? <>{first}{" "}</> : null}
-              <em className="not-italic font-serif italic text-destructive">{last}</em>
+              <em className="not-italic italic text-destructive">{last}</em>
             </h1>
 
             <div className="mt-3 sm:mt-4 max-w-[640px] flex flex-col gap-2">
-              <div className="font-serif text-secondary-foreground leading-[1.45] text-[15px] sm:text-[17px] break-words text-pretty">
+              <div className="text-secondary-foreground leading-[1.45] text-[15px] sm:text-[17px] break-words text-pretty">
                 {mp.clubRef ? (
                   <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 align-middle">
                     <ClubBadge klub={mp.clubRef} size="xl" tooltip={clubName ?? undefined} />
@@ -344,12 +344,12 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
               {(mp.profession || mp.educationLevel) && (
                 <div className="flex flex-wrap gap-1.5">
                   {mp.profession && (
-                    <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-foreground/40 text-secondary-foreground px-2.5 py-1">
+                    <span className="text-[11px] border border-foreground/40 text-secondary-foreground px-2.5 py-1 font-medium">
                       {mp.profession}
                     </span>
                   )}
                   {mp.educationLevel && (
-                    <span className="font-mono text-[9.5px] sm:text-[10px] tracking-[0.16em] uppercase border border-foreground/40 text-secondary-foreground px-2.5 py-1">
+                    <span className="text-[11px] border border-foreground/40 text-secondary-foreground px-2.5 py-1 font-medium">
                       wykszt. {mp.educationLevel}
                     </span>
                   )}
@@ -365,16 +365,16 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
                 href="#wydatki"
                 className="block group text-center md:text-right shrink-0 flex-1 md:flex-none"
               >
-                <span className="block font-mono text-[9.5px] sm:text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                <span className="block text-[11px] text-muted-foreground font-medium">
                   Wydał w {expSummary.year}
                 </span>
                 <span
-                  className="block font-serif font-medium tabular-nums tracking-[-0.03em] text-foreground group-hover:text-destructive transition-colors leading-[0.95] mt-0.5"
+                  className="block font-medium tabular-nums tracking-[-0.03em] text-foreground group-hover:text-foreground transition-colors leading-[0.95] mt-0.5"
                   style={{ fontSize: "clamp(1.9rem, 4.4vw, 2.9rem)" }}
                 >
                   {PLN_INT.format(expSummary.totalSpent)}
                 </span>
-                <span className="block font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground group-hover:text-destructive mt-0.5">
+                <span className="block text-[11px] text-muted-foreground group-hover:text-foreground mt-0.5 font-medium">
                   na biuro poselskie →
                 </span>
               </a>
@@ -412,11 +412,11 @@ export default async function MpPage({ params }: { params: Promise<{ mpId: strin
                 borderBottom: i < 2 ? "1px solid var(--border)" : undefined,
               }}
             >
-              <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground mb-1.5">
+              <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
                 {s.k}
               </div>
               <div
-                className="font-serif font-medium leading-none tabular-nums mb-1.5"
+                className="font-medium leading-none tabular-nums mb-1.5"
                 style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", color: s.color, letterSpacing: "-0.025em" }}
               >
                 {s.v}

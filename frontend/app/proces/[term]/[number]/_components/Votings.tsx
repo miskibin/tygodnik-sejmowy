@@ -8,7 +8,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
   return (
     <div className="mb-5 flex items-baseline gap-4 border-b border-border pb-3">
       <h2
-        className="font-serif font-medium text-foreground m-0"
+        className="font-medium text-foreground m-0"
         style={{ fontSize: 22, lineHeight: 1, letterSpacing: "-0.015em" }}
       >
         {title}
@@ -119,11 +119,10 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
           className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ts-red)] focus-visible:ring-offset-2"
         >
           <div
-            className="font-mono uppercase mb-2.5 group-hover:text-destructive transition-colors"
+            className="mb-2.5 group-hover:text-foreground transition-colors font-medium"
             style={{
               fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.16em",
               minHeight: 44,
               display: "flex",
               alignItems: "center",
@@ -134,7 +133,7 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
             </span>
           </div>
           <div
-            className="font-serif font-medium mb-2 text-foreground group-hover:underline decoration-dotted underline-offset-4"
+            className="font-medium mb-2 text-foreground group-hover:underline decoration-dotted underline-offset-4"
             style={{
               fontSize: emphasizedChip ? 30 : 22,
               lineHeight: 1.05,
@@ -152,7 +151,7 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
           </h3>
         </Link>
         <div
-          className="font-serif italic font-medium mb-2.5"
+          className="italic font-medium mb-2.5"
           style={{
             // clamp prevents the longer labels (e.g. "WNIOSEK O ODRZUCENIE
             // PRZYJĘTY", "AUTOPOPRAWKA PRZYJĘTA") from overflowing the card
@@ -187,11 +186,10 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
         </div>
         {v.majorityVotes != null && (
           <div
-            className="mt-4 font-mono uppercase"
+            className="mt-4 font-medium"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.12em",
             }}
           >
             próg: {v.majorityVotes} &nbsp;·&nbsp; suma: {total}
@@ -201,9 +199,8 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
           <div
             className="mt-3 font-mono italic"
             style={{
-              fontSize: 10.5,
+              fontSize: 11,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.03em",
             }}
           >
             Rozkład klubowy dostępny dla głosowania głównego.
@@ -231,11 +228,10 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
 function Kicker({ children, mb = 0 }: { children: React.ReactNode; mb?: number }) {
   return (
     <div
-      className="font-mono uppercase"
+      className="font-medium"
       style={{
         fontSize: 11,
         color: "var(--muted-foreground)",
-        letterSpacing: "0.16em",
         marginBottom: mb,
       }}
     >
@@ -270,8 +266,7 @@ function NumCell({
         className="uppercase"
         style={{
           color: "var(--muted-foreground)",
-          fontSize: 10,
-          letterSpacing: "0.1em",
+          fontSize: 11,
         }}
       >
         {label}
@@ -353,17 +348,16 @@ function FutureVoting() {
     >
       <div className="flex-1 min-w-[260px]">
         <div
-          className="font-mono uppercase mb-1.5"
+          className="mb-1.5 font-medium"
           style={{
             fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.16em",
           }}
         >
           planowane głosowanie
         </div>
         <div
-          className="font-serif font-medium text-foreground"
+          className="font-medium text-foreground"
           style={{ fontSize: 22, lineHeight: 1.2 }}
         >
           Głosowanie nad całością projektu.
@@ -373,11 +367,10 @@ function FutureVoting() {
         </div>
       </div>
       <div
-        className="font-mono uppercase px-3 py-1.5 rounded-full"
+        className="px-3 py-1.5 rounded-full font-medium"
         style={{
           fontSize: 11,
           color: "var(--destructive)",
-          letterSpacing: "0.16em",
           border: "1px solid var(--destructive)",
         }}
       >

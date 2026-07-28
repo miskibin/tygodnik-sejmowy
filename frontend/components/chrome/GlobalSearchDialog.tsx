@@ -168,7 +168,7 @@ export function GlobalSearchDialog({
                       className="flex flex-col items-start gap-0.5 py-2"
                     >
                       <div className="flex w-full items-baseline justify-between gap-3">
-                        <span className="font-serif text-[14px] text-foreground line-clamp-1">
+                        <span className="text-[14px] text-foreground line-clamp-1">
                           {h.label}
                         </span>
                         {h.meta && (

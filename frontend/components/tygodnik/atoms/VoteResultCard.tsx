@@ -68,7 +68,7 @@ export function VoteResultCard({
         głosowanie{time ? ` · ${time}` : ""}
       </Kicker>
       <div
-        className="font-serif italic font-medium"
+        className="italic font-medium"
         style={{
           fontSize: 22,
           color: accent,
@@ -118,22 +118,20 @@ export function VoteResultCard({
       {detailHref ? (
         <Link
           href={detailHref}
-          className="mt-3 font-mono uppercase no-underline block"
+          className="mt-3 no-underline block font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--destructive-deep)",
-            letterSpacing: "0.14em",
           }}
         >
           całe głosowanie →
         </Link>
       ) : (
         <div
-          className="mt-3 font-mono uppercase"
+          className="mt-3 font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--destructive-deep)",
-            letterSpacing: "0.14em",
           }}
         >
           całe głosowanie →

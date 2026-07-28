@@ -9,7 +9,7 @@ export function AffectedGroups({ groups }: { groups: AffectedGroup[] }) {
   if (groups.length === 0) return null;
   return (
     <div className="my-4 font-sans text-xs">
-      <div className="text-[10px] tracking-[0.16em] uppercase text-muted-foreground mb-2">
+      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
         Dla kogo
       </div>
       <div className="flex flex-wrap gap-2">

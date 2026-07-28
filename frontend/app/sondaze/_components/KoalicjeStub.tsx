@@ -102,7 +102,7 @@ export function KoalicjeStub({
 
   return (
     <section className="min-w-0">
-      <div className="font-serif text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-6 text-pretty">
+      <div className="text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-6 text-pretty">
         Suma prognozowanych mandatów dla wstępnie zdefiniowanych bloków. Większość bezwzględna:{" "}
         <strong className="text-foreground tabular-nums">{MAJORITY}</strong> z {SEJM_SEATS}. Czy
         którykolwiek z tych układów byłby politycznie realny — to oddzielna rozmowa.
@@ -122,11 +122,11 @@ export function KoalicjeStub({
               }}
             >
               <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
-                <h3 className="font-serif text-[19px] sm:text-[22px] font-medium m-0 tracking-[-0.01em] leading-tight text-balance">
+                <h3 className="text-[19px] sm:text-[22px] font-medium m-0 tracking-[-0.01em] leading-tight text-balance">
                   {s.name}
                 </h3>
                 {s.viable && (
-                  <span className="font-mono text-[9.5px] tracking-[0.16em] uppercase text-success font-semibold shrink-0">
+                  <span className="text-[11px] text-success font-semibold shrink-0">
                     ● ma większość
                   </span>
                 )}
@@ -178,7 +178,7 @@ export function KoalicjeStub({
                   );
                 })}
                 {s.members.length === 0 && (
-                  <span className="font-serif italic text-[13px] text-muted-foreground">
+                  <span className="text-[13px] text-muted-foreground">
                     Brak partii w tym scenariuszu.
                   </span>
                 )}
@@ -186,7 +186,7 @@ export function KoalicjeStub({
 
               <div className="flex items-baseline gap-3 mb-2">
                 <span
-                  className="font-serif font-medium leading-none tabular-nums"
+                  className="font-medium leading-none tabular-nums"
                   style={{
                     fontSize: "clamp(2.5rem, 6vw, 3.5rem)",
                     color: s.viable ? "var(--success)" : "var(--foreground)",
@@ -217,7 +217,7 @@ export function KoalicjeStub({
               </div>
 
               {s.cohesion ? (
-                <div className="mt-3 flex items-baseline gap-2 font-mono text-[10.5px] tracking-[0.04em] uppercase text-muted-foreground">
+                <div className="mt-3 flex items-baseline gap-2 text-[11px] text-muted-foreground font-medium">
                   <span>Spójność głosowań</span>
                   <span
                     className="tabular-nums font-semibold"
@@ -230,14 +230,14 @@ export function KoalicjeStub({
                   </span>
                 </div>
               ) : (
-                <div className="mt-3 font-mono text-[10.5px] tracking-[0.04em] uppercase text-muted-foreground">
+                <div className="mt-3 text-[11px] text-muted-foreground font-medium">
                   {agreementAvailable
                     ? "Spójność głosowań — n/d (jeden klub lub partie spoza Sejmu)"
                     : "Spójność głosowań — dane niedostępne"}
                 </div>
               )}
 
-              <p className="font-serif italic text-[12.5px] sm:text-[13px] text-muted-foreground mt-2 mb-0 leading-snug">
+              <p className="text-[12.5px] sm:text-[13px] text-muted-foreground mt-2 mb-0 leading-snug">
                 {s.description}
               </p>
             </article>
@@ -245,7 +245,7 @@ export function KoalicjeStub({
         })}
       </div>
 
-      <p className="mt-6 font-serif text-[13px] text-muted-foreground leading-[1.55] max-w-[760px] italic">
+      <p className="mt-6 text-[13px] text-muted-foreground leading-[1.55] max-w-[760px]">
         Bloki to redakcyjne definicje. „Spójność głosowań” liczona z{" "}
         <code className="not-italic font-mono text-[12px]">klub_pair_agreement_mv</code> — odsetek głosowań, w których
         większość obu klubów zagłosowała tak samo, uśredniony po wszystkich parach klubów w bloku (kadencja {term}).

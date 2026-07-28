@@ -12,7 +12,7 @@ export function PersonaSwitcher() {
 
   return (
     <div className="flex items-center gap-3 md:gap-6 flex-wrap font-sans text-xs px-4 md:px-8 lg:px-14 py-3.5 bg-muted border-b border-border">
-      <span className="text-muted-foreground tracking-[0.1em] uppercase text-[10px]">Twój profil</span>
+      <span className="text-muted-foreground text-[11px] font-medium">Twój profil</span>
       {district && (
         <>
           <span className="flex items-center gap-1.5 text-secondary-foreground">

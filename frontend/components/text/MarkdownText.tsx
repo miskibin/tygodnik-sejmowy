@@ -81,7 +81,7 @@ function buildComponents(inline: boolean, allowLists: boolean): Components {
         return (
           <Link
             href={url}
-            className="text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
+            className="text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
           >
             {children}
           </Link>
@@ -92,7 +92,7 @@ function buildComponents(inline: boolean, allowLists: boolean): Components {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
+          className="text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
         >
           {children}
           <span aria-hidden className="ml-0.5 text-[0.85em]">↗</span>

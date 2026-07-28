@@ -34,7 +34,7 @@ export default async function Landing() {
     safeNextSitting(),
   ]);
   return (
-    <main className="bg-background font-serif text-foreground">
+    <main className="bg-background text-foreground">
       <LandingHero viralQuotes={quotes} />
       <ElectionCountdown nextSitting={nextSitting} />
       <FeatureTileGrid />

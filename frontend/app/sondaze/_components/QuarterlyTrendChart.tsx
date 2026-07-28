@@ -150,7 +150,7 @@ function Sparkline({
 
 export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
   if (rows.length === 0) {
-    return <p className="font-serif italic text-muted-foreground py-12 text-center">Brak danych trendu.</p>;
+    return <p className="text-muted-foreground py-12 text-center">Brak danych trendu.</p>;
   }
 
   // Group by party, sort each by quarter_start ascending.
@@ -178,10 +178,10 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
 
   return (
     <section className="min-w-0">
-      <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-2">
+      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
         Sześć miesięcy poparcia · {quarterStartLabel(firstQuarter)} – {quarterStartLabel(lastQuarter)}
       </div>
-      <p className="font-serif text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-7 sm:mb-9 text-pretty">
+      <p className="text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-7 sm:mb-9 text-pretty">
         Każdy wykres pokazuje tę samą oś czasu. Liczba po prawej to dzisiejszy wynik średniej, po lewej — punkt wyjścia
         sprzed pół roku. <em className="italic">Patrz na kształt, nie na pojedyncze odchylenia.</em>
       </p>
@@ -215,12 +215,12 @@ export function QuarterlyTrendChart({ rows }: { rows: PollTrendRow[] }) {
                   ) : (
                     <span aria-hidden className="inline-block w-3.5 h-3.5 rounded-sm shrink-0" style={{ background: color }} />
                   )}
-                  <span className="font-serif text-[17px] sm:text-[19px] font-medium leading-tight tracking-[-0.01em] truncate">
+                  <span className="text-[17px] sm:text-[19px] font-medium leading-tight tracking-[-0.01em] truncate">
                     {partyLabel(c.code)}
                   </span>
                 </div>
                 <span
-                  className="font-mono text-[9.5px] tracking-[0.16em] uppercase shrink-0"
+                  className="text-[11px] shrink-0 font-medium"
                   style={{ color: trend.tone }}
                 >
                   {trend.label}

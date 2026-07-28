@@ -41,7 +41,7 @@ export function PromiseToolbar({
           : `${resultCount} z ${totalCount}`}
       </span>
       <div className="flex items-baseline gap-2 font-sans text-[11px]">
-        <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted-foreground">
+        <span className="text-[11px] text-muted-foreground font-medium">
           sortuj:
         </span>
         {HUB_SORTS.map((s, i) => (

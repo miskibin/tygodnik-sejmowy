@@ -81,7 +81,7 @@ export default async function KomisjaIndexPage() {
   const order: GroupKey[] = ["STANDING", "EXTRAORDINARY", "INVESTIGATIVE", "OTHER"];
 
   return (
-    <main className="bg-background text-foreground font-serif pb-20">
+    <main className="bg-background text-foreground pb-20">
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8">
         <PageBreadcrumb
           items={[{ label: "Komisje" }]}
@@ -104,7 +104,7 @@ export default async function KomisjaIndexPage() {
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-2 md:pt-4 space-y-12">
         {/* Legend bar */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-sans text-muted-foreground border-b border-border pb-3">
-          <span className="font-sans text-[10.5px] tracking-[0.14em] uppercase">Aktywność:</span>
+          <span className="font-sans text-[11px] font-medium">Aktywność:</span>
           <span className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-destructive border border-destructive" />
             3+ posiedzeń / 30 dni
@@ -143,7 +143,7 @@ export default async function KomisjaIndexPage() {
           return (
             <section key={k}>
               <div
-                className={`font-sans text-[11px] tracking-[0.16em] uppercase mb-2 ${
+                className={`font-sans text-[11px] font-medium mb-2 ${
                   isDim ? "text-muted-foreground" : "text-destructive"
                 }`}
               >
@@ -161,7 +161,7 @@ export default async function KomisjaIndexPage() {
               </ul>
               {quiet.length > 0 && (
                 <details className="mt-3">
-                  <summary className="cursor-pointer font-sans text-[11px] tracking-[0.14em] uppercase text-muted-foreground hover:text-destructive py-2">
+                  <summary className="cursor-pointer font-sans text-[11px] text-muted-foreground hover:text-foreground py-2 font-medium">
                     Uśpione w ostatnich 3 miesiącach · {quiet.length}
                   </summary>
                   <ul className="grid gap-2 mt-2">

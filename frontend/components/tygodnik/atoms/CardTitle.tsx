@@ -35,14 +35,14 @@ export function CardTitle({
   return (
     <>
       <h2
-        className="font-serif font-medium tracking-[-0.018em] m-0 mb-3 leading-[1.1] text-foreground"
+        className="font-medium tracking-[-0.018em] m-0 mb-3 leading-[1.1] text-foreground"
         style={{ fontSize, textWrap: "balance" }}
       >
         {titleBody}
       </h2>
       {subtitle && (
         <div
-          className="font-serif text-secondary-foreground mb-3"
+          className="text-secondary-foreground mb-3"
           style={{ fontSize: size === "hero" ? 18 : 16, lineHeight: 1.6 }}
         >
           {subtitle}

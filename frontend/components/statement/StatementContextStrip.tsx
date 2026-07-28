@@ -61,13 +61,13 @@ export function StatementContextStrip({ items }: { items: ContextItem[] }) {
                 >
                   {speaker}
                   {isCurrent && (
-                    <span className="ml-2 font-mono text-[9px] tracking-[0.18em] uppercase text-destructive">
+                    <span className="ml-2 text-[11px] text-muted-foreground font-medium">
                       ta wypowiedź
                     </span>
                   )}
                 </div>
                 {preview && (
-                  <div className="font-serif italic text-[12px] text-muted-foreground leading-snug mt-0.5 truncate">
+                  <div className="text-[12px] text-muted-foreground leading-snug mt-0.5 truncate">
                     {preview}
                   </div>
                 )}

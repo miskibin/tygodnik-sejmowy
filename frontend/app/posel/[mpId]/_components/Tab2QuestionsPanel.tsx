@@ -14,12 +14,12 @@ function KpiTile({
 }) {
   return (
     <div className="py-4 px-4 border border-border" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-1.5 flex items-center gap-1.5">
+      <div className="font-sans text-[11px] text-muted-foreground mb-1.5 flex items-center gap-1.5 font-medium">
         {color && <span className="inline-block w-2 h-2 rounded-sm" style={{ background: color }} />}
         {label}
       </div>
       <div
-        className="font-serif font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
+        className="font-medium leading-none mb-1.5 tracking-[-0.025em] text-foreground"
         style={{ fontSize: "clamp(1.6rem, 3vw, 2.1rem)" }}
       >
         {value}
@@ -34,7 +34,7 @@ function RecipientBars({ items }: { items: Array<{ name: string; count: number }
   const max = Math.max(...items.map((i) => i.count), 1);
   return (
     <div className="border border-border p-5" style={{ background: "var(--muted)" }}>
-      <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-4">
+      <div className="font-sans text-[11px] text-muted-foreground mb-4 font-medium">
         Adresaci interpelacji
       </div>
       <ul>
@@ -43,7 +43,7 @@ function RecipientBars({ items }: { items: Array<{ name: string; count: number }
           return (
             <li key={it.name} className="mb-3 last:mb-0">
               <div className="flex items-baseline justify-between mb-1 gap-3">
-                <span className="font-serif text-[14px] text-foreground leading-snug truncate">
+                <span className="text-[14px] text-foreground leading-snug truncate">
                   {it.name.replace(/^minister\s+/i, "min. ")}
                 </span>
                 <span className="font-mono text-[12px] text-foreground font-semibold">{it.count}</span>
@@ -73,7 +73,7 @@ export function Tab2QuestionsPanel({
 }) {
   if (stats.total === 0) {
     return (
-      <p className="font-serif italic text-muted-foreground text-center py-12">
+      <p className="text-muted-foreground text-center py-12">
         Ten poseł nie złożył jeszcze interpelacji ani zapytań w tej kadencji.
       </p>
     );
@@ -113,7 +113,7 @@ export function Tab2QuestionsPanel({
         <RecipientBars items={stats.recipientsTop} />
 
         <div>
-          <div className="font-sans text-[10px] text-muted-foreground uppercase tracking-[0.14em] mb-3">
+          <div className="font-sans text-[11px] text-muted-foreground mb-3 font-medium">
             Interpelacje i zapytania (najnowsze wpisy)
           </div>
           <PoselInterpellationsListClient mpId={mpId} initialRows={initialRows} total={stats.total} />

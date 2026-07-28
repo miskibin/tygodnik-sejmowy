@@ -56,15 +56,15 @@ export async function SiteFooter() {
         {/* Wordmark + tagline */}
         <div>
           <Link href="/" className="inline-flex items-baseline gap-2">
-            <span className="font-serif text-[22px] font-medium tracking-tight text-foreground leading-none">
+            <span className="text-[22px] font-medium tracking-tight text-foreground leading-none">
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
           </Link>
-          <p className="font-serif italic text-[13.5px] text-secondary-foreground mt-3 mb-0 leading-snug max-w-[320px]">
+          <p className="italic text-[13.5px] text-secondary-foreground mt-3 mb-0 leading-snug max-w-[320px]">
             Cotygodniowy przegląd prac Sejmu RP. Wydanie piątkowe, dopasowane do okręgu.
           </p>
           {lastUpdate && (
-            <div className="mt-4 flex items-center gap-2 font-mono text-[10.5px] tracking-[0.14em] uppercase text-muted-foreground">
+            <div className="mt-4 flex items-center gap-2 text-[11px] text-muted-foreground font-medium">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive/70" aria-hidden />
               <span>Aktualizacja danych</span>
               <span className="text-secondary-foreground" title={PL_DATE.format(lastUpdate)}>
@@ -76,7 +76,7 @@ export async function SiteFooter() {
 
         {/* Sitemap */}
         <nav aria-label="Stopka" className="font-sans text-[13px]">
-          <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted-foreground mb-3">
+          <div className="text-[11px] text-muted-foreground mb-3 font-medium">
             Działy
           </div>
           <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 m-0 p-0 list-none">
@@ -84,7 +84,7 @@ export async function SiteFooter() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-secondary-foreground hover:text-destructive"
+                  className="text-secondary-foreground hover:text-foreground"
                 >
                   {item.label}
                 </Link>
@@ -95,7 +95,7 @@ export async function SiteFooter() {
 
         {/* Links */}
         <div className="font-mono text-[11px] text-muted-foreground tracking-wide leading-[1.65]">
-          <div className="uppercase tracking-[0.18em] text-muted-foreground mb-3">
+          <div className="text-muted-foreground mb-3 font-medium">
             Linki
           </div>
           <div className="flex items-center gap-3 mb-4">
@@ -106,7 +106,7 @@ export async function SiteFooter() {
               aria-label="X (Twitter): sejmstats"
               title="X / Twitter"
               data-umami-event="footer_x_click"
-              className="text-muted-foreground hover:text-destructive transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <XIcon className="w-[18px] h-[18px]" />
             </a>
@@ -117,7 +117,7 @@ export async function SiteFooter() {
               aria-label="YouTube"
               title="YouTube"
               data-umami-event="footer_youtube_click"
-              className="text-muted-foreground hover:text-destructive transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <YoutubeIcon className="w-[18px] h-[18px]" />
             </a>
@@ -128,7 +128,7 @@ export async function SiteFooter() {
               aria-label="Kod źródłowy na GitHubie"
               title="GitHub — kod źródłowy"
               data-umami-event="footer_github_click"
-              className="text-muted-foreground hover:text-destructive transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <GithubIcon className="w-[18px] h-[18px]" />
             </a>
@@ -139,7 +139,7 @@ export async function SiteFooter() {
               aria-label="Zgłoś błąd lub pomysł"
               title="Zgłoś błąd lub pomysł"
               data-umami-event="footer_bug_click"
-              className="text-muted-foreground hover:text-destructive transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <Bug className="w-[18px] h-[18px]" aria-hidden />
             </a>
@@ -148,30 +148,30 @@ export async function SiteFooter() {
               aria-label="Kanał RSS"
               title="RSS"
               data-umami-event="footer_rss_click"
-              className="text-muted-foreground hover:text-destructive transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <Rss className="w-[18px] h-[18px]" aria-hidden />
             </a>
           </div>
           <ul className="m-0 p-0 list-none space-y-2">
             <li className="group flex items-start gap-2">
-              <Heart className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-destructive transition-colors" aria-hidden />
+              <Heart className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-foreground transition-colors" aria-hidden />
               <div>
                 <span>Wsparcie: </span>
-                <PatroniteTrackedLink placement="footer" className="text-destructive hover:underline">
+                <PatroniteTrackedLink placement="footer" className="text-foreground hover:underline">
                   patronite.pl/tygodniksejmowy
                 </PatroniteTrackedLink>
               </div>
             </li>
             <li className="group flex items-start gap-2">
-              <Globe className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-destructive transition-colors" aria-hidden />
+              <Globe className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-foreground transition-colors" aria-hidden />
               <div>
                 <a
                   href="https://radoskop.pl/"
                   target="_blank"
                   rel="noopener noreferrer"
                   data-umami-event="footer_radoskop_click"
-                  className="text-destructive hover:underline"
+                  className="text-foreground hover:underline"
                 >
                   radoskop.pl
                 </a>
@@ -183,7 +183,7 @@ export async function SiteFooter() {
               <div>
                 <Link
                   href="/polityka-prywatnosci"
-                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Polityka prywatności
                 </Link>

@@ -26,11 +26,11 @@ function MarginDirection({ direction }: { direction: StageDirection }) {
   const Icon = DIRECTION_ICON[direction.kind];
   return (
     <div
-      className="flex items-start gap-1.5 font-mono text-[10px] tracking-wide uppercase text-muted-foreground leading-snug"
+      className="flex items-start gap-1.5 text-[11px] tracking-wide text-muted-foreground leading-snug font-medium"
       title={direction.label}
     >
       <Icon aria-hidden size={11} strokeWidth={1.75} className="text-destructive mt-[1px] shrink-0" />
-      <span className="italic normal-case font-serif text-[12px]">{direction.label}</span>
+      <span className="italic normal-case text-[12px]">{direction.label}</span>
     </div>
   );
 }
@@ -71,7 +71,7 @@ export function AnnotatedTranscript({
   return (
     <section className="my-2">
       <div className="flex items-baseline justify-between gap-4 py-2.5 border-b border-border">
-        <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted-foreground">
+        <span className="text-[11px] text-muted-foreground font-medium">
           {minutes} min czytania · {paragraphs.length}{" "}
           {paragraphs.length === 1 ? "akapit" : "akapitów"}
         </span>
@@ -80,7 +80,7 @@ export function AnnotatedTranscript({
             href={transcriptUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-[10px] tracking-wide text-destructive underline decoration-dotted underline-offset-4 hover:decoration-solid"
+            className="font-mono text-[10px] tracking-wide text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid"
           >
             ↗ Stenogram dnia (PDF)
           </a>
@@ -113,7 +113,7 @@ export function AnnotatedTranscript({
                     className="md:grid md:grid-cols-[1fr_180px] md:gap-6 md:items-start"
                   >
                     <p
-                      className="m-0 font-serif text-secondary-foreground"
+                      className="m-0 text-secondary-foreground"
                       style={{ fontSize: 17, lineHeight: 1.75, textWrap: "pretty" }}
                     >
                       {spans.map((s, k) =>

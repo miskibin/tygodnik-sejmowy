@@ -44,7 +44,7 @@ function SectionHead({
       }}
     >
       <span
-        className="font-serif italic"
+        className="italic"
         style={{
           fontSize: 36,
           color: "var(--destructive)",
@@ -55,7 +55,7 @@ function SectionHead({
         {label}
       </span>
       <h2
-        className="font-serif m-0"
+        className="m-0"
         style={{
           fontSize: 32,
           fontWeight: 500,
@@ -131,11 +131,10 @@ function ClubRow({ c }: { c: ClubBreakdownRow }) {
       style={{ fontSize: 12, color: "var(--secondary-foreground)" }}
     >
       <span
-        className="font-mono uppercase"
+        className="font-medium"
         style={{
-          fontSize: 10,
+          fontSize: 11,
           color: "var(--muted-foreground)",
-          letterSpacing: "0.12em",
         }}
       >
         za klubem{" "}
@@ -150,12 +149,11 @@ function ClubRow({ c }: { c: ClubBreakdownRow }) {
       </span>
       {showBroken && (
         <span
-          className="font-mono uppercase"
+          className="font-medium"
           style={{
             marginLeft: 10,
             color: "var(--destructive)",
-            fontSize: 10,
-            letterSpacing: "0.12em",
+            fontSize: 11,
           }}
         >
           ↪ złamań: {c.brokenCount}
@@ -389,7 +387,6 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
             fontFamily: "var(--font-mono, monospace)",
             fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.1em",
             textTransform: "uppercase",
           }}
         >
@@ -410,7 +407,6 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
               marginLeft: 8,
               color: "var(--destructive)",
               fontSize: 11,
-              letterSpacing: "0.1em",
               textTransform: "uppercase",
             }}
           >
@@ -467,18 +463,17 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
         />
 
         <div
-          className="font-mono uppercase"
+          className="font-medium"
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.16em",
             marginBottom: 6,
           }}
         >
           Sejm {header.term} · pos. {header.sitting} · głos. nr {header.voting_number} · {formatDateShort(header.date)}
         </div>
         <div
-          className="font-serif"
+          className=""
           style={{
             fontSize: 20,
             fontWeight: 500,
@@ -492,13 +487,12 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
 
         {/* Live (responsive) rows. */}
         <div
-          className="hidden sm:grid items-center font-mono uppercase"
+          className="hidden sm:grid items-center font-medium"
           style={{
             gridTemplateColumns: "120px 80px 1fr 240px",
             gap: 24,
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.14em",
             borderBottom: "1px solid var(--rule)",
             paddingBottom: 10,
             marginBottom: 4,
@@ -549,7 +543,7 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            fontFamily: "var(--font-serif, serif)",
+            fontFamily: "var(--font-sans)",
             color: "var(--foreground)",
           }}
         >
@@ -567,7 +561,6 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
               textTransform: "uppercase",
               fontSize: 12,
               color: "var(--muted-foreground)",
-              letterSpacing: "0.18em",
               marginBottom: 14,
             }}
           >
@@ -577,7 +570,7 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
 
           <div
             style={{
-              fontFamily: "var(--font-serif, serif)",
+              fontFamily: "var(--font-sans)",
               fontSize: 30,
               fontWeight: 500,
               lineHeight: 1.18,
@@ -592,7 +585,7 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
           {pngSubtitle && (
             <div
               style={{
-                fontFamily: "var(--font-serif, serif)",
+                fontFamily: "var(--font-sans)",
                 fontStyle: "italic",
                 fontSize: 18,
                 lineHeight: 1.3,
@@ -612,9 +605,8 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
             gap: 20,
             fontFamily: "var(--font-mono, monospace)",
             textTransform: "uppercase",
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.14em",
             borderBottom: "1px solid var(--rule)",
             paddingBottom: 8,
             marginBottom: 2,
@@ -652,9 +644,8 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
             alignItems: "center",
             fontFamily: "var(--font-mono, monospace)",
             textTransform: "uppercase",
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--muted-foreground)",
-            letterSpacing: "0.18em",
           }}
         >
           <span>tygodnik sejmowy · jak głosowały kluby</span>

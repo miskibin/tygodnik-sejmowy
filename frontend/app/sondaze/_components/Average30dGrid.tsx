@@ -45,10 +45,10 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
   return (
     <section className="grid gap-8 lg:gap-12 lg:grid-cols-[1.6fr_1fr] items-start min-w-0">
       <div className="min-w-0">
-        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-2">
+        <div className="text-[11px] text-muted-foreground mb-2 font-medium">
           Średnia ważona{dateLo && dateHi ? ` · ${fmtDayMonth(dateLo)} – ${fmtDayMonth(dateHi)}` : ""}
         </div>
-        <p className="font-serif text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[680px] mb-6 text-pretty">
+        <p className="text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[680px] mb-6 text-pretty">
           Wykładniczy zanik z półokresem 14 dni — świeższy sondaż waży więcej. Punkt pokazuje
           średnią, półprzezroczysty pasek to rozrzut min–max w 30-dniowym oknie.
         </p>
@@ -89,7 +89,7 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
                   </span>
                 )}
                 <div className="min-w-0">
-                  <div className="font-serif text-[16px] sm:text-[18px] font-medium leading-tight tracking-[-0.01em] truncate">
+                  <div className="text-[16px] sm:text-[18px] font-medium leading-tight tracking-[-0.01em] truncate">
                     {r.party_code}
                   </div>
                   <div className="font-sans text-[11px] text-muted-foreground truncate">
@@ -125,7 +125,7 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
               {/* Big percentage */}
               <div className="text-right">
                 <span
-                  className="font-serif font-medium tabular-nums"
+                  className="font-medium tabular-nums"
                   style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", letterSpacing: "-0.02em", lineHeight: 1 }}
                 >
                   {fmtPct(r.percentage_avg)}
@@ -141,7 +141,7 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
                 {qualified ? (
                   <>
                     <div
-                      className="font-serif font-medium tabular-nums leading-none"
+                      className="font-medium tabular-nums leading-none"
                       style={{ fontSize: "clamp(1.1rem, 2.6vw, 1.45rem)" }}
                     >
                       {seatCount}
@@ -149,7 +149,7 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
                     <div className="font-mono text-[9.5px] text-muted-foreground mt-1">mandatów</div>
                   </>
                 ) : (
-                  <div className="font-mono text-[10px] text-destructive uppercase tracking-wider leading-tight">
+                  <div className="text-[11px] text-muted-foreground tracking-wider leading-tight font-medium">
                     pod
                     <br />
                     progiem
@@ -163,7 +163,7 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
 
       {residual.length > 0 && (
         <div className="mt-5 pt-3 border-t border-dashed border-border flex flex-wrap gap-x-5 gap-y-1.5 font-mono text-[10.5px] text-muted-foreground tracking-wide">
-          <span className="uppercase tracking-[0.14em]">Pozostałe:</span>
+          <span className="font-medium">Pozostałe:</span>
           {residual.map((r) => (
             <span key={r.party_code}>
               <span className="text-secondary-foreground">{partyLabel(r.party_code)}</span>{" "}
@@ -176,22 +176,22 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
 
       {/* Sidebar — "Co się zmieniło" callouts, mirroring the design mock */}
       <aside className="min-w-0 lg:sticky lg:top-4">
-        <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-destructive mb-3">
+        <div className="text-[11px] text-muted-foreground mb-3 font-medium">
           Co warto wiedzieć
         </div>
 
         {mostVolatile && (
           <div className="bg-muted border border-border p-5 sm:p-6 mb-4">
-            <div className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground mb-2">
+            <div className="text-[11px] text-muted-foreground mb-2 font-medium">
               Największy rozrzut w 30 dniach
             </div>
             <div
-              className="font-serif font-medium leading-tight tracking-[-0.015em] m-0 text-balance"
+              className="font-medium leading-tight tracking-[-0.015em] m-0 text-balance"
               style={{ fontSize: "clamp(1.4rem, 4vw, 1.85rem)" }}
             >
               {partyLabel(mostVolatile.party_code)}
             </div>
-            <p className="font-serif italic text-[14px] sm:text-[15px] text-secondary-foreground mt-2 mb-0 leading-[1.5]">
+            <p className="italic text-[14px] sm:text-[15px] text-secondary-foreground mt-2 mb-0 leading-[1.5]">
               {fmtPct(mostVolatile.percentage_min_30d)}% – {fmtPct(mostVolatile.percentage_max_30d)}% w sondażach z ostatniego miesiąca · różnica{" "}
               {fmtPct(mostVolatile.percentage_max_30d - mostVolatile.percentage_min_30d)} pkt.
             </p>
@@ -204,11 +204,11 @@ export function Average30dGrid({ rows }: { rows: PollAverageRow[] }) {
 
         {subThreshold && (
           <div className="border border-border p-5 sm:p-6">
-            <div className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground mb-3">
+            <div className="text-[11px] text-muted-foreground mb-3 font-medium">
               {subThresholdGap > 0 ? `Na granicy progu (${SEJM_THRESHOLD_PCT}%)` : `Najbliżej progu od góry`}
             </div>
             <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
-              <span className="font-serif text-[20px] sm:text-[22px] font-medium tracking-[-0.01em]">
+              <span className="text-[20px] sm:text-[22px] font-medium tracking-[-0.01em]">
                 {partyLabel(subThreshold.party_code)}
               </span>
               <span
