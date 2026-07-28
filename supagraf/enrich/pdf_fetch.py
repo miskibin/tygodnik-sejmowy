@@ -26,6 +26,12 @@ from urllib.parse import quote
 
 import httpx
 from loguru import logger
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from supagraf.fixtures.storage import fixtures_root
 
@@ -36,6 +42,8 @@ CACHE_DIR = Path(
     )
 )
 DEFAULT_TTL_SECONDS = int(os.environ.get("SUPAGRAF_PDF_TTL", "86400"))
+# Sejm serves multi-MB scans slowly; 60 s was timing out on the bigger ones.
+HTTP_TIMEOUT_S = float(os.environ.get("SUPAGRAF_PDF_HTTP_TIMEOUT_S", "120"))
 DEFAULT_TERM = int(os.environ.get("SUPAGRAF_DEFAULT_TERM", "10"))
 
 # Sejm prints API: /sejm/term{N}/prints/{number}/{filename}
@@ -97,13 +105,34 @@ def _print_url(term: int, number: str, filename: str) -> str:
     )
 
 
+class _TransientFetch(Exception):
+    """Timeout / 5xx / 429 — worth another attempt."""
+
+
+@retry(
+    retry=retry_if_exception_type((_TransientFetch, httpx.TimeoutException,
+                                   httpx.TransportError)),
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=2, min=2, max=20),
+    reraise=True,
+)
 def _get(url: str) -> httpx.Response:
+    """GET with retry on transient upstream trouble.
+
+    api.sejm.gov.pl goes slow in bursts — a catch-up run walking hundreds of
+    prints reliably hits a stretch of read timeouts. Without a retry, each one
+    permanently failed that print for the whole run (the LLM client has had
+    tenacity from the start; this path never did).
+    """
     with httpx.Client(
-        timeout=60.0,
+        timeout=HTTP_TIMEOUT_S,
         headers={"User-Agent": USER_AGENT},
         follow_redirects=True,
     ) as c:
-        return c.get(url)
+        r = c.get(url)
+    if r.status_code == 429 or 500 <= r.status_code < 600:
+        raise _TransientFetch(f"{url} -> {r.status_code}")
+    return r
 
 
 def _download_document(url: str, *, expects_docx: bool) -> bytes:
@@ -113,7 +142,7 @@ def _download_document(url: str, *, expects_docx: bool) -> bytes:
         r = _get(url)
         r.raise_for_status()
         body = r.content
-    except httpx.HTTPError as e:
+    except (httpx.HTTPError, _TransientFetch) as e:
         raise PdfFetchError(f"failed to fetch {url}: {e!r}") from e
 
     # Magic-byte check: PDF starts with %PDF, docx (zip) starts with PK\x03\x04.
@@ -150,7 +179,7 @@ def upstream_attachments(term: int, number: str) -> list[str]:
             ) from e
         logger.warning("upstream_attachments: {} failed: {!r}", url, e)
         return []
-    except (httpx.HTTPError, ValueError) as e:
+    except (httpx.HTTPError, _TransientFetch, ValueError) as e:
         logger.warning("upstream_attachments: {} failed: {!r}", url, e)
         return []
     atts = data.get("attachments") if isinstance(data, dict) else None

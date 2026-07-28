@@ -39,7 +39,20 @@ def isolated_cache(tmp_path, monkeypatch):
 def _make_pdf_response(body: bytes = b"%PDF-1.4\n...content...\n%%EOF\n"):
     r = MagicMock(spec=httpx.Response)
     r.content = body
+    r.status_code = 200
     r.raise_for_status = MagicMock()
+    return r
+
+
+def _make_error_response(status: int):
+    """4xx/5xx response: _get inspects status_code, callers raise_for_status."""
+    r = MagicMock(spec=httpx.Response)
+    r.status_code = status
+    r.raise_for_status = MagicMock(
+        side_effect=httpx.HTTPStatusError(
+            str(status), request=MagicMock(), response=MagicMock(status_code=status)
+        )
+    )
     return r
 
 
@@ -86,12 +99,7 @@ def test_cache_miss_fetches_and_caches(isolated_cache):
 
 def test_404_raises_pdf_fetch_error(isolated_cache):
     m, cache, fixtures = isolated_cache
-    resp = MagicMock(spec=httpx.Response)
-    resp.raise_for_status = MagicMock(
-        side_effect=httpx.HTTPStatusError(
-            "404", request=MagicMock(), response=MagicMock(status_code=404)
-        )
-    )
+    resp = _make_error_response(404)
     with patch(
         "supagraf.enrich.pdf_fetch.httpx.Client",
         return_value=_patched_client(resp),
@@ -133,15 +141,10 @@ def test_404_falls_back_to_upstream_attachment(isolated_cache):
 
     def fake_get(url, *args, **kwargs):
         if url.endswith("/1816-001/1816-001.pdf"):
-            r = MagicMock(spec=httpx.Response)
-            r.raise_for_status = MagicMock(
-                side_effect=httpx.HTTPStatusError(
-                    "404", request=MagicMock(), response=MagicMock(status_code=404)
-                )
-            )
-            return r
+            return _make_error_response(404)
         if url.endswith("/prints/1816-001"):
             r = MagicMock(spec=httpx.Response)
+            r.status_code = 200
             r.raise_for_status = MagicMock()
             r.json = MagicMock(return_value={"attachments": ["1849-001.pdf"]})
             return r
@@ -226,17 +229,7 @@ def test_metadata_404_raises_print_gone(isolated_cache):
     m, cache, fixtures = isolated_cache
 
     def fake_get(url, *args, **kwargs):
-        r = MagicMock(spec=httpx.Response)
-        status = 404 if url.endswith("/prints/1041-004") else 500
-        r.raise_for_status = MagicMock(
-            side_effect=httpx.HTTPStatusError(
-                str(status),
-                request=MagicMock(),
-                response=MagicMock(status_code=status),
-            )
-        )
-        r.response = MagicMock(status_code=status)
-        return r
+        return _make_error_response(404)
 
     client = MagicMock()
     client.__enter__ = MagicMock(return_value=client)
@@ -246,3 +239,28 @@ def test_metadata_404_raises_print_gone(isolated_cache):
     with patch("supagraf.enrich.pdf_fetch.httpx.Client", return_value=client):
         with pytest.raises(m.PrintGoneError):
             m.resolve_print_pdf("sejm/prints/1041-004__1041-004.pdf", term=10)
+
+
+def test_read_timeout_is_retried(isolated_cache):
+    """api.sejm.gov.pl times out in bursts; one slow response must not
+    permanently fail the print for the whole run."""
+    m, cache, fixtures = isolated_cache
+    body = b"%PDF-1.7\nslow but fine\n"
+    calls = {"n": 0}
+
+    def flaky_get(url, *args, **kwargs):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise httpx.ReadTimeout("The read operation timed out")
+        return _make_pdf_response(body)
+
+    client = MagicMock()
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=False)
+    client.get = MagicMock(side_effect=flaky_get)
+
+    with patch("supagraf.enrich.pdf_fetch.httpx.Client", return_value=client):
+        out = m.resolve_print_pdf("sejm/prints/2670__2670.pdf", term=10)
+
+    assert out.read_bytes() == body
+    assert calls["n"] == 2
