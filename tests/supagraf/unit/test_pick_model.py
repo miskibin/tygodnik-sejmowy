@@ -29,3 +29,12 @@ def test_env_override_pins_every_print(monkeypatch):
     monkeypatch.setenv("SUPAGRAF_LLM_MODEL", "deepseek-v4-flash")
     assert pick_model({"document_category": "projekt_ustawy"}) == "deepseek-v4-flash"
     assert pick_model({"document_category": "sprawozdanie_komisji"}) == "deepseek-v4-flash"
+
+
+def test_over_long_mention_is_truncated_not_rejected():
+    """A 200+ char committee name used to fail PrintUnifiedOutput validation,
+    discarding the whole print's enrichment over one mention."""
+    from supagraf.enrich.print_unified import UnifiedMention
+
+    m = UnifiedMention(raw_text="Komisji Śledczej " * 20, mention_type="committee")
+    assert len(m.raw_text) == 200

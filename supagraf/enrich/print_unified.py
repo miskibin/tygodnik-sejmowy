@@ -185,6 +185,22 @@ class UnifiedMention(BaseModel):
     raw_text: str = Field(min_length=1, max_length=200)
     mention_type: MentionType
 
+    @field_validator("raw_text", mode="before")
+    @classmethod
+    def _cap_raw_text(cls, v):
+        """Truncate instead of failing the whole print.
+
+        Long committee names ("Komisji Śledczej do zbadania…") overshoot the
+        200-char cap, and a hard reject threw away the entire unified payload —
+        summary, impact, tone, everything — over one over-long mention. The cap
+        is our own guard (print_mentions.raw_text is plain `text`), and a
+        truncated prefix still resolves in the str.find span recovery.
+        """
+        if isinstance(v, str) and len(v) > 200:
+            logger.warning("mention raw_text {} chars — truncating to 200", len(v))
+            return v[:200]
+        return v
+
 
 class UnifiedAffectedGroup(BaseModel):
     model_config = ConfigDict(extra="forbid")
