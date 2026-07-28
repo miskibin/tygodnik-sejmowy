@@ -792,6 +792,23 @@ def _run_direct_stage_captures(*, term: int, direct_staged: set[str]) -> None:
             except Exception as e:
                 logger.error("capture_videos direct-stage failed: {!r}", e)
 
+            # Proceedings can't stream into _stage_proceedings (the stager
+            # composes one payload out of transcripts JSON + per-statement
+            # HTML), but the fixtures still have to be pulled here — Phase 2
+            # only file-scans what is already on disk. Without this, a new
+            # sitting never enters the DB and, worse, load_votings hard-fails
+            # on the votings that reference it:
+            #   Key (term, sitting)=(10, 59) is not present in "proceedings"
+            # which aborts the whole daily. Binaries stay on so the statement
+            # HTML bodies land with the transcripts.
+            try:
+                await sejm_src.capture_proceedings(
+                    client, out_root, term, year,
+                    refresh=False, no_binaries=False, limit=None,
+                )
+            except Exception as e:
+                logger.error("capture_proceedings failed: {!r}", e)
+
     asyncio.run(_go())
 
 
