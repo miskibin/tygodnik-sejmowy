@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 from enum import Enum
 from pathlib import Path
 from typing import Callable
@@ -1174,16 +1175,29 @@ def _pending_query(kind: EnrichKind, term: int):
     return q
 
 
+# A handful of `prints.number` values are Lotus/Domino document GUIDs rather
+# than Sejm print numbers (4 rows in term 10). api.sejm.gov.pl has no
+# /prints/<guid>/ path — the WAF answers with an HTML "Request Rejected" page —
+# so there is no document to enrich. Skip instead of failing every run.
+_GUID_NUMBER_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
+
+
 def _resolve_pdf_relpath(print_row: dict) -> str | None:
     """Pick best document attachment: prefer .docx (clean text from Sejm's
     editable source) over .pdf (often a scanned signed copy without text layer).
 
     Returns relpath under fixtures/ or None if no usable document found.
     """
+    # Upstream ships a few numbers with embedded newlines/spaces ("1041-004\n").
+    # Left unstripped they end up verbatim in the request URL and httpx rejects
+    # it (`InvalidURL: non-printable ASCII character`).
+    number = (print_row.get("number") or "").strip()
+    if not number or _GUID_NUMBER_RE.match(number):
+        return None
     atts = sorted(print_row.get("attachments") or [], key=lambda a: a.get("ordinal", 0))
     docx_match = pdf_match = None
     for a in atts:
-        fn = a.get("filename")
+        fn = (a.get("filename") or "").strip()
         if not fn:
             continue
         low = fn.lower()
@@ -1194,7 +1208,7 @@ def _resolve_pdf_relpath(print_row: dict) -> str | None:
     chosen = docx_match or pdf_match
     if chosen is None:
         return None
-    return f"sejm/prints/{print_row['number']}__{chosen}"
+    return f"sejm/prints/{number}__{chosen}"
 
 
 def _runner_for(kind: EnrichKind) -> Callable:

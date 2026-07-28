@@ -257,3 +257,21 @@ def test_empty_term_no_prints(fake_runners, fake_path_exists):
     assert result.exit_code == 0
     assert "ok=0" in result.output
     assert "failed=0" in result.output
+
+
+def test_resolve_relpath_strips_whitespace_in_number():
+    """Upstream ships a few numbers with a trailing newline; unstripped they
+    reach the fetch layer and httpx rejects the URL."""
+    from supagraf.cli import _resolve_pdf_relpath
+
+    rp = _resolve_pdf_relpath(_row("1041-004\n", [_pdf_att("1041-004.pdf")]))
+    assert rp == "sejm/prints/1041-004__1041-004.pdf"
+
+
+def test_resolve_relpath_skips_guid_numbered_prints():
+    """4 term-10 prints are keyed by a Domino GUID; api.sejm.gov.pl has no
+    /prints/<guid>/ path, so there is nothing to enrich."""
+    from supagraf.cli import _resolve_pdf_relpath
+
+    row = _row("3D10FECA9709FEFEC1258CD8004D1770", [_pdf_att("997-s.pdf")])
+    assert _resolve_pdf_relpath(row) is None

@@ -22,6 +22,8 @@ import re
 import time
 from pathlib import Path
 
+from urllib.parse import quote
+
 import httpx
 from loguru import logger
 
@@ -39,6 +41,7 @@ DEFAULT_TERM = int(os.environ.get("SUPAGRAF_DEFAULT_TERM", "10"))
 # Sejm prints API: /sejm/term{N}/prints/{number}/{filename}
 # E.g.  https://api.sejm.gov.pl/sejm/term10/prints/2055-A/2055-A.pdf
 SEJM_PRINT_URL = "https://api.sejm.gov.pl/sejm/term{term}/prints/{number}/{filename}"
+SEJM_PRINT_META_URL = "https://api.sejm.gov.pl/sejm/term{term}/prints/{number}"
 USER_AGENT = "supagraf/1.0 (etl; +https://github.com/miskibin/sejmograf)"
 
 # pdf_relpath shape produced by cli._resolve_pdf_relpath:
@@ -70,6 +73,73 @@ def _is_fresh(path: Path, ttl: int) -> bool:
     return (time.time() - path.stat().st_mtime) < ttl
 
 
+def _print_url(term: int, number: str, filename: str) -> str:
+    """Build the attachment URL, percent-encoding both path segments.
+
+    Print numbers and attachment filenames come from upstream verbatim and are
+    not URL-safe: ~290 attachment filenames contain spaces and a few numbers
+    carry stray whitespace. Interpolated raw, httpx rejects the URL outright
+    (`InvalidURL: non-printable ASCII character`).
+    """
+    return SEJM_PRINT_URL.format(
+        term=term,
+        number=quote(number.strip(), safe=""),
+        filename=quote(filename.strip(), safe=""),
+    )
+
+
+def _get(url: str) -> httpx.Response:
+    with httpx.Client(
+        timeout=60.0,
+        headers={"User-Agent": USER_AGENT},
+        follow_redirects=True,
+    ) as c:
+        return c.get(url)
+
+
+def _download_document(url: str, *, expects_docx: bool) -> bytes:
+    """GET one attachment URL, returning the body only if it really is the
+    expected binary. Raises PdfFetchError on HTTP failure or wrong body type."""
+    try:
+        r = _get(url)
+        r.raise_for_status()
+        body = r.content
+    except httpx.HTTPError as e:
+        raise PdfFetchError(f"failed to fetch {url}: {e!r}") from e
+
+    # Magic-byte check: PDF starts with %PDF, docx (zip) starts with PK\x03\x04.
+    is_pdf = body[:4].startswith(b"%PDF")
+    is_zip = body[:4] == b"PK\x03\x04"
+    if not body or (expects_docx and not is_zip) or (not expects_docx and not is_pdf):
+        # Sejm sometimes returns an HTML error page with 200 — refuse to cache.
+        raise PdfFetchError(
+            f"unexpected body type from {url} (len={len(body)}, head={body[:16]!r})"
+        )
+    return body
+
+
+def upstream_attachments(term: int, number: str) -> list[str]:
+    """Attachment filenames the API reports for a print, right now.
+
+    Our `print_attachments` rows can disagree with upstream: print 1816-001
+    lists `1849-001.pdf`, but the loader recorded `1816-001.pdf` — every fetch
+    then 404s. Re-reading the print metadata is the authoritative repair.
+    Returns [] on any failure; the caller keeps its original error.
+    """
+    url = SEJM_PRINT_META_URL.format(term=term, number=quote(number.strip(), safe=""))
+    try:
+        r = _get(url)
+        r.raise_for_status()
+        data = r.json()
+    except (httpx.HTTPError, ValueError) as e:
+        logger.warning("upstream_attachments: {} failed: {!r}", url, e)
+        return []
+    atts = data.get("attachments") if isinstance(data, dict) else None
+    if not isinstance(atts, list):
+        return []
+    return [a.strip() for a in atts if isinstance(a, str) and a.strip()]
+
+
 def fetch_print_pdf(
     *,
     term: int,
@@ -83,9 +153,14 @@ def fetch_print_pdf(
       1. Legacy fixtures path: fixtures_root()/sejm/prints/{number}__{filename}
       2. Short-term cache (TTL window)
       3. Live HTTP GET against api.sejm.gov.pl
+      4. On failure, re-read the print metadata and retry with the attachment
+         names upstream currently advertises
 
     Raises PdfFetchError on network/HTTP failure.
     """
+    number = number.strip()
+    filename = filename.strip()
+
     legacy = fixtures_root() / "sejm" / "prints" / f"{number}__{filename}"
     if legacy.exists() and legacy.stat().st_size > 0:
         return legacy
@@ -95,35 +170,51 @@ def fetch_print_pdf(
         return target
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    url = SEJM_PRINT_URL.format(term=term, number=number, filename=filename)
+    url = _print_url(term, number, filename)
     logger.info("fetch_print_pdf: GET {} -> {}", url, target.name)
     try:
-        with httpx.Client(
-            timeout=60.0,
-            headers={"User-Agent": USER_AGENT},
-            follow_redirects=True,
-        ) as c:
-            r = c.get(url)
-            r.raise_for_status()
-            body = r.content
-    except httpx.HTTPError as e:
-        raise PdfFetchError(f"failed to fetch {url}: {e!r}") from e
-
-    # Magic-byte check: PDF starts with %PDF, docx (zip) starts with PK\x03\x04.
-    is_pdf = body[:4].startswith(b"%PDF")
-    is_zip = body[:4] == b"PK\x03\x04"
-    expects_docx = filename.lower().endswith(".docx")
-    if not body or (expects_docx and not is_zip) or (not expects_docx and not is_pdf):
-        # Sejm sometimes returns an HTML error page with 200 — refuse to cache.
-        raise PdfFetchError(
-            f"unexpected body type from {url} (len={len(body)}, head={body[:16]!r})"
+        body = _download_document(url, expects_docx=filename.lower().endswith(".docx"))
+    except PdfFetchError as first_error:
+        alt_name, body = _fetch_via_upstream_listing(term, number, skip=filename)
+        if body is None:
+            raise first_error
+        logger.info(
+            "fetch_print_pdf: {} not served for print {}; used upstream attachment {}",
+            filename, number, alt_name,
         )
+        target = _cache_path(term, number, alt_name)
 
     # Atomic write: write to .part then rename.
     tmp = target.with_suffix(target.suffix + ".part")
     tmp.write_bytes(body)
     os.replace(tmp, target)
     return target
+
+
+def _fetch_via_upstream_listing(
+    term: int, number: str, *, skip: str
+) -> tuple[str | None, bytes | None]:
+    """Retry the download against the attachment names upstream reports.
+
+    .docx first (clean text) then .pdf, matching _resolve_pdf_relpath's
+    preference. Returns (filename, body) or (None, None) if nothing worked.
+    """
+    candidates = [
+        a for a in upstream_attachments(term, number)
+        if a != skip and a.lower().endswith((".docx", ".pdf"))
+    ]
+    candidates.sort(key=lambda a: 0 if a.lower().endswith(".docx") else 1)
+    for alt in candidates:
+        try:
+            body = _download_document(
+                _print_url(term, number, alt),
+                expects_docx=alt.lower().endswith(".docx"),
+            )
+        except PdfFetchError as e:
+            logger.warning("fetch_print_pdf: fallback {} failed: {}", alt, e)
+            continue
+        return alt, body
+    return None, None
 
 
 def resolve_print_pdf(

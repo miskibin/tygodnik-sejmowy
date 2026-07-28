@@ -112,6 +112,53 @@ def test_non_pdf_body_rejected(isolated_cache):
             m.resolve_print_pdf("sejm/prints/0001__0001.pdf", term=10)
 
 
+def test_url_segments_are_percent_encoded(isolated_cache):
+    """Numbers/filenames carry spaces upstream — raw interpolation makes httpx
+    reject the URL."""
+    m, cache, fixtures = isolated_cache
+    assert m._print_url(10, "1090 -001", "opinia 1090.pdf") == (
+        "https://api.sejm.gov.pl/sejm/term10/prints/1090%20-001/opinia%201090.pdf"
+    )
+    # Stray whitespace from upstream is trimmed, not encoded.
+    assert m._print_url(10, "1041-004\n", "1041-004.pdf") == (
+        "https://api.sejm.gov.pl/sejm/term10/prints/1041-004/1041-004.pdf"
+    )
+
+
+def test_404_falls_back_to_upstream_attachment(isolated_cache):
+    """print_attachments can be stale (1816-001 lists 1849-001.pdf upstream).
+    A 404 must trigger a metadata re-read and retry, not a hard failure."""
+    m, cache, fixtures = isolated_cache
+    body = b"%PDF-1.7\nreal doc\n"
+
+    def fake_get(url, *args, **kwargs):
+        if url.endswith("/1816-001/1816-001.pdf"):
+            r = MagicMock(spec=httpx.Response)
+            r.raise_for_status = MagicMock(
+                side_effect=httpx.HTTPStatusError(
+                    "404", request=MagicMock(), response=MagicMock(status_code=404)
+                )
+            )
+            return r
+        if url.endswith("/prints/1816-001"):
+            r = MagicMock(spec=httpx.Response)
+            r.raise_for_status = MagicMock()
+            r.json = MagicMock(return_value={"attachments": ["1849-001.pdf"]})
+            return r
+        return _make_pdf_response(body)
+
+    client = MagicMock()
+    client.__enter__ = MagicMock(return_value=client)
+    client.__exit__ = MagicMock(return_value=False)
+    client.get = MagicMock(side_effect=fake_get)
+
+    with patch("supagraf.enrich.pdf_fetch.httpx.Client", return_value=client):
+        out = m.resolve_print_pdf("sejm/prints/1816-001__1816-001.pdf", term=10)
+
+    assert out.read_bytes() == body
+    assert out.name.endswith("1816-001__1849-001.pdf")
+
+
 def test_evict_expired(isolated_cache):
     m, cache, fixtures = isolated_cache
     cache.mkdir(parents=True, exist_ok=True)

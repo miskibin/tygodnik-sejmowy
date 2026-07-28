@@ -10,11 +10,24 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+def _strip(v):
+    """Upstream ships stray whitespace in a few numbers ("1041-004\\n") and in
+    attachment filenames. Unstripped they reach the fetch layer verbatim and
+    make the request URL invalid, so normalise at the schema boundary."""
+    if isinstance(v, str):
+        return v.strip()
+    if isinstance(v, list):
+        return [x.strip() if isinstance(x, str) else x for x in v]
+    return v
 
 
 class AdditionalPrint(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    _strip_text = field_validator("number", "attachments", mode="before")(_strip)
 
     term: int
     number: str
@@ -29,6 +42,8 @@ class AdditionalPrint(BaseModel):
 
 class Print(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    _strip_text = field_validator("number", "attachments", mode="before")(_strip)
 
     term: int
     number: str
