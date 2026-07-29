@@ -989,25 +989,36 @@ def cmd_daily(
                 UTTERANCE_LLM_MODEL,
                 enrich_statements,
             )
-            latest = (
+            # "Latest sitting" has to mean the latest sitting that actually has
+            # pending statements. The Marshal schedules a sitting before it
+            # happens, so the highest-numbered proceeding routinely has no
+            # transcripts yet — picking it blind enriched nothing and silently
+            # shadowed the sitting that did have statements (63 was empty, so
+            # 62's 755 statements were never touched). Walk back a few
+            # sittings; enrich_statements is a cheap no-op when nothing pends.
+            recent = (
                 supabase().table("proceedings")
                 .select("number")
                 .eq("term", term)
                 .order("number", desc=True)
-                .limit(1)
+                .limit(_UTTERANCE_SITTING_LOOKBACK)
                 .execute()
                 .data
                 or []
             )
-            if latest:
-                s = int(latest[0]["number"])
+            if not recent:
+                logger.info("enrich-utterances: no proceedings for term {}", term)
+            for row in recent:
+                s = int(row["number"])
                 n_ok, n_failed = enrich_statements(
                     term=term, sitting_num=s, limit=0,
                     llm_model=UTTERANCE_LLM_MODEL,
                 )
-                logger.info("enrich-utterances sitting={} ok={} failed={}", s, n_ok, n_failed)
-            else:
-                logger.info("enrich-utterances: no proceedings for term {}", term)
+                if n_ok or n_failed:
+                    logger.info(
+                        "enrich-utterances sitting={} ok={} failed={}", s, n_ok, n_failed
+                    )
+                    break
         except Exception as e:
             logger.error("enrich-utterances failed: {!r}", e)
 
@@ -1259,6 +1270,12 @@ def _runner_for(kind: EnrichKind) -> Callable:
         return embed_print
     raise ValueError(f"no single runner for {kind}")
 
+
+# How many sittings back the daily will look for statements to enrich. Covers
+# scheduled-but-empty sittings without turning into a corpus-wide backfill.
+_UTTERANCE_SITTING_LOOKBACK = int(
+    os.environ.get("SUPAGRAF_UTTERANCE_SITTING_LOOKBACK", "3")
+)
 
 # Consecutive attachment-fetch failures that mean "upstream is down, stop
 # trying" rather than "these particular prints are bad".
