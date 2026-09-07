@@ -192,3 +192,12 @@ def test_402_raises_budget_error_without_retry(monkeypatch):
     with pytest.raises(llm_mod.LLMBudgetError):
         llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
     assert len(calls) == 1
+
+
+def test_usage_totals_accumulate_per_call(monkeypatch):
+    _capture(monkeypatch, [_ok('{"a": 1}'), _ok('{"a": 2}')])
+    before = llm_mod.usage_snapshot()
+    llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
+    llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
+    d = llm_mod.usage_since(before)
+    assert d["calls"] == 2 and d["input"] == 200 and d["cache_hit"] == 128 and d["output"] == 10

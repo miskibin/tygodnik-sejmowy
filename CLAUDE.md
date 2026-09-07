@@ -49,6 +49,7 @@ PaddleOCR and the GPU OCR experiments were removed in Sept 2026 (deadlocks, mult
 - **Statements (`enrich-utterances`) use `deepseek-v4-flash`** (`SUPAGRAF_UTTERANCE_LLM_MODEL`), `thinking=off`. Do NOT pass `SUPAGRAF_LLM_MODEL` to the utterance job; it clobbers the per-statement default.
 - **Thinking**: DeepSeek enables it by default and then ignores `temperature`. `call_structured(thinking="off"|"low"|"high"|"max")`; default `SUPAGRAF_LLM_THINKING=off` everywhere, including prints (`SUPAGRAF_PRINT_THINKING=low` costs ~3× per print). The body key is `thinking: {"type": ...}` + `reasoning_effort` — `reasoning.effort` is the Anthropic-format field and is ignored on this endpoint.
 - **402 Insufficient Balance / 401** raise `LLMBudgetError` and stop the whole enrich phase after one call (remaining items stay pending, nothing is counted as failed) — top up at platform.deepseek.com and re-run.
+- Token usage per enrich phase (`calls/input/cache_hit/output/reasoning`) is summed in `llm.usage_snapshot()` and lands in `etl_runs.steps.<phase>.counts.tokens` — the `/admin/etl` panel shows it; that is the cost signal.
 - 429 (concurrency throttle) and 503 are retried; empty JSON-mode content is retried; `usage.prompt_cache_hit_tokens` is logged — keep system prompt + schema first, document last, so the automatic prefix cache hits.
 - **Peak pricing** Mon–Fri 01–04 & 06–10 UTC (2× off-peak). Schedule enrichment outside it; `is_deepseek_peak_hour()` warns.
 - Enrichment concurrency `SUPAGRAF_ENRICH_WORKERS` (default 4); failure backoff 3 failures / 14 days per print.
