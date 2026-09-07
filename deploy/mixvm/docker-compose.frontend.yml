@@ -13,8 +13,8 @@
 #   - PATRONITE_TOKEN       — optional
 #   - ETL_DASHBOARD_PASSWORD — optional, shared password for the operator ETL
 #                             dashboard at /admin/etl. Unset or empty = the
-#                             route 404s, so an undeployed config cannot leak
-#                             the run ledger. Changing it logs everyone out.
+#                             panel is open without a login. Changing it
+#                             logs everyone out.
 #
 # Port 3001 chosen because 3000 is reserved for any future Next dev session
 # and 80/443 are owned by something else on the host. Cloudflare Tunnel

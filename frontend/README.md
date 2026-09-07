@@ -43,8 +43,8 @@ host and an expandable per-step breakdown with counters and errors.
 
 Gated by a single shared password in `ETL_DASHBOARD_PASSWORD`:
 
-- unset or empty → the route returns 404, so an undeployed config can never
-  expose the ledger;
+- unset or empty → the panel is open (no login); the ledger holds only run
+  timings, counters and error strings;
 - a correct password sets an httpOnly `etl_session` cookie (30 days, scoped to
   `/admin`) holding an HMAC-SHA256 of a fixed subject keyed by the password —
   the password itself is never stored client-side, and rotating it invalidates
