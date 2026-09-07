@@ -60,6 +60,7 @@ def test_sync_skips_identical_payload_and_writes_changed(routes, ctx, fake_stage
     res = pr.sync(ctx)
     assert res.notes["touched"] == [64]
     assert res.upserted == 1 and "proceedings" in ctx.dirty
+    assert ctx.changed_keys["proceedings"] == {64}
     # second run: identical payload → no write
     ctx.dirty.clear()
     res2 = pr.sync(ctx)

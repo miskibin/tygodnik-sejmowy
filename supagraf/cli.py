@@ -725,7 +725,7 @@ def cmd_sync(
         sync_resources(ctx, ledger, tuple(r for r in RESOURCES if r in resources))
         if load and ctx.dirty:
             with ledger.step("load") as step:
-                step.counts = run_loaders(term, ctx.dirty, full=False)
+                step.counts = run_loaders(term, ctx.dirty, full=full, changed_keys=ctx.changed_keys)
     ledger.finish()
     for s in ledger.steps:
         print(f"{s.name}: {s.status} {s.counts}")

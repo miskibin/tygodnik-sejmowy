@@ -24,10 +24,16 @@ class SyncContext:
     today: date = field(default_factory=lambda: datetime.now(timezone.utc).date())
     # Resources whose stage rows changed this run — drives the loader plan.
     dirty: set[str] = field(default_factory=set)
+    # Natural keys written per resource, for the loaders that have a
+    # per-sitting variant (proceedings → number, votings → sitting). Empty
+    # when the whole-term loader must run (e.g. --skip-fetch).
+    changed_keys: dict[str, set[int]] = field(default_factory=dict)
 
     def base(self) -> str:
         return f"/sejm/term{self.term}"
 
-    def mark(self, resource: str, changed: bool) -> None:
+    def mark(self, resource: str, changed: bool, keys: set[int] | None = None) -> None:
         if changed:
             self.dirty.add(resource)
+            if keys:
+                self.changed_keys.setdefault(resource, set()).update(keys)

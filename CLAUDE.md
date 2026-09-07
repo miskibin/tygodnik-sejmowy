@@ -41,7 +41,9 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
 ## Updater (daily)
 
 - `python -m supagraf daily` = `supagraf/sync/` (Sept 2026 rewrite). Incremental: per-resource change detection (server-side `modifiedSince`/`since` where the API has it, `changeDate`/payload diffs against `_stage_*` otherwise), loaders only for dirty resources, `etl_runs` ledger, non-zero exit on any failed step. Full description in `docs/updater.md`.
-- Needs migrations **0105** (`etl_runs`, `etl_cursors`, `proceeding_day_gaps`) and **0106** (`vote_choice` += `VOTE_VALID`); refuses to run without 0105.
+- Needs migrations **0105** (`etl_runs`, `etl_cursors`, `proceeding_day_gaps`), **0106** (`vote_choice` += `VOTE_VALID`), **0107** (`load_votings` topic fallback), **0108** (per-sitting `load_proceeding` / `load_votings_sitting` / `load_votes_sitting`); refuses to run without 0105. Applied to prod 2026-09-07.
+- Heavy whole-term loaders (`load_proceedings`, `load_votes`, matview refreshes) exceed Cloudflare's 100 s limit through PostgREST (504, no commit). The daily avoids them via the per-sitting variants; `--full` / `--skip-fetch` still need `SUPAGRAF_LOAD_DIRECT_DSN` (mixvm).
+- In `db-exec` / `exec_sql`, `create function` must be qualified `public.` — the RPC's search_path starts at `pg_catalog`.
 - Upstream drift = `sync:<resource> failed … schema:` in `etl_runs`; extend the Pydantic model in `supagraf/schema/`, never loosen `extra="forbid"`. `python -m supagraf db-exec -f <file>` applies SQL through the `exec_sql` RPC.
 - The daily writes no fixture files. `fixtures capture` / `stage` remain for bulk snapshots and the external sources (districts, postcodes, promises, mp_office_expenses).
 - Sejm API facts (verified 2026-09-07): no ETag/Last-Modified, conditional GETs are ignored, no gzip; `/prints` ignores every query param; `processes`, `interpellations`, `writtenQuestions` accept `modifiedSince`; `videos` accepts `since/till`; `/committees/sittings/{date}`; `/eli/changes/acts?since=` returns full details for DU+MP. Transcripts have no change signal and an empty `statements[]` means "not published yet".

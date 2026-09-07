@@ -78,7 +78,19 @@ proceedings loaded after prints/processes so agenda refs resolve the same
 day. Matview refreshes are gated the same way: no votings change → no
 `refresh_mp_discipline` / atlas refresh.
 
-`load_proceedings` writes `body_html`/`body_text` from the payload
+The two loaders that dominate runtime have per-sitting variants (migration
+0108): the sync reports which sittings it wrote and the plan calls
+`load_proceeding(term, number)`, `load_votings_sitting(term, sitting)` and
+`load_votes_sitting(term, sitting)` for exactly those, instead of rebuilding
+75 sittings / 2M vote rows. The whole-term functions remain for `--full` and
+`--skip-fetch` (no keys known) — those need `SUPAGRAF_LOAD_DIRECT_DSN`
+on mixvm, because through PostgREST they exceed Cloudflare's 100 s gateway
+limit and come back as 504 without committing.
+
+Trigger sets list inputs only; FK prerequisites are guaranteed by the chain
+order (a new proceeding does not reload the term's votings).
+
+`load_proceeding` writes `body_html`/`body_text` from the payload
 unconditionally, which is why the proceedings composer always carries the
 bodies the DB already has.
 
@@ -118,10 +130,15 @@ Without SSH/Tailscale, through the service-role RPC:
 ```
 uv run python -m supagraf db-exec -f supabase/migrations/0105_etl_runs_cursors.sql
 uv run python -m supagraf db-exec -f supabase/migrations/0106_vote_choice_vote_valid.sql
+uv run python -m supagraf db-exec -f supabase/migrations/0107_load_votings_topic_fallback.sql
+uv run python -m supagraf db-exec -f supabase/migrations/0108_targeted_loaders.sql
 ```
 
 0106 adds the `VOTE_VALID` enum value upstream started sending for ON_LIST
-votings; without it `load_votes` aborts on the first such voting.
+votings; 0107 lets `load_votings` fall back to the title when `topic` is
+null (elections); 0108 adds the per-sitting loaders. All four were applied
+to prod on 2026-09-07 through the RPC. Note the RPC's search_path starts
+with `pg_catalog`: `create function` must be schema-qualified (`public.`).
 
 ## Upstream schema drift
 

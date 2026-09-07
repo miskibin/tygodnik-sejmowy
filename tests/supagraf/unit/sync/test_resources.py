@@ -121,6 +121,7 @@ def test_votings_sync_fetches_missing_detail_only(routes, ctx, fake_stage, monke
     assert routes.count("/votings/64/1") == 0
     assert sealed_now == ["term10__64__2"]
     assert "votings" in ctx.dirty
+    assert ctx.changed_keys["votings"] == {64}
 
 
 # ---- mps / clubs / committees ------------------------------------------------

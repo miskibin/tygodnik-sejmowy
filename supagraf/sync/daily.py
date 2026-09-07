@@ -125,7 +125,8 @@ def run_daily(
             ledger.skip("load", "nothing changed upstream")
         else:
             with ledger.step("load") as step:
-                step.counts = {"dirty": sorted(ctx.dirty), **run_loaders(term, ctx.dirty, full=full)}
+                step.counts = {"dirty": sorted(ctx.dirty),
+                               **run_loaders(term, ctx.dirty, full=full, changed_keys=ctx.changed_keys)}
             if ({"prints", "processes"} & ctx.dirty) and "proceedings" not in ctx.dirty:
                 with ledger.step("load:relink_agenda_refs"):
                     _relink_agenda_refs(term)

@@ -72,3 +72,34 @@ def test_refresh_plan_quiet_day_is_empty():
     assert {l.fn for l in plan(REFRESH_CHAIN, {"votings"}, full=False)} >= {
         "refresh_mp_discipline", "refresh_atlas_matviews", "refresh_mp_activity",
     }
+
+
+def test_run_loaders_uses_per_sitting_variants(monkeypatch):
+    from supagraf.sync import loaders
+
+    calls: list[tuple[str, dict | None]] = []
+    monkeypatch.setattr(loaders, "_rpc_int", lambda fn, term: calls.append((fn, None)) or 1)
+    monkeypatch.setattr(loaders, "call_rpc_scalar", lambda fn, args: calls.append((fn, args)) or 2)
+    out = loaders.run_loaders(10, {"proceedings", "votings"},
+                              changed_keys={"proceedings": {64, 65}, "votings": {64}})
+    assert ("load_proceeding", {"p_term": 10, "p_number": 64}) in calls
+    assert ("load_proceeding", {"p_term": 10, "p_number": 65}) in calls
+    assert ("load_votings_sitting", {"p_term": 10, "p_sitting": 64}) in calls
+    assert ("load_votes_sitting", {"p_term": 10, "p_sitting": 64}) in calls
+    assert not any(fn in ("load_proceedings", "load_votings", "load_votes") for fn, _ in calls)
+    assert out["load_proceedings"] == 4
+    # inferred clubs is whole-term (no variant) and still runs for votings
+    assert ("load_inferred_clubs", None) in calls
+
+
+def test_run_loaders_falls_back_to_whole_term_without_keys(monkeypatch):
+    from supagraf.sync import loaders
+
+    calls: list[str] = []
+    monkeypatch.setattr(loaders, "_rpc_int", lambda fn, term: calls.append(fn) or 0)
+    loaders.run_loaders(10, {"proceedings"})
+    assert calls == ["load_proceedings"]
+    calls.clear()
+    # --full always takes the whole-term path
+    loaders.run_loaders(10, {"proceedings"}, full=True, changed_keys={"proceedings": {64}})
+    assert "load_proceedings" in calls and "load_prints" in calls

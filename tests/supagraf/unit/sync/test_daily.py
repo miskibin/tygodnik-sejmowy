@@ -26,7 +26,7 @@ def stubs(monkeypatch):
         return _sync
 
     monkeypatch.setattr(daily, "_resource_fn", fake_resource)
-    monkeypatch.setattr(daily, "run_loaders", lambda term, dirty, full=False: calls["loaders"].append((sorted(dirty), full)) or {})
+    monkeypatch.setattr(daily, "run_loaders", lambda term, dirty, full=False, changed_keys=None: calls["loaders"].append((sorted(dirty), full)) or {})
     monkeypatch.setattr(daily, "run_refreshes", lambda term, dirty, full=False: calls["refresh"].append((sorted(dirty), full)) or {})
     monkeypatch.setattr(daily, "_relink_agenda_refs", lambda term: calls.setdefault("relink", []).append(term))
 

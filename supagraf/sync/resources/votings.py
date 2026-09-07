@@ -16,7 +16,7 @@ from supagraf.etl.watermark import bulk_seal, load_sealed
 from supagraf.schema.votings import Voting
 from supagraf.sync.context import SyncContext
 from supagraf.sync.resources._diff import upsert_changed
-from supagraf.sync.stage import SyncResult, read_index, read_payloads_for
+from supagraf.sync.stage import SyncResult, read_index, read_payloads_for, same_payload
 
 RESOURCE = "votings"
 TABLE = "_stage_votings"
@@ -93,11 +93,15 @@ def sync(ctx: SyncContext) -> SyncResult:
     # Refetched unsealed votings may be byte-identical (votes still not
     # published) — the stored comparison keeps those out of the write set.
     stored = read_payloads_for(TABLE, ctx.term, [nid for nid, _, _ in items]) if items else {}
-    upsert_changed(ctx, res, table=TABLE, model=Voting, items=items, stored=stored)
+    n = upsert_changed(ctx, res, table=TABLE, model=Voting, items=items, stored=stored)
+    # Sittings whose votings were written — the loader plan loads only those.
+    written = {int(nid.split("__")[0]) for nid, payload, _ in items
+               if not (nid in stored and same_payload(stored[nid], payload))} if n else set()
+    res.notes["written_sittings"] = sorted(written)
     if to_seal and not res.errors:
         try:
             bulk_seal("voting", to_seal, source="predicate_votes_captured")
         except Exception as e:  # noqa: BLE001 — watermark is an optimisation
             logger.warning("bulk_seal voting failed: {!r}", e)
-    ctx.mark(RESOURCE, res.dirty)
+    ctx.mark(RESOURCE, res.dirty, written)
     return res

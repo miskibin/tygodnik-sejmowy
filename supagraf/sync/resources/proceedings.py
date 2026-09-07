@@ -194,6 +194,7 @@ def sync(ctx: SyncContext) -> SyncResult:
     res.skipped = res.listed - len(scope)
     res.notes["touched"] = [p["number"] for p in scope]
     sealed = load_sealed("proceeding_body")
+    written: set[int] = set()
 
     for p in scope:
         number = int(p["number"])
@@ -212,6 +213,7 @@ def sync(ctx: SyncContext) -> SyncResult:
             if previous is not None and same_payload(previous, payload):
                 continue
             res.changed += 1
+            before = res.upserted
             res.upserted += upsert_rows(
                 TABLE,
                 [{
@@ -221,6 +223,8 @@ def sync(ctx: SyncContext) -> SyncResult:
                 }],
                 on_conflict="term,number", batch_size=1, errors=res.errors,
             )
+            if res.upserted > before:
+                written.add(number)
             key = f"term{ctx.term}__proc{number}"
             if (
                 not payload["current"] and key not in sealed and _complete(payload)
@@ -230,5 +234,6 @@ def sync(ctx: SyncContext) -> SyncResult:
         except Exception as e:  # noqa: BLE001 — one sitting must not sink the rest
             logger.exception("proceeding {} failed: {!r}", number, e)
             res.errors.append((str(number), repr(e)[:300]))
-    ctx.mark(RESOURCE, res.dirty)
+    res.notes["written"] = sorted(written)
+    ctx.mark(RESOURCE, res.dirty, written)
     return res
