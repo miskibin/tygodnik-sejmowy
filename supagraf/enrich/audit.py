@@ -34,7 +34,7 @@ ERROR_MAX_CHARS = 4000
 # Supabase via Tailscale (mixvm) sees intermittent RemoteProtocolError +
 # ReadError under concurrent load — retry transport-layer drops on top of
 # the postgrest API errors.
-_RETRY_EXC = (
+DB_RETRY_EXC = (
     APIError,
     httpx.RemoteProtocolError,
     httpx.ReadError,
@@ -55,7 +55,7 @@ def _validate_entity_type(et: str) -> None:
 
 
 @retry(
-    retry=retry_if_exception_type(_RETRY_EXC),
+    retry=retry_if_exception_type(DB_RETRY_EXC),
     stop=stop_after_attempt(5),
     wait=wait_exponential(multiplier=1, min=1, max=8),
     reraise=True,
@@ -75,7 +75,7 @@ def _insert_run(fn_name: str, model: str, prompt_version: str | None,
 
 
 @retry(
-    retry=retry_if_exception_type(_RETRY_EXC),
+    retry=retry_if_exception_type(DB_RETRY_EXC),
     stop=stop_after_attempt(5),
     wait=wait_exponential(multiplier=1, min=1, max=8),
     reraise=True,
@@ -93,7 +93,7 @@ def _record_failure(model_run_id: int, entity_type: str, entity_id: str,
 
 
 @retry(
-    retry=retry_if_exception_type(_RETRY_EXC),
+    retry=retry_if_exception_type(DB_RETRY_EXC),
     stop=stop_after_attempt(5),
     wait=wait_exponential(multiplier=1, min=1, max=8),
     reraise=True,
