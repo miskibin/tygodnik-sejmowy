@@ -75,3 +75,11 @@ def test_unknown_persona_tag_is_dropped_not_rejected():
 
     fn = PrintUnifiedOutput._drop_unknown_persona_tags
     assert fn(["rolnik", "zdrowie"]) == ["rolnik"]
+
+
+def test_affected_group_with_unknown_tag_is_dropped():
+    from supagraf.enrich.print_unified import PrintUnifiedOutput
+
+    fn = PrintUnifiedOutput._drop_unknown_affected_groups
+    groups = [{"tag": "mieszkaniec", "severity": "high"}, {"tag": "najemca", "severity": "low"}]
+    assert fn(groups) == [{"tag": "najemca", "severity": "low"}]

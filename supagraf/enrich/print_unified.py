@@ -343,6 +343,16 @@ class PrintUnifiedOutput(BaseModel):
     def _drop_unknown_persona_tags(cls, v: object) -> object:
         return _keep_known(v, PERSONA_TAGS, "persona_tags")
 
+    @field_validator("affected_groups", mode="before")
+    @classmethod
+    def _drop_unknown_affected_groups(cls, v: object) -> object:
+        if not isinstance(v, list):
+            return v
+        unknown = [g.get("tag") for g in v if isinstance(g, dict) and g.get("tag") not in PERSONA_TAGS]
+        if unknown:
+            logger.warning("dropping affected_groups with unknown tag {}", unknown)
+        return [g for g in v if not isinstance(g, dict) or g.get("tag") in PERSONA_TAGS]
+
     @field_validator("topic_tags", mode="after")
     @classmethod
     def _trim_topic_tags_to_3(cls, v: list[str]) -> list[str]:
