@@ -68,3 +68,10 @@ def test_unknown_topic_tag_is_dropped_not_rejected():
     fn = PrintUnifiedOutput._drop_unknown_topic_tags
     assert fn(["zdrowie", "konsument", "transport"]) == ["zdrowie", "transport"]
     assert fn("not-a-list") == "not-a-list"
+
+
+def test_unknown_persona_tag_is_dropped_not_rejected():
+    from supagraf.enrich.print_unified import PrintUnifiedOutput
+
+    fn = PrintUnifiedOutput._drop_unknown_persona_tags
+    assert fn(["rolnik", "zdrowie"]) == ["rolnik"]

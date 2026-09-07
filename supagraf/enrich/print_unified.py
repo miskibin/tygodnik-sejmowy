@@ -247,6 +247,19 @@ class UnifiedAffectedGroup(BaseModel):
         return None
 
 
+def _keep_known(v: object, taxonomy: tuple[str, ...], field: str) -> object:
+    """Salvage the print when the model invents a tag ("konsument" as a topic).
+
+    The taxonomies are our own guard; one off-list label is not worth losing
+    summary, impact and mentions for the whole print."""
+    if not isinstance(v, list):
+        return v
+    unknown = [t for t in v if t not in taxonomy]
+    if unknown:
+        logger.warning("dropping unknown {} {}", field, unknown)
+    return [t for t in v if t in taxonomy]
+
+
 class PrintUnifiedOutput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -323,16 +336,12 @@ class PrintUnifiedOutput(BaseModel):
     @field_validator("topic_tags", mode="before")
     @classmethod
     def _drop_unknown_topic_tags(cls, v: object) -> object:
-        """Salvage the print when the model invents a tag ("konsument").
+        return _keep_known(v, TOPIC_TAGS, "topic_tags")
 
-        The taxonomy is our own guard; one off-list label is not worth
-        losing summary, impact and mentions for the whole print."""
-        if not isinstance(v, list):
-            return v
-        unknown = [t for t in v if t not in TOPIC_TAGS]
-        if unknown:
-            logger.warning("dropping unknown topic_tags {}", unknown)
-        return [t for t in v if t in TOPIC_TAGS]
+    @field_validator("persona_tags", mode="before")
+    @classmethod
+    def _drop_unknown_persona_tags(cls, v: object) -> object:
+        return _keep_known(v, PERSONA_TAGS, "persona_tags")
 
     @field_validator("topic_tags", mode="after")
     @classmethod
