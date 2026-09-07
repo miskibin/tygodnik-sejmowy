@@ -42,10 +42,25 @@ from supagraf.enrich.audit import with_model_run
 from supagraf.enrich.llm import call_structured
 from supagraf.enrich.pdf import extract_pdf, extract_pdf_cover
 from supagraf.enrich.pdf_fetch import resolve_print_pdf
-from supagraf.enrich.print_personas import PersonaTag
 
 JOB_NAME = "print_unified"
 PROMPT_NAME = "print_unified"
+
+# Persona taxonomy (26 tags, mig 0016/0031). Must match the prompt's list.
+PERSONA_TAGS = (
+    "najemca", "wlasciciel-mieszkania", "rodzic-ucznia", "pacjent-nfz", "kierowca-zawodowy",
+    "rolnik", "jdg", "emeryt", "pracownik-najemny", "student", "przedsiebiorca-pracodawca",
+    "niepelnosprawny", "wies", "duze-miasto", "podatnik-pit", "podatnik-vat", "kierowca-prywatny",
+    "odbiorca-energii", "beneficjent-rodzinny", "opiekun-seniora", "dzialkowicz", "wedkarz",
+    "mysliwy", "hodowca", "konsument", "imigrant",
+)
+PersonaTag = Literal[
+    "najemca", "wlasciciel-mieszkania", "rodzic-ucznia", "pacjent-nfz", "kierowca-zawodowy",
+    "rolnik", "jdg", "emeryt", "pracownik-najemny", "student", "przedsiebiorca-pracodawca",
+    "niepelnosprawny", "wies", "duze-miasto", "podatnik-pit", "podatnik-vat", "kierowca-prywatny",
+    "odbiorca-energii", "beneficjent-rodzinny", "opiekun-seniora", "dzialkowicz", "wedkarz",
+    "mysliwy", "hodowca", "konsument", "imigrant",
+]
 
 # Topic taxonomy locked v1 (mig 0061). Multi-label: a print may belong to
 # multiple topics (e.g. "Kodeks pracy" -> sady-prawa + praca-zus).
@@ -126,9 +141,9 @@ def pick_model(meta_row: dict) -> str:
 # the entry-into-force / transitional articles at the end survive.
 MAX_INPUT_CHARS = int(os.environ.get("SUPAGRAF_PRINT_MAX_INPUT_CHARS", "240000"))
 TAIL_CHARS = 20000
-# Reasoning mode for the unified print call. Prints are low-volume and
-# citizen-facing, so a little thinking is worth its output tokens.
-PRINT_THINKING = os.environ.get("SUPAGRAF_PRINT_THINKING", "low")
+# Reasoning mode for the unified print call. "off" keeps a print at ~1k
+# output tokens; "low" adds ~4k reasoning tokens (≈ 3x the cost per print).
+PRINT_THINKING = os.environ.get("SUPAGRAF_PRINT_THINKING", "off")
 PLAIN_MIN_WORDS = 20
 PLAIN_MAX_WORDS = 300
 

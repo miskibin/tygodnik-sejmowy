@@ -70,10 +70,11 @@ Not touched by the daily: districts, postcodes, promises,
 mp_office_expenses (external sources — `stage <resource>` + `load`).
 
 Removed with the rewrite (all replaced by `sync <resource> [--full]`):
-`backfill-prints`, `backfill-processes`, `fetch proceeding-bodies`,
-`fetch committees`, `fetch committee-sittings`, and the
-`supagraf/fetch/{proceedings_bodies,proceeding_agendas,committees,
-committee_sittings}.py` modules.
+`backfill-prints`, `backfill-processes`, `fetch proceeding-bodies|committees|
+committee-sittings|acts`, `fixtures <sejm resource>` capture, the per-resource
+`supagraf/stage/*` modules for Sejm data, the legacy `supagraf/fetch/*`
+fetchers, the seven per-field print enrichers (unified covers them), the
+gemini/ollama chat backends and the PaddleOCR path.
 
 ## Code map
 
@@ -130,8 +131,8 @@ bodies the DB already has.
 ## LLM
 
 * Prints: `deepseek-v4-flash-vision-exp` (`SUPAGRAF_LLM_MODEL_VISION`) for
-  every print, text in, JSON out, `thinking=low`
-  (`SUPAGRAF_PRINT_THINKING`). Input budget is 240 000 chars head+tail
+  every print, text in, JSON out, `thinking=off` (`SUPAGRAF_PRINT_THINKING=low`
+  buys ~4k reasoning tokens per print, ≈3× the cost). Input budget is 240 000 chars head+tail
   (`SUPAGRAF_PRINT_MAX_INPUT_CHARS`) — the old 8 000-char cap dropped ~95 %
   of a typical bill. The legacy pro/flash router is behind
   `SUPAGRAF_LLM_ROUTING=pro_flash`.

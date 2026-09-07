@@ -3,29 +3,16 @@ from __future__ import annotations
 
 import os
 import re
-from enum import Enum
 from pathlib import Path
-from typing import Callable
 
 import typer
 from loguru import logger
 
 from supagraf.db import supabase
 from supagraf.load import run_core_load
-from supagraf.stage import acts as stage_acts
-from supagraf.stage import bills as stage_bills
-from supagraf.stage import clubs as stage_clubs
-from supagraf.stage import committees as stage_committees
-from supagraf.stage import committee_sittings as stage_committee_sittings
 from supagraf.stage import districts as stage_districts
 from supagraf.stage import mp_office_expenses as stage_mp_office_expenses
-from supagraf.stage import mps as stage_mps
-from supagraf.stage import proceedings as stage_proceedings
-from supagraf.stage import processes as stage_processes
 from supagraf.stage import promises as stage_promises
-from supagraf.stage import questions as stage_questions
-from supagraf.stage import videos as stage_videos
-from supagraf.stage import votings as stage_votings
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 enrich_app = typer.Typer(no_args_is_help=True, add_completion=False)
@@ -215,43 +202,27 @@ def cmd_backfill_all(dry_run: bool = typer.Option(False, "--dry-run")):
 
 @app.command("stage")
 def cmd_stage(
-    resources: list[str] = typer.Argument(None, help="mps|clubs|votings|committees|committee_sittings|processes|bills|questions|videos|proceedings|districts|postcodes|promises|acts|mp_office_expenses (default: all)"),
+    resources: list[str] = typer.Argument(None, help="districts|postcodes|promises|mp_office_expenses (default: all)"),
     term: int = 10,
 ):
-    """Stage fixture JSON to _stage_* tables."""
-    targets = resources or [
-        "clubs", "mps", "votings", "committees", "committee_sittings",
-        "processes", "bills",
-        "questions", "videos", "proceedings",
-        "districts", "postcodes", "promises",
-        "acts", "mp_office_expenses",
-    ]
+    """Stage the external (non-Sejm-API) fixture JSON to `_stage_*`.
+
+    Sejm resources go through `sync <resource>`; this covers the sources that
+    are still curated as files under fixtures/external/.
+    """
     runners = {
-        "clubs": stage_clubs.stage,
-        "mps": stage_mps.stage,
-        "votings": stage_votings.stage,
-        "committees": stage_committees.stage,
-        "committee_sittings": stage_committee_sittings.stage,
-        "processes": stage_processes.stage,
-        "bills": stage_bills.stage,
-        "questions": stage_questions.stage,
-        "videos": stage_videos.stage,
-        "proceedings": stage_proceedings.stage,
         "districts": stage_districts.stage_districts,
         "postcodes": stage_districts.stage_district_postcodes,
         "promises": stage_promises.stage_promises,
-        "acts": stage_acts.stage,
         "mp_office_expenses": stage_mp_office_expenses.stage,
     }
-    for r in targets:
+    for r in resources or list(runners):
         if r not in runners:
-            logger.error("unknown resource: {}", r)
+            logger.error("unknown resource: {} (known: {})", r, ", ".join(runners))
             raise typer.Exit(1)
         report = runners[r](term=term)
         if not report.ok():
-            logger.error("stage {} failed: {} errors", r, len(report.errors))
-            for src, err in report.errors[:5]:
-                logger.error("  {}: {}", src, err)
+            logger.error("stage {} failed: {} errors: {}", r, len(report.errors), report.errors[:5])
             raise typer.Exit(2)
 
 
@@ -302,7 +273,6 @@ def cmd_backfill_sponsor_authority(
     — exactly the failure mode the project memory rule flags. The function
     refuses to run when it detects an off-VM environment.
     """
-    import os
     import re
     from urllib.parse import urlparse
 
@@ -412,229 +382,26 @@ def cmd_backfill_sponsor_authority(
 # ---- enrich subcommand ----------------------------------------------------
 
 
-class EnrichKind(str, Enum):
-    # unified does all 7 LLM outputs in one call (~5x cheaper, ~5x faster)
-    unified = "unified"
-    summary = "summary"
-    stance = "stance"
-    mentions = "mentions"
-    personas = "personas"
-    action = "action"
-    plain_polish = "plain_polish"
-    impact = "impact"
-    embed = "embed"
-    all = "all"
-
-
-def _pending_query(kind: EnrichKind, term: int):
-    """Pending = needs this enrichment. Uses partial indexes added in
-    0014/0016/0017/0018 so each run scans only what's left to do.
-
-    Testing-phase rollout: SUPAGRAF_LLM_TESTING_FROM_DATE (ISO date) caps the
-    scan to prints with change_date >= that date. Older corpus stays on
-    whatever model produced its existing rows.
-    """
-    import os
-    client = supabase()
-    q = client.table("prints").select(
-        "id, term, number, attachments:print_attachments(filename, ordinal)"
-    )
-    q = q.eq("term", term)
-    testing_from = os.environ.get("SUPAGRAF_LLM_TESTING_FROM_DATE")
-    if testing_from:
-        q = q.gte("change_date", testing_from)
-    if kind == EnrichKind.summary:
-        q = q.is_("summary", "null")
-    elif kind == EnrichKind.stance:
-        q = q.is_("stance", "null")
-    elif kind == EnrichKind.mentions:
-        q = q.is_("mentions_extracted_at", "null")
-    elif kind == EnrichKind.personas:
-        q = q.is_("persona_tags", "null")
-    elif kind == EnrichKind.action:
-        q = q.is_("citizen_action_model", "null")
-    elif kind == EnrichKind.plain_polish:
-        q = q.is_("summary_plain", "null")
-    elif kind == EnrichKind.impact:
-        q = q.is_("impact_punch", "null")
-    elif kind == EnrichKind.embed:
-        # embed pulls from prints.summary, so require summary present.
-        q = q.is_("embedded_at", "null").not_.is_("summary", "null")
-    elif kind == EnrichKind.unified:
-        # Unified pending = any of the 7 fields missing. Practical filter:
-        # impact_punch is the last field set so its absence covers most cases
-        # (drukı that have summary but no impact still need unified-or-impact).
-        q = q.is_("impact_punch", "null")
-    return q
-
-
-from supagraf.enrich.jobs import resolve_print_document as _resolve_pdf_relpath  # noqa: E402
-
-
-def _runner_for(kind: EnrichKind) -> Callable:
-    # Late import — avoids circular imports + speeds CLI startup when not needed.
-    if kind == EnrichKind.unified:
-        from supagraf.enrich.print_unified import enrich_print_unified
-        return enrich_print_unified
-    if kind == EnrichKind.summary:
-        from supagraf.enrich.print_summary import summarize_print
-        return summarize_print
-    if kind == EnrichKind.stance:
-        from supagraf.enrich.print_stance import classify_stance
-        return classify_stance
-    if kind == EnrichKind.mentions:
-        from supagraf.enrich.print_mentions import extract_mentions
-        return extract_mentions
-    if kind == EnrichKind.personas:
-        from supagraf.enrich.print_personas import tag_personas
-        return tag_personas
-    if kind == EnrichKind.action:
-        from supagraf.enrich.print_action import suggest_print_action
-        return suggest_print_action
-    if kind == EnrichKind.plain_polish:
-        from supagraf.enrich.print_plain_polish import summarize_plain_polish
-        return summarize_plain_polish
-    if kind == EnrichKind.impact:
-        from supagraf.enrich.print_impact import assess_impact
-        return assess_impact
-    if kind == EnrichKind.embed:
-        from supagraf.enrich.embed_print import embed_print
-        return embed_print
-    raise ValueError(f"no single runner for {kind}")
-
-
-# Consecutive attachment-fetch failures that mean "upstream is down, stop
-# trying" rather than "these particular prints are bad".
-_FETCH_OUTAGE_THRESHOLD = int(os.environ.get("SUPAGRAF_FETCH_OUTAGE_THRESHOLD", "8"))
-
-
-def _run_kind_for_prints(kind: EnrichKind, prints_rows: list[dict]) -> tuple[int, int, int]:
-    """Returns (ok, failed, skipped). Failures logged + continue per plan:
-    one bad print does not abort the loop — the @with_model_run decorator
-    already records the failure to enrichment_failures + status='failed'.
-
-    Each row is expected to carry `term` so the runner can scope DB lookups
-    to (term, number) rather than just number — multi-term collisions are
-    a real risk once historical terms get loaded.
-    """
-    runner = _runner_for(kind)
-    ok = failed = skipped = 0
-    consecutive_fetch_failures = 0
-    needs_pdf = kind != EnrichKind.embed  # embed reads summary from DB; others need PDF
-    for i, row in enumerate(prints_rows):
-        try:
-            kwargs = {
-                "entity_type": "print",
-                "entity_id": row["number"],
-            }
-            # Only LLM enrichers accept term (for multi-term DB scoping).
-            # embed_print signature doesn't take it.
-            if kind != EnrichKind.embed:
-                kwargs["term"] = row.get("term", 10)
-            if needs_pdf:
-                rp = _resolve_pdf_relpath(row)
-                if rp is None:
-                    logger.warning("print {} has no .pdf attachment — skipping {}", row["number"], kind.value)
-                    skipped += 1
-                    continue
-                runner(pdf_relpath=rp, **kwargs)
-            else:
-                runner(**kwargs)
-            ok += 1
-            consecutive_fetch_failures = 0
-        except Exception as e:
-            # Scanned PDFs (no text layer) raise from pymupdf+pypdf. Treat as
-            # 'skipped' rather than 'failed' so totals reflect actionable
-            # failures (LLM/network/schema), not an inherent property of the
-            # source. The audit row is still written by @with_model_run with
-            # status='failed' for traceability.
-            from supagraf.enrich.pdf_fetch import PdfFetchError, PrintGoneError
-
-            msg = str(e)
-            # Upstream-wide outage guard. When api.sejm.gov.pl's document
-            # backend goes down it 502s after a 60 s hang on EVERY attachment
-            # (metadata keeps answering instantly), so the loop would spend
-            # minutes per print for hours and finish with nothing enriched.
-            # Bail out and leave the rest pending for the next run.
-            if isinstance(e, PdfFetchError) and not isinstance(e, PrintGoneError):
-                consecutive_fetch_failures += 1
-                if consecutive_fetch_failures >= _FETCH_OUTAGE_THRESHOLD:
-                    logger.error(
-                        "enrich {}: {} consecutive fetch failures — upstream looks "
-                        "down, aborting this phase ({} prints left pending)",
-                        kind.value, consecutive_fetch_failures, len(prints_rows) - i,
-                    )
-                    failed += 1
-                    break
-            else:
-                consecutive_fetch_failures = 0
-            if isinstance(e, PrintGoneError):
-                # Withdrawn/renumbered upstream — nothing to retry tomorrow.
-                logger.warning("enrich {} {} skipped (gone upstream): {}", kind.value, row["number"], e)
-                skipped += 1
-            elif "0 chars" in msg or "scanned PDF" in msg or "no .pdf attachment" in msg:
-                logger.warning("enrich {} {} skipped (no text layer): {}", kind.value, row["number"], type(e).__name__)
-                skipped += 1
-            else:
-                logger.error("enrich {} {} failed: {!r}", kind.value, row["number"], e)
-                failed += 1
-    return ok, failed, skipped
-
-
 @enrich_app.command("prints")
 def cmd_enrich_prints(
-    kind: EnrichKind = typer.Option(..., "--kind", "-k", help="summary|stance|mentions|personas|action|plain_polish|impact|embed|all"),
+    kind: str = typer.Option("unified", "--kind", "-k", help="unified | embed"),
     term: int = typer.Option(10, "--term", "-t"),
     limit: int = typer.Option(0, "--limit", "-n", help="0 = no cap"),
-    workers: int = typer.Option(0, "--workers", "-w", help="unified only: concurrent prints (0 = SUPAGRAF_ENRICH_WORKERS or 4)"),
+    workers: int = typer.Option(0, "--workers", "-w", help="concurrent prints (0 = SUPAGRAF_ENRICH_WORKERS)"),
 ):
-    """Run an enrichment job over prints that don't yet have it.
+    """Unified LLM enrichment (all citizen-facing fields in one call) or the
+    qwen3 embedding pass over prints that still lack it. Exit 3 on failures."""
+    from supagraf.enrich.jobs import DEFAULT_WORKERS, embed_pending_prints, enrich_pending_prints
 
-    Uses partial indexes (summary_pending, stance_pending, mentions_pending,
-    embedding_pending) so each run scans only what's left. Failures don't
-    abort the loop; check enrichment_failures + model_runs(status='failed')
-    for diagnostics. Exit 3 if any failures so scripts notice.
-
-    `--kind unified` runs the concurrent runner from supagraf.enrich.jobs
-    (failure backoff + upstream-outage guard); the per-field kinds keep the
-    sequential legacy loop.
-    """
-    if kind == EnrichKind.unified:
-        from supagraf.enrich.jobs import DEFAULT_WORKERS, enrich_pending_prints
-
+    if kind == "unified":
         st = enrich_pending_prints(term=term, limit=limit, workers=workers or DEFAULT_WORKERS)
-        print(f"\nenrich unified: ok={st.ok} failed={st.failed} skipped={st.skipped} "
-              f"backoff={st.backoff} aborted={st.aborted}")
-        if st.failed > 0 or st.aborted:
-            raise typer.Exit(3)
-        return
-    kinds = (
-        # embed last — depends on prints.summary produced by the summary job.
-        [EnrichKind.summary, EnrichKind.stance, EnrichKind.mentions,
-         EnrichKind.personas, EnrichKind.action,
-         EnrichKind.plain_polish, EnrichKind.impact, EnrichKind.embed]
-        if kind == EnrichKind.all
-        else [kind]
-    )
-    totals = {"ok": 0, "failed": 0, "skipped": 0}
-    for k in kinds:
-        q = _pending_query(k, term)
-        if limit > 0:
-            q = q.limit(limit)
-        rows = q.execute().data or []
-        if not rows:
-            logger.info("enrich {}: no pending prints (term={})", k.value, term)
-            continue
-        logger.info("enrich {}: {} pending prints", k.value, len(rows))
-        ok, failed, skipped = _run_kind_for_prints(k, rows)
-        totals["ok"] += ok
-        totals["failed"] += failed
-        totals["skipped"] += skipped
-        logger.info("enrich {} done: ok={} failed={} skipped={}", k.value, ok, failed, skipped)
-
-    print(f"\nenrich totals: ok={totals['ok']} failed={totals['failed']} skipped={totals['skipped']}")
-    if totals["failed"] > 0:
-        # Non-zero exit so CI / scripts see the partial failure.
+    elif kind == "embed":
+        st = embed_pending_prints(term=term, limit=limit)
+    else:
+        logger.error("unknown kind {!r}: expected unified | embed", kind)
+        raise typer.Exit(1)
+    logger.info("enrich {}: {}", kind, st.to_dict())
+    if st.failed or st.aborted:
         raise typer.Exit(3)
 
 
@@ -872,21 +639,18 @@ def cmd_refresh_aggregates():
 
 @app.command("fetch")
 def cmd_fetch(
-    resource: str = typer.Argument(..., help="mp-photos|acts|mp-office-expenses"),
+    resource: str = typer.Argument(..., help="mp-photos|mp-office-expenses"),
     term: int = typer.Option(10, "--term", "-t"),
     throttle_s: float = typer.Option(0.2, "--throttle", help="seconds between requests (5 req/s default)"),
     limit: int = typer.Option(0, "--limit", "-n", help="cap on statements to attempt; 0 = no cap"),
-    publisher: str = typer.Option("both", "--publisher",
-        help="for acts: 'du' | 'mp' | 'both' (default 'both' covers Dziennik Ustaw + Monitor Polski)"),
-    year: int = typer.Option(0, "--year",
-        help="for acts: single year override (0 = use SUPAGRAF_ELI_YEARS env / default)"),
+    year: int = typer.Option(0, "--year", help="for mp-office-expenses: reporting year (default 2025)"),
     force: bool = typer.Option(False, "--force", help="for mp-office-expenses: re-fetch cached PDFs"),
     workers: int = typer.Option(1, "--workers", "-w",
         help="for mp-office-expenses: parallel fetch+OCR+LLM workers (1=sequential; "
              "recommended 4–6 for full 460-PDF run)"),
 ):
-    """Fetch real-data assets outside the Sejm JSON API (photos, ELI years,
-    office-expense PDFs). Sejm resources go through `sync`."""
+    """Fetch real-data assets outside the Sejm JSON API (photos,
+    office-expense PDFs). Sejm + ELI resources go through `sync`."""
     if resource == "mp-photos":
         # P3.3 — extension. Dispatch added here so `cmd_fetch` stays the single
         # entry point. `--limit` is ignored for this resource (state-driven).
@@ -896,28 +660,6 @@ def cmd_fetch(
             f"\nfetch mp-photos: checked={rep.checked} has_photo={rep.has_photo} "
             f"no_photo={rep.no_photo} errors={rep.errors}"
         )
-        return
-    if resource == "acts":
-        # P4.2 — ELI acts. Years scoped via --year (single override) or
-        # SUPAGRAF_ELI_YEARS env (CSV) defaulting to 2024,2025,2026.
-        # `--publisher` selects DU (Dziennik Ustaw), MP (Monitor Polski),
-        # or 'both' (default — needed for full process->act coverage; ~half
-        # the passed processes culminate in MP entries, not DU).
-        # `--limit` caps detail fetches per (publisher, year).
-        import os
-        from supagraf.fetch.acts import fetch_acts
-        if year > 0:
-            years = [year]
-        else:
-            years_env = os.environ.get("SUPAGRAF_ELI_YEARS", "2024,2025,2026")
-            years = [int(y.strip()) for y in years_env.split(",") if y.strip()]
-        report = fetch_acts(
-            years=years,
-            publisher=publisher,
-            throttle_s=throttle_s,
-            limit_per_year=limit,
-        )
-        print(f"\nfetch acts: {report}")
         return
     if resource == "mp-office-expenses":
         # MP office expense reports (sprawozdania wydatków biur poselskich).

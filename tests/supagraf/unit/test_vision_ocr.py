@@ -52,7 +52,7 @@ def test_transcribe_pdf_one_call_per_page_and_per_page_counts(tmp_path, monkeypa
 
     def fake_call(*, model, system, user_text, images, timeout_s=0, thinking="off", max_tokens=None):
         seen.append((len(images), max_tokens))
-        return "Druk nr 123\nPodpisali: (-) Jan Kowalski", TokenUsage(10, 20)
+        return "Druk nr 123\nPodpisali: (-) Jan Kowalski", TokenUsage(input_tokens=10, output_tokens=20)
 
     monkeypatch.setattr(vision_ocr, "call_vision_text", fake_call)
     text, per_page = vision_ocr.transcribe_pdf(pdf)

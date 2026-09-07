@@ -1,7 +1,6 @@
 """Pydantic schema unit tests for Video."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -12,16 +11,6 @@ from supagraf.schema.videos import Video
 REPO_ROOT = Path(__file__).resolve().parents[3]
 VIDEOS_DIR = REPO_ROOT / "fixtures" / "sejm" / "videos"
 SAMPLE = VIDEOS_DIR / "004BBF920E8397E2C1258D950045099C.json"
-
-
-def test_round_trip_real_fixture():
-    payload = json.loads(SAMPLE.read_text(encoding="utf-8"))
-    obj = Video.model_validate(payload)
-    assert obj.unid == "004BBF920E8397E2C1258D950045099C"
-    assert obj.type == "komisja"
-    assert obj.committee == "RSP"
-    assert obj.transcribe is False
-    assert obj.start_datetime is not None
 
 
 def test_extras_rejected():

@@ -50,7 +50,7 @@ def _env(monkeypatch, tmp_path):
     monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
     monkeypatch.delenv("SUPAGRAF_LLM_THINKING", raising=False)
     monkeypatch.setattr(llm_mod, "DEFAULT_THINKING", "off")
-    monkeypatch.setattr(llm_mod._post_deepseek.retry, "wait", wait_none())
+    monkeypatch.setattr(llm_mod._post.retry, "wait", wait_none())
     d = tmp_path / "p"
     d.mkdir()
     (d / "v1.md").write_text("system prompt", encoding="utf-8")
@@ -136,10 +136,34 @@ def test_images_become_data_url_parts(monkeypatch):
     assert content[-1] == {"type": "text", "text": "read"}
 
 
-def test_images_rejected_on_non_deepseek_backend(monkeypatch):
-    monkeypatch.setenv("SUPAGRAF_LLM_BACKEND", "ollama")
-    with pytest.raises(llm_mod.LLMResponseError, match="deepseek"):
-        llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out, images=[b"\x89PNG\r\n\x1a\n"])
+def test_bad_image_bytes_rejected(monkeypatch):
+    _capture(monkeypatch, [])
+    with pytest.raises(llm_mod.LLMResponseError, match="PNG/JPEG"):
+        llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out, images=[b"notanimage"])
+
+
+def test_prompt_resolution_picks_highest_version_and_pins(monkeypatch, tmp_path):
+    d = tmp_path / "q"
+    d.mkdir()
+    for v in (1, 2, 10):
+        (d / f"v{v}.md").write_text(f"prompt v{v}", encoding="utf-8")
+    monkeypatch.setattr(llm_mod, "PROMPTS_DIR", tmp_path)
+    ref = llm_mod._resolve_prompt("q")
+    assert ref.version == 10 and ref.body == "prompt v10" and len(ref.sha256) == 64
+    assert llm_mod._resolve_prompt("q", 2).version == 2
+    with pytest.raises(FileNotFoundError):
+        llm_mod._resolve_prompt("q", 99)
+    with pytest.raises(FileNotFoundError):
+        llm_mod._resolve_prompt("missing")
+
+
+def test_schema_mismatch_and_bad_json_are_response_errors(monkeypatch):
+    _capture(monkeypatch, [_ok('{"b": 1}')])
+    with pytest.raises(llm_mod.LLMResponseError, match="failed Out schema"):
+        llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
+    _capture(monkeypatch, [_ok("not json {{")])
+    with pytest.raises(llm_mod.LLMResponseError, match="not JSON"):
+        llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
 
 
 def test_call_vision_text_returns_raw_text(monkeypatch):

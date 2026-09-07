@@ -16,7 +16,9 @@ transcripts and an empty `statements[]` means "not published yet".
 """
 from __future__ import annotations
 
+import re
 from datetime import date, timedelta
+from html.parser import HTMLParser
 
 from loguru import logger
 from pydantic import ValidationError
@@ -25,13 +27,37 @@ from supagraf.db import call_rpc_table, supabase
 from supagraf.etl import watermark
 from supagraf.schema.proceedings import ProceedingDayIn, ProceedingIn
 from supagraf.stage.agenda_parser import parse_agenda
-from supagraf.stage.proceedings import _html_to_text
 from supagraf.sync import stage
 from supagraf.sync.context import SyncContext
 from supagraf.sync.http import UpstreamError
 from supagraf.sync.stage import SyncResult
 
 TABLE = "_stage_proceedings"
+_WS = re.compile(r"\s+")
+
+
+class _Text(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.parts: list[str] = []
+        self.skip = 0
+
+    def handle_starttag(self, tag, attrs):
+        self.skip += tag in ("script", "style", "head")
+
+    def handle_endtag(self, tag):
+        self.skip -= tag in ("script", "style", "head") and self.skip > 0
+
+    def handle_data(self, data):
+        if not self.skip:
+            self.parts.append(data)
+
+
+def _html_to_text(html: str) -> str:
+    p = _Text()
+    p.feed(html)
+    p.close()
+    return _WS.sub(" ", " ".join(p.parts)).strip()
 
 
 def _dates(p: dict) -> list[date]:

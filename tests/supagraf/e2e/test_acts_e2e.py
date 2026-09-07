@@ -13,7 +13,6 @@ import pytest
 
 from supagraf.db import supabase
 from supagraf.fetch.acts import fetch_acts
-from supagraf.fixtures.storage import fixtures_root
 from supagraf.stage import acts as stage_acts
 
 pytestmark = pytest.mark.skipif(

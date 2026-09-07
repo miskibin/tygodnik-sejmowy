@@ -128,8 +128,8 @@ def transcribe_pdf(path: Path) -> tuple[str, list[int]]:
 
     `chars_per_page` has one entry per *source* page (omitted middle pages
     report 0) so the pdf_extracts CHECK on array length holds.
-    Raises VisionOcrUnavailable when the path is disabled; LLM errors
-    propagate so the caller can fall back to Tesseract.
+    Raises VisionOcrUnavailable (a RuntimeError) when the path is disabled and
+    RuntimeError when a page fails, so the caller can fall back to Tesseract.
     """
     if not vision_ocr_available():
         raise VisionOcrUnavailable("vision OCR disabled or DEEPSEEK_API_KEY missing")
