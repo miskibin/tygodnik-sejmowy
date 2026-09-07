@@ -196,6 +196,21 @@ one-shot. Keep `SUPAGRAF_LOAD_DIRECT_DSN` set there — `load_votes`,
 timeout when they run through PostgREST. The `fixtures/` bind mount is no
 longer needed by the daily.
 
+## Dashboard
+
+`etl_runs` / `etl_cursors` are also readable from the frontend at
+[`/admin/etl`](../frontend/app/admin/etl/page.tsx) — the last run and its
+status, a duration strip, one expandable row per run with the full per-step
+breakdown (status, duration, counters, error text) plus the run `args`, and a
+card listing the delta cursors. Filters `?kind=daily|sync` and
+`?limit=25|50|100`.
+
+The page is gated by a single shared password in the frontend's
+`ETL_DASHBOARD_PASSWORD` env var (Portainer stack var, see
+`deploy/mixvm/docker-compose.frontend.yml`). Unset or empty and the route
+404s, so an undeployed config cannot expose the ledger. It reads through the
+anon key like the rest of the site — strictly read-only.
+
 ## First live runs (2026-09-07)
 
 Prod had not completed a daily since 2026-07-28. The rewrite's first pass
