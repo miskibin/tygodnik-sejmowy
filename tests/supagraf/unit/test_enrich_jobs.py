@@ -86,3 +86,40 @@ def test_statements_pick_newest_sitting_with_pending(monkeypatch):
     monkeypatch.setattr(llm, "_resolve_prompt", lambda name: type("P", (), {"version": 1, "sha256": "x"})())
     st = jobs.enrich_pending_statements(term=10, workers=2)
     assert st.ok == 2 and sorted(done) == ["1", "2"]
+
+
+def test_budget_error_stops_prints_phase_without_failing_the_rest(monkeypatch, pending):
+    monkeypatch.setattr(jobs, "recent_failure_counts", lambda fn, et, days=14: {})
+    from supagraf.enrich.llm import LLMBudgetError
+    attempted: list[str] = []
+
+    def runner(**kw):
+        attempted.append(kw["entity_id"])
+        raise LLMBudgetError("deepseek 402: Insufficient Balance")
+
+    import supagraf.enrich.print_unified as pu
+    monkeypatch.setattr(pu, "enrich_print_unified", runner)
+    st = jobs.enrich_pending_prints(term=10, workers=1)
+    assert st.aborted and st.failed == 0 and st.ok == 0
+    assert len(attempted) == 1
+    assert "402" in st.errors[0][1]
+
+
+def test_budget_error_stops_statements_phase(monkeypatch):
+    import supagraf.enrich.llm as llm
+    import supagraf.enrich.utterance_enrich as ue
+    from supagraf.enrich.llm import LLMBudgetError
+    monkeypatch.setattr(jobs, "sittings_with_pending_statements", lambda term: [64])
+    monkeypatch.setattr(ue, "fetch_pending_statements", lambda term, sitting_num, limit: [
+        {"id": i, "body_text": "x"} for i in range(20)])
+    monkeypatch.setattr(llm, "_resolve_prompt", lambda name: type("P", (), {"version": 1, "sha256": "x"})())
+    calls: list[str] = []
+
+    def runner(**kw):
+        calls.append(kw["entity_id"])
+        raise LLMBudgetError("deepseek 402: Insufficient Balance")
+
+    monkeypatch.setattr(ue, "enrich_one_statement", runner)
+    st = jobs.enrich_pending_statements(term=10, workers=1)
+    assert st.aborted and st.failed == 0
+    assert len(calls) == 1
