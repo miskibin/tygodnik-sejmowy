@@ -69,6 +69,39 @@ are kept in that space.
 Not touched by the daily: districts, postcodes, promises,
 mp_office_expenses (external sources — `stage <resource>` + `load`).
 
+Removed with the rewrite (all replaced by `sync <resource> [--full]`):
+`backfill-prints`, `backfill-processes`, `fetch proceeding-bodies`,
+`fetch committees`, `fetch committee-sittings`, and the
+`supagraf/fetch/{proceedings_bodies,proceeding_agendas,committees,
+committee_sittings}.py` modules.
+
+## Code map
+
+```
+supagraf/sync/
+  cli.py          daily / sync / db-exec (typer)
+  daily.py        phases; `_run(ledger, name, fn)` wraps every step
+  context.py      SyncContext: term, api, window, dirty set, changed keys
+  http.py         SejmApi: retrying GET, paginate, map (thread pool)
+  stage.py        SyncResult + read_index / read_payloads / upsert_rows
+  cursors.py      etl_cursors helpers
+  loaders.py      LOAD_CHAIN / REFRESH_CHAIN, per-sitting variants
+  runlog.py       RunLedger + StepResult (etl_runs)
+  resources/
+    _common.py    fetch_details() + upsert_changed() — every detail resource is
+                  "list → ids to fetch → fetch_details → upsert_changed"
+    <resource>.py sync(ctx) -> SyncResult, ~30 lines each
+supagraf/enrich/jobs.py        concurrent enrichment + embed jobs
+supagraf/enrich/vision_ocr.py  scan → vision transcript
+supagraf/backfill/agenda_refs.py  relink queued agenda → print refs
+```
+
+Adding a resource: write `resources/<name>.py` with `sync(ctx)`, add the
+name to `daily.RESOURCES` and its loader triggers to `loaders.LOAD_CHAIN`.
+Tests patch `supagraf.sync.stage`, `supagraf.sync.cursors` and
+`supagraf.etl.watermark` (see `tests/supagraf/unit/sync/conftest.py`) and
+serve HTTP from an `httpx.MockTransport`.
+
 ## Loader plan
 
 No `load_*` function is incremental — each rebuilds its target from the

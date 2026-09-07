@@ -109,9 +109,7 @@ def test_votings_plan_sittings():
 
 def test_votings_sync_fetches_missing_detail_only(routes, ctx, fake_stage, monkeypatch):
     fake_stage.seed("_stage_votings", {"64__1": {"votingNumber": 1}})
-    monkeypatch.setattr(votings, "load_sealed", lambda e: {"term10__64__1"})
-    sealed_now = []
-    monkeypatch.setattr(votings, "bulk_seal", lambda e, keys, source: sealed_now.extend(keys))
+    fake_stage.sealed["voting"] = {"term10__64__1"}
     monkeypatch.setattr(votings, "Voting", type("V", (), {"model_validate": staticmethod(lambda p: p)}))
     routes.add(f"{B}/votings", [{"date": "2026-09-03", "proceeding": 64, "votingsNum": 2}])
     routes.add(f"{B}/votings/64", [{"votingNumber": 1}, {"votingNumber": 2}])
@@ -119,7 +117,7 @@ def test_votings_sync_fetches_missing_detail_only(routes, ctx, fake_stage, monke
     res = votings.sync(ctx)
     assert res.fetched == 1 and res.upserted == 1 and res.skipped == 1
     assert routes.count("/votings/64/1") == 0
-    assert sealed_now == ["term10__64__2"]
+    assert fake_stage.sealed["voting"] == {"term10__64__1", "term10__64__2"}
     assert "votings" in ctx.dirty
     assert ctx.changed_keys["votings"] == {64}
 
@@ -156,13 +154,14 @@ def test_committees_rejects_bad_codes(routes, ctx, fake_stage, monkeypatch):
     monkeypatch.setattr(committees, "Committee", type("C", (), {"model_validate": staticmethod(lambda p: p)}))
     res = committees.sync(ctx)
     assert res.listed == 1 and res.upserted == 1
+    assert routes.count("/committees/..") == 0
 
 
 # ---- committee sittings ---------------------------------------------------------
 
 def test_committee_sittings_merge_keeps_history():
     existing = {"code": "ENM", "sittings": [{"num": 1, "status": "FINISHED"}, {"num": 2, "status": "PLANNED"}]}
-    merged = committee_sittings._merge(existing, "ENM", [{"num": 2, "status": "FINISHED"}, {"num": 3, "status": "PLANNED"}])
+    merged = committee_sittings.merge(existing, "ENM", [{"num": 2, "status": "FINISHED"}, {"num": 3, "status": "PLANNED"}])
     assert [s["num"] for s in merged["sittings"]] == [1, 2, 3]
     assert merged["sittings"][1]["status"] == "FINISHED"
 

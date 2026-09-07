@@ -89,11 +89,9 @@ def fake_runners():
 
 @pytest.fixture
 def fake_path_exists():
-    """Default: every fixtures path exists. Tests can override via .return_value."""
-    with patch("supagraf.cli.fixtures_root") as fr:
-        fr.return_value = Path("/tmp/fixtures")
-        with patch.object(Path, "exists", return_value=True) as ex:
-            yield ex
+    """Default: every local path exists. Tests can override via .return_value."""
+    with patch.object(Path, "exists", return_value=True) as ex:
+        yield ex
 
 
 # ---- enum validation ------------------------------------------------------

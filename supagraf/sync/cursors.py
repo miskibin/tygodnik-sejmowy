@@ -19,10 +19,11 @@ UPSTREAM_TS_FMT = "%Y-%m-%dT%H:%M:%S"
 
 
 def _warsaw() -> tzinfo:
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
     try:
-        from zoneinfo import ZoneInfo
         return ZoneInfo("Europe/Warsaw")
-    except Exception:  # noqa: BLE001 — tzdata missing on a minimal image
+    except ZoneInfoNotFoundError:  # tzdata missing on a minimal image
         return timezone(timedelta(hours=2))
 
 

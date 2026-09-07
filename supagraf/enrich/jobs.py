@@ -317,3 +317,25 @@ def enrich_pending_statements(
             if i % 50 == 0 or i == len(futures):
                 logger.info("enrich statements: {}/{} (ok={} failed={})", i, len(futures), stats.ok, stats.failed)
     return stats
+
+
+# ---- embeddings --------------------------------------------------------------
+
+
+def embed_pending_prints(*, term: int = 10, limit: int = 0) -> EnrichStats:
+    """qwen3 embedding for prints that have a summary but no vector yet."""
+    from supagraf.enrich.embed_print import embed_print
+
+    stats = EnrichStats()
+    q = (supabase().table("prints").select("number").eq("term", term)
+         .is_("embedded_at", "null").not_.is_("summary", "null"))
+    rows = (q.limit(limit) if limit > 0 else q).execute().data or []
+    for r in rows:
+        try:
+            embed_print(entity_type="print", entity_id=r["number"])
+            stats.ok += 1
+        except Exception as e:  # noqa: BLE001 — audited by @with_model_run, loop continues
+            stats.failed += 1
+            stats.errors.append((r["number"], repr(e)[:300]))
+            logger.error("embed print {} failed: {!r}", r["number"], e)
+    return stats

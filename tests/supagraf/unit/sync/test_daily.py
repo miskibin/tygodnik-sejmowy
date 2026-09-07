@@ -16,7 +16,7 @@ def stubs(monkeypatch):
     def fake_resource(name):
         def _sync(ctx):
             calls["resources"].append(name)
-            r = SyncResult(name)
+            r = SyncResult(resource=name)
             if name == "prints":
                 r.upserted = 2
                 ctx.mark(name, True)
@@ -28,7 +28,8 @@ def stubs(monkeypatch):
     monkeypatch.setattr(daily, "_resource_fn", fake_resource)
     monkeypatch.setattr(daily, "run_loaders", lambda term, dirty, full=False, changed_keys=None: calls["loaders"].append((sorted(dirty), full)) or {})
     monkeypatch.setattr(daily, "run_refreshes", lambda term, dirty, full=False: calls["refresh"].append((sorted(dirty), full)) or {})
-    monkeypatch.setattr(daily, "_relink_agenda_refs", lambda term: calls.setdefault("relink", []).append(term))
+    import supagraf.backfill.agenda_refs as ar
+    monkeypatch.setattr(ar, "relink_agenda_print_refs", lambda term: calls.setdefault("relink", []).append(term))
 
     import supagraf.fetch.mp_photos as mpp
     import supagraf.fetch.polls as polls
@@ -56,7 +57,7 @@ def stubs(monkeypatch):
 
 
 def test_quiet_run_skips_load_when_nothing_dirty(monkeypatch, stubs):
-    monkeypatch.setattr(daily, "_resource_fn", lambda name: (lambda ctx: SyncResult(name)))
+    monkeypatch.setattr(daily, "_resource_fn", lambda name: (lambda ctx: SyncResult(resource=name)))
     led = daily.run_daily(skip_enrich=True, skip_embed=True, persist_ledger=False)
     assert stubs["loaders"] == []
     assert led.exit_code == 0

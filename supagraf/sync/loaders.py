@@ -20,11 +20,14 @@ not force a reload.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from loguru import logger
 
+from postgrest.exceptions import APIError
+
 from supagraf.db import call_rpc_scalar
-from supagraf.load import _rpc_int
+from supagraf.load import _PgOperationalError, _rpc_int
 
 
 @dataclass(frozen=True)
@@ -128,16 +131,21 @@ def run_loaders(term: int, dirty: set[str], *, full: bool = False,
     return out
 
 
-def run_refreshes(term: int, dirty: set[str], *, full: bool = False) -> dict[str, str]:
+def run_refreshes(term: int, dirty: set[str], *, full: bool = False) -> dict[str, Any]:
     """Refresh the matviews whose inputs changed. Failures are collected,
     not raised — one slow matview must not block the others."""
-    out: dict[str, str] = {}
+    out: dict[str, Any] = {}
+    failed = 0
     for l in plan(REFRESH_CHAIN, dirty, full=full):
         try:
             r = call_rpc_scalar(l.fn, {"p_term": term} if l.takes_term else None)
-            out[l.fn] = "ok" if r is None else str(r)[:80]
-            logger.info("refresh {}: {}", l.fn, out[l.fn])
-        except Exception as e:  # noqa: BLE001
-            out[l.fn] = f"failed: {e!r}"[:200]
-            logger.error("refresh {} failed: {!r}", l.fn, e)
+        except (APIError, _PgOperationalError) as e:
+            out[l.fn] = f"failed: {e}"[:200]
+            failed += 1
+            logger.error("refresh {} failed: {}", l.fn, e)
+            continue
+        out[l.fn] = "ok" if r is None else str(r)[:80]
+        logger.info("refresh {}: {}", l.fn, out[l.fn])
+    if failed:
+        out["failed"] = failed
     return out

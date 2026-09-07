@@ -1,5 +1,7 @@
-"""Shared fakes for the sync tests: an httpx MockTransport-backed SejmApi and
-an in-memory stand-in for the `_stage_*` reads/writes."""
+"""Shared fakes for the sync tests: a MockTransport-backed SejmApi and an
+in-memory stand-in for `supagraf.sync.stage` / `cursors` / `etl.watermark`.
+Resources reach those through the module objects, so one patch per module
+covers every resource."""
 from __future__ import annotations
 
 from datetime import date
@@ -8,13 +10,14 @@ from typing import Any
 import httpx
 import pytest
 
-from supagraf.sync import stage as stage_mod
+from supagraf.etl import watermark
+from supagraf.sync import cursors, stage
 from supagraf.sync.context import SyncContext
 from supagraf.sync.http import SejmApi
 
 
 class Routes:
-    """Map of path (without query) → JSON payload | callable(request) → Response."""
+    """path (without query) → JSON payload | text | callable(request) → Response."""
 
     def __init__(self) -> None:
         self.table: dict[str, Any] = {}
@@ -24,12 +27,10 @@ class Routes:
         self.table[path] = (payload, headers or {}, status)
 
     def handler(self, request: httpx.Request) -> httpx.Response:
-        path = request.url.path
         self.calls.append(str(request.url))
-        entry = self.table.get(path)
-        if entry is None:
+        if request.url.path not in self.table:
             return httpx.Response(404, text="")
-        payload, headers, status = entry
+        payload, headers, status = self.table[request.url.path]
         if callable(payload):
             return payload(request)
         if isinstance(payload, str):
@@ -58,38 +59,29 @@ def ctx(api: SejmApi) -> SyncContext:
 
 
 class FakeStage:
-    """In-memory `_stage_*`: {table: {natural_id: payload}} + written rows."""
+    """In-memory `_stage_*`: {table: {key: payload}}, written rows, cursors, seals."""
 
     def __init__(self) -> None:
         self.tables: dict[str, dict[str, Any]] = {}
         self.written: list[tuple[str, dict]] = []
         self.cursors: dict[str, str] = {}
+        self.sealed: dict[str, set[str]] = {}
 
     def seed(self, table: str, rows: dict[str, Any]) -> None:
         self.tables.setdefault(table, {}).update(rows)
 
-    # stage.py surface
     def read_index(self, table, term, *, json_key=None, key_col="natural_id"):
-        out = {}
-        for nid, payload in self.tables.get(table, {}).items():
-            out[nid] = (payload.get(json_key) if json_key and isinstance(payload, dict) else None)
-        return out
+        return {k: (p.get(json_key) if json_key and isinstance(p, dict) else None)
+                for k, p in self.tables.get(table, {}).items()}
 
-    def read_payloads(self, table, term, *, key_col="natural_id"):
-        return dict(self.tables.get(table, {}))
-
-    def read_payloads_for(self, table, term, ids, *, key_col="natural_id", chunk=200):
+    def read_payloads(self, table, term, ids=None, *, key_col="natural_id"):
         t = self.tables.get(table, {})
-        return {i: t[i] for i in ids if i in t}
+        return dict(t) if ids is None else {i: t[i] for i in ids if i in t}
 
-    def read_payload(self, table, term, natural_id, *, key_col="natural_id"):
-        return self.tables.get(table, {}).get(str(natural_id))
-
-    def upsert_rows(self, table, rows, *, on_conflict="term,natural_id", batch_size=25, errors=None):
+    def upsert_rows(self, table, rows, *, on_conflict="term,natural_id", errors, batch_size=25):
         t = self.tables.setdefault(table, {})
         for r in rows:
-            key = r.get("natural_id") or r.get("eli_id") or str(r.get("number"))
-            t[str(key)] = r["payload"]
+            t[str(r.get("natural_id") or r.get("eli_id") or r.get("number"))] = r["payload"]
             self.written.append((table, r))
         return len(rows)
 
@@ -97,36 +89,11 @@ class FakeStage:
 @pytest.fixture
 def fake_stage(monkeypatch) -> FakeStage:
     fs = FakeStage()
-    import importlib
-    import pkgutil
-
-    import supagraf.sync.resources as pkg
-
-    targets = [stage_mod]
-    for m in pkgutil.iter_modules(pkg.__path__):
-        targets.append(importlib.import_module(f"{pkg.__name__}.{m.name}"))
-    for mod in targets:
-        for name in ("read_index", "read_payloads", "read_payloads_for", "read_payload", "upsert_rows"):
-            if hasattr(mod, name):
-                monkeypatch.setattr(mod, name, getattr(fs, name))
-    # cursors
-    from supagraf.sync import cursors as cur_mod
-
-    monkeypatch.setattr(cur_mod, "get_cursor", lambda n: fs.cursors.get(n))
-    monkeypatch.setattr(cur_mod, "set_cursor", lambda n, v: fs.cursors.__setitem__(n, v))
-    for mod in targets:
-        if hasattr(mod, "get_cursor"):
-            monkeypatch.setattr(mod, "get_cursor", lambda n: fs.cursors.get(n))
-        if hasattr(mod, "set_cursor"):
-            monkeypatch.setattr(mod, "set_cursor", lambda n, v: fs.cursors.__setitem__(n, v))
-    # watermarks
-    from supagraf.etl import watermark as wm
-
-    monkeypatch.setattr(wm, "load_sealed", lambda entity: set())
-    monkeypatch.setattr(wm, "bulk_seal", lambda entity, keys, source: len(list(keys)))
-    monkeypatch.setattr(wm, "seal", lambda entity, key, source="predicate": None)
-    for mod in targets:
-        for name in ("load_sealed", "bulk_seal", "seal"):
-            if hasattr(mod, name):
-                monkeypatch.setattr(mod, name, getattr(wm, name))
+    for name in ("read_index", "read_payloads", "upsert_rows"):
+        monkeypatch.setattr(stage, name, getattr(fs, name))
+    monkeypatch.setattr(cursors, "get_cursor", lambda n: fs.cursors.get(n))
+    monkeypatch.setattr(cursors, "set_cursor", lambda n, v: fs.cursors.__setitem__(n, v))
+    monkeypatch.setattr(watermark, "load_sealed", lambda entity: fs.sealed.get(entity, set()))
+    monkeypatch.setattr(watermark, "bulk_seal", lambda entity, keys, source: fs.sealed.setdefault(entity, set()).update(keys))
+    monkeypatch.setattr(watermark, "seal", lambda entity, key, source="predicate": fs.sealed.setdefault(entity, set()).add(key))
     return fs

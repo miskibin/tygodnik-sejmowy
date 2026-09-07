@@ -33,7 +33,7 @@ def test_compose_reuses_db_bodies_and_fetches_only_new(routes, ctx, fake_stage, 
     monkeypatch.setattr(pr, "_existing_bodies", lambda day_id: {1: ("<p>old</p>", "old")})
     detail = {"number": 64, "title": "64. posiedzenie", "current": False,
               "dates": ["2026-09-03", "2026-09-30"], "agenda": "<ol><li>Pkt 1</li></ol>"}
-    res = pr.SyncResult("proceedings")
+    res = pr.SyncResult(resource="proceedings")
     payload = pr.compose(ctx, detail, res)
     assert routes.count("/transcripts/1") == 0 and routes.count("/transcripts/2") == 1
     assert routes.count("2026-09-30") == 0                       # future day not requested

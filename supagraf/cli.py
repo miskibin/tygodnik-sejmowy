@@ -11,8 +11,7 @@ import typer
 from loguru import logger
 
 from supagraf.db import supabase
-from supagraf.fixtures.storage import fixtures_root
-from supagraf.load import _rpc_int, run_core_load
+from supagraf.load import run_core_load
 from supagraf.stage import acts as stage_acts
 from supagraf.stage import bills as stage_bills
 from supagraf.stage import clubs as stage_clubs
@@ -270,245 +269,6 @@ def cmd_run_all(term: int = 10):
     cmd_load(term=term)
 
 
-@app.command("backfill-prints")
-def cmd_backfill_prints(
-    term: int = typer.Option(10, "--term", "-t"),
-    skip_relink: bool = typer.Option(
-        False, "--skip-relink",
-        help="skip re-running load_proceedings to resolve agenda refs",
-    ),
-):
-    """Sweep ALL upstream prints regardless of year, stage + load them.
-
-    `daily` filters `capture_prints` by `SUPAGRAF_CAPTURE_YEAR` (default:
-    current year) — historical prints from earlier years of the term get
-    skipped on the per-day path. Symptom: prints listed in agenda HTML as
-    `druki nr 1, 2, 3` end up in `unresolved_agenda_print_refs` because
-    the `prints` row never existed locally.
-
-    This command runs the same fetch path with `year=None`, then runs the
-    prints chain of SQL loaders. By default also re-runs `load_proceedings`
-    so previously-unresolved agenda refs resolve into `agenda_item_prints`.
-
-    Idempotent: existing on-disk fixtures and prints rows aren't refetched
-    (refresh=False). Cost: one HTTP GET per missing print + N upserts.
-
-    NOT SAFE TO RUN CONCURRENTLY with `daily` — both write to
-    `_stage_prints` and the loaders are not write-locked. Run this when
-    cron is off, or just accept that daily picks up what backfill misses
-    on the next pass.
-    """
-    import asyncio
-
-    from supagraf.fixtures.client import SejmClient
-    from supagraf.fixtures.sources import sejm as sejm_src
-    from supagraf.schema.prints import Print
-    from supagraf.stage.base import StreamingStager
-
-    out_root = fixtures_root()
-    staged_count = 0
-
-    async def _go() -> None:
-        nonlocal staged_count
-        async with SejmClient(concurrency=5) as client:
-            with StreamingStager(
-                resource="prints", table="_stage_prints", model=Print, term=term,
-            ) as stager:
-                ids = await sejm_src.capture_prints(
-                    client, out_root, term,
-                    year=None,  # NO year filter — that's the whole point.
-                    refresh=False, no_binaries=True, limit=None,
-                    on_record=lambda nid, p, src: stager.push(
-                        natural_id=nid, payload=p, source_path=src,
-                    ),
-                )
-                staged_count = len(ids)
-
-    logger.info("backfill-prints: fetching all upstream prints (no year filter)…")
-    asyncio.run(_go())
-    logger.info("backfill-prints: staged {} prints", staged_count)
-
-    # Prints chain — order matters (see supagraf/load/__init__.py:_PRE_STEPS).
-    # additional/relationships/attachments depend on prints existing first.
-    chain = (
-        "load_prints",
-        "load_prints_additional",
-        "load_print_relationships",
-        "load_print_attachments",
-    )
-    for fn in chain:
-        n = _rpc_int(fn, term)
-        logger.info("backfill-prints: {} affected={}", fn, n)
-
-    if not skip_relink:
-        _resolve_unresolved_agenda_refs(term=term)
-
-    logger.info("backfill-prints: done")
-
-
-def _resolve_unresolved_agenda_refs(*, term: int) -> None:
-    """Targeted relink: move `unresolved_agenda_print_refs` rows whose
-    print_number is now present in `prints` into `agenda_item_prints`.
-
-    Why not just call `load_proceedings` RPC: that function does a full
-    delete + re-insert of every agenda_item, statement, and link for every
-    proceeding in the term — too heavy for Cloudflare/Kong's nginx upstream
-    timeout (60s), times out as 504 on hosted PostgREST.
-
-    This function does the surgical version: only the rows where a previously
-    unresolved ref now has a matching print. All via PostgREST table ops so
-    each request is small (<8s) — no direct-DSN required.
-    """
-    client = supabase()
-
-    # 1. Pull all unresolved refs for the term — paginate since PostgREST
-    #    caps at 1000 rows per request.
-    unresolved: list[dict] = []
-    page = 1000
-    offset = 0
-    while True:
-        rows = (
-            client.table("unresolved_agenda_print_refs")
-            .select("id, agenda_item_id, term, print_number")
-            .eq("term", term)
-            .is_("resolved_at", "null")
-            .order("id")
-            .range(offset, offset + page - 1)
-            .execute()
-            .data
-            or []
-        )
-        if not rows:
-            break
-        unresolved.extend(rows)
-        if len(rows) < page:
-            break
-        offset += len(rows)
-    logger.info("backfill-prints: {} unresolved agenda refs to check", len(unresolved))
-
-    if not unresolved:
-        return
-
-    # 2. Which print_numbers now exist? Pull the set once.
-    refs = sorted({r["print_number"] for r in unresolved})
-    have: set[str] = set()
-    batch = 500  # in-clause length limit
-    for i in range(0, len(refs), batch):
-        chunk = refs[i:i + batch]
-        rows = (
-            client.table("prints")
-            .select("number")
-            .eq("term", term)
-            .in_("number", chunk)
-            .execute()
-            .data
-            or []
-        )
-        have.update(r["number"] for r in rows)
-
-    resolvable = [r for r in unresolved if r["print_number"] in have]
-    logger.info(
-        "backfill-prints: {} of {} unresolved refs now point to real prints",
-        len(resolvable), len(unresolved),
-    )
-
-    # 3. Upsert into agenda_item_prints with on-conflict ignore.
-    #    Count actually-inserted rows from `.execute().data` length per batch —
-    #    PostgREST returns only the new/updated rows. Collisions silently drop.
-    inserted_rows = 0
-    if resolvable:
-        rows_to_insert = [
-            {"agenda_item_id": r["agenda_item_id"], "term": r["term"], "print_number": r["print_number"]}
-            for r in resolvable
-        ]
-        for i in range(0, len(rows_to_insert), batch):
-            res = (
-                client.table("agenda_item_prints")
-                .upsert(rows_to_insert[i:i + batch], on_conflict="agenda_item_id,term,print_number")
-                .execute()
-            )
-            inserted_rows += len(res.data or [])
-
-    # 4. Mark resolved.
-    if resolvable:
-        from datetime import datetime, timezone
-
-        now = datetime.now(timezone.utc).isoformat()
-        ids = [r["id"] for r in resolvable]
-        for i in range(0, len(ids), batch):
-            (
-                client.table("unresolved_agenda_print_refs")
-                .update({"resolved_at": now})
-                .in_("id", ids[i:i + batch])
-                .execute()
-            )
-
-    # Two distinct counts:
-    #   - inserted_rows: NEW rows in agenda_item_prints (may be < len(resolvable)
-    #     if links already existed from another code path).
-    #   - len(resolvable): unresolved refs we marked resolved this run.
-    logger.info(
-        "backfill-prints: relink done — agenda_item_prints +{} rows, "
-        "{} unresolved refs marked resolved",
-        inserted_rows, len(resolvable),
-    )
-
-
-@app.command("backfill-processes")
-def cmd_backfill_processes(
-    term: int = typer.Option(10, "--term", "-t"),
-):
-    """Sweep ALL upstream processes regardless of year, stage + load them.
-
-    Same year-filter problem as `backfill-prints`: `capture_processes` filters
-    `list_data` by `in_year(year)`, so historical processes from earlier years
-    of the term get skipped on the daily path. Symptom: the
-    `process_stages.sitting_num` lookup on the print page returns nothing for
-    older prints, so the "Punkty obrad" badges (I/II czytanie, głosowanie)
-    don't render even when the print actually was procedowany.
-
-    Runs the same fetch path with `year=None`, then `load_processes` SQL
-    function (idempotent — ON CONFLICT updates in-place, additional stages
-    get re-derived from the fresh payload).
-
-    NOT SAFE TO RUN CONCURRENTLY with `daily` (same `_stage_processes`
-    table; the loaders don't take a write lock).
-    """
-    import asyncio
-
-    from supagraf.fixtures.client import SejmClient
-    from supagraf.fixtures.sources import sejm as sejm_src
-    from supagraf.schema.processes import Process
-    from supagraf.stage.base import StreamingStager
-
-    out_root = fixtures_root()
-    staged_count = 0
-
-    async def _go() -> None:
-        nonlocal staged_count
-        async with SejmClient(concurrency=5) as client:
-            with StreamingStager(
-                resource="processes", table="_stage_processes", model=Process, term=term,
-            ) as stager:
-                ids = await sejm_src.capture_processes(
-                    client, out_root, term,
-                    year=None,
-                    refresh=False, no_binaries=True, limit=None,
-                    on_record=lambda nid, p, src: stager.push(
-                        natural_id=nid, payload=p, source_path=src,
-                    ),
-                )
-                staged_count = len(ids)
-
-    logger.info("backfill-processes: fetching all upstream processes (no year filter)…")
-    asyncio.run(_go())
-    logger.info("backfill-processes: staged {} processes", staged_count)
-
-    n = _rpc_int("load_processes", term)
-    logger.info("backfill-processes: load_processes affected={}", n)
-    logger.info("backfill-processes: done")
-
-
 @app.command("backfill-sponsor-authority")
 def cmd_backfill_sponsor_authority(
     term: int = typer.Option(10, "--term", "-t"),
@@ -649,108 +409,6 @@ def cmd_backfill_sponsor_authority(
     logger.info("backfill-sponsor-authority: wrote {} updates", written)
 
 
-@app.command("daily")
-def cmd_daily(
-    term: int = typer.Option(10, "--term", "-t"),
-    skip_fetch: bool = typer.Option(False, "--skip-fetch", help="skip the upstream sync; every resource is then treated as dirty and reloaded"),
-    skip_load: bool = typer.Option(False, "--skip-load", help="skip load_* and matview refreshes"),
-    skip_enrich: bool = typer.Option(False, "--skip-enrich"),
-    skip_embed: bool = typer.Option(False, "--skip-embed"),
-    full: bool = typer.Option(False, "--full", help="ignore cursors/diffs: refetch every entity, run every loader and refresh"),
-    window_days: int = typer.Option(14, "--window-days", help="days back that count as 'still moving' (proceedings, committee sittings)"),
-    only: list[str] = typer.Option(None, "--only", help="restrict the sync phase to these resources (repeatable)"),
-    workers: int = typer.Option(0, "--workers", help="LLM enrichment concurrency (0 = SUPAGRAF_ENRICH_WORKERS or 4)"),
-    concurrency: int = typer.Option(8, "--concurrency", help="parallel requests against api.sejm.gov.pl"),
-    no_ledger: bool = typer.Option(False, "--no-ledger", help="do not write the etl_runs row (dev)"),
-    summary_json: Path = typer.Option(None, "--summary-json", help="write the run summary to this file"),
-):
-    """Incremental daily update: sync → load → enrich → embed → refresh.
-
-    Only what changed upstream is fetched and only the loaders whose inputs
-    changed run (see supagraf/sync/). Every phase is recorded in `etl_runs`;
-    the exit code is 1 when any step failed, 0 otherwise.
-    """
-    import json
-
-    from supagraf.sync.daily import run_daily
-    from supagraf.sync.runlog import SchemaMissing
-
-    try:
-        ledger = run_daily(
-            term=term, skip_fetch=skip_fetch, skip_load=skip_load, skip_enrich=skip_enrich,
-            skip_embed=skip_embed, full=full, window_days=window_days,
-            only=tuple(only) if only else None, workers=workers or None,
-            concurrency=concurrency, persist_ledger=not no_ledger,
-        )
-    except SchemaMissing as e:
-        logger.error(str(e))
-        raise typer.Exit(2)
-    summary = ledger.summary()
-    if summary_json:
-        summary_json.write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
-    failed = [s.name for s in ledger.failed_steps]
-    print(f"\ndaily {ledger.status}: {len(ledger.steps)} steps, failed={failed or 'none'}, run_id={ledger.run_id}")
-    raise typer.Exit(ledger.exit_code)
-
-
-@app.command("sync")
-def cmd_sync(
-    resources: list[str] = typer.Argument(..., help="mps|clubs|committees|committee_sittings|prints|processes|proceedings|votings|bills|videos|questions|acts"),
-    term: int = typer.Option(10, "--term", "-t"),
-    full: bool = typer.Option(False, "--full", help="ignore cursors/diffs for these resources"),
-    load: bool = typer.Option(False, "--load", help="run the affected load_* chain afterwards"),
-    window_days: int = typer.Option(14, "--window-days"),
-    concurrency: int = typer.Option(8, "--concurrency"),
-):
-    """Sync one or more upstream resources into `_stage_*` (no enrich/embed)."""
-    from supagraf.sync.context import SyncContext
-    from supagraf.sync.daily import RESOURCES, sync_resources
-    from supagraf.sync.http import SejmApi
-    from supagraf.sync.loaders import run_loaders
-    from supagraf.sync.runlog import RunLedger, SchemaMissing, ensure_schema
-
-    unknown = [r for r in resources if r not in RESOURCES]
-    if unknown:
-        logger.error("unknown resource(s): {} (known: {})", unknown, ", ".join(RESOURCES))
-        raise typer.Exit(1)
-    try:
-        ensure_schema()
-    except SchemaMissing as e:
-        logger.error(str(e))
-        raise typer.Exit(2)
-    ledger = RunLedger(kind="sync", term=term, args={"resources": resources, "full": full, "load": load})
-    ledger.start()
-    with SejmApi(concurrency=concurrency) as api:
-        ctx = SyncContext(term=term, api=api, full=full, window_days=window_days)
-        sync_resources(ctx, ledger, tuple(r for r in RESOURCES if r in resources))
-        if load and ctx.dirty:
-            with ledger.step("load") as step:
-                step.counts = run_loaders(term, ctx.dirty, full=full, changed_keys=ctx.changed_keys)
-    ledger.finish()
-    for s in ledger.steps:
-        print(f"{s.name}: {s.status} {s.counts}")
-    raise typer.Exit(ledger.exit_code)
-
-
-@app.command("db-exec")
-def cmd_db_exec(
-    file: Path = typer.Option(None, "--file", "-f", help="SQL file to run (e.g. a migration)"),
-    query: str = typer.Option(None, "--query", "-q", help="inline SQL"),
-):
-    """Run SQL through the service-role `exec_sql` RPC (no SSH/Tailscale needed).
-
-    Typical use: `python -m supagraf db-exec -f supabase/migrations/0105_etl_runs_cursors.sql`.
-    """
-    from supagraf.db import exec_sql
-
-    if not file and not query:
-        logger.error("pass --file or --query")
-        raise typer.Exit(1)
-    sql = file.read_text(encoding="utf-8") if file else query
-    out = exec_sql(sql)
-    print(out if not isinstance(out, list) else f"{len(out)} rows: {out[:5]}")
-
-
 # ---- enrich subcommand ----------------------------------------------------
 
 
@@ -810,40 +468,7 @@ def _pending_query(kind: EnrichKind, term: int):
     return q
 
 
-# A handful of `prints.number` values are Lotus/Domino document GUIDs rather
-# than Sejm print numbers (4 rows in term 10). api.sejm.gov.pl has no
-# /prints/<guid>/ path — the WAF answers with an HTML "Request Rejected" page —
-# so there is no document to enrich. Skip instead of failing every run.
-_GUID_NUMBER_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
-
-
-def _resolve_pdf_relpath(print_row: dict) -> str | None:
-    """Pick best document attachment: prefer .docx (clean text from Sejm's
-    editable source) over .pdf (often a scanned signed copy without text layer).
-
-    Returns relpath under fixtures/ or None if no usable document found.
-    """
-    # Upstream ships a few numbers with embedded newlines/spaces ("1041-004\n").
-    # Left unstripped they end up verbatim in the request URL and httpx rejects
-    # it (`InvalidURL: non-printable ASCII character`).
-    number = (print_row.get("number") or "").strip()
-    if not number or _GUID_NUMBER_RE.match(number):
-        return None
-    atts = sorted(print_row.get("attachments") or [], key=lambda a: a.get("ordinal", 0))
-    docx_match = pdf_match = None
-    for a in atts:
-        fn = (a.get("filename") or "").strip()
-        if not fn:
-            continue
-        low = fn.lower()
-        if docx_match is None and low.endswith(".docx"):
-            docx_match = fn
-        elif pdf_match is None and low.endswith(".pdf"):
-            pdf_match = fn
-    chosen = docx_match or pdf_match
-    if chosen is None:
-        return None
-    return f"sejm/prints/{number}__{chosen}"
+from supagraf.enrich.jobs import resolve_print_document as _resolve_pdf_relpath  # noqa: E402
 
 
 def _runner_for(kind: EnrichKind) -> Callable:
@@ -1247,7 +872,7 @@ def cmd_refresh_aggregates():
 
 @app.command("fetch")
 def cmd_fetch(
-    resource: str = typer.Argument(..., help="proceeding-bodies|mp-photos|acts|committees|committee-sittings|mp-office-expenses"),
+    resource: str = typer.Argument(..., help="mp-photos|acts|mp-office-expenses"),
     term: int = typer.Option(10, "--term", "-t"),
     throttle_s: float = typer.Option(0.2, "--throttle", help="seconds between requests (5 req/s default)"),
     limit: int = typer.Option(0, "--limit", "-n", help="cap on statements to attempt; 0 = no cap"),
@@ -1255,23 +880,13 @@ def cmd_fetch(
         help="for acts: 'du' | 'mp' | 'both' (default 'both' covers Dziennik Ustaw + Monitor Polski)"),
     year: int = typer.Option(0, "--year",
         help="for acts: single year override (0 = use SUPAGRAF_ELI_YEARS env / default)"),
-    force: bool = typer.Option(False, "--force",
-        help="for committees: re-fetch all committee detail JSON, ignoring cached fixtures"),
+    force: bool = typer.Option(False, "--force", help="for mp-office-expenses: re-fetch cached PDFs"),
     workers: int = typer.Option(1, "--workers", "-w",
         help="for mp-office-expenses: parallel fetch+OCR+LLM workers (1=sequential; "
              "recommended 4–6 for full 460-PDF run)"),
 ):
-    """Fetch real-data assets that aren't on disk yet (HTML statement bodies, etc.).
-
-    proceeding-bodies: backfill HTML transcript bodies for any proceeding-day
-    whose statements lack body_text in the DB. Re-run `stage proceedings` +
-    `load` afterwards to surface the new bodies.
-    """
-    if resource == "proceeding-bodies":
-        from supagraf.fetch.proceedings_bodies import fetch_proceeding_bodies
-        report = fetch_proceeding_bodies(term=term, throttle_s=throttle_s, limit=limit)
-        print(f"\nfetch proceeding-bodies: {report}")
-        return
+    """Fetch real-data assets outside the Sejm JSON API (photos, ELI years,
+    office-expense PDFs). Sejm resources go through `sync`."""
     if resource == "mp-photos":
         # P3.3 — extension. Dispatch added here so `cmd_fetch` stays the single
         # entry point. `--limit` is ignored for this resource (state-driven).
@@ -1303,21 +918,6 @@ def cmd_fetch(
             limit_per_year=limit,
         )
         print(f"\nfetch acts: {report}")
-        return
-    if resource == "committees":
-        # Phase G — committees roster. Per-committee idempotent (skips
-        # cached fixtures unless --force). Throttle defaults to 1.0s here
-        # to stay polite even though committee count is small.
-        from supagraf.fetch.committees import fetch_committees
-        rep = fetch_committees(term=term, force=force, throttle_s=max(throttle_s, 1.0))
-        print(f"\nfetch committees: {rep.to_dict()}")
-        return
-    if resource == "committee-sittings":
-        # Sittings + agenda + video links per committee. Always re-fetches
-        # (mutable). Throttle floor 1.0s — committee count is small.
-        from supagraf.fetch.committee_sittings import fetch_committee_sittings
-        rep = fetch_committee_sittings(term=term, throttle_s=max(throttle_s, 1.0))
-        print(f"\nfetch committee-sittings: {rep.to_dict()}")
         return
     if resource == "mp-office-expenses":
         # MP office expense reports (sprawozdania wydatków biur poselskich).

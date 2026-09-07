@@ -7,7 +7,7 @@ from typing import Optional
 from loguru import logger
 
 from ..client import SejmClient
-from ..storage import update_index, write_binary, write_json
+from ..storage import update_index, write_json
 from .sejm import _maybe_save_binary, _maybe_save_json, _take
 
 

@@ -366,8 +366,8 @@ def stage_polls_from_wikipedia(html_path: Path) -> tuple[int, int]:
                 continue
             sample = _parse_sample(expanded[2].get_text(strip=True))
             source_url = _row_pollster_url(expanded[0]) or (
-                f"https://en.wikipedia.org/wiki/"
-                f"Opinion_polling_for_the_next_Polish_parliamentary_election"
+                "https://en.wikipedia.org/wiki/"
+                "Opinion_polling_for_the_next_Polish_parliamentary_election"
             )
 
             # Build poll header row.

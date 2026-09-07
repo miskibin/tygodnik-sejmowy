@@ -13,7 +13,6 @@ import asyncio
 from pathlib import Path
 from typing import Any
 
-import pytest
 
 from supagraf.fixtures.sources import sejm as sejm_src
 

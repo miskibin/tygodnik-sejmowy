@@ -68,15 +68,10 @@ def captured_seals(monkeypatch):
     monkeypatch.setattr(sejm_src, "load_sealed", _fake_load_sealed, raising=False)
     # Some fetchers import seal/bulk_seal/load_sealed at module load time —
     # patch the names bound on those modules too.
-    import supagraf.fetch.committee_sittings as csmod
     import supagraf.fetch.acts as actsmod
-    import supagraf.fetch.proceedings_bodies as bodiesmod
-    monkeypatch.setattr(csmod, "bulk_seal", _fake_bulk_seal, raising=False)
     monkeypatch.setattr(actsmod, "seal", _fake_seal, raising=False)
     monkeypatch.setattr(actsmod, "bulk_seal", _fake_bulk_seal, raising=False)
     monkeypatch.setattr(actsmod, "load_sealed", _fake_load_sealed, raising=False)
-    monkeypatch.setattr(bodiesmod, "seal", _fake_seal, raising=False)
-    monkeypatch.setattr(bodiesmod, "load_sealed", _fake_load_sealed, raising=False)
     return seals
 
 
@@ -125,40 +120,6 @@ def test_capture_votings_seals_after_capture_with_votes(tmp_path: Path, captured
     ))
 
     assert ("voting", "term10__28__1", "predicate_votes_captured") in captured_seals
-
-
-def test_fetch_committee_sittings_seals_finished_status(tmp_path, captured_seals, monkeypatch):
-    """Each committee bundle write should seal sittings whose status='FINISHED'."""
-    from unittest.mock import MagicMock, patch
-    import supagraf.fetch.committee_sittings as csmod
-
-    monkeypatch.setattr(csmod, "fixtures_root", lambda: tmp_path)
-    (tmp_path / "sejm" / "committee_sittings").mkdir(parents=True)
-
-    # Bundle: 2 finished, 1 planned -> 2 seals.
-    listing = [{"code": "ASW"}]
-    sittings = [
-        {"num": 10, "status": "FINISHED"},
-        {"num": 11, "status": "FINISHED"},
-        {"num": 12, "status": "PLANNED"},
-    ]
-
-    def _get_json(client, url):
-        if url.endswith("/committees"):
-            return listing
-        if url.endswith("/committees/ASW/sittings"):
-            return sittings
-        return None
-
-    monkeypatch.setattr(csmod, "_get_json", _get_json)
-    fake_client = MagicMock()
-    fake_client.__enter__ = MagicMock(return_value=fake_client)
-    fake_client.__exit__ = MagicMock(return_value=False)
-    with patch.object(csmod.httpx, "Client", return_value=fake_client):
-        csmod.fetch_committee_sittings(term=10, throttle_s=0)
-
-    finished_keys = {s[1] for s in captured_seals if s[0] == "committee_sitting"}
-    assert finished_keys == {"term10__ASW__10", "term10__ASW__11"}
 
 
 def test_fetch_acts_seals_settled_acts(tmp_path, captured_seals, monkeypatch):

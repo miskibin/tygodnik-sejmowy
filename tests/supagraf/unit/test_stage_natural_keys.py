@@ -1,7 +1,6 @@
 """Natural-key derivation in each stage module is fixture-independent."""
 from __future__ import annotations
 
-from pathlib import Path
 
 from supagraf.schema.clubs import Club
 from supagraf.schema.mps import MP

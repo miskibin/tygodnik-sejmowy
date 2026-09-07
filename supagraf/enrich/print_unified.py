@@ -42,7 +42,7 @@ from supagraf.enrich.audit import with_model_run
 from supagraf.enrich.llm import call_structured
 from supagraf.enrich.pdf import extract_pdf, extract_pdf_cover
 from supagraf.enrich.pdf_fetch import resolve_print_pdf
-from supagraf.enrich.print_personas import PERSONA_TAGS, PersonaTag
+from supagraf.enrich.print_personas import PersonaTag
 
 JOB_NAME = "print_unified"
 PROMPT_NAME = "print_unified"

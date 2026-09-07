@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from supagraf.db import supabase
 from supagraf.enrich import DEFAULT_LLM_MODEL
 from supagraf.enrich.audit import with_model_run
-from supagraf.enrich.llm import LLMResponseError, call_structured
+from supagraf.enrich.llm import call_structured
 from supagraf.enrich.pdf import extract_pdf
 from supagraf.enrich.pdf_fetch import resolve_print_pdf
 

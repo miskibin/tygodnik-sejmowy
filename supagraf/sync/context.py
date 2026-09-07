@@ -1,34 +1,33 @@
 """Shared state handed to every resource syncer."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from supagraf.sync.http import SejmApi
 
 
-@dataclass
-class SyncContext:
+class SyncContext(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     term: int
     api: SejmApi
-    # Ignore cursors and diffs — refetch every entity of the term. Slow but
-    # the way to repair a stage table after a schema change.
+    # Ignore cursors and diffs — refetch every entity of the term.
     full: bool = False
-    # Days back that count as "still moving" for proceedings, committee
-    # sittings and votings. Anything older is only touched when the DB
-    # shows a gap (e.g. a sitting day with no transcript yet).
+    # Days back that count as "still moving" (proceedings, committee sittings).
     window_days: int = 14
     # Days ahead for scheduled committee sittings.
     horizon_days: int = 30
-    captured_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    today: date = field(default_factory=lambda: datetime.now(timezone.utc).date())
+    captured_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    today: date = Field(default_factory=lambda: datetime.now(timezone.utc).date())
     # Resources whose stage rows changed this run — drives the loader plan.
-    dirty: set[str] = field(default_factory=set)
-    # Natural keys written per resource, for the loaders that have a
-    # per-sitting variant (proceedings → number, votings → sitting). Empty
-    # when the whole-term loader must run (e.g. --skip-fetch).
-    changed_keys: dict[str, set[int]] = field(default_factory=dict)
+    dirty: set[str] = Field(default_factory=set)
+    # Sitting numbers written per resource, for the per-sitting loaders
+    # (proceedings → number, votings → sitting). Empty → whole-term loader.
+    changed_keys: dict[str, set[int]] = Field(default_factory=dict)
 
+    @property
     def base(self) -> str:
         return f"/sejm/term{self.term}"
 
