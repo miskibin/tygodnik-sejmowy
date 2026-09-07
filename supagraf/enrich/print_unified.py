@@ -320,6 +320,20 @@ class PrintUnifiedOutput(BaseModel):
         # Keep first 3 (LLM orders by relevance). Frontend gets exactly 3 max.
         return v[:3]
 
+    @field_validator("topic_tags", mode="before")
+    @classmethod
+    def _drop_unknown_topic_tags(cls, v: object) -> object:
+        """Salvage the print when the model invents a tag ("konsument").
+
+        The taxonomy is our own guard; one off-list label is not worth
+        losing summary, impact and mentions for the whole print."""
+        if not isinstance(v, list):
+            return v
+        unknown = [t for t in v if t not in TOPIC_TAGS]
+        if unknown:
+            logger.warning("dropping unknown topic_tags {}", unknown)
+        return [t for t in v if t in TOPIC_TAGS]
+
     @field_validator("topic_tags", mode="after")
     @classmethod
     def _trim_topic_tags_to_3(cls, v: list[str]) -> list[str]:
