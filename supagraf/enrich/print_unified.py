@@ -37,9 +37,9 @@ from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 from supagraf.enrich import DEFAULT_LLM_MODEL, LLM_MODELS, LLM_ROUTING
-from supagraf.enrich.audit import DB_RETRY_EXC, with_model_run
+from supagraf.enrich.audit import with_model_run
 from supagraf.enrich.llm import call_structured
 from supagraf.enrich.pdf import extract_pdf, extract_pdf_cover
 from supagraf.enrich.pdf_fetch import resolve_print_pdf
@@ -438,25 +438,16 @@ def _recover_spans(mentions: list[UnifiedMention], text: str) -> list[dict]:
     return out
 
 
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(4),
+       wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
 def _fetch_meta(term: int, entity_id: str) -> dict:
-    """Single source of truth for the metadata read used by both the model
-    picker and the prompt header. Two-step select tolerates older schemas
-    that lack opinion_source / is_meta_document."""
-    select_cols = "document_category, sponsor_authority, title"
-    try:
-        return (
-            supabase().table("prints")
-            .select(select_cols + ", opinion_source, is_meta_document")
-            .eq("term", term).eq("number", entity_id)
-            .single().execute().data or {}
-        )
-    except Exception:
-        return (
-            supabase().table("prints")
-            .select(select_cols)
-            .eq("term", term).eq("number", entity_id)
-            .single().execute().data or {}
-        )
+    """Metadata read used by both the model picker and the prompt header."""
+    return (
+        supabase().table("prints")
+        .select("document_category, sponsor_authority, title, opinion_source, is_meta_document")
+        .eq("term", term).eq("number", entity_id)
+        .single().execute().data or {}
+    )
 
 
 def enrich_print_unified(

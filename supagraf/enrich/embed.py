@@ -11,7 +11,6 @@ import os
 from dataclasses import dataclass
 
 import httpx
-from postgrest.exceptions import APIError
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -19,7 +18,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 
 EMBED_DIM = 1024
 # qwen3-embedding:0.6b is natively 1024-d so no padding needed (vs the
@@ -127,7 +126,7 @@ def embed_text(
 
 
 @retry(
-    retry=retry_if_exception_type(APIError),
+    retry=retry_if_exception_type(DB_RETRY_EXC),
     stop=stop_after_attempt(4),
     wait=wait_exponential(multiplier=1, min=1, max=8),
     reraise=True,

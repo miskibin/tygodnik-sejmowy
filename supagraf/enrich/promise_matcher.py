@@ -30,11 +30,10 @@ from datetime import datetime, timezone
 from typing import Literal
 
 from loguru import logger
-from postgrest.exceptions import APIError
 from pydantic import BaseModel, ConfigDict, Field
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 from supagraf.enrich import DEFAULT_LLM_MODEL
 from supagraf.enrich.embed import DEFAULT_EMBED_MODEL
 from supagraf.enrich.llm import call_structured
@@ -43,7 +42,7 @@ RERANK_PROMPT_NAME = "promise_match_rerank"
 
 
 @retry(
-    retry=retry_if_exception_type(APIError),
+    retry=retry_if_exception_type(DB_RETRY_EXC),
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=8),
     reraise=True,

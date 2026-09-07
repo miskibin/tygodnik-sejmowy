@@ -11,6 +11,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+import httpx
+from postgrest.exceptions import APIError
 from supabase import Client, create_client
 
 
@@ -33,6 +35,19 @@ def load_dotenv() -> None:
 
 # Back-compat alias for any internal call sites.
 _load_dotenv = load_dotenv
+
+
+# PostgREST behind Cloudflare/Kong closes idle keep-alive connections; a pooled
+# request on a dead socket surfaces as RemoteProtocolError("Server disconnected")
+# or ReadError. Every Supabase call site retries on these, not just APIError.
+DB_RETRY_EXC = (
+    APIError,
+    httpx.RemoteProtocolError,
+    httpx.ReadError,
+    httpx.ConnectError,
+    httpx.TimeoutException,
+    httpx.PoolTimeout,
+)
 
 
 @lru_cache(maxsize=1)
