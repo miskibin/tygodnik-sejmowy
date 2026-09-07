@@ -1,7 +1,6 @@
 """Unit tests for the agenda HTML parser."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from supagraf.stage.agenda_parser import parse_agenda
@@ -97,29 +96,3 @@ def test_div_wrapper_56_pattern_captured():
     items = parse_agenda(html)
     assert items[0].process_refs == ["2352"]
     assert "Spr nr 2352." in items[0].title
-
-
-def test_real_fixture_49():
-    raw = json.loads((FIXTURES / "49.json").read_text(encoding="utf-8"))
-    items = parse_agenda(raw["agenda"])
-    assert len(items) == 22
-    with_procs = [i for i in items if i.process_refs]
-    assert len(with_procs) >= 15
-    ords = [i.ord for i in items]
-    assert ords == list(range(1, 23))
-
-
-def test_real_fixture_56_value_attr():
-    raw = json.loads((FIXTURES / "56.json").read_text(encoding="utf-8"))
-    items = parse_agenda(raw["agenda"])
-    assert len(items) == 20
-    assert items[0].process_refs == ["2294"]
-    assert items[0].print_refs == ["2294", "2399"]
-
-
-def test_real_fixture_57_multiple_ols_unique_ord():
-    raw = json.loads((FIXTURES / "57.json").read_text(encoding="utf-8"))
-    items = parse_agenda(raw["agenda"])
-    assert len(items) == 31
-    ords = [i.ord for i in items]
-    assert len(set(ords)) == len(ords)

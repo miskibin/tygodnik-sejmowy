@@ -1,6 +1,13 @@
 """Stage districts + postcodes from external fixtures."""
 from __future__ import annotations
 
+import pytest as _pytest
+from pathlib import Path as _Path
+
+if not (_Path(__file__).resolve().parents[3] / "fixtures" / "external").exists():
+    _pytest.skip("fixtures/external not generated (run `python -m supagraf fixtures districts|promises`)", allow_module_level=True)
+
+
 from unittest.mock import MagicMock, patch
 
 from supagraf.stage import districts as stage_mod

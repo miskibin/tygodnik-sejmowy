@@ -14,7 +14,6 @@ output and re-classifying via summary would couple two enrichment jobs.
 """
 from __future__ import annotations
 
-import re
 import unicodedata
 
 from loguru import logger

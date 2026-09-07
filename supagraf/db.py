@@ -132,3 +132,31 @@ def call_rpc_table(fn: str, args: dict[str, Any] | None = None) -> list[dict[str
             cur.execute(sql_str, vals)
             return list(cur.fetchall())
     return supabase().rpc(fn, args or {}).execute().data or []
+
+
+def exec_sql(query: str, *, timeout_s: float = 600.0) -> Any:
+    """Run arbitrary SQL through the `exec_sql` RPC (migration 0093+).
+
+    Service-role only. DDL/DML returns {"status": "ok", ...}; SELECT returns
+    a jsonb array; SQL errors come back as {"status": "error", ...} and are
+    raised here so callers never mistake them for success.
+
+    Uses httpx directly: the postgrest client treats any object carrying a
+    `message` key as an API error and refuses the RPC's own success reply.
+    """
+    import httpx
+
+    if "SUPABASE_URL" not in os.environ:
+        load_dotenv()
+    url = os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/rpc/exec_sql"
+    key = os.environ["SUPABASE_KEY"]
+    r = httpx.post(
+        url, json={"query": query}, timeout=timeout_s,
+        headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+    )
+    if r.status_code >= 400:
+        raise RuntimeError(f"exec_sql HTTP {r.status_code}: {r.text[:300]}")
+    out = r.json()
+    if isinstance(out, dict) and out.get("status") == "error":
+        raise RuntimeError(f"exec_sql: {out.get('sqlstate')} {out.get('message')}")
+    return out

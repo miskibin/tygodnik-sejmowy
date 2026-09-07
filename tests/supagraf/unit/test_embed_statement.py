@@ -1,7 +1,7 @@
 """Unit tests for supagraf.enrich.embed_statement."""
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 

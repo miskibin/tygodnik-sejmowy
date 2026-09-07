@@ -6,7 +6,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-VoteChoice = Literal["YES", "NO", "ABSTAIN", "ABSENT", "PRESENT"]
+# VOTE_VALID: ON_LIST votings mark an MP who cast a valid list ballot; the
+# per-option choices live in `listVotes`. Observed upstream 2026-09.
+VoteChoice = Literal["YES", "NO", "ABSTAIN", "ABSENT", "PRESENT", "VOTE_VALID"]
 VotingKind = Literal["ELECTRONIC", "ON_LIST", "TRADITIONAL"]
 MajorityType = Literal[
     "SIMPLE_MAJORITY",
@@ -36,6 +38,14 @@ class VoteRow(BaseModel):
     list_votes: dict[str, VoteChoice] | None = Field(default=None, alias="listVotes")
 
 
+class VotingOption(BaseModel):
+    """One candidate/option of an ON_LIST voting (e.g. election of the Marshal)."""
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    option: str
+    option_index: int = Field(alias="optionIndex")
+    votes: int
+
+
 class Voting(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -45,7 +55,8 @@ class Voting(BaseModel):
     voting_number: int = Field(alias="votingNumber")
     date: datetime
     title: str
-    topic: str
+    # `topic` is absent on a few ON_LIST votings (elections) upstream.
+    topic: str | None = None
     description: str | None = None
     kind: VotingKind
     majority_type: MajorityType = Field(alias="majorityType")
@@ -58,3 +69,6 @@ class Voting(BaseModel):
     total_voted: int = Field(alias="totalVoted")
     votes: list[VoteRow]
     links: list[Link] = []
+    # ON_LIST votings only (observed upstream 2026-09).
+    against_all: int | None = Field(default=None, alias="againstAll")
+    voting_options: list[VotingOption] = Field(default_factory=list, alias="votingOptions")

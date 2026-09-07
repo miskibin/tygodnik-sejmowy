@@ -29,7 +29,7 @@ obietnice, wypowiedzi.
 
 Pythonowy pipeline: pobiera dane z API Sejmu i ELI, ładuje do Supabase,
 wzbogaca treści za pomocą LLM (DeepSeek) oraz embeddingów (qwen3),
-OCR-uje skany druków (pymupdf + tesseract `pol`).
+czyta skany druków modelem wizyjnym DeepSeek (fallback: tesseract `pol`).
 
 [`supagraf/`](supagraf/)
 
@@ -67,7 +67,7 @@ każdego modułu znajdziesz w [docs/getting-started.md](docs/getting-started.md)
 
 ## Struktura repo
 
-- **`supagraf/`** — pipeline ETL w Pythonie (fetch → stage → load → enrich → embed).
+- **`supagraf/`** — pipeline ETL w Pythonie (`sync` → `_stage_*` → load → enrich → embed; opis w `docs/updater.md`).
 - **`frontend/`** — webowy Next.js 16.
 - **`mobile/`** — mobilne Expo / React Native.
 - **`supabase/migrations/`** — sekwencyjne migracje SQL.

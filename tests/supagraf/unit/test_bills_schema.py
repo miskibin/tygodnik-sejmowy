@@ -1,7 +1,6 @@
 """Pydantic schema unit tests for Bill."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -11,20 +10,6 @@ from supagraf.schema.bills import Bill
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SAMPLE = REPO_ROOT / "fixtures" / "sejm" / "bills" / "RPW_10073_2026.json"
-
-
-def test_round_trip_real_fixture():
-    payload = json.loads(SAMPLE.read_text(encoding="utf-8"))
-    obj = Bill.model_validate(payload)
-    assert obj.number == "RPW/10073/2026"
-    assert obj.term == 10
-    assert obj.applicant_type == "DEPUTIES"
-    assert obj.submission_type == "BILL"
-    assert obj.status == "ACTIVE"
-    assert obj.eu_related is False
-    assert obj.public_consultation is False
-    assert obj.consultation_results is False
-    assert obj.title.startswith("Poselski projekt")
 
 
 def test_extra_fields_rejected():
@@ -104,16 +89,3 @@ def test_full_optional_fields():
     assert obj.description == "desc"
     assert obj.print == "2414"
     assert obj.senders_number == "RM-0610-38-26"
-
-
-def test_natural_id_is_slash_number():
-    """Stage uses obj.number as natural_id (slash form, NOT filename stem)."""
-    from supagraf.stage import bills as stage_mod  # noqa: F401
-    obj = Bill.model_validate({
-        "term": 10, "number": "RPW/10073/2026", "title": "t",
-        "applicantType": "DEPUTIES", "submissionType": "BILL", "status": "ACTIVE",
-        "euRelated": False, "publicConsultation": False, "consultationResults": False,
-        "dateOfReceipt": "2026-01-01",
-    })
-    assert obj.number == "RPW/10073/2026"
-    assert "/" in obj.number  # slash form

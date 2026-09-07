@@ -27,13 +27,6 @@ import supagraf.enrich.embed_print  # noqa: F401
 import supagraf.enrich.llm  # noqa: F401
 import supagraf.enrich.pdf  # noqa: F401
 import supagraf.enrich.pdf_fetch  # noqa: F401
-import supagraf.enrich.print_action  # noqa: F401
-import supagraf.enrich.print_impact  # noqa: F401
-import supagraf.enrich.print_mentions  # noqa: F401
-import supagraf.enrich.print_personas  # noqa: F401
-import supagraf.enrich.print_plain_polish  # noqa: F401
-import supagraf.enrich.print_stance  # noqa: F401
-import supagraf.enrich.print_summary  # noqa: F401
 import supagraf.fetch  # noqa: F401
 import supagraf.fetch.acts  # noqa: F401
 import supagraf.fetch.mp_photos  # noqa: F401

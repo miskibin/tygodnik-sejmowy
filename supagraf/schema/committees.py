@@ -21,6 +21,10 @@ class CommitteeMember(BaseModel):
     club: str
     function: str | None = None
     last_first_name: str = Field(alias="lastFirstName")
+    # Added upstream in 2026 (split name + membership start date).
+    first_name: str | None = Field(default=None, alias="firstName")
+    last_name: str | None = Field(default=None, alias="lastName")
+    join_date: date | None = Field(default=None, alias="joinDate")
 
 
 class Committee(BaseModel):
@@ -34,5 +38,7 @@ class Committee(BaseModel):
     phone: str | None = None
     appointment_date: date | None = Field(default=None, alias="appointmentDate")
     composition_date: date | None = Field(default=None, alias="compositionDate")
+    # Set on dissolved committees (e.g. investigative ones). Upstream 2026.
+    dismissal_date: date | None = Field(default=None, alias="dismissalDate")
     members: list[CommitteeMember] = Field(default_factory=list)
     sub_committees: list[str] = Field(default_factory=list, alias="subCommittees")

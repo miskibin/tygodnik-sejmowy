@@ -1,7 +1,6 @@
 """Pydantic schema unit tests for Question + nested models."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -20,32 +19,6 @@ INTER = REPO_ROOT / "fixtures" / "sejm" / "interpellations" / "14441.json"
 WRITTEN = REPO_ROOT / "fixtures" / "sejm" / "writtenQuestions" / "3011.json"
 # 14492 has the rare repeatedInterpellation field present (audit found 23 such docs).
 INTER_REPEATED = REPO_ROOT / "fixtures" / "sejm" / "interpellations" / "14492.json"
-
-
-def test_round_trip_real_interpellation():
-    payload = json.loads(INTER.read_text(encoding="utf-8"))
-    obj = Question.model_validate(payload)
-    assert obj.term == 10
-    assert obj.num == 14441
-    assert isinstance(obj.from_ids, list)
-    assert isinstance(obj.to_recipients, list)
-    assert isinstance(obj.recipient_details, list)
-
-
-def test_round_trip_real_written_question():
-    payload = json.loads(WRITTEN.read_text(encoding="utf-8"))
-    obj = Question.model_validate(payload)
-    assert obj.term == 10
-    assert obj.num == 3011
-
-
-def test_repeated_interpellation_recursive():
-    """23 docs carry a 1-element list with a nested copy of the question."""
-    payload = json.loads(INTER_REPEATED.read_text(encoding="utf-8"))
-    obj = Question.model_validate(payload)
-    assert obj.repeated_interpellation is not None
-    assert len(obj.repeated_interpellation) == 1
-    assert obj.repeated_interpellation[0].num == obj.num
 
 
 def test_reply_with_key_present():

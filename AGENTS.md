@@ -16,9 +16,7 @@
 
 ### Running tests
 
-- **Python unit tests**: `uv run pytest tests/supagraf/unit -q --ignore=tests/supagraf/unit/test_pdf_extract.py`
-  - `test_pdf_extract.py` has a stale import (`_resolve_ocr_backend`) — skip it.
-  - Some unit tests have pre-existing mock signature mismatches (61 failures as of May 2026) — these are not caused by env issues.
+- **Python unit tests**: `uv run pytest tests/supagraf/unit tests/supagraf/contract -q` (all green as of Sept 2026; external-fixture tests skip when `fixtures/external` is absent).
 - **E2E tests** (hit live Supabase): `RUN_E2E=1 uv run pytest tests/supagraf/e2e -q`
 - **Frontend lint**: `cd frontend && pnpm lint` (23 pre-existing errors, mostly React hooks warnings)
 

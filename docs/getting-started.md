@@ -29,25 +29,10 @@ uv sync
 
 ```bash
 # wszystko (kadencja 10, rok 2026), małe próbki binarne
-uv run python -m supagraf fixtures all --binary-cap 5
-
-# tylko JSON
-uv run python -m supagraf fixtures all --no-binaries
-
-# pojedynczy zasób
-uv run python -m supagraf fixtures votings --limit 50
-uv run python -m supagraf fixtures prints --binary-cap 3
-```
-
-JSON jest trzymany w gicie; PDF-y / obrazki / HTML-owe transkrypcje są w `.gitignore`.
-
-### Ingest pipeline
-
-```bash
-uv run python -m supagraf stage      # fixtures → tabele _stage_*
-uv run python -m supagraf load       # funkcje SQL load (idempotentne)
-uv run python -m supagraf run-all    # stage + load
-uv run python -m supagraf daily      # pełny inkrement: fetch → stage → load → enrich → embed
+uv run python -m supagraf db-exec -f supabase/migrations/0105_etl_runs_cursors.sql   # raz, jeśli baza nie ma etl_runs
+uv run python -m supagraf sync prints processes --load   # pojedyncze zasoby z api.sejm.gov.pl → _stage_* → load
+uv run python -m supagraf daily                          # pełny inkrement: sync → load → enrich → embed → refresh
+uv run python -m supagraf fixtures districts promises    # źródła zewnętrzne (pliki) — potem `stage` + `load`
 ```
 
 Migracje znajdują się w `supabase/migrations/`, aplikowane przez Supabase CLI

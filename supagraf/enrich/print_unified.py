@@ -37,15 +37,30 @@ from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from supagraf.db import supabase
-from supagraf.enrich import DEFAULT_LLM_MODEL, LLM_MODELS
+from supagraf.enrich import DEFAULT_LLM_MODEL, LLM_MODELS, LLM_ROUTING
 from supagraf.enrich.audit import with_model_run
 from supagraf.enrich.llm import call_structured
 from supagraf.enrich.pdf import extract_pdf, extract_pdf_cover
 from supagraf.enrich.pdf_fetch import resolve_print_pdf
-from supagraf.enrich.print_personas import PERSONA_TAGS, PersonaTag
 
 JOB_NAME = "print_unified"
 PROMPT_NAME = "print_unified"
+
+# Persona taxonomy (26 tags, mig 0016/0031). Must match the prompt's list.
+PERSONA_TAGS = (
+    "najemca", "wlasciciel-mieszkania", "rodzic-ucznia", "pacjent-nfz", "kierowca-zawodowy",
+    "rolnik", "jdg", "emeryt", "pracownik-najemny", "student", "przedsiebiorca-pracodawca",
+    "niepelnosprawny", "wies", "duze-miasto", "podatnik-pit", "podatnik-vat", "kierowca-prywatny",
+    "odbiorca-energii", "beneficjent-rodzinny", "opiekun-seniora", "dzialkowicz", "wedkarz",
+    "mysliwy", "hodowca", "konsument", "imigrant",
+)
+PersonaTag = Literal[
+    "najemca", "wlasciciel-mieszkania", "rodzic-ucznia", "pacjent-nfz", "kierowca-zawodowy",
+    "rolnik", "jdg", "emeryt", "pracownik-najemny", "student", "przedsiebiorca-pracodawca",
+    "niepelnosprawny", "wies", "duze-miasto", "podatnik-pit", "podatnik-vat", "kierowca-prywatny",
+    "odbiorca-energii", "beneficjent-rodzinny", "opiekun-seniora", "dzialkowicz", "wedkarz",
+    "mysliwy", "hodowca", "konsument", "imigrant",
+]
 
 # Topic taxonomy locked v1 (mig 0061). Multi-label: a print may belong to
 # multiple topics (e.g. "Kodeks pracy" -> sady-prawa + praca-zus).
@@ -97,25 +112,38 @@ _FLASH_CATEGORIES = frozenset({
 
 
 def pick_model(meta_row: dict) -> str:
-    """Choose pro/flash from prints metadata. ONE call per print, model varies.
+    """Choose the model for one print.
 
-    Sub-prints (opinions/OSR/etc.) and the procedural categories above route
-    to flash; everything else (projekt_ustawy, sprawozdanie_komisji) routes
-    to pro because that's where the citizen-facing fields actually carry
-    meaningful content.
+    Default routing is "single": every print goes to the vision-capable flash
+    model — same price as flash, and the only model that can read a scanned
+    print. `SUPAGRAF_LLM_ROUTING=pro_flash` restores the legacy split
+    (substantive bills → pro, procedural/meta docs → flash).
 
     `SUPAGRAF_LLM_MODEL` pins every print to one model, bypassing the routing —
-    the documented escape hatch for cost-capped catch-up runs, where paying pro
-    rates on a backlog matters more than the reasoning headroom."""
+    the documented escape hatch for cost-capped catch-up runs."""
     override = os.environ.get("SUPAGRAF_LLM_MODEL")
     if override:
         return override
+    routing = os.environ.get("SUPAGRAF_LLM_ROUTING", LLM_ROUTING).lower()
+    if routing != "pro_flash":
+        return LLM_MODELS["vision"]
     if meta_row.get("is_meta_document"):
         return LLM_MODELS["flash"]
     if meta_row.get("document_category") in _FLASH_CATEGORIES:
         return LLM_MODELS["flash"]
     return LLM_MODELS["pro"]
-MAX_INPUT_CHARS = 8000
+
+
+# Input budget. The V4 family has a 1M-token context, so the old 8 000-char
+# cap (≈2 pages) — which threw away 95% of a typical bill — is gone. Flash
+# input is $0.22/M tokens at cache-miss rates: a 200-page bill (~150k chars,
+# ~50k tokens) costs about a cent. Long documents are trimmed head+tail so
+# the entry-into-force / transitional articles at the end survive.
+MAX_INPUT_CHARS = int(os.environ.get("SUPAGRAF_PRINT_MAX_INPUT_CHARS", "240000"))
+TAIL_CHARS = 20000
+# Reasoning mode for the unified print call. "off" keeps a print at ~1k
+# output tokens; "low" adds ~4k reasoning tokens (≈ 3x the cost per print).
+PRINT_THINKING = os.environ.get("SUPAGRAF_PRINT_THINKING", "off")
 PLAIN_MIN_WORDS = 20
 PLAIN_MAX_WORDS = 300
 
@@ -324,6 +352,23 @@ class PrintUnifiedOutput(BaseModel):
         return v
 
 
+def trim_body(text: str, budget: int) -> str:
+    """Fit `text` into `budget` chars keeping the head and the tail.
+
+    Sejm bills put the operative articles first and the vacatio legis /
+    transitional provisions last; a head-only cut loses the second half.
+    """
+    if budget <= 0:
+        return ""
+    if len(text) <= budget:
+        return text
+    tail = min(TAIL_CHARS, budget // 4)
+    marker = "\n\n[... pominięto {n} znaków ze środka dokumentu ...]\n\n"
+    head = max(0, budget - tail - len(marker) - 8)
+    omitted = len(text) - head - tail
+    return text[:head] + marker.format(n=omitted) + text[-tail:]
+
+
 def _recover_spans(mentions: list[UnifiedMention], text: str) -> list[dict]:
     """Locate each mention.raw_text in the source text via str.find.
 
@@ -490,7 +535,7 @@ def _enrich_print_unified(
     # Trim body so combined user_input stays under ~MAX_INPUT_CHARS. Header is
     # tiny (~200 chars), cover capped at MAX_COVER_CHARS — rest goes to body.
     budget_for_body = MAX_INPUT_CHARS - len(header) - len(cover_section)
-    body_section = f"## CIAŁO DOKUMENTU\n{body_text[:max(0, budget_for_body)]}"
+    body_section = f"## CIAŁO DOKUMENTU\n{trim_body(body_text, max(0, budget_for_body))}"
 
     user_input = header + cover_section + body_section
     if not body_text.strip():
@@ -502,8 +547,15 @@ def _enrich_print_unified(
         user_input=user_input,
         output_model=PrintUnifiedOutput,
         prompt_version=prompt_version,
+        thinking=PRINT_THINKING,
     )
     parsed: PrintUnifiedOutput = call.parsed  # type: ignore[assignment]
+    logger.info(
+        "print {}: {} in={} (cache hit {}) out={} reasoning={} extract={} cache_hit={}",
+        entity_id, llm_model, call.usage.input_tokens, call.usage.cache_hit_tokens,
+        call.usage.output_tokens, call.usage.reasoning_tokens,
+        extraction.model_version, extraction.cache_hit,
+    )
 
     # Issue #8 — post-parse blacklist sweep. Re-prompting on hit would double
     # latency+cost; instead we log a warning so the corpus can be swept for
