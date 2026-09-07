@@ -100,12 +100,12 @@ def _finish_run(run_id: int, status: str, notes: dict | None = None) -> None:
         if getattr(e, "code", "") == "P0001" and "not in running state" in str(e):
             logger.warning("model_run_finish({}, {}): already finished", run_id, status)
             return
-        logger.error("model_run_finish({}, {}) failed: {!r}", run_id, status, e)
+        logger.warning("model_run_finish({}, {}) failed, retrying: {!r}", run_id, status, e)
         raise
     except Exception as e:
-        # NEVER swallow this silently — leaves the row stuck at 'running' which
-        # is observable. Log loud and re-raise so callers see the breakage.
-        logger.error("model_run_finish({}, {}) failed: {!r}", run_id, status, e)
+        # Never swallow: a stuck 'running' row must stay observable. tenacity
+        # retries transport drops; the final failure surfaces to the caller.
+        logger.warning("model_run_finish({}, {}) failed, retrying: {!r}", run_id, status, e)
         raise
 
 
