@@ -83,3 +83,22 @@ def test_affected_group_with_unknown_tag_is_dropped():
     fn = PrintUnifiedOutput._drop_unknown_affected_groups
     groups = [{"tag": "mieszkaniec", "severity": "high"}, {"tag": "najemca", "severity": "low"}]
     assert fn(groups) == [{"tag": "najemca", "severity": "low"}]
+
+
+def test_persist_retries_transport_drop_then_writes():
+    """A paid LLM reply must survive one 'Server disconnected' on the write."""
+    from unittest.mock import MagicMock, patch
+
+    import httpx
+
+    from supagraf.enrich import print_unified
+
+    sb = MagicMock()
+    update_exec = sb.table.return_value.update.return_value.eq.return_value.eq.return_value.execute
+    update_exec.side_effect = [httpx.RemoteProtocolError("Server disconnected"), MagicMock()]
+    sb.table.return_value.select.return_value.eq.return_value.eq.return_value.single.return_value.execute.return_value.data = {"id": 1}
+    with patch("supagraf.enrich.print_unified.supabase", return_value=sb):
+        print_unified._persist.retry_with(wait=print_unified.wait_exponential(multiplier=0, max=0))(
+            10, "1", {"summary": "x"}, [], "7", "sha", "m")
+    assert update_exec.call_count == 2
+    sb.table.return_value.delete.return_value.eq.return_value.eq.return_value.execute.assert_called_once()

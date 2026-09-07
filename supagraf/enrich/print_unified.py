@@ -35,10 +35,11 @@ from typing import Literal
 
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from supagraf.db import supabase
 from supagraf.enrich import DEFAULT_LLM_MODEL, LLM_MODELS, LLM_ROUTING
-from supagraf.enrich.audit import with_model_run
+from supagraf.enrich.audit import DB_RETRY_EXC, with_model_run
 from supagraf.enrich.llm import call_structured
 from supagraf.enrich.pdf import extract_pdf, extract_pdf_cover
 from supagraf.enrich.pdf_fetch import resolve_print_pdf
@@ -706,35 +707,26 @@ def _enrich_print_unified(
         # for non-meta prints. Frontend reads opinion_source for the granular
         # author when sponsor_authority='inne' on a meta-document.
         update_payload["sponsor_authority"] = sponsor_authority_override
-    supabase().table("prints").update(update_payload).eq(
-        "term", term
-    ).eq("number", entity_id).execute()
+    _persist(term, entity_id, update_payload, mention_rows, pv_str, prompt_sha, llm_model)
+    return parsed
 
-    # Replace mentions for this prompt_version: delete then insert fresh batch.
-    print_id_row = (
-        supabase().table("prints").select("id")
-        .eq("term", term).eq("number", entity_id)
-        .single().execute().data
-    )
-    print_id = print_id_row["id"]
 
-    supabase().table("print_mentions").delete().eq("print_id", print_id).eq(
-        "prompt_version", pv_str
-    ).execute()
-
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(5),
+       wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
+def _persist(term: int, entity_id: str, update_payload: dict, mention_rows: list[dict],
+             pv_str: str, prompt_sha: str, llm_model: str) -> None:
+    """Write the enrichment; retried on transport drops so a paid LLM reply
+    is never lost to one "Server disconnected". Idempotent: same update,
+    mentions replaced wholesale for this prompt_version."""
+    sb = supabase()
+    sb.table("prints").update(update_payload).eq("term", term).eq("number", entity_id).execute()
+    print_id = (sb.table("prints").select("id").eq("term", term).eq("number", entity_id)
+                .single().execute().data["id"])
+    sb.table("print_mentions").delete().eq("print_id", print_id).eq("prompt_version", pv_str).execute()
     if mention_rows:
-        supabase().table("print_mentions").insert([
-            {
-                "print_id": print_id,
-                "mention_type": r["mention_type"],
-                "raw_text": r["raw_text"],
-                "span_start": r["span_start"],
-                "span_end": r["span_end"],
-                "prompt_version": pv_str,
-                "prompt_sha256": prompt_sha,
-                "model": llm_model,
-            }
+        sb.table("print_mentions").insert([
+            {"print_id": print_id, "mention_type": r["mention_type"], "raw_text": r["raw_text"],
+             "span_start": r["span_start"], "span_end": r["span_end"],
+             "prompt_version": pv_str, "prompt_sha256": prompt_sha, "model": llm_model}
             for r in mention_rows
         ]).execute()
-
-    return parsed
