@@ -34,19 +34,30 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
 ## Data ingest invariants
 
 - **Real data only** for non-Sejm sources (Patronite, manifestos, postcodes). No synthetic fixtures.
-- On-demand PDF fetch: `supagraf/enrich/pdf_fetch.py` caches to `~/.cache/supagraf/prints/` with TTL 24h. Do not re-introduce a "PDFs on disk in fixtures/" pattern.
+- On-demand PDF fetch: `supagraf/enrich/pdf_fetch.py` caches to `~/.cache/supagraf/prints/` with TTL 24h. Do not re-introduce a "PDFs on disk in fixtures/" pattern. The daily itself writes no fixture files either (see Updater).
 - `pdf_extracts` table is the durable cache (sha256-keyed paddle markdown). Second enricher on same print reuses, no re-paddle.
 - Hard FK / hard CHECK / provenance / idempotent on every layer. No silent fallbacks. No mocks for production runs (mocks fine in tests).
+
+## Updater (daily)
+
+- `python -m supagraf daily` = `supagraf/sync/` (Sept 2026 rewrite). Incremental: per-resource change detection (server-side `modifiedSince`/`since` where the API has it, `changeDate`/payload diffs against `_stage_*` otherwise), loaders only for dirty resources, `etl_runs` ledger, non-zero exit on any failed step. Full description in `docs/updater.md`.
+- Needs migration **0105** (`etl_runs`, `etl_cursors`, `proceeding_day_gaps`); refuses to run without it. `python -m supagraf db-exec -f <file>` applies SQL through the `exec_sql` RPC.
+- The daily writes no fixture files. `fixtures capture` / `stage` remain for bulk snapshots and the external sources (districts, postcodes, promises, mp_office_expenses).
+- Sejm API facts (verified 2026-09-07): no ETag/Last-Modified, conditional GETs are ignored, no gzip; `/prints` ignores every query param; `processes`, `interpellations`, `writtenQuestions` accept `modifiedSince`; `videos` accepts `since/till`; `/committees/sittings/{date}`; `/eli/changes/acts?since=` returns full details for DU+MP. Transcripts have no change signal and an empty `statements[]` means "not published yet".
+- `_stage_*.source_path` carries the upstream URL for rows written by the updater.
 
 ## LLM
 
 - **Default backend: `deepseek`** (`SUPAGRAF_LLM_BACKEND=deepseek`). Needs `DEEPSEEK_API_KEY`. Code defaults live in `supagraf/enrich/__init__.py`.
-- **Per-print picker** (`supagraf/enrich/print_unified.py:pick_model`) routes each print to `pro` or `flash`:
-  - `deepseek-v4-pro` (`SUPAGRAF_LLM_MODEL_PRO`) — substantive bills (projekt_ustawy, sprawozdanie_komisji). 1M ctx.
-  - `deepseek-v4-flash` (`SUPAGRAF_LLM_MODEL_FLASH`) — procedural/meta docs (opinions, OSR, autopoprawka). 1M ctx.
-- **Statements (`enrich-utterances`) ALWAYS use `deepseek-v4-flash`.** Volume rule — single sitting = ~700 statements, full term = thousands; flash output (viral_quote, summary_one_line, tone, topic_tags, key_claims) is short-form and flash matches quality at ~10% of pro cost. Default lives in `SUPAGRAF_UTTERANCE_LLM_MODEL`. Do NOT pass `-e SUPAGRAF_LLM_MODEL=deepseek-v4` to the utterance job; that env clobbers the per-statement default and routes the whole batch to pro.
-- Alternative backends behind `SUPAGRAF_LLM_BACKEND`: `gemini` (needs `GOOGLE_API_KEY`) and `ollama` (legacy local; historically `gemma4:e4b`, 9.6 GB, ID c6eb396dbd59). `SUPAGRAF_LLM_MODEL` overrides the per-print picker with a single model name.
-- **Default timeout 300 s** (long Polish prints + structured-JSON inference can take 60-120 s; 60 s default was triggering `ReadTimeout` mid-batch). Override via `SUPAGRAF_LLM_TIMEOUT_S` env.
+- **Prints: `deepseek-v4-flash-vision-exp`** (`SUPAGRAF_LLM_MODEL_VISION`, `LLM_MODELS["vision"]`) for every print — flash pricing, 1M ctx, reads images. `pick_model` returns it unless `SUPAGRAF_LLM_MODEL` pins a model or `SUPAGRAF_LLM_ROUTING=pro_flash` re-enables the legacy substantive→`deepseek-v4-pro` / procedural→`deepseek-v4-flash` split. Input budget `SUPAGRAF_PRINT_MAX_INPUT_CHARS` (default 240 000, head+tail trim) — do not reintroduce the 8 000-char cap.
+- **Scanned prints → vision OCR** (`supagraf/enrich/vision_ocr.py`): pages rasterized + cut into 3 strips (DeepSeek caps every image at 384 tokens), transcribed to markdown, cached in `pdf_extracts` as `deepseek-v4-flash-vision-exp-ocr-v1`. Tesseract+`pol` is the fallback (`SUPAGRAF_VISION_OCR=0`).
+- **Statements (`enrich-utterances`) use `deepseek-v4-flash`** (`SUPAGRAF_UTTERANCE_LLM_MODEL`), `thinking=off`. Do NOT pass `SUPAGRAF_LLM_MODEL` to the utterance job; it clobbers the per-statement default.
+- **Thinking**: DeepSeek enables it by default and then ignores `temperature`. `call_structured(thinking="off"|"low"|"high"|"max")`; default `SUPAGRAF_LLM_THINKING=off`, prints use `SUPAGRAF_PRINT_THINKING=low`. The body key is `thinking: {"type": ...}` + `reasoning_effort` — `reasoning.effort` is the Anthropic-format field and is ignored on this endpoint.
+- 429 (concurrency throttle) and 503 are retried; empty JSON-mode content is retried; `usage.prompt_cache_hit_tokens` is logged — keep system prompt + schema first, document last, so the automatic prefix cache hits.
+- **Peak pricing** Mon–Fri 01–04 & 06–10 UTC (2× off-peak). Schedule enrichment outside it; `is_deepseek_peak_hour()` warns.
+- Enrichment concurrency `SUPAGRAF_ENRICH_WORKERS` (default 4); failure backoff 3 failures / 14 days per print.
+- Alternative backends behind `SUPAGRAF_LLM_BACKEND`: `gemini` (needs `GOOGLE_API_KEY`) and `ollama` (legacy local). Images are deepseek-only.
+- **Default timeout 300 s** (`SUPAGRAF_LLM_TIMEOUT_S`); `SUPAGRAF_LLM_MAX_TOKENS` (default 8192) caps JSON replies.
 - Embedding: `qwen3-embedding:0.6b` (Ollama, 639 MB). Native dim 1024 → fits `halfvec(1024)` DB column directly, no padding. Override via `SUPAGRAF_EMBED_MODEL` env or `--model` flag on embed commands. Legacy `nomic-embed-text-v2-moe` (768-d zero-padded) retired Q2 2026; if mixed-model embeddings appear in the table (`SELECT DISTINCT model FROM embeddings`), wipe non-qwen rows before semantic search — vector spaces are not comparable.
 
 ## Database
@@ -58,7 +69,7 @@ LightOnOCR-1B / Marker / Surya / paddle were all rejected for scanned-PDF OCR: G
 ## Migrations
 
 - Sequential numbering: 0001..NNNN. Co-existing agents must reserve number ranges to avoid collision. Check `supabase/migrations/` before picking next number.
-- **Apply path #1 (preferred — no SSH, no Tailscale):** `POST /rest/v1/rpc/exec_sql` against `db.msulawiak.pl` w/ service-role JWT (`SUPABASE_SECRET_KEY` / `SUPABASE_KEY` in `.env`). RPC defined by migration 0093.
+- **Apply path #1 (preferred — no SSH, no Tailscale):** `POST /rest/v1/rpc/exec_sql` against `db.msulawiak.pl` w/ service-role JWT (`SUPABASE_SECRET_KEY` / `SUPABASE_KEY` in `.env`). RPC defined by migration 0093. CLI wrapper: `uv run python -m supagraf db-exec -f supabase/migrations/NNNN_x.sql` (uses httpx directly — the supabase-py client rejects the RPC's `{"status":"ok"}` reply as an error).
   - Body: `{"query": "<sql>"}` — accepts SELECT (returns jsonb array), DDL/DML (returns `{"status":"ok"}`), and surfaces errors as `{"status":"error","message":...,"sqlstate":...}` instead of HTTP failure.
   - Service-role only; anon/authenticated get `permission denied for function exec_sql`.
   - Defense-in-depth guard blocks `DROP DATABASE`, `DROP SCHEMA public`, `TRUNCATE auth.users` (regex match, not a real sandbox — auth is the actual boundary).

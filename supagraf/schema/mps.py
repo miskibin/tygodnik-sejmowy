@@ -30,3 +30,7 @@ class MP(BaseModel):
     number_of_votes: int = Field(alias="numberOfVotes")
     inactive_cause: str | None = Field(default=None, alias="inactiveCause")
     waiver_desc: str | None = Field(default=None, alias="waiverDesc")
+    # Added upstream in 2026: swearing-in date and, for MPs who left, the
+    # date the mandate expired. Not consumed by load_mps yet.
+    oath_date: date | None = Field(default=None, alias="oathDate")
+    mandate_expiry_date: date | None = Field(default=None, alias="mandateExpiryDate")

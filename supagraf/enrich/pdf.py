@@ -16,16 +16,17 @@ Three extractor paths, dispatched on file extension and content:
      Polish diacritics; we sidestep that by feeding only text-layer pages.
      ~0.5s/page, no GPU.
 
-  3. ``.pdf`` scan (0 chars) → ``tesseract`` + pol  [TESSERACT_MODEL_VERSION]
-     Scanned signed letters / opinions / transmittals. ~140/543 prints in
-     the corpus. PymupdfBackend returns empty result; ``extract_pdf``
-     auto-routes to ``_extract_tesseract`` which rasterizes via pymupdf at
-     ``TESSERACT_DPI`` and OCRs each page with Polish (``pol``) traineddata.
-     ~3-5s/page CPU, plain text output (no markdown — scans are mostly
-     short transmittal letters where heading structure is minimal anyway).
-     LightOnOCR-1B / paddle-style transformer OCR was rejected: would
-     repeat the paddle GPU/RAM disaster (multi-GB VRAM, deadlock risk on
-     Windows + RTX 5060 Ti) for marginal markdown gain on short scans.
+  3. ``.pdf`` scan (0 chars) → DeepSeek vision OCR    [vision_ocr.VISION_OCR_MODEL_VERSION]
+     Scanned signed letters / opinions / transmittals (~1/4 of prints).
+     PymupdfBackend returns empty result; ``extract_pdf`` rasterizes the
+     pages into strips and has ``deepseek-v4-flash-vision-exp`` transcribe
+     them to markdown (see ``supagraf/enrich/vision_ocr.py``). Cached in
+     ``pdf_extracts`` like every other extraction.
+
+  3b. ``.pdf`` scan, vision unavailable → ``tesseract`` + pol  [TESSERACT_MODEL_VERSION]
+     Fallback when SUPAGRAF_VISION_OCR=0, no DEEPSEEK_API_KEY, or the vision
+     call fails. Rasterizes via pymupdf at ``TESSERACT_DPI`` and OCRs each
+     page with Polish (``pol``) traineddata. ~3-5s/page CPU, plain text.
 
   4. ``.pdf`` w/ ``SUPAGRAF_PDF_BACKEND=paddle`` → ``PaddleOCRVL``
      Legacy escape hatch — PaddleOCR-VL-1.5 with long-document slicing
@@ -496,6 +497,37 @@ def _extract_paddle_sliced(
             pass
 
 
+def _extract_scanned(path: Path, sha: str) -> ExtractionResult | None:
+    """Vision-model OCR for a PDF with no text layer. None → caller falls back.
+
+    Cache first (vision rows are the most expensive extraction to redo),
+    then one transcription call per page. Any failure is logged and yields
+    None so Tesseract gets its turn — a scan must never be lost because the
+    LLM had a bad minute.
+    """
+    from supagraf.enrich import vision_ocr
+
+    if not vision_ocr.vision_ocr_available():
+        return None
+    version = vision_ocr.VISION_OCR_MODEL_VERSION
+    cached = _cache_lookup(sha, version)
+    if cached is not None:
+        return ExtractionResult(
+            sha, cached["text"], cached["page_count"], cached["ocr_used"],
+            cached["char_count_per_page"], version, cache_hit=True,
+        )
+    logger.info("pymupdf 0 chars for {} — vision OCR ({})", path.name, vision_ocr.VISION_OCR_MODEL)
+    try:
+        text, per_page = vision_ocr.transcribe_pdf(path)
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except Exception as e:  # noqa: BLE001 — fall back to tesseract, logged
+        logger.warning("vision OCR failed for {}: {!r} — falling back", path.name, e)
+        return None
+    _cache_insert(sha, version, text, len(per_page), True, per_page)
+    return ExtractionResult(sha, text, len(per_page), True, per_page, version, cache_hit=False)
+
+
 def extract_pdf(path: Path, *, ocr_backend: OcrBackend | None = None) -> ExtractionResult:
     """Extract text. Default backend = pymupdf (fast, no GPU).
 
@@ -568,9 +600,13 @@ def extract_pdf(path: Path, *, ocr_backend: OcrBackend | None = None) -> Extract
         else:
             text, per_page = backend.extract(path)
         if sum(per_page) == 0:
-            # pymupdf returns 0 chars on scanned PDFs (no text layer). Auto-OCR
-            # with tesseract before falling back to pypdf — pypdf will also
-            # return 0 chars on scans, so without OCR these prints are lost.
+            # pymupdf returns 0 chars on scanned PDFs (no text layer). OCR
+            # before falling back to pypdf — pypdf will also return 0 chars
+            # on scans, so without OCR these prints are lost.
+            if not is_paddle:
+                scanned = _extract_scanned(path, sha)
+                if scanned is not None:
+                    return scanned
             if not is_paddle and TESSERACT_ENABLED:
                 logger.info(
                     "pymupdf 0 chars for {} — trying tesseract OCR fallback",

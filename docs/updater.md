@@ -1,0 +1,131 @@
+# The updater (`python -m supagraf daily`)
+
+The daily is an incremental sync from api.sejm.gov.pl / ELI into the
+self-hosted Supabase, followed by LLM enrichment and embeddings. It was
+rewritten in September 2026 (`supagraf/sync/`); the fixture-file pipeline
+(`fixtures capture` → `stage` → `load`) still exists for bulk snapshots and
+the non-Sejm sources, but the daily no longer touches the filesystem.
+
+```
+python -m supagraf daily                    # the cron entrypoint
+python -m supagraf daily --only prints --only proceedings --skip-enrich
+python -m supagraf daily --full             # ignore cursors/diffs, run every loader
+python -m supagraf sync votings proceedings --load   # one resource, then its loaders
+python -m supagraf db-exec -f supabase/migrations/0105_etl_runs_cursors.sql
+```
+
+Exit code is **0 only when every step succeeded**; 1 when any step failed
+(the old daily always exited 0). Every run writes one `etl_runs` row with
+per-step timings, counters and errors:
+
+```sql
+select id, status, started_at, finished_at, steps from etl_runs order by id desc limit 5;
+```
+
+## Phases
+
+| phase | what happens | skipped when |
+|---|---|---|
+| `schema` | migration 0105 present (`etl_runs`, `etl_cursors`, `proceeding_day_gaps`) | never — refuses to run without it |
+| `sync:<resource>` | fetch only what changed upstream, validate against the Pydantic contract, upsert `_stage_*` | `--skip-fetch`, `--only` |
+| `sync:mp_photos`, `sync:polls` | photo URL probe, Wikipedia poll scrape | `--only` without them |
+| `load` | `load_*` SQL for **dirty resources only**, FK-ordered (`supagraf/sync/loaders.py`) | nothing dirty, `--skip-load` |
+| `load:relink_agenda_refs`, `backfill:*` | cheap relinks that depend on what changed | inputs not dirty |
+| `enrich:prints` | unified LLM pass on prints without `impact_punch`, `SUPAGRAF_ENRICH_WORKERS` at a time | `--skip-enrich` |
+| `enrich:statements` | flash pass on the newest sitting that has un-enriched statements | `--skip-enrich` |
+| `enrich:voting_short_title` | last 30 days | `--skip-enrich` |
+| `embed:*` | qwen3 embeddings (Ollama) for prints / statements / promises | `--skip-embed`, `SUPAGRAF_DAILY_SKIP_EMBED=1` |
+| `refresh` | matviews whose inputs changed | `--skip-load` |
+
+`--skip-fetch` marks every resource dirty (nothing to diff against), which
+reproduces the old "reload everything" run.
+
+## How each resource detects change
+
+Verified against the live API on 2026-09-07. The API sends **no ETag,
+Last-Modified or Cache-Control** and ignores `If-None-Match` /
+`If-Modified-Since`, so HTTP caching is useless; change detection is done
+with the delta parameters that exist and client-side diffs otherwise.
+
+| resource | signal | cost of a quiet day |
+|---|---|---|
+| prints | full `/prints` list (1.8 MB — every query param is ignored upstream), `changeDate` diffed against `_stage_prints.payload->>changeDate`; detail (400 B) only for new/advanced numbers | 1 request |
+| processes | `?modifiedSince=<cursor>` (server-side), detail per changed process, detail compared to the stage row so a timestamp-only bump does not trigger `load_processes` | 1 request |
+| votings | 8 KB `/votings` index (`votingsNum` per sitting) vs stage count; unsealed votings (captured before vote rows were published) are re-pulled; sealed via `etl_watermarks` | 1 request |
+| proceedings | `current=true`, any date inside `--window-days`, not yet staged, or reported by `proceeding_day_gaps()` (a recent day with no statements or statements without bodies). Composes the stage payload from detail + per-day transcripts + statement HTML; **bodies already in `proceeding_statements` are reused, only new statements are fetched**; identical payloads are not rewritten | 1 list request + detail/transcripts for the current sitting |
+| committee_sittings | `/committees/sittings/{date}` for each day in `[today-window, today+30]` (60 KB/day), merged by `num` into the per-committee bundle | ~45 requests |
+| mps | `/MP` list vs stored detail (the list repeats the detail's fields); detail only on disagreement | 1 request |
+| clubs, committees | every detail (12 / 40 rows), written only when changed | 52 requests |
+| bills | full list (850 KB, no filter upstream) diffed against stage | 1 request |
+| videos | `?since=&till=` from a cursor (full list is 7.5 MB) | 1 request |
+| questions | `interpellations` + `writtenQuestions` `?modifiedSince=<cursor>` | 2 requests |
+| acts | `/eli/changes/acts?since=<cursor>` — full act details for DU **and** MP in one feed, replaces the year listing + per-act detail loop | 1 request |
+
+Cursors (`etl_cursors`) are only advanced after a resource sync with no
+item errors, and a 2 h overlap is subtracted on read, so a crash never
+skips a window. Upstream timestamps are Warsaw local time; the cursors
+are kept in that space.
+
+Not touched by the daily: districts, postcodes, promises,
+mp_office_expenses (external sources — `stage <resource>` + `load`).
+
+## Loader plan
+
+No `load_*` function is incremental — each rebuilds its target from the
+whole `_stage_*` table for the term. The daily therefore only *calls* the
+ones whose inputs changed (`supagraf/sync/loaders.py`), in FK order, with
+proceedings loaded after prints/processes so agenda refs resolve the same
+day. Matview refreshes are gated the same way: no votings change → no
+`refresh_mp_discipline` / atlas refresh.
+
+`load_proceedings` writes `body_html`/`body_text` from the payload
+unconditionally, which is why the proceedings composer always carries the
+bodies the DB already has.
+
+## LLM
+
+* Prints: `deepseek-v4-flash-vision-exp` (`SUPAGRAF_LLM_MODEL_VISION`) for
+  every print, text in, JSON out, `thinking=low`
+  (`SUPAGRAF_PRINT_THINKING`). Input budget is 240 000 chars head+tail
+  (`SUPAGRAF_PRINT_MAX_INPUT_CHARS`) — the old 8 000-char cap dropped ~95 %
+  of a typical bill. The legacy pro/flash router is behind
+  `SUPAGRAF_LLM_ROUTING=pro_flash`.
+* Scanned PDFs (no text layer): pages rasterized at 200 DPI, cut into 3
+  strips (each image is capped at 384 tokens upstream, whole pages are too
+  coarse), transcribed to markdown by the vision model, cached in
+  `pdf_extracts` under `deepseek-v4-flash-vision-exp-ocr-v1`. Tesseract+`pol`
+  remains the fallback (`SUPAGRAF_VISION_OCR=0` disables vision OCR).
+* Statements: `deepseek-v4-flash`, `thinking=off`.
+* DeepSeek facts encoded in `supagraf/enrich/llm.py`: thinking is on by
+  default and silently ignores `temperature`, so requests carry
+  `thinking.type=disabled` unless a mode is asked for; 429 is
+  concurrency throttling and is retried; JSON mode can return empty
+  content and is retried; prefix caching is automatic — system prompt +
+  schema first, document last — and hits are logged from
+  `prompt_cache_hit_tokens`.
+* **Pricing windows**: peak is Mon–Fri 01:00–04:00 and 06:00–10:00 UTC,
+  off-peak is half price. Schedule the cron outside those windows (e.g.
+  22:00 UTC); the daily logs a warning when it starts inside one.
+
+Prints that failed 3 times in 14 days are left alone until the window
+slides (`SUPAGRAF_ENRICH_FAILURE_BACKOFF_*`); after 8 attachment-fetch
+failures in a run the phase aborts (upstream document backend down).
+
+## Applying the migration
+
+Without SSH/Tailscale, through the service-role RPC:
+
+```
+uv run python -m supagraf db-exec -f supabase/migrations/0105_etl_runs_cursors.sql
+```
+
+(then `NOTIFY pgrst, 'reload schema'` via `db-exec -q` if PostgREST reports
+PGRST205). Or via psql on mixvm as documented in CLAUDE.md.
+
+## mixvm
+
+`deploy/mixvm/docker-compose.yml` runs `python -m supagraf daily --term 10`
+one-shot. Keep `SUPAGRAF_LOAD_DIRECT_DSN` set there — `load_votes`,
+`load_proceedings` and the matview refreshes exceed Kong's 60 s upstream
+timeout when they run through PostgREST. The `fixtures/` bind mount is no
+longer needed by the daily.

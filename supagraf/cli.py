@@ -651,497 +651,106 @@ def cmd_backfill_sponsor_authority(
     logger.info("backfill-sponsor-authority: wrote {} updates", written)
 
 
-def _run_direct_stage_captures(*, term: int, direct_staged: set[str]) -> None:
-    """Run the bulk Sejm captures with StreamingStager callbacks attached.
-
-    Each capture writes its fixture (durable cache) AND streams the parsed
-    payload into `_stage_<resource>` so the daily skips the file-scan
-    re-stage for these resources. This is the only daily path — there's no
-    legacy fork. Manual `python -m supagraf fixtures capture <r>` still
-    works for bulk-snapshot operations because `on_record` defaults to None.
-
-    Resources covered: mps, clubs, prints, processes, votings, bills, videos.
-    Proceedings + interpellations + writtenQuestions stay on the file-scan
-    path (compound payload composition / `kind` column).
-
-    `direct_staged` is mutated to add each resource we actually streamed —
-    a per-resource try/except ensures one failed capture doesn't take down
-    the rest. Any resource that fails here falls through to Phase 2-3's
-    file-scan-stage recovery in cmd_daily.
-
-    `SUPAGRAF_CAPTURE_YEAR` overrides the year filter (default: current).
-    """
-    import asyncio
-    from datetime import datetime as _dt
-
-    from supagraf.fixtures.client import SejmClient
-    from supagraf.fixtures.sources import sejm as sejm_src
-    from supagraf.fixtures.storage import fixtures_root
-    from supagraf.schema.bills import Bill
-    from supagraf.schema.clubs import Club
-    from supagraf.schema.mps import MP
-    from supagraf.schema.prints import Print
-    from supagraf.schema.processes import Process
-    from supagraf.schema.videos import Video
-    from supagraf.schema.votings import Voting
-    from supagraf.stage.base import StreamingStager
-
-    year = int(os.environ.get("SUPAGRAF_CAPTURE_YEAR") or _dt.now().year)
-    out_root = fixtures_root()
-
-    async def _go() -> None:
-        async with SejmClient(concurrency=5) as client:
-
-            def _make_cb(stager: StreamingStager):
-                return lambda nid, p, src: stager.push(
-                    natural_id=nid, payload=p, source_path=src
-                )
-
-            # mps — term-only, no year. Set no_binaries=True so daily skips
-            # photo binaries; fetch_mp_photos handles the HEAD probe.
-            try:
-                with StreamingStager(
-                    resource="mps", table="_stage_mps", model=MP, term=term,
-                ) as st:
-                    await sejm_src.capture_mps(
-                        client, out_root, term,
-                        refresh=False, no_binaries=True, limit=None,
-                        on_record=_make_cb(st),
-                    )
-                direct_staged.add("mps")
-            except Exception as e:
-                logger.error("capture_mps direct-stage failed: {!r}", e)
-
-            try:
-                with StreamingStager(
-                    resource="clubs", table="_stage_clubs", model=Club, term=term,
-                ) as st:
-                    await sejm_src.capture_clubs(
-                        client, out_root, term,
-                        refresh=False, no_binaries=True, limit=None,
-                        on_record=_make_cb(st),
-                    )
-                direct_staged.add("clubs")
-            except Exception as e:
-                logger.error("capture_clubs direct-stage failed: {!r}", e)
-
-            try:
-                with StreamingStager(
-                    resource="prints", table="_stage_prints", model=Print, term=term,
-                ) as st:
-                    await sejm_src.capture_prints(
-                        client, out_root, term, year,
-                        refresh=False, no_binaries=True, limit=None,
-                        on_record=_make_cb(st),
-                    )
-                direct_staged.add("prints")
-            except Exception as e:
-                logger.error("capture_prints direct-stage failed: {!r}", e)
-
-            try:
-                with StreamingStager(
-                    resource="processes", table="_stage_processes", model=Process, term=term,
-                ) as st:
-                    await sejm_src.capture_processes(
-                        client, out_root, term, year,
-                        refresh=False, no_binaries=True, limit=None,
-                        on_record=_make_cb(st),
-                    )
-                direct_staged.add("processes")
-            except Exception as e:
-                logger.error("capture_processes direct-stage failed: {!r}", e)
-
-            try:
-                # Votings carry the largest per-row jsonb; StreamingStager
-                # batch_size default (10) keeps flush spikes manageable.
-                with StreamingStager(
-                    resource="votings", table="_stage_votings", model=Voting, term=term,
-                ) as st:
-                    await sejm_src.capture_votings(
-                        client, out_root, term, year,
-                        refresh=False, no_binaries=True, limit=None,
-                        on_record=_make_cb(st),
-                    )
-                direct_staged.add("votings")
-            except Exception as e:
-                logger.error("capture_votings direct-stage failed: {!r}", e)
-
-            try:
-                with StreamingStager(
-                    resource="bills", table="_stage_bills", model=Bill, term=term,
-                ) as st:
-                    await sejm_src.capture_bills(
-                        client, out_root, term, year,
-                        refresh=False, limit=None,
-                        on_record=_make_cb(st),
-                    )
-                direct_staged.add("bills")
-            except Exception as e:
-                logger.error("capture_bills direct-stage failed: {!r}", e)
-
-            try:
-                with StreamingStager(
-                    resource="videos", table="_stage_videos", model=Video, term=term,
-                ) as st:
-                    await sejm_src.capture_videos(
-                        client, out_root, term, year,
-                        refresh=False, limit=None,
-                        on_record=_make_cb(st),
-                    )
-                direct_staged.add("videos")
-            except Exception as e:
-                logger.error("capture_videos direct-stage failed: {!r}", e)
-
-            # Proceedings can't stream into _stage_proceedings (the stager
-            # composes one payload out of transcripts JSON + per-statement
-            # HTML), but the fixtures still have to be pulled here — Phase 2
-            # only file-scans what is already on disk. Without this, a new
-            # sitting never enters the DB and, worse, load_votings hard-fails
-            # on the votings that reference it:
-            #   Key (term, sitting)=(10, 59) is not present in "proceedings"
-            # which aborts the whole daily. Binaries stay on so the statement
-            # HTML bodies land with the transcripts.
-            try:
-                await sejm_src.capture_proceedings(
-                    client, out_root, term, year,
-                    refresh=False, no_binaries=False, limit=None,
-                )
-            except Exception as e:
-                logger.error("capture_proceedings failed: {!r}", e)
-
-    asyncio.run(_go())
-
-
 @app.command("daily")
 def cmd_daily(
     term: int = typer.Option(10, "--term", "-t"),
-    skip_fetch: bool = typer.Option(False, "--skip-fetch", help="skip Sejm API fetch"),
+    skip_fetch: bool = typer.Option(False, "--skip-fetch", help="skip the upstream sync; every resource is then treated as dirty and reloaded"),
+    skip_load: bool = typer.Option(False, "--skip-load", help="skip load_* and matview refreshes"),
     skip_enrich: bool = typer.Option(False, "--skip-enrich"),
     skip_embed: bool = typer.Option(False, "--skip-embed"),
+    full: bool = typer.Option(False, "--full", help="ignore cursors/diffs: refetch every entity, run every loader and refresh"),
+    window_days: int = typer.Option(14, "--window-days", help="days back that count as 'still moving' (proceedings, committee sittings)"),
+    only: list[str] = typer.Option(None, "--only", help="restrict the sync phase to these resources (repeatable)"),
+    workers: int = typer.Option(0, "--workers", help="LLM enrichment concurrency (0 = SUPAGRAF_ENRICH_WORKERS or 4)"),
+    concurrency: int = typer.Option(8, "--concurrency", help="parallel requests against api.sejm.gov.pl"),
+    no_ledger: bool = typer.Option(False, "--no-ledger", help="do not write the etl_runs row (dev)"),
+    summary_json: Path = typer.Option(None, "--summary-json", help="write the run summary to this file"),
 ):
-    """End-to-end daily incremental: fetch+stage -> load -> enrich -> embed
-    -> refresh aggregates.
+    """Incremental daily update: sync → load → enrich → embed → refresh.
 
-    Designed for cron / GitHub Actions: idempotent (skips already-processed
-    items via partial-index pending filters), bounded cost (LLM only on
-    not-yet-summarized prints), and safe to interrupt at any phase.
-
-    Phases (each independent — `--skip-*` flags re-run only what's needed):
-      1. fetch:  pull new data from api.sejm.gov.pl AND stream it straight
-                 into `_stage_*` tables via StreamingStager. Covers
-                 mps/clubs/prints/processes/votings/bills/videos +
-                 committees/committee_sittings.
-      2. stage:  file-scan the remaining resources (proceedings/questions/
-                 districts/postcodes/promises/acts) that don't fit the
-                 JSON-payload-to-stage pattern.
-      3. load:   _stage_* -> production tables (SQL RPC orchestration)
-      4. enrich: unified LLM call on prints with no impact_punch yet
-      5. embed:  qwen3 embeddings on prints/statements/promises with no
-                 embedded_at marker yet
-      6. refresh: matviews mp_discipline_summary + mp_attendance +
-                 mp_activity_summary + minister_reply_stats
-
-    Exit code 0 only if every phase finished without unhandled exceptions.
+    Only what changed upstream is fetched and only the loaders whose inputs
+    changed run (see supagraf/sync/). Every phase is recorded in `etl_runs`;
+    the exit code is 1 when any step failed, 0 otherwise.
     """
-    # Phase 1: fetch + stream straight into `_stage_*`. Every term-keyed
-    # JSON resource (mps/clubs/prints/processes/votings/bills/videos +
-    # committees/committee_sittings) goes through StreamingStager during
-    # fetch — no file-scan re-stage needed. Resources that don't fit the
-    # JSON-payload-to-stage pattern (proceedings — compound HTML body
-    # composition; questions — `kind` column; promises/districts/postcodes
-    # — non-Sejm origins; acts — single-key eli_id) stay on the legacy
-    # file-scan path in Phase 2 below.
-    direct_staged: set[str] = set()
+    import json
 
-    if not skip_fetch:
-        logger.info("=== daily phase 1/6: fetch + direct-stage ===")
-        from supagraf.fetch.committees import fetch_committees
-        from supagraf.fetch.committee_sittings import fetch_committee_sittings
-        from supagraf.fetch.mp_photos import fetch_mp_photos
-        from supagraf.fetch.proceeding_agendas import fetch_current_proceeding_agendas
-        from supagraf.fetch.proceedings_bodies import fetch_proceeding_bodies
-        from supagraf.schema.committee_sittings import CommitteeSittingsBundle
-        from supagraf.schema.committees import Committee
-        from supagraf.stage.base import StreamingStager
+    from supagraf.sync.daily import run_daily
+    from supagraf.sync.runlog import SchemaMissing
 
-        # Plenary agendas for `current=true` sittings — Marshal edits the
-        # porządek obrad mid-sitting (new prints, sprawozdania, drugie czytania
-        # appended). The default `capture_proceedings` path skips cached files,
-        # so without this refresh `agenda_item_prints` stops gaining links the
-        # moment a sitting starts.
-        try:
-            fetch_current_proceeding_agendas(term=term)
-        except Exception as e:
-            logger.error("proceeding agendas refresh failed: {!r}", e)
-
-        # HTML statement bodies — not a JSON-payload resource; bodies get
-        # picked up by stage_proceedings on its file-scan pass.
-        try:
-            fetch_proceeding_bodies(term=term)
-        except Exception as e:
-            logger.error("proceedings_bodies fetch failed: {!r}", e)
-
-        # MP photo URLs land directly on the `mps` table; no stage row.
-        try:
-            fetch_mp_photos(term=term)
-        except Exception as e:
-            logger.error("mp_photos fetch failed: {!r}", e)
-
-        # Committees roster — idempotent, skips already-cached fixtures.
-        try:
-            with StreamingStager(
-                resource="committees",
-                table="_stage_committees",
-                model=Committee,
-                term=term,
-            ) as stager:
-                fetch_committees(
-                    term=term,
-                    on_record=lambda nid, p, src: stager.push(
-                        natural_id=nid, payload=p, source_path=src
-                    ),
-                )
-            direct_staged.add("committees")
-        except Exception as e:
-            logger.error("committees fetch failed: {!r}", e)
-
-        # Committee sittings — ALWAYS re-fetches (status PLANNED → ONGOING
-        # → FINISHED, agenda edits mid-day).
-        try:
-            with StreamingStager(
-                resource="committee_sittings",
-                table="_stage_committee_sittings",
-                model=CommitteeSittingsBundle,
-                term=term,
-            ) as stager:
-                fetch_committee_sittings(
-                    term=term,
-                    on_record=lambda nid, p, src: stager.push(
-                        natural_id=nid, payload=p, source_path=src
-                    ),
-                )
-            direct_staged.add("committee_sittings")
-        except Exception as e:
-            logger.error("committee_sittings fetch failed: {!r}", e)
-
-        # Bulk Sejm captures (mps / clubs / prints / processes / votings /
-        # bills / videos). Each opens its own StreamingStager keyed to the
-        # matching `_stage_<resource>` table; no_binaries=True skips photo /
-        # logo / attachment downloads (not needed for staging).
-        try:
-            _run_direct_stage_captures(term=term, direct_staged=direct_staged)
-        except Exception as e:
-            logger.error("direct-stage captures failed: {!r}", e)
-
-    # Phase 2-3: file-scan-stage only the resources that DIDN'T stream
-    # during fetch. Subtraction (rather than a hardcoded short list) means
-    # if a direct-stage capture failed earlier (logged + swallowed), the
-    # file-scan path still picks it up as a recovery — no resource silently
-    # falls through the cracks.
-    _all_resources = (
-        "clubs", "mps", "votings", "committees", "committee_sittings",
-        "processes", "bills",
-        "questions", "videos", "proceedings",
-        "districts", "postcodes", "promises",
-        "acts",
-    )
-    remaining_targets = [r for r in _all_resources if r not in direct_staged]
-    logger.info(
-        "=== daily phase 2-3/6: stage + load (direct-staged: {}; file-scanning: {}) ===",
-        sorted(direct_staged), remaining_targets,
-    )
-    cmd_stage(remaining_targets, term=term)
-    cmd_load(term=term)
-
-    # Keep print -> committee_sitting links fresh after every load.
-    logger.info("=== daily: backfill committee-sitting-links ===")
     try:
-        from supagraf.backfill import backfill_print_committee_sitting_links
-        out = backfill_print_committee_sitting_links(term=term)
-        logger.info("backfill_print_committee_sitting_links: {}", out)
-    except Exception as e:
-        logger.error("backfill_print_committee_sitting_links failed: {!r}", e)
-
-    if not skip_enrich:
-        logger.info("=== daily phase 4/6: enrich (unified) ===")
-        # 0 limit = process every pending print. Daily volume is tiny
-        # (~5-30 new drukı per session day) so cost stays bounded.
-        # cmd_enrich_prints raises typer.Exit(3) when ANY print fails; for
-        # daily we swallow it because the per-print loop already logs +
-        # records each failure (model_runs / enrichment_failures), and
-        # partial failures (404 PDFs, OCR misses) are routine production
-        # data noise that should NOT abort embed/refresh phases below.
-        try:
-            cmd_enrich_prints(kind=EnrichKind.unified, term=term, limit=0)
-        except typer.Exit as e:
-            logger.warning("enrich unified completed with failures (exit={}); continuing", e.exit_code)
-
-    if not skip_enrich:
-        # Utterance LLM enrichment (viral_score/quote/tone/topic_tags/...).
-        # Powers Tygodnik "Powiedziane w Sejmie" + MP profile speech panels.
-        # Scoped to the LATEST sitting only: historical sittings (45..N-1)
-        # have NULL viral_score and we intentionally do NOT backfill them
-        # — too expensive (~12 min × N sittings) and citizen-value of stale
-        # quotes is low. New sittings get enriched here as they arrive.
-        logger.info("=== daily: enrich-utterances (latest sitting) ===")
-        try:
-            from supagraf.enrich.utterance_enrich import (
-                UTTERANCE_LLM_MODEL,
-                enrich_statements,
-            )
-            # "Latest sitting" has to mean the latest sitting that actually has
-            # pending statements. The Marshal schedules a sitting before it
-            # happens, so the highest-numbered proceeding routinely has no
-            # transcripts yet — picking it blind enriched nothing and silently
-            # shadowed the sitting that did have statements (63 was empty, so
-            # 62's 755 statements were never touched). Walk back a few
-            # sittings; enrich_statements is a cheap no-op when nothing pends.
-            recent = (
-                supabase().table("proceedings")
-                .select("number")
-                .eq("term", term)
-                .order("number", desc=True)
-                .limit(_UTTERANCE_SITTING_LOOKBACK)
-                .execute()
-                .data
-                or []
-            )
-            if not recent:
-                logger.info("enrich-utterances: no proceedings for term {}", term)
-            for row in recent:
-                s = int(row["number"])
-                n_ok, n_failed = enrich_statements(
-                    term=term, sitting_num=s, limit=0,
-                    llm_model=UTTERANCE_LLM_MODEL,
-                )
-                if n_ok or n_failed:
-                    logger.info(
-                        "enrich-utterances sitting={} ok={} failed={}", s, n_ok, n_failed
-                    )
-                    break
-        except Exception as e:
-            logger.error("enrich-utterances failed: {!r}", e)
-
-    # Embed phase env knobs:
-    #   SUPAGRAF_DAILY_SKIP_EMBED=1  → skip phase 5 entirely (escape hatch
-    #     for hosts where Ollama embedding is too slow to fit in a daily
-    #     window; the embeddings table just stays behind, frontend features
-    #     that need it gracefully degrade).
-    #   SUPAGRAF_EMBED_LIMIT=N       → per-resource cap. Daily then chips
-    #     away at the backlog instead of trying to drain it in one run.
-    skip_embed_env = os.environ.get("SUPAGRAF_DAILY_SKIP_EMBED") == "1"
-    embed_limit_env = int(os.environ.get("SUPAGRAF_EMBED_LIMIT", "0") or 0)
-    if not skip_embed and not skip_embed_env:
-        logger.info("=== daily phase 5/6: embed (limit={}) ===", embed_limit_env or "unbounded")
-        try:
-            cmd_enrich_prints(kind=EnrichKind.embed, term=term, limit=embed_limit_env)
-        except typer.Exit as e:
-            logger.warning("enrich embed completed with failures (exit={}); continuing", e.exit_code)
-        # Statements + promises run via their dedicated commands.
-        try:
-            cmd_enrich_statements(term=term, limit=embed_limit_env)
-        except Exception as e:
-            logger.error("statement embed failed: {!r}", e)
-        try:
-            cmd_enrich_promises(kind="embed", limit=embed_limit_env)
-        except Exception as e:
-            logger.error("promise embed failed: {!r}", e)
-    elif skip_embed_env:
-        logger.info("=== daily phase 5/6: embed SKIPPED (SUPAGRAF_DAILY_SKIP_EMBED=1) ===")
-
-    logger.info("=== daily phase 6/6: refresh aggregates ===")
-    try:
-        cmd_refresh_aggregates()
-    except Exception as e:
-        logger.error("refresh aggregates failed: {!r}", e)
-
-    # Atlas matviews — voting_by_club_mv + klub_pair_agreement_mv. Refresh
-    # CONCURRENTLY (no read lock) so frontend keeps serving during reload.
-    logger.info("=== daily: refresh atlas matviews ===")
-    try:
-        from supagraf.db import call_rpc_scalar
-        r = call_rpc_scalar("refresh_atlas_matviews", {"p_term": term})
-        logger.info("refresh_atlas_matviews: {}", r)
-    except Exception as e:
-        logger.error("refresh_atlas_matviews failed: {!r}", e)
-
-    # voting.short_title — citizen-readable headline parallel to prints.short_title.
-    # Daily runs the last-30d slice only; idempotent so already-enriched rows are
-    # skipped. Fast-path (linked-print copy) costs nothing; LLM fallback gated by
-    # SUPAGRAF_VOTING_LLM_MODEL availability — failures here don't break daily.
-    logger.info("=== daily: enrich-voting-short-title (last 30d) ===")
-    try:
-        from supagraf.enrich.voting_short_title import enrich_votings
-        n_fast, n_llm, n_failed = enrich_votings(term=term, days=30)
-        logger.info(
-            "enrich_voting_short_title fast={} llm={} failed={}",
-            n_fast, n_llm, n_failed,
+        ledger = run_daily(
+            term=term, skip_fetch=skip_fetch, skip_load=skip_load, skip_enrich=skip_enrich,
+            skip_embed=skip_embed, full=full, window_days=window_days,
+            only=tuple(only) if only else None, workers=workers or None,
+            concurrency=concurrency, persist_ledger=not no_ledger,
         )
-    except Exception as e:
-        logger.error("enrich_voting_short_title failed: {!r}", e)
+    except SchemaMissing as e:
+        logger.error(str(e))
+        raise typer.Exit(2)
+    summary = ledger.summary()
+    if summary_json:
+        summary_json.write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    failed = [s.name for s in ledger.failed_steps]
+    print(f"\ndaily {ledger.status}: {len(ledger.steps)} steps, failed={failed or 'none'}, run_id={ledger.run_id}")
+    raise typer.Exit(ledger.exit_code)
 
-    # acts.short_title — Tygodnik "WCHODZI W ŻYCIE" headline. Testing-phase
-    # rollout: gated by SUPAGRAF_ENABLE_ACT_SHORT_TITLE=1; default off until
-    # the 30-day slice has been observed and the rewrites look clean.
-    if os.environ.get("SUPAGRAF_ENABLE_ACT_SHORT_TITLE") == "1":
-        logger.info("=== daily: enrich-act-short-title (last 30d) ===")
-        try:
-            from supagraf.enrich.act_short_title import enrich_acts
-            n_llm, n_failed = enrich_acts(days=30)
-            logger.info(
-                "enrich_act_short_title llm={} failed={}", n_llm, n_failed,
-            )
-        except Exception as e:
-            logger.error("enrich_act_short_title failed: {!r}", e)
-    else:
-        logger.info("=== daily: enrich-act-short-title SKIPPED (set SUPAGRAF_ENABLE_ACT_SHORT_TITLE=1 to enable) ===")
 
-    # Polls (sondaże) — Wikipedia EN scrape, idempotent. Failure here does
-    # not block downstream MV refreshes for other resources.
-    logger.info("=== daily: fetch-polls ===")
+@app.command("sync")
+def cmd_sync(
+    resources: list[str] = typer.Argument(..., help="mps|clubs|committees|committee_sittings|prints|processes|proceedings|votings|bills|videos|questions|acts"),
+    term: int = typer.Option(10, "--term", "-t"),
+    full: bool = typer.Option(False, "--full", help="ignore cursors/diffs for these resources"),
+    load: bool = typer.Option(False, "--load", help="run the affected load_* chain afterwards"),
+    window_days: int = typer.Option(14, "--window-days"),
+    concurrency: int = typer.Option(8, "--concurrency"),
+):
+    """Sync one or more upstream resources into `_stage_*` (no enrich/embed)."""
+    from supagraf.sync.context import SyncContext
+    from supagraf.sync.daily import RESOURCES, sync_resources
+    from supagraf.sync.http import SejmApi
+    from supagraf.sync.loaders import run_loaders
+    from supagraf.sync.runlog import RunLedger, SchemaMissing, ensure_schema
+
+    unknown = [r for r in resources if r not in RESOURCES]
+    if unknown:
+        logger.error("unknown resource(s): {} (known: {})", unknown, ", ".join(RESOURCES))
+        raise typer.Exit(1)
     try:
-        from supagraf.fetch.polls import fetch_polls
-        from supagraf.stage.polls import stage_polls_from_wikipedia
-        p = fetch_polls()
-        inserted, updated = stage_polls_from_wikipedia(p)
-        logger.info("fetch_polls inserted={} updated={}", inserted, updated)
-    except Exception as e:
-        logger.error("fetch_polls failed: {!r}", e)
+        ensure_schema()
+    except SchemaMissing as e:
+        logger.error(str(e))
+        raise typer.Exit(2)
+    ledger = RunLedger(kind="sync", term=term, args={"resources": resources, "full": full, "load": load})
+    ledger.start()
+    with SejmApi(concurrency=concurrency) as api:
+        ctx = SyncContext(term=term, api=api, full=full, window_days=window_days)
+        sync_resources(ctx, ledger, tuple(r for r in RESOURCES if r in resources))
+        if load and ctx.dirty:
+            with ledger.step("load") as step:
+                step.counts = run_loaders(term, ctx.dirty, full=False)
+    ledger.finish()
+    for s in ledger.steps:
+        print(f"{s.name}: {s.status} {s.counts}")
+    raise typer.Exit(ledger.exit_code)
 
-    # Atlas A5: club-switch history derived from votes.club_ref series.
-    # Idempotent (~1.8s) — re-running after a fresh load picks up any new
-    # transitions detected from votes added since last run.
-    logger.info("=== daily: backfill mp_club_history ===")
-    try:
-        from supagraf.backfill.mp_club_history import backfill_mp_club_history
-        out = backfill_mp_club_history(term=term)
-        logger.info("backfill_mp_club_history: {}", out)
-    except Exception as e:
-        logger.error("backfill_mp_club_history failed: {!r}", e)
 
-    # Backfill processes.eli_act_id from acts table — idempotent SQL fn shipped
-    # in 0038. Runs after fetch/load so newly-published acts get linked to the
-    # processes that culminated in them. Cheap (single UPDATE), so no skip flag.
-    logger.info("=== daily: backfill_process_act_links ===")
-    try:
-        from supagraf.db import call_rpc_scalar
-        r = call_rpc_scalar("backfill_process_act_links", {"p_term": term})
-        logger.info("backfill_process_act_links affected={}", r)
-    except Exception as e:
-        logger.error("backfill_process_act_links failed: {!r}", e)
+@app.command("db-exec")
+def cmd_db_exec(
+    file: Path = typer.Option(None, "--file", "-f", help="SQL file to run (e.g. a migration)"),
+    query: str = typer.Option(None, "--query", "-q", help="inline SQL"),
+):
+    """Run SQL through the service-role `exec_sql` RPC (no SSH/Tailscale needed).
 
-    # Re-pull processes that passed but still lack eli_act_id (Dz.U./MP
-    # publication often lags Sejm passage by 2-4 weeks). Tolerant: errors
-    # logged but daily continues — this is a tail-fix job, not critical path.
-    logger.info("=== daily: refresh-stale-eli ===")
-    try:
-        from supagraf.fetch.acts import refresh_stale_eli
-        out = refresh_stale_eli(term=term)
-        logger.info("refresh_stale_eli: {}", out)
-    except Exception as e:
-        logger.error("refresh_stale_eli failed: {!r}", e)
+    Typical use: `python -m supagraf db-exec -f supabase/migrations/0105_etl_runs_cursors.sql`.
+    """
+    from supagraf.db import exec_sql
 
-    logger.info("daily complete")
+    if not file and not query:
+        logger.error("pass --file or --query")
+        raise typer.Exit(1)
+    sql = file.read_text(encoding="utf-8") if file else query
+    out = exec_sql(sql)
+    print(out if not isinstance(out, list) else f"{len(out)} rows: {out[:5]}")
 
 
 # ---- enrich subcommand ----------------------------------------------------
@@ -1271,12 +880,6 @@ def _runner_for(kind: EnrichKind) -> Callable:
     raise ValueError(f"no single runner for {kind}")
 
 
-# How many sittings back the daily will look for statements to enrich. Covers
-# scheduled-but-empty sittings without turning into a corpus-wide backfill.
-_UTTERANCE_SITTING_LOOKBACK = int(
-    os.environ.get("SUPAGRAF_UTTERANCE_SITTING_LOOKBACK", "3")
-)
-
 # Consecutive attachment-fetch failures that mean "upstream is down, stop
 # trying" rather than "these particular prints are bad".
 _FETCH_OUTAGE_THRESHOLD = int(os.environ.get("SUPAGRAF_FETCH_OUTAGE_THRESHOLD", "8"))
@@ -1360,6 +963,7 @@ def cmd_enrich_prints(
     kind: EnrichKind = typer.Option(..., "--kind", "-k", help="summary|stance|mentions|personas|action|plain_polish|impact|embed|all"),
     term: int = typer.Option(10, "--term", "-t"),
     limit: int = typer.Option(0, "--limit", "-n", help="0 = no cap"),
+    workers: int = typer.Option(0, "--workers", "-w", help="unified only: concurrent prints (0 = SUPAGRAF_ENRICH_WORKERS or 4)"),
 ):
     """Run an enrichment job over prints that don't yet have it.
 
@@ -1367,7 +971,20 @@ def cmd_enrich_prints(
     embedding_pending) so each run scans only what's left. Failures don't
     abort the loop; check enrichment_failures + model_runs(status='failed')
     for diagnostics. Exit 3 if any failures so scripts notice.
+
+    `--kind unified` runs the concurrent runner from supagraf.enrich.jobs
+    (failure backoff + upstream-outage guard); the per-field kinds keep the
+    sequential legacy loop.
     """
+    if kind == EnrichKind.unified:
+        from supagraf.enrich.jobs import DEFAULT_WORKERS, enrich_pending_prints
+
+        st = enrich_pending_prints(term=term, limit=limit, workers=workers or DEFAULT_WORKERS)
+        print(f"\nenrich unified: ok={st.ok} failed={st.failed} skipped={st.skipped} "
+              f"backoff={st.backoff} aborted={st.aborted}")
+        if st.failed > 0 or st.aborted:
+            raise typer.Exit(3)
+        return
     kinds = (
         # embed last — depends on prints.summary produced by the summary job.
         [EnrichKind.summary, EnrichKind.stance, EnrichKind.mentions,

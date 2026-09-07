@@ -29,7 +29,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from supagraf.etl.watermark import bulk_seal, load_sealed, seal
 from supagraf.fixtures.storage import fixtures_root
@@ -419,7 +419,7 @@ def fetch_one_act(
 
 def refresh_stale_eli(
     term: int = 10,
-    max_age_days: int = 21,
+    max_age_days: int = 7,
     timeout_s: float = DEFAULT_TIMEOUT_S,
     throttle_s: float = 1.0,
 ) -> dict:
@@ -438,10 +438,8 @@ def refresh_stale_eli(
       4. Re-stages + re-loads acts so new fixtures land in the acts table.
       5. Calls backfill_process_act_links() RPC to set eli_act_id.
 
-    `max_age_days` is accepted for forward compatibility with a future
-    `processes.last_refreshed_at` column (migration 0047, owned elsewhere).
-    Right now we just refresh every passed-but-unlinked process — the
-    upstream API call is cheap and the result set is tiny.
+    `max_age_days` bounds the re-check cadence via `processes.last_refreshed_at`
+    (migration 0047): a row re-pulled within the window is skipped.
 
     Returns counts dict.
     """
@@ -456,12 +454,17 @@ def refresh_stale_eli(
     # Some columns may not exist yet (e.g. last_refreshed_at lands in 0047).
     # Select defensively and ignore missing-column errors.
     select_cols = "number, eli, eli_act_id, passed"
+    # Publication lags Sejm passage by weeks; re-checking every stuck process
+    # daily is a request per row for nothing. Only rows not looked at within
+    # `max_age_days` (or never) are re-pulled.
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=max_age_days)).isoformat()
     rows = (
         client.table("processes")
         .select(select_cols)
         .eq("term", term)
         .eq("passed", True)
         .is_("eli_act_id", "null")
+        .or_(f"last_refreshed_at.is.null,last_refreshed_at.lt.{cutoff}")
         .execute()
         .data
         or []
@@ -578,7 +581,6 @@ def refresh_stale_eli(
     # window so we don't re-hit api.sejm.gov.pl for the same stuck row.
     if refreshed_numbers:
         try:
-            from datetime import datetime, timezone
             now_iso = datetime.now(timezone.utc).isoformat()
             client.table("processes").update(
                 {"last_refreshed_at": now_iso}

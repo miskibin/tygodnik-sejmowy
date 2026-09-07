@@ -21,6 +21,10 @@ class CommitteeMember(BaseModel):
     club: str
     function: str | None = None
     last_first_name: str = Field(alias="lastFirstName")
+    # Added upstream in 2026 (split name + membership start date).
+    first_name: str | None = Field(default=None, alias="firstName")
+    last_name: str | None = Field(default=None, alias="lastName")
+    join_date: date | None = Field(default=None, alias="joinDate")
 
 
 class Committee(BaseModel):

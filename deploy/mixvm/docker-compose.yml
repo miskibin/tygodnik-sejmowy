@@ -3,7 +3,9 @@
 # - `ollama`: long-running embeddings server. Persistent model cache at
 #   `./ollama_data`. Bound to internal compose network only.
 # - `supagraf-daily`: one-shot run. Triggered via `docker compose run --rm
-#   daily` (cron-friendly). Mounts repo + fixtures + .env read-only.
+#   daily` (cron-friendly). Schedule it OUTSIDE DeepSeek's peak windows
+#   (Mon-Fri 01-04 & 06-10 UTC) — off-peak is half price; e.g. `0 22 * * *`.
+#   Exit code is non-zero when any step failed (see `etl_runs`).
 #
 # All upstream services (Supabase REST at db.*.pl, Sejm API,
 # DeepSeek API) are reached over public HTTPS — no extra network plumbing.
@@ -47,7 +49,9 @@ services:
       - default
       - supabase
     # Source code is baked into the image; only persist mutable state on
-    # the host. Bind-mounting /app would mask the installed .venv.
+    # the host. Bind-mounting /app would mask the installed .venv. The
+    # daily no longer writes fixtures (the DB is the cache); the mount stays
+    # for manual `fixtures capture` / `stage` runs.
     volumes:
       - ./fixtures:/app/fixtures
       - ./logs:/app/logs
