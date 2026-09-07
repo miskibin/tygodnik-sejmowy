@@ -227,3 +227,26 @@ def test_finish_failure_on_success_propagates(mock_db):
 
     with pytest.raises(RuntimeError, match="finish broken"):
         f(entity_type="print", entity_id="p")
+
+
+# ---- _finish_run idempotency -------------------------------------------------
+
+def test_finish_run_treats_already_finished_row_as_success():
+    """A lost reply followed by a retry must not fail an enrichment that was
+    already persisted: P0001 'not in running state' means the first call landed."""
+    from unittest.mock import MagicMock
+
+    from postgrest.exceptions import APIError
+
+    from supagraf.enrich import audit
+
+    err = APIError({"code": "P0001", "message": "model_runs row 7 not in running state",
+                    "details": None, "hint": None})
+    sb = MagicMock()
+    sb.rpc.return_value.execute.side_effect = err
+    with patch("supagraf.enrich.audit.supabase", return_value=sb):
+        audit._finish_run(7, "ok")  # no raise
+        other = APIError({"code": "P0001", "message": "something else", "details": None, "hint": None})
+        sb.rpc.return_value.execute.side_effect = other
+        with pytest.raises(APIError):
+            audit._finish_run.retry_with(stop=audit.stop_after_attempt(1))(7, "ok")
