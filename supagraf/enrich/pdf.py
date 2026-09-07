@@ -18,11 +18,10 @@ from pathlib import Path
 
 import fitz  # pymupdf
 from loguru import logger
-from postgrest.exceptions import APIError
 from pydantic import BaseModel
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 
 PYMUPDF_MODEL_VERSION = f"pymupdf-{fitz.__version__}-md-primary"
 DOCX_MODEL_VERSION = "python-docx-1.2-primary"
@@ -49,7 +48,7 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-@retry(retry=retry_if_exception_type(APIError), stop=stop_after_attempt(4),
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(4),
        wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
 def _cache_lookup(sha: str, model_version: str) -> dict | None:
     r = (supabase().table("pdf_extracts").select("text, page_count, ocr_used, char_count_per_page")
@@ -57,7 +56,7 @@ def _cache_lookup(sha: str, model_version: str) -> dict | None:
     return (r.data or [None])[0]
 
 
-@retry(retry=retry_if_exception_type(APIError), stop=stop_after_attempt(4),
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(4),
        wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
 def _cache_insert(sha: str, model_version: str, text: str, ocr_used: bool, per_page: list[int]) -> None:
     supabase().table("pdf_extracts").upsert(

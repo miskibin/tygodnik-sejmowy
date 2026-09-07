@@ -17,7 +17,7 @@ from postgrest.exceptions import APIError
 from pydantic import BaseModel, Field, ValidationError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 
 PAGE = 1000
 BATCH = 25
@@ -69,7 +69,7 @@ def validate(model: type[BaseModel], payload: Any) -> str | None:
     return None
 
 
-@retry(retry=retry_if_exception_type(APIError), stop=stop_after_attempt(4),
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(4),
        wait=wait_exponential(multiplier=1, min=1, max=10), reraise=True)
 def _upsert(table: str, batch: list[dict], on_conflict: str) -> int:
     return len(supabase().table(table).upsert(batch, on_conflict=on_conflict).execute().data or [])

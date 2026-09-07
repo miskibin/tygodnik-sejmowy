@@ -7,7 +7,7 @@ from loguru import logger
 from postgrest.exceptions import APIError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import call_rpc_scalar, supabase
+from supagraf.db import DB_RETRY_EXC, call_rpc_scalar, supabase
 
 try:
     from psycopg import OperationalError as _PgOperationalError
@@ -15,7 +15,7 @@ except ImportError:  # psycopg only required on the direct-PG path
     _PgOperationalError = type("_NoPsycopg", (Exception,), {})
 
 
-_RPC_RETRY_EXC = (APIError, _PgOperationalError)
+_RPC_RETRY_EXC = (*DB_RETRY_EXC, _PgOperationalError)
 _TRANSIENT_TIMEOUT_CODE = "57014"
 
 

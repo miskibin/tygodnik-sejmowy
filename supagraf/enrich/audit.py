@@ -22,26 +22,14 @@ from dataclasses import dataclass
 from typing import Any, Callable, ParamSpec, TypeVar
 
 from loguru import logger
-import httpx
 from postgrest.exceptions import APIError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 from supagraf.enrich.embed import ALLOWED_ENTITY_TYPES
 
 ERROR_MAX_CHARS = 4000
 
-# Supabase via Tailscale (mixvm) sees intermittent RemoteProtocolError +
-# ReadError under concurrent load — retry transport-layer drops on top of
-# the postgrest API errors.
-DB_RETRY_EXC = (
-    APIError,
-    httpx.RemoteProtocolError,
-    httpx.ReadError,
-    httpx.ConnectError,
-    httpx.TimeoutException,
-    httpx.PoolTimeout,
-)
 
 P = ParamSpec("P")
 R = TypeVar("R")

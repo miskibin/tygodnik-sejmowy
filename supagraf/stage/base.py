@@ -15,11 +15,10 @@ from pathlib import Path
 from typing import Callable, Iterable, Type
 
 from loguru import logger
-from postgrest.exceptions import APIError
 from pydantic import BaseModel
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 from supagraf.fixtures.storage import fixtures_root
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -108,7 +107,7 @@ def stage_resource(
 
 
 @retry(
-    retry=retry_if_exception_type(APIError),
+    retry=retry_if_exception_type(DB_RETRY_EXC),
     stop=stop_after_attempt(4),
     wait=wait_exponential(multiplier=1, min=1, max=10),
     reraise=True,
