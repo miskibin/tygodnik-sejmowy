@@ -36,9 +36,11 @@ function Chip({
 export function Filters({
   kind,
   limit,
+  gated,
 }: {
   kind: string | null;
   limit: number;
+  gated: boolean;
 }) {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -77,14 +79,16 @@ export function Filters({
           <RotateCwIcon className="size-3" aria-hidden="true" />
           Odśwież
         </a>
-        <form action={logoutAction}>
-          <button
-            type="submit"
-            className="rounded bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Wyloguj
-          </button>
-        </form>
+        {gated && (
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="rounded bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Wyloguj
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

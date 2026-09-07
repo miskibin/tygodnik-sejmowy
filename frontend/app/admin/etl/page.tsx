@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { etlPassword, hasEtlSession } from "@/lib/admin-auth";
@@ -48,13 +47,13 @@ export default async function EtlDashboardPage({
 }: {
   searchParams: SearchParams;
 }) {
-  // Not configured = not deployed. 404 before touching anything else so a
-  // missing env var can never leak the ledger.
-  if (!etlPassword()) notFound();
+  // No password configured = open panel (the ledger holds nothing secret).
+  // Setting ETL_DASHBOARD_PASSWORD turns the login gate on.
+  const gated = etlPassword() !== null;
 
   const sp = await searchParams;
 
-  if (!(await hasEtlSession())) {
+  if (gated && !(await hasEtlSession())) {
     return (
       <Shell>
         <LoginForm error={one(sp.blad) === "1"} />
@@ -80,7 +79,7 @@ export default async function EtlDashboardPage({
       />
 
       <div className="mb-6">
-        <Filters kind={kind} limit={limit} />
+        <Filters kind={kind} limit={limit} gated={gated} />
       </div>
 
       <SummaryStrip runs={runs} />

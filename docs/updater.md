@@ -207,8 +207,8 @@ card listing the delta cursors. Filters `?kind=daily|sync` and
 
 The page is gated by a single shared password in the frontend's
 `ETL_DASHBOARD_PASSWORD` env var (Portainer stack var, see
-`deploy/mixvm/docker-compose.frontend.yml`). Unset or empty and the route
-404s, so an undeployed config cannot expose the ledger. It reads through the
+`deploy/mixvm/docker-compose.frontend.yml`). Unset or empty and the panel is
+open without a login (the ledger holds nothing secret). It reads through the
 anon key like the rest of the site — strictly read-only.
 
 ## First live runs (2026-09-07)
