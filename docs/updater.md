@@ -161,3 +161,19 @@ one-shot. Keep `SUPAGRAF_LOAD_DIRECT_DSN` set there — `load_votes`,
 `load_proceedings` and the matview refreshes exceed Kong's 60 s upstream
 timeout when they run through PostgREST. The `fixtures/` bind mount is no
 longer needed by the daily.
+
+## First live runs (2026-09-07)
+
+Prod had not completed a daily since 2026-07-28. The rewrite's first pass
+from a remote container (through Cloudflare, no direct DSN):
+
+| step | result |
+|---|---|
+| sync (all resources, cold cursors) | prints 1 303 changed of 3 275 (exactly the upstream `changeDate > 2026-07-28` count), processes 171, votings 148 details, proceedings 63–65 with 1 638 bodies, questions 8 638, acts 5 369, videos 253, bills 86 |
+| targeted loads | `load_proceeding` ×3 in 4 s; `load_votes_sitting` ×9 (sitting 1 = 67 613 rows in 8 s) |
+| whole-term `load_proceedings` / `load_questions` | 504 after 100 s through Cloudflare (questions committed server-side anyway) — use the per-sitting variants or a direct DSN |
+| steady-state daily right after | 93 s, 123 requests / 4.4 MB, 3 prints + 1 committee sitting changed, loaders only for those, refreshes skipped |
+| enrichment | 4 prints in 45 s (4 workers, ~4k reasoning tokens each), 20 statements in 17 s; vision OCR of a scanned print: 1 page, 5.6 s, ~1.6k tokens, diacritics and signatures intact |
+
+Backlog left for the next scheduled daily: ~229 prints without enrichment
+(new since July) and the remaining statements of sitting 64.
