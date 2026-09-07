@@ -18,8 +18,9 @@ from typing import Literal
 
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
 from supagraf.enrich import LLM_MODELS
 from supagraf.enrich.audit import with_model_run
 from supagraf.enrich.llm import call_structured
@@ -114,6 +115,14 @@ class UtteranceEnrichmentOutput(BaseModel):
     addressee: Addressee
     summary_one_line: str = Field(min_length=1, max_length=MAX_SUMMARY_CHARS)
 
+    @field_validator("key_claims", "topic_tags", mode="before")
+    @classmethod
+    def _trim_lists(cls, v: object, info) -> object:
+        """v4-flash overshoots the list caps too (4 key_claims for max 3);
+        keep the head instead of discarding the whole statement."""
+        cap = MAX_KEY_CLAIMS if info.field_name == "key_claims" else MAX_TOPIC_TAGS
+        return v[:cap] if isinstance(v, list) else v
+
     @field_validator("summary_one_line", mode="before")
     @classmethod
     def _trim_summary(cls, v: object) -> object:
@@ -166,7 +175,7 @@ def enrich_one_statement(
     quote = parsed.viral_quote if parsed.viral_score >= 0.4 else ""
     reason = parsed.viral_reason if quote else ""
 
-    supabase().table("proceeding_statements").update({
+    _persist(int(entity_id), {
         "viral_score": parsed.viral_score,
         "viral_quote": quote or None,
         "viral_reason": reason or None,
@@ -179,9 +188,15 @@ def enrich_one_statement(
         "enrichment_model": llm_model,
         "enrichment_prompt_version": str(call.prompt.version),
         "enrichment_prompt_sha256": call.prompt.sha256,
-    }).eq("id", int(entity_id)).execute()
+    })
 
     return parsed
+
+
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(5),
+       wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
+def _persist(statement_id: int, payload: dict) -> None:
+    supabase().table("proceeding_statements").update(payload).eq("id", statement_id).execute()
 
 
 def _day_ids_for_sitting(term: int, sitting_num: int) -> list[int]:
