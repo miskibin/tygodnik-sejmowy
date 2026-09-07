@@ -14,7 +14,7 @@ versioned prompt provenance via @with_model_run.
 from __future__ import annotations
 
 import os
-from typing import Literal
+from typing import Literal, get_args
 
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -73,6 +73,9 @@ TopicTag = Literal[
     "srodowisko-klimat",
 ]
 
+ADDRESSEE_VALUES: tuple[str, ...] = get_args(Addressee)
+TOPIC_TAG_VALUES: tuple[str, ...] = get_args(TopicTag)
+
 
 class MentionedEntities(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -118,10 +121,28 @@ class UtteranceEnrichmentOutput(BaseModel):
     @field_validator("key_claims", "topic_tags", mode="before")
     @classmethod
     def _trim_lists(cls, v: object, info) -> object:
-        """v4-flash overshoots the list caps too (4 key_claims for max 3);
-        keep the head instead of discarding the whole statement."""
-        cap = MAX_KEY_CLAIMS if info.field_name == "key_claims" else MAX_TOPIC_TAGS
-        return v[:cap] if isinstance(v, list) else v
+        """v4-flash overshoots the list caps (4 key_claims for max 3) and
+        invents topic labels; keep the known head instead of discarding the
+        whole statement."""
+        if not isinstance(v, list):
+            return v
+        if info.field_name == "topic_tags":
+            unknown = [t for t in v if t not in TOPIC_TAG_VALUES]
+            if unknown:
+                logger.warning("dropping unknown topic_tags {}", unknown)
+            v = [t for t in v if t in TOPIC_TAG_VALUES]
+            return v[:MAX_TOPIC_TAGS]
+        return v[:MAX_KEY_CLAIMS]
+
+    @field_validator("addressee", mode="before")
+    @classmethod
+    def _unknown_addressee_is_inne(cls, v: object) -> object:
+        """"minister", "premier" and friends are not in the taxonomy; the
+        catch-all exists for exactly that."""
+        if isinstance(v, str) and v not in ADDRESSEE_VALUES:
+            logger.warning("addressee {!r} not in taxonomy — using 'inne'", v)
+            return "inne"
+        return v
 
     @field_validator("summary_one_line", mode="before")
     @classmethod
