@@ -185,3 +185,10 @@ def test_peak_hour_detection():
     assert not llm_mod.is_deepseek_peak_hour(datetime(2026, 9, 7, 5, 0, tzinfo=timezone.utc))
     assert not llm_mod.is_deepseek_peak_hour(datetime(2026, 9, 7, 22, 0, tzinfo=timezone.utc))
     assert not llm_mod.is_deepseek_peak_hour(datetime(2026, 9, 5, 2, 0, tzinfo=timezone.utc))   # Sat
+
+
+def test_402_raises_budget_error_without_retry(monkeypatch):
+    calls = _capture(monkeypatch, [_Resp(402, text='{"error":{"message":"Insufficient Balance"}}')])
+    with pytest.raises(llm_mod.LLMBudgetError):
+        llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
+    assert len(calls) == 1

@@ -32,6 +32,7 @@ from datetime import datetime, timedelta, timezone
 from loguru import logger
 
 from supagraf.db import supabase
+from supagraf.enrich.llm import LLMBudgetError
 
 DEFAULT_WORKERS = int(os.environ.get("SUPAGRAF_ENRICH_WORKERS", "4"))
 OUTAGE_THRESHOLD = int(os.environ.get("SUPAGRAF_FETCH_OUTAGE_THRESHOLD", "8"))
@@ -136,19 +137,30 @@ def recent_failure_counts(fn_name: str, entity_type: str, days: int = FAILURE_BA
 
 
 class _Outage:
-    """Shared 'upstream is down' switch for the worker pool."""
+    """Shared 'stop the pool' switch: trips after `threshold` consecutive
+    attachment fetch failures (Sejm down) or immediately on an LLM budget
+    error (DeepSeek 402/401 — every further call would fail the same way).
+    Workers check `tripped` before starting; remaining items stay pending."""
 
     def __init__(self, threshold: int):
         self.threshold = threshold
         self._n = 0
         self._lock = threading.Lock()
         self.tripped = False
+        self.reason: str | None = None
+
+    def trip(self, reason: str) -> None:
+        with self._lock:
+            if not self.tripped:
+                self.tripped, self.reason = True, reason
 
     def record_fetch_failure(self) -> None:
         with self._lock:
             self._n += 1
             if self._n >= self.threshold:
                 self.tripped = True
+                self.reason = self.reason or (
+                    f"{self.threshold} consecutive attachment fetch failures — upstream looks down")
 
     def record_success(self) -> None:
         with self._lock:
@@ -186,6 +198,10 @@ def _enrich_one_print(row: dict, outage: _Outage, stats: EnrichStats, lock: thre
             term=int(row.get("term", 10)),
         )
     except Exception as e:  # noqa: BLE001 — recorded, loop continues
+        if isinstance(e, LLMBudgetError):
+            outage.trip(f"LLM budget: {e}")
+            logger.error("print {}: {} — stopping the phase, rest stays pending", number, e)
+            return
         if isinstance(e, PdfFetchError) and not isinstance(e, PrintGoneError):
             outage.record_fetch_failure()
         kind = _classify_print_error(e)
@@ -232,10 +248,9 @@ def enrich_pending_prints(*, term: int = 10, limit: int = 0, workers: int = DEFA
                             i, len(futures), stats.ok, stats.failed, stats.skipped)
     if outage.tripped:
         stats.aborted = True
-        logger.error(
-            "enrich prints: {} consecutive attachment fetch failures — upstream looks down; "
-            "remaining prints left pending for the next run", OUTAGE_THRESHOLD,
-        )
+        stats.errors.append(("phase", f"aborted: {outage.reason}"))
+        logger.error("enrich prints aborted: {}; remaining prints left pending for the next run",
+                     outage.reason)
     return stats
 
 
@@ -291,9 +306,12 @@ def enrich_pending_statements(
     logger.info("enrich statements: sitting={} pending={} model={} workers={}",
                 sitting, len(pending), model, workers)
     lock = threading.Lock()
+    outage = _Outage(OUTAGE_THRESHOLD)
 
     def _one(r: dict) -> None:
         sid = str(r["id"])
+        if outage.tripped:
+            return
         try:
             enrich_one_statement(
                 entity_type="proceeding_statement", entity_id=sid,
@@ -301,6 +319,10 @@ def enrich_pending_statements(
                 prompt_version=prompt.version, prompt_sha256=prompt.sha256,
                 llm_model=model,
             )
+        except LLMBudgetError as e:
+            outage.trip(f"LLM budget: {e}")
+            logger.error("statement {}: {} — stopping the phase, rest stays pending", sid, e)
+            return
         except Exception as e:  # noqa: BLE001
             with lock:
                 stats.failed += 1
@@ -316,6 +338,10 @@ def enrich_pending_statements(
             fut.result()
             if i % 50 == 0 or i == len(futures):
                 logger.info("enrich statements: {}/{} (ok={} failed={})", i, len(futures), stats.ok, stats.failed)
+    if outage.tripped:
+        stats.aborted = True
+        stats.errors.append(("phase", f"aborted: {outage.reason}"))
+        logger.error("enrich statements aborted: {}", outage.reason)
     return stats
 
 

@@ -52,6 +52,11 @@ class LLMResponseError(Exception):
     """4xx, malformed JSON, schema mismatch — NOT retried."""
 
 
+class LLMBudgetError(LLMResponseError):
+    """402 Insufficient Balance / 401 bad key — every further call will fail
+    too, so callers stop the whole phase instead of failing item by item."""
+
+
 class PromptRef(BaseModel):
     name: str
     version: int
@@ -119,6 +124,8 @@ def _post(payload: dict, timeout: float) -> dict:
         raise LLMHTTPError(f"transport error: {e!r}") from e
     if r.status_code == 429 or r.status_code >= 500:
         raise LLMHTTPError(f"deepseek {r.status_code}: {r.text[:300]}")
+    if r.status_code in (401, 402):
+        raise LLMBudgetError(f"deepseek {r.status_code}: {r.text[:300]}")
     if r.status_code >= 400:
         raise LLMResponseError(f"deepseek {r.status_code}: {r.text[:300]}")
     body = r.json()
