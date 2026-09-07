@@ -63,8 +63,14 @@ function isRecord(v: unknown): v is Record<string, unknown> {
 // but not the updater's execution order — that is lost at write time.
 function parseSteps(raw: unknown): EtlStep[] {
   if (!isRecord(raw)) return [];
-  return Object.entries(raw).map(([name, value]) => {
+  // jsonb normalises key order, so the writer stamps each step with `seq`
+  // (its execution index). Rows from before that stamp keep API order.
+  const entries = Object.entries(raw).map(([name, value], i) => {
     const step = isRecord(value) ? value : {};
+    return { name, step, seq: typeof step.seq === "number" ? step.seq : i };
+  });
+  entries.sort((a, b) => a.seq - b.seq);
+  return entries.map(({ name, step }) => {
     const counts = isRecord(step.counts) ? step.counts : null;
     return {
       name,

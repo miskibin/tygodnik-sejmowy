@@ -20,6 +20,7 @@ def test_ledger_records_ok_failed_skipped_and_exit_code():
     summ = led.summary()
     assert summ["steps"]["a"]["counts"] == {"n": 1}
     assert "nope" in summ["steps"]["b"]["error"]
+    assert [summ["steps"][k]["seq"] for k in ("a", "b", "c")] == [0, 1, 2]
 
 
 def test_ledger_all_ok_exit_zero_and_fatal_reraises():
