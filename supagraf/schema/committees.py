@@ -38,5 +38,7 @@ class Committee(BaseModel):
     phone: str | None = None
     appointment_date: date | None = Field(default=None, alias="appointmentDate")
     composition_date: date | None = Field(default=None, alias="compositionDate")
+    # Set on dissolved committees (e.g. investigative ones). Upstream 2026.
+    dismissal_date: date | None = Field(default=None, alias="dismissalDate")
     members: list[CommitteeMember] = Field(default_factory=list)
     sub_committees: list[str] = Field(default_factory=list, alias="subCommittees")

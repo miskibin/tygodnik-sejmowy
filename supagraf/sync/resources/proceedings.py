@@ -53,7 +53,9 @@ def _parse_dates(p: dict) -> list[date]:
 
 def in_scope(p: dict, *, stored: set[str], gaps: set[int], today: date, window_days: int, full: bool) -> bool:
     number = p.get("number")
-    if number is None:
+    # `/proceedings` lists a few `number: 0` placeholders (assemblies, no
+    # agenda) — never a sitting we can stage.
+    if not number:
         return False
     if full or str(number) not in stored or p.get("current") or int(number) in gaps:
         return True

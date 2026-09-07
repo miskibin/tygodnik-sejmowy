@@ -17,6 +17,7 @@ def test_in_scope_rules():
     assert not pr.in_scope({"number": 63, "dates": ["2026-07-01"]}, **kw)        # old, complete
     assert pr.in_scope({"number": 60, "dates": ["2026-05-01"]}, **kw)            # DB gap
     assert pr.in_scope({"number": 63, "dates": ["2026-07-01"]}, **{**kw, "full": True})
+    assert not pr.in_scope({"number": 0, "dates": ["2026-09-01"], "current": True}, **kw)  # placeholder
 
 
 def _stmt(num, name="Poseł X"):
