@@ -58,3 +58,28 @@ def test_trim_body_keeps_head_and_tail_within_budget():
     assert "pominięto" in out
     assert trim_body("short", 1000) == "short"
     assert trim_body("x", 0) == ""
+
+
+def test_unknown_topic_tag_is_dropped_not_rejected():
+    """v4-flash with thinking off occasionally invents a tag ("konsument");
+    one off-list label must not discard the whole print's enrichment."""
+    from supagraf.enrich.print_unified import PrintUnifiedOutput
+
+    fn = PrintUnifiedOutput._drop_unknown_topic_tags
+    assert fn(["zdrowie", "konsument", "transport"]) == ["zdrowie", "transport"]
+    assert fn("not-a-list") == "not-a-list"
+
+
+def test_unknown_persona_tag_is_dropped_not_rejected():
+    from supagraf.enrich.print_unified import PrintUnifiedOutput
+
+    fn = PrintUnifiedOutput._drop_unknown_persona_tags
+    assert fn(["rolnik", "zdrowie"]) == ["rolnik"]
+
+
+def test_affected_group_with_unknown_tag_is_dropped():
+    from supagraf.enrich.print_unified import PrintUnifiedOutput
+
+    fn = PrintUnifiedOutput._drop_unknown_affected_groups
+    groups = [{"tag": "mieszkaniec", "severity": "high"}, {"tag": "najemca", "severity": "low"}]
+    assert fn(groups) == [{"tag": "najemca", "severity": "low"}]

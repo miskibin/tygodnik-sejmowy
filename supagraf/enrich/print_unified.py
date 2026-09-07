@@ -247,6 +247,19 @@ class UnifiedAffectedGroup(BaseModel):
         return None
 
 
+def _keep_known(v: object, taxonomy: tuple[str, ...], field: str) -> object:
+    """Salvage the print when the model invents a tag ("konsument" as a topic).
+
+    The taxonomies are our own guard; one off-list label is not worth losing
+    summary, impact and mentions for the whole print."""
+    if not isinstance(v, list):
+        return v
+    unknown = [t for t in v if t not in taxonomy]
+    if unknown:
+        logger.warning("dropping unknown {} {}", field, unknown)
+    return [t for t in v if t in taxonomy]
+
+
 class PrintUnifiedOutput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -319,6 +332,26 @@ class PrintUnifiedOutput(BaseModel):
         # Runs after type validation so Literal-membership is enforced first.
         # Keep first 3 (LLM orders by relevance). Frontend gets exactly 3 max.
         return v[:3]
+
+    @field_validator("topic_tags", mode="before")
+    @classmethod
+    def _drop_unknown_topic_tags(cls, v: object) -> object:
+        return _keep_known(v, TOPIC_TAGS, "topic_tags")
+
+    @field_validator("persona_tags", mode="before")
+    @classmethod
+    def _drop_unknown_persona_tags(cls, v: object) -> object:
+        return _keep_known(v, PERSONA_TAGS, "persona_tags")
+
+    @field_validator("affected_groups", mode="before")
+    @classmethod
+    def _drop_unknown_affected_groups(cls, v: object) -> object:
+        if not isinstance(v, list):
+            return v
+        unknown = [g.get("tag") for g in v if isinstance(g, dict) and g.get("tag") not in PERSONA_TAGS]
+        if unknown:
+            logger.warning("dropping affected_groups with unknown tag {}", unknown)
+        return [g for g in v if not isinstance(g, dict) or g.get("tag") in PERSONA_TAGS]
 
     @field_validator("topic_tags", mode="after")
     @classmethod
