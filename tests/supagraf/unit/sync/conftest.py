@@ -2,13 +2,11 @@
 an in-memory stand-in for the `_stage_*` reads/writes."""
 from __future__ import annotations
 
-import json
 from datetime import date
-from typing import Any, Callable
+from typing import Any
 
 import httpx
 import pytest
-from tenacity import wait_none
 
 from supagraf.sync import stage as stage_mod
 from supagraf.sync.context import SyncContext

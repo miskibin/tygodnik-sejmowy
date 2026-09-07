@@ -1,9 +1,7 @@
 """Per-resource change detection against the fake stage + mocked API."""
 from __future__ import annotations
 
-from datetime import date
 
-import pytest
 
 from supagraf.sync.resources import (
     acts, bills, clubs, committee_sittings, committees, mps, prints, processes, questions, videos, votings,

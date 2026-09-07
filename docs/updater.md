@@ -111,13 +111,28 @@ Prints that failed 3 times in 14 days are left alone until the window
 slides (`SUPAGRAF_ENRICH_FAILURE_BACKOFF_*`); after 8 attachment-fetch
 failures in a run the phase aborts (upstream document backend down).
 
-## Applying the migration
+## Applying the migrations
 
 Without SSH/Tailscale, through the service-role RPC:
 
 ```
 uv run python -m supagraf db-exec -f supabase/migrations/0105_etl_runs_cursors.sql
+uv run python -m supagraf db-exec -f supabase/migrations/0106_vote_choice_vote_valid.sql
 ```
+
+0106 adds the `VOTE_VALID` enum value upstream started sending for ON_LIST
+votings; without it `load_votes` aborts on the first such voting.
+
+## Upstream schema drift
+
+Every payload is validated against the strict Pydantic contract in
+`supagraf/schema/` before it is staged; a drift shows up as
+`sync:<resource> failed … schema: … Extra inputs are not permitted` in the
+ledger with the row left untouched. Fix = extend the model (optional
+field), add a migration only if a loader consumes the new value. Drift
+absorbed in the rewrite (2026-09): clubs `members[]`, committee members
+`firstName/lastName/joinDate`, MPs `oathDate/mandateExpiryDate`, votes
+`VOTE_VALID`.
 
 (then `NOTIFY pgrst, 'reload schema'` via `db-exec -q` if PostgREST reports
 PGRST205). Or via psql on mixvm as documented in CLAUDE.md.

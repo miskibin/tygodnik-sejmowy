@@ -6,7 +6,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-VoteChoice = Literal["YES", "NO", "ABSTAIN", "ABSENT", "PRESENT"]
+# VOTE_VALID: ON_LIST votings mark an MP who cast a valid list ballot; the
+# per-option choices live in `listVotes`. Observed upstream 2026-09.
+VoteChoice = Literal["YES", "NO", "ABSTAIN", "ABSENT", "PRESENT", "VOTE_VALID"]
 VotingKind = Literal["ELECTRONIC", "ON_LIST", "TRADITIONAL"]
 MajorityType = Literal[
     "SIMPLE_MAJORITY",

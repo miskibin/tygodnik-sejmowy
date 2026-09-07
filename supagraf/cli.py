@@ -302,7 +302,6 @@ def cmd_backfill_prints(
 
     from supagraf.fixtures.client import SejmClient
     from supagraf.fixtures.sources import sejm as sejm_src
-    from supagraf.fixtures.storage import fixtures_root
     from supagraf.schema.prints import Print
     from supagraf.stage.base import StreamingStager
 
@@ -479,7 +478,6 @@ def cmd_backfill_processes(
 
     from supagraf.fixtures.client import SejmClient
     from supagraf.fixtures.sources import sejm as sejm_src
-    from supagraf.fixtures.storage import fixtures_root
     from supagraf.schema.processes import Process
     from supagraf.stage.base import StreamingStager
 

@@ -31,7 +31,7 @@ from tenacity import (
 
 from datetime import date, datetime, timedelta, timezone
 
-from supagraf.etl.watermark import bulk_seal, load_sealed, seal
+from supagraf.etl.watermark import seal
 from supagraf.fixtures.storage import fixtures_root
 from supagraf.schema.acts import ActIn, ActListPage
 
