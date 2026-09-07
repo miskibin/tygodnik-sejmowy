@@ -32,7 +32,7 @@ from datetime import datetime, timedelta, timezone
 from loguru import logger
 
 from supagraf.db import supabase
-from supagraf.enrich.llm import LLMBudgetError
+from supagraf.enrich.llm import LLMBudgetError, usage_since, usage_snapshot
 
 DEFAULT_WORKERS = int(os.environ.get("SUPAGRAF_ENRICH_WORKERS", "4"))
 OUTAGE_THRESHOLD = int(os.environ.get("SUPAGRAF_FETCH_OUTAGE_THRESHOLD", "8"))
@@ -56,12 +56,13 @@ class EnrichStats:
     backoff: int = 0
     aborted: bool = False
     errors: list[tuple[str, str]] = field(default_factory=list)
+    tokens: dict[str, int] = field(default_factory=dict)   # DeepSeek usage for this phase
 
     def to_dict(self) -> dict:
         return {
             "ok": self.ok, "failed": self.failed, "skipped": self.skipped,
             "backoff": self.backoff, "aborted": self.aborted,
-            "errors": self.errors[:20],
+            "errors": self.errors[:20], "tokens": self.tokens,
         }
 
 
@@ -239,6 +240,7 @@ def enrich_pending_prints(*, term: int = 10, limit: int = 0, workers: int = DEFA
     )
     outage = _Outage(OUTAGE_THRESHOLD)
     lock = threading.Lock()
+    usage0 = usage_snapshot()
     with ThreadPoolExecutor(max_workers=max(1, workers), thread_name_prefix="enrich-print") as pool:
         futures = [pool.submit(_enrich_one_print, r, outage, stats, lock) for r in todo]
         for i, fut in enumerate(as_completed(futures), 1):
@@ -251,6 +253,8 @@ def enrich_pending_prints(*, term: int = 10, limit: int = 0, workers: int = DEFA
         stats.errors.append(("phase", f"aborted: {outage.reason}"))
         logger.error("enrich prints aborted: {}; remaining prints left pending for the next run",
                      outage.reason)
+    stats.tokens = usage_since(usage0)
+    logger.info("enrich prints tokens: {}", stats.tokens)
     return stats
 
 
@@ -307,6 +311,7 @@ def enrich_pending_statements(
                 sitting, len(pending), model, workers)
     lock = threading.Lock()
     outage = _Outage(OUTAGE_THRESHOLD)
+    usage0 = usage_snapshot()
 
     def _one(r: dict) -> None:
         sid = str(r["id"])
@@ -342,6 +347,8 @@ def enrich_pending_statements(
         stats.aborted = True
         stats.errors.append(("phase", f"aborted: {outage.reason}"))
         logger.error("enrich statements aborted: {}", outage.reason)
+    stats.tokens = usage_since(usage0)
+    logger.info("enrich statements tokens: {}", stats.tokens)
     return stats
 
 

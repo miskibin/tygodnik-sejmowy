@@ -22,6 +22,7 @@ import hashlib
 import json
 import os
 import re
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TypeVar
@@ -165,7 +166,32 @@ def _chat(*, model: str, messages: list[dict], timeout_s: float, json_mode: bool
         cache_hit_tokens=u.get("prompt_cache_hit_tokens"), cache_miss_tokens=u.get("prompt_cache_miss_tokens"),
         reasoning_tokens=(u.get("completion_tokens_details") or {}).get("reasoning_tokens"),
     )
+    _count_usage(usage)
     return body["choices"][0]["message"]["content"], usage
+
+
+_usage_lock = threading.Lock()
+_usage_totals: dict[str, int] = {"calls": 0, "input": 0, "cache_hit": 0, "output": 0, "reasoning": 0}
+
+
+def _count_usage(u: TokenUsage) -> None:
+    with _usage_lock:
+        _usage_totals["calls"] += 1
+        _usage_totals["input"] += u.input_tokens or 0
+        _usage_totals["cache_hit"] += u.cache_hit_tokens or 0
+        _usage_totals["output"] += u.output_tokens or 0
+        _usage_totals["reasoning"] += u.reasoning_tokens or 0
+
+
+def usage_snapshot() -> dict[str, int]:
+    """Process-wide DeepSeek token totals so far (all models, all jobs)."""
+    with _usage_lock:
+        return dict(_usage_totals)
+
+
+def usage_since(before: dict[str, int]) -> dict[str, int]:
+    now = usage_snapshot()
+    return {k: now[k] - before.get(k, 0) for k in now}
 
 
 def _user_content(text: str, images: list[bytes] | None) -> str | list[dict]:
