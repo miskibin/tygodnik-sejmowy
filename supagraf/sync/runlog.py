@@ -98,12 +98,16 @@ class RunLedger:
                 supabase().table("etl_runs").update({
                     "status": self.status,
                     "finished_at": datetime.now(timezone.utc).isoformat(),
-                    "steps": {s.name: s.to_dict() for s in self.steps},
+                    "steps": self._steps_json(),
                     "errors": [{"step": s.name, "error": s.error} for s in self.steps if s.error],
                 }).eq("id", self.run_id).execute()
             except APIError as e:
                 logger.error("etl_runs finish failed: {}", e)
         return self.summary()
+
+    def _steps_json(self) -> dict[str, dict]:
+        # jsonb re-orders object keys, so each step carries its execution index.
+        return {s.name: {**s.to_dict(), "seq": i} for i, s in enumerate(self.steps)}
 
     @contextmanager
     def step(self, name: str, *, fatal: bool = False) -> Iterator[StepResult]:
@@ -145,4 +149,4 @@ class RunLedger:
     def summary(self) -> dict:
         return {"run_id": self.run_id, "kind": self.kind, "term": self.term, "status": self.status,
                 "duration_s": round(time.monotonic() - self._t0, 1),
-                "steps": {s.name: s.to_dict() for s in self.steps}}
+                "steps": self._steps_json()}
