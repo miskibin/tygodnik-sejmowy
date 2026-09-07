@@ -380,6 +380,7 @@ def _recover_spans(mentions: list[UnifiedMention], text: str) -> list[dict]:
     """
     cursor = 0
     out: list[dict] = []
+    seen: set[tuple[str, str, int]] = set()
     for m in mentions:
         idx = text.find(m.raw_text, cursor)
         if idx == -1:
@@ -387,6 +388,12 @@ def _recover_spans(mentions: list[UnifiedMention], text: str) -> list[dict]:
             idx = text.find(m.raw_text)
         if idx == -1:
             continue
+        key = (m.mention_type, m.raw_text, idx)
+        if key in seen:
+            # The model listed the same name twice and the text has only one
+            # occurrence left — print_mentions is unique on the span.
+            continue
+        seen.add(key)
         out.append({
             "raw_text": m.raw_text,
             "mention_type": m.mention_type,
