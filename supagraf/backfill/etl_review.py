@@ -618,8 +618,8 @@ def backfill_committee_ids(*, dry_run: bool = False) -> dict[str, int]:
 
 # Regex for "Pkt. NN" or "NN. punkt porządku dziennego" preamble in transcript
 # bodies. The Sejm proceedings boilerplate prepends this before each speech
-# block; agenda_items.ord is the same ordinal, so this gives us a surgical
-# link from a statement to the specific agenda item it discussed.
+# block. This ordinal belongs to the ACTUAL debate and can differ from the
+# initial agenda_items.ord. Never use it alone to attribute prints.
 _AGENDA_ORD_RE = re.compile(
     r"(?:Pkt\.\s*|(\d+)\.\s*punkt\s+porz[ąa]dku\s+dziennego)",
     re.IGNORECASE,
@@ -652,9 +652,8 @@ def _extract_agenda_ord(body_text: str) -> int | None:
 def backfill_statement_print_links(*, dry_run: bool = False, term: int = 10) -> dict[str, int]:
     """Materialize statement_print_links from two sources:
 
-      A) AGENDA — statement -> proceeding_day -> proceeding -> agenda_items
-         narrowed by 'Pkt. NN' / 'NN. punkt porządku dziennego' ordinal in
-         body_text -> agenda_item_prints. Source='agenda', confidence 0.95.
+      A) AGENDA — explicit print references in the transcript heading.
+         Planned agenda ordinals may be stale. Source='agenda_item', 0.95.
 
       B) MENTION — _DRUKI_RE regex on body_text matches 'druk(i) nr X, Y'
          tokens. Source='mention', confidence 0.7.
@@ -664,6 +663,8 @@ def backfill_statement_print_links(*, dry_run: bool = False, term: int = 10) -> 
     rows by PK).
     """
     client = supabase()
+
+    from supagraf.backfill.sitting_links import heading_print_numbers
 
     # 1. Print lookup: (term, number) -> id
     prints_rows = _fetch_all("prints", "id,term,number", eq={"term": term})
@@ -680,26 +681,6 @@ def backfill_statement_print_links(*, dry_run: bool = False, term: int = 10) -> 
         logger.info("statement_print_links: no statements with body_text")
         return {"inserted": 0, "updated": 0, "skipped": 0}
 
-    # 3. Day -> proceeding_id map (so we can find agenda_items by proceeding)
-    day_ids = sorted({s["proceeding_day_id"] for s in stmts if s.get("proceeding_day_id")})
-    days = _fetch_all("proceeding_days", "id,proceeding_id")
-    day_to_proc = {d["id"]: d["proceeding_id"] for d in days if d["id"] in set(day_ids)}
-
-    # 4. agenda_items keyed by (proceeding_id, ord)
-    ag_items = _fetch_all("agenda_items", "id,proceeding_id,ord")
-    ag_by_proc_ord: dict[tuple[int, int], int] = {
-        (a["proceeding_id"], a["ord"]): a["id"] for a in ag_items
-    }
-
-    # 5. agenda_item_prints: agenda_item_id -> list of print_ids
-    aip = _fetch_all("agenda_item_prints", "agenda_item_id,term,print_number")
-    prints_by_ai: dict[int, list[int]] = {}
-    for r in aip:
-        pid = print_by_key.get((r["term"], r["print_number"]))
-        if pid is None:
-            continue
-        prints_by_ai.setdefault(r["agenda_item_id"], []).append(pid)
-
     candidates: list[dict] = []
     agenda_hits = 0
     mention_hits = 0
@@ -711,23 +692,18 @@ def backfill_statement_print_links(*, dry_run: bool = False, term: int = 10) -> 
         if not body:
             continue
 
-        # A) Agenda pass — narrow by Pkt. ordinal.
-        ordinal = _extract_agenda_ord(body)
+        # A) Actual transcript heading; no lookup by the planned ordinal.
+        heading_numbers = heading_print_numbers(body)
         agenda_item_id: int | None = None
-        if ordinal is not None and s.get("proceeding_day_id") in day_to_proc:
+        if heading_numbers:
             statements_with_agenda_ord += 1
-            proc_id = day_to_proc[s["proceeding_day_id"]]
-            agenda_item_id = ag_by_proc_ord.get((proc_id, ordinal))
-            if agenda_item_id is not None:
-                for pid in prints_by_ai.get(agenda_item_id, []):
-                    candidates.append({
-                        "statement_id": s["id"],
-                        "print_id": pid,
-                        "source": "agenda_item",
-                        "confidence": 0.95,
-                        "agenda_item_id": agenda_item_id,
-                    })
-                    agenda_hits += 1
+        for num in heading_numbers:
+            pid = print_by_key.get((term, num))
+            if pid is not None:
+                candidates.append({"statement_id": s["id"], "print_id": pid,
+                                   "source": "agenda_item", "confidence": 0.95,
+                                   "agenda_item_id": None})
+                agenda_hits += 1
 
         # B) Mention pass — regex on body_text.
         nums = _extract_print_numbers(body)

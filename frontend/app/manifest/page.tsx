@@ -1,39 +1,10 @@
 import type { Metadata } from "next";
+import { PatroniteTrackedLink } from "@/components/chrome/PatroniteTrackedLink";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/manifest" },
 };
-
-// Manifest is a static editorial page — no data, no force-dynamic.
-// Patronite tiers and the anti-feature list are the emotional contract
-// with patrons, not a feature catalogue.
-
-type Tier = {
-  name: string;
-  price: string;
-  desc: string;
-  tag?: string;
-};
-
-const TIERS: Tier[] = [
-  {
-    name: "Obserwator · Obserwatorka",
-    price: "15 zł / mies.",
-    tag: "najpopularniejszy",
-    desc: "Dostęp do tygodnika. Otrzymujesz to samo, co każdy obywatel — Brief, alerty, pełną aplikację. Płacisz, żeby to istniało, nie żeby mieć przewagę.",
-  },
-  {
-    name: "Strażnik · Strażniczka",
-    price: "30 zł / mies.",
-    desc: "Plus: kalendarz głosowań w formacie ICS — synchronizacja z Twoim kalendarzem. Wiesz, co Sejm robi w tym tygodniu, zanim się zacznie.",
-  },
-  {
-    name: "Mecenas · Mecenaska",
-    price: "100 zł / mies.",
-    desc: "Plus: pełne dane w CSV/JSON do własnych analiz. Twoje imię (jeśli chcesz) w rocznym tekście rocznicowym.",
-  },
-];
 
 const ANTI: Array<[string, string]> = [
   ["Rankingu „najaktywniejszych” posłów.", "The Times pokazał w 2006 roku, że takie rankingi nakręcają śmieć — masowe pytania kosmetyczne dla statystyki."],
@@ -112,61 +83,13 @@ export default function ManifestPage() {
         </ul>
       </section>
 
-      {/* Patronite tiers */}
-      <section
-        className="border-t border-rule px-4 sm:px-8 md:px-14 py-12 sm:py-15"
-        style={{ maxWidth: 1200, margin: "0 auto" }}
-      >
-        <p className="text-[11px] text-muted-foreground m-0 mb-2 font-medium">
-          Patronite
-        </p>
-        <h2
-          className="font-normal m-0 mb-9"
-          style={{ fontSize: 38, letterSpacing: "-0.02em" }}
-        >
-          Trzy progi.{" "}
-          <em className="text-destructive not-italic italic">Wszystkie z tego samego powodu.</em>
-        </h2>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {TIERS.map((t, i) => {
-            const featured = i === 0;
-            return (
-              <article
-                key={t.name}
-                className={
-                  "relative p-7 transition-transform hover:-translate-y-0.5 " +
-                  (featured
-                    ? "bg-foreground text-background border-2 border-foreground"
-                    : "bg-background text-foreground border-2 border-rule hover:border-foreground")
-                }
-                style={featured ? { boxShadow: "6px 6px 0 var(--destructive)" } : undefined}
-              >
-                {t.tag && (
-                  <span
-                    className="absolute bg-destructive text-background font-medium"
-                    style={{ top: -12, left: 22, padding: "3px 10px", fontSize: 9 }}
-                  >
-                    {t.tag}
-                  </span>
-                )}
-                <h3 className="font-medium m-0 mb-2" style={{ fontSize: 22, lineHeight: 1.2 }}>
-                  {t.name}
-                </h3>
-                <p
-                  className={"italic m-0 mb-4" + (featured ? "text-highlight" : "text-destructive")}
-                  style={{ fontSize: 30 }}
-                >
-                  {t.price}
-                </p>
-                <p className="m-0" style={{ fontSize: 15, lineHeight: 1.55, opacity: 0.92 }}>
-                  {t.desc}
-                </p>
-              </article>
-            );
-          })}
+      <section className="mx-auto max-w-[1100px] px-5 py-12">
+        <div className="rounded-2xl border border-border bg-muted p-7 md:p-10">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">Patronite</p>
+          <h2 className="mb-4 text-3xl font-semibold tracking-tight">Pomóż nam rozwijać Tygodnik.</h2>
+          <p className="max-w-2xl text-secondary-foreground leading-relaxed">Twoje wsparcie pomaga utrzymać serwer, pobierać dane i rozwijać aplikację. Aktualne progi i warunki wsparcia znajdziesz na naszym profilu Patronite.</p>
+          <PatroniteTrackedLink placement="manifest" className="mt-6 inline-flex rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">Wesprzyj na Patronite ↗</PatroniteTrackedLink>
         </div>
-
       </section>
     </main>
   );

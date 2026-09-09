@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { PatroniteTrackedLink } from "@/components/chrome/PatroniteTrackedLink";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/budzet" },
@@ -7,7 +8,6 @@ export const metadata: Metadata = {
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { getInfraCosts } from "@/lib/db/budzet";
 import { getPatroniteStats } from "@/lib/patronite";
-
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
   try { return await p; } catch { return fallback; }
@@ -26,43 +26,6 @@ function fmtPL(n: number): string {
   return n.toLocaleString("pl-PL");
 }
 
-function MockChip() {
-  return (
-    <span
-      className="text-[11px] px-1.5 py-0.5 border ml-3 align-middle font-medium"
-      style={{ borderColor: "var(--warning)", color: "var(--warning)" }}
-      title="Dane poglądowe — tabela jeszcze pusta, pokazujemy modelowe liczby"
-    >
-      przykładowo
-    </span>
-  );
-}
-
-function MockNotice() {
-  return (
-    <aside
-      className="mb-12 px-5 py-4 border-l-4"
-      style={{
-        borderColor: "var(--warning)",
-        background: "var(--muted)",
-      }}
-    >
-      <div
-        className="text-[11px] mb-1.5 font-medium"
-        style={{ color: "var(--warning)" }}
-      >
-        ✶ &nbsp; Uwaga &nbsp; ✶
-      </div>
-      <p
-        className="text-[15px] leading-[1.55] m-0 text-foreground"
-        style={{ maxWidth: 720 }}
-      >
-        Wpływy z Patronite i koszty miesięczne — realne. Pierwsza pełna księga z fakturami w czerwcu 2026.
-      </p>
-    </aside>
-  );
-}
-
 export default async function BudzetPage() {
   const [costs, patron] = await Promise.all([
     safe(getInfraCosts(), { rows: [], isEmpty: true }),
@@ -74,14 +37,12 @@ export default async function BudzetPage() {
   const costRows: Array<[string, number]> = costs.isEmpty
     ? COSTS_MONTHLY
     : Array.from(
-        costs.rows.reduce<Map<string, number>>((m, r) => {
-          if (!m.has(r.category)) m.set(r.category, r.zl);
+        costs.rows.filter(r => r.month === costs.rows[0]?.month).reduce<Map<string, number>>((m, r) => {
+          m.set(r.category, (m.get(r.category) ?? 0) + r.zl);
           return m;
         }, new Map())
       );
   const costsTotal = costRows.reduce((s, [, v]) => s + v, 0);
-
-  const totalSixMonths = costsTotal * 6;
 
   const monthlyIncome = patron.ok ? patron.monthlyAmount : 0;
   const patronCount = patron.ok ? patron.activeCount : 0;
@@ -90,47 +51,43 @@ export default async function BudzetPage() {
     ? Math.min(100, Math.round((monthlyIncome / costsTotal) * 100))
     : 0;
 
-  const headlineIsMock = !patron.ok;
-  const incomeIsMock = !patron.ok;
-  // Costs are operator-declared real numbers (not yet from invoices DB) — they
-  // are NOT mock.
-  const anyMock = headlineIsMock || incomeIsMock;
-
   return (
     <main className="bg-background text-foreground px-4 sm:px-8 md:px-14 pt-10 sm:pt-12 pb-24 sm:pb-28">
       <div className="max-w-[1100px] mx-auto">
         <PageBreadcrumb
           items={[{ label: "Budżet" }]}
-          subtitle="Pełen budżet projektu, aktualizowany co miesiąc. Wpływy z Patronite, koszty serwera, hosting, domeny."
+          subtitle="Koszty utrzymania projektu i dostępne dane o wsparciu patronów."
         />
 
-        {anyMock ? <MockNotice /> : null}
+        {!patron.ok && (
+          <aside className="mb-8 rounded-xl border border-border bg-muted p-6">
+            <h1 className="mb-2 text-xl font-semibold tracking-tight">Wsparcie, które utrzymuje Tygodnik</h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-secondary-foreground">Dane o wpłatach są chwilowo niedostępne. Aktualną liczbę patronów i kwotę wsparcia sprawdzisz bezpośrednio na Patronite.</p>
+            <PatroniteTrackedLink placement="budget" className="mt-4 inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">Zobacz profil Patronite ↗</PatroniteTrackedLink>
+          </aside>
+        )}
 
         {/* Big numbers row */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        {patron.ok && <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <BigStat
-            kicker={patron.ok ? "Patroni · aktywni" : "Patroni · od początku"}
+            kicker="Patroni · aktywni"
             value={fmtPL(patron.ok ? patronCount : 0)}
             unit={patron.ok && totalEverCount > patronCount
               ? `aktywni · ${fmtPL(totalEverCount)} kiedykolwiek`
               : "osób"}
-            mock={headlineIsMock}
           />
           <BigStat
             kicker="Bieżące wpływy"
             value={fmtPL(monthlyIncome)}
             unit="zł / mc"
             accent
-            mock={headlineIsMock}
           />
           <BigStat
             kicker="Pokrycie kosztów"
             value={`${coveragePct}%`}
             unit={`z ${fmtPL(costsTotal)} zł/mc`}
-            mock={headlineIsMock}
           />
-        </section>
-
+        </section>}
 
         {/* Costs breakdown */}
         <section className="mb-16">
@@ -138,10 +95,11 @@ export default async function BudzetPage() {
             kicker="Koszty miesięczne"
             title="Na co idzie kasa"
           />
+          <p className="mb-5 text-sm text-muted-foreground">{costs.isEmpty ? "Szacunkowe koszty miesięczne zadeklarowane przez zespół. Nie są zestawieniem faktur." : "Koszty z ostatniego miesiąca dostępnego w zestawieniu: " + new Date(costs.rows[0].month).toLocaleDateString("pl-PL", { month: "long", year: "numeric" }) + "."}</p>
           <div className="grid md:grid-cols-2 gap-10">
             <div>
               {costRows.map(([label, zl]) => {
-                const pct = (zl / costsTotal) * 100;
+                const pct = costsTotal > 0 ? (zl / costsTotal) * 100 : 0;
                 return (
                   <div key={label} className="py-2 border-b border-dotted border-border">
                     <div className="flex items-baseline justify-between gap-3 mb-1.5">
@@ -160,9 +118,9 @@ export default async function BudzetPage() {
                 );
               })}
               <div className="flex items-baseline justify-between pt-3 mt-2 border-t-2 border-foreground">
-                <span className="text-[16px] font-medium">Razem · 6 miesięcy</span>
+                <span className="text-[16px] font-medium">Razem · miesięcznie</span>
                 <span className="font-mono text-[16px] font-semibold text-destructive tabular-nums">
-                  {fmtPL(totalSixMonths)} zł
+                  {fmtPL(costsTotal)} zł
                 </span>
               </div>
             </div>
@@ -170,7 +128,6 @@ export default async function BudzetPage() {
             <div>
               <h3 className="text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule flex items-baseline">
                 <span>Skąd wpływy</span>
-                {incomeIsMock ? <MockChip /> : null}
               </h3>
               {patron.ok ? (
                 <>
@@ -188,9 +145,8 @@ export default async function BudzetPage() {
                 </>
               ) : (
                 <IncomeRow
-                  label="Patronite — brak tokena (PATRONITE_TOKEN)"
+                  label="Patronite — dane chwilowo niedostępne"
                   value="—"
-                  mock
                 />
               )}
               <p
@@ -204,7 +160,6 @@ export default async function BudzetPage() {
             </div>
           </div>
         </section>
-
 
         {/* Team */}
         <section className="mb-4">
@@ -238,34 +193,20 @@ function BigStat({
   value,
   unit,
   accent = false,
-  mock = false,
 }: {
   kicker: string;
   value: string;
   unit: string;
   accent?: boolean;
-  mock?: boolean;
 }) {
-  const valueColor = mock
-    ? "text-muted-foreground italic"
-    : accent
-      ? "text-destructive italic"
-      : "text-foreground";
+  const valueColor = accent ? "text-primary" : "text-foreground";
   return (
     <div
-      className="bg-background border-2 border-foreground p-6"
-      style={{ boxShadow: "5px 5px 0 var(--foreground)" }}
+      className="bg-card rounded-xl border border-border p-6"
     >
       <div className="text-[11px] text-muted-foreground mb-2 font-medium">
         {kicker}
-        {mock ? (
-          <span
-            className="ml-2 normal-case tracking-normal"
-            style={{ color: "var(--warning)" }}
-          >
-            (przykładowo)
-          </span>
-        ) : null}
+
       </div>
       <div
         className={`font-normal leading-none ${valueColor}`}
@@ -304,12 +245,10 @@ function IncomeRow({
   label,
   value,
   muted = false,
-  mock = false,
 }: {
   label: string;
   value: string;
   muted?: boolean;
-  mock?: boolean;
 }) {
   return (
     <div
@@ -317,7 +256,7 @@ function IncomeRow({
     >
       <span className="text-[15px]">{label}</span>
       <span
-        className={`font-mono text-[13px] tabular-nums ${mock ? "italic text-muted-foreground" : ""}`}
+        className="font-mono text-[13px] tabular-nums"
       >
         {value}
       </span>
@@ -338,8 +277,7 @@ function TeamCard({
 }) {
   return (
     <div
-      className="bg-background border-2 border-foreground p-5 sm:p-6 flex gap-5 items-start"
-      style={{ boxShadow: "5px 5px 0 var(--foreground)" }}
+      className="bg-card rounded-xl border border-border p-5 sm:p-6 flex gap-5 items-start"
     >
       <div className="shrink-0 border-2 border-foreground overflow-hidden bg-muted">
         <Image

@@ -1,0 +1,92 @@
+.edition { --vote-yes:#159b78; --vote-no:#e25467; --vote-abstain:#e3ae42; max-width: 1080px; margin: 0 auto; padding: 48px 32px 64px; }
+.header { padding-bottom: 30px; }
+.eyebrow { display:flex; gap:12px; font-size:10px; font-weight:650; letter-spacing:.12em; color:var(--muted-foreground); }
+.eyebrow span { color:var(--destructive); }
+.header h1 { font-size:clamp(30px,4vw,46px); line-height:1.15; letter-spacing:-.055em; font-weight:600; margin:15px 0 12px; }
+.intro { color:var(--muted-foreground); font-size:15px; line-height:1.6; }
+.toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; border-top:1px solid var(--foreground); border-bottom:1px solid var(--rule); padding:18px 0; }
+.editionDate { display:flex; flex-direction:column; gap:5px; font-size:13px; }
+.editionDate strong { font-weight:550; }
+.editionDate span { color:var(--muted-foreground); font-size:11px; }
+.tools { display:flex; align-items:center; gap:20px; }
+.archive select { cursor:pointer; background:var(--background); color:var(--secondary-foreground); font-size:12px; padding:8px 16px 8px 0; max-width:235px; }
+.story { padding:34px 0 32px; border-bottom:1px solid var(--rule); scroll-margin-top:100px; }
+.storyMeta { display:flex; flex-wrap:wrap; align-items:center; gap:12px; font-size:10px; font-weight:550; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:12px; }
+.storyMeta span+span::before { content:'·'; margin-right:12px; color:var(--destructive); }
+.phase { color:var(--destructive); }
+.phase[data-phase="Weto prezydenta"] { color:#b87819; }
+.phase[data-phase="Poprawki Senatu"] { color:#8372c5; }
+.storyTitle { font-size:clamp(23px,2.7vw,30px); font-weight:570; line-height:1.25; letter-spacing:-.035em; max-width:900px; margin:0 0 18px; text-wrap:balance; }
+.storyTitle a:hover { color:var(--destructive); }
+.storyColumns { display:grid; grid-template-columns:minmax(0,1fr) 270px; gap:48px; align-items:start; }
+.storyBody { max-width:720px; }
+.summary { font-size:15px; color:var(--secondary-foreground); line-height:1.75; margin:0; }
+.summaryLabel { font-weight:550; }
+.result { margin-top:18px; font-size:13px; line-height:1.6; }
+.result strong { font-weight:600; }
+.resultDot { display:inline-block; width:6px; height:6px; margin:0 8px 2px 0; border-radius:50%; background:var(--muted-foreground); }
+.resultDot[data-tone=positive] { background:var(--success); }
+.resultDot[data-tone=negative] { background:var(--destructive); }
+.voteNumbers { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:11px; font-variant-numeric:tabular-nums; color:var(--muted-foreground); margin:5px 0 0 14px; }
+.procedure { margin:7px 0 0 14px; color:var(--secondary-foreground); font-size:12px; }
+.quote { margin:0; padding:2px 0 0 18px; border-left:2px solid color-mix(in srgb,var(--destructive) 35%,var(--background)); }
+.quote blockquote { font-family:var(--font-source-serif),Georgia,serif; font-size:18px; line-height:1.55; letter-spacing:-.015em; color:var(--secondary-foreground); }
+.quote figcaption { margin-top:12px; font-size:11px; font-weight:550; line-height:1.6; }
+.quote figcaption>a:last-child { display:block; color:var(--muted-foreground); font-weight:400; margin-top:2px; }
+.links { display:flex; flex-wrap:wrap; align-items:baseline; gap:12px 22px; margin-top:20px; font-size:11px; color:var(--secondary-foreground); }
+.links>a { color:var(--destructive); text-decoration:underline; text-decoration-color:color-mix(in srgb,var(--destructive) 25%,transparent); text-underline-offset:4px; }
+.links a:hover, .quote a:hover { color:var(--destructive); }
+.voteDetails summary { cursor:pointer; text-underline-offset:4px; }
+.voteDetails[open] { flex-basis:100%; }
+.voteDetails ol { list-style:none; margin-top:12px; }
+.voteDetails li { border-top:1px solid var(--rule); padding:10px 0; }
+.voteDetails li a { display:flex; flex-direction:column; gap:3px; }
+.voteDetails small { color:var(--muted-foreground); }
+.more { display:flex; justify-content:space-between; align-items:center; width:100%; padding:24px 0; font-size:14px; font-weight:550; border-bottom:1px solid var(--rule); cursor:pointer; }
+.more span { color:var(--muted-foreground); font-size:12px; font-weight:400; }
+.more:hover { color:var(--destructive); }
+.sourceNote { max-width:680px; margin-top:32px; font-size:11px; color:var(--muted-foreground); line-height:1.7; }
+.empty { padding:56px 0; }
+.empty h2 { font-size:22px; margin-bottom:12px; }
+.empty p { color:var(--muted-foreground); margin-bottom:16px; }
+.filterStatus { display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; font-size:12px; padding:16px 0 0; color:var(--muted-foreground); }
+.filterStatus button { cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.voteChart { margin-top:12px; max-width:460px; }
+.voteTrack { display:flex; height:10px; position:relative; border-radius:3px; background:var(--muted); }
+.voteTrack>span:first-child { border-radius:3px 0 0 3px; }
+.voteTrack>span:last-of-type { border-radius:0 3px 3px 0; }
+.voteTrack>span:only-of-type { border-radius:3px; }
+.voteTrack [data-vote=yes], .voteLegend [data-vote=yes] { background:var(--vote-yes); }
+.voteTrack [data-vote=no], .voteLegend [data-vote=no] { background:var(--vote-no); }
+.voteTrack [data-vote=abstain], .voteLegend [data-vote=abstain] { background:var(--vote-abstain); }
+.voteLegend { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:8px; color:var(--muted-foreground); font-size:11px; font-variant-numeric:tabular-nums; }
+.voteLegend>span { display:inline-flex; align-items:center; gap:5px; }
+.voteLegend i { width:6px; height:6px; border-radius:50%; }
+.voteLegend strong { color:var(--secondary-foreground); font-weight:600; }
+.threshold { position:absolute; top:-4px; bottom:-4px; border-left:2px solid var(--foreground); box-shadow:-1px 0 var(--background); }
+.thresholdLabel { margin-top:7px; color:var(--muted-foreground); font-size:10px; }
+.voteChart[data-compact=true] { max-width:320px; margin-top:8px; }
+.voteChart[data-compact=true] .voteTrack { height:6px; }
+.candidateChart { display:grid; gap:12px; max-width:460px; margin-top:12px; }
+.candidateLabel { display:flex; justify-content:space-between; gap:12px; font-size:11px; color:var(--muted-foreground); }
+.candidateTrack { height:6px; margin-top:5px; background:var(--muted); border-radius:3px; }
+.candidateTrack span { display:block; height:100%; border-radius:3px; background:#8372c5; }
+.amendmentsChart { margin-top:12px; }
+.amendmentDots { display:flex; gap:6px; flex-wrap:wrap; }
+.amendmentDots a { display:block; width:18px; height:12px; border-radius:2px; background:var(--vote-no); }
+.amendmentDots a[data-accepted=true] { background:var(--vote-yes); }
+.amendmentsChart p { margin-top:7px; font-size:10px; color:var(--muted-foreground); }
+@media(max-width:760px) {
+  .edition { padding:28px 20px 40px; }
+  .header { padding-bottom:22px; }
+  .intro { font-size:13px; max-width:300px; }
+  .toolbar { align-items:flex-start; }
+  .tools { width:100%; justify-content:space-between; gap:12px; }
+  .story { padding:28px 0; }
+  .storyColumns { grid-template-columns:1fr; gap:22px; }
+  .storyTitle { text-wrap:pretty; }
+  .summary { font-size:14px; line-height:1.7; }
+  .quote { max-width:540px; }
+  .quote blockquote { font-size:17px; }
+  .quote figcaption>a:last-child { display:inline; margin-left:10px; }
+}

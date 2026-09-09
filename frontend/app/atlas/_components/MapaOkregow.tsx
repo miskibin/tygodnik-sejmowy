@@ -68,8 +68,8 @@ function mpColor(c: number): string {
 }
 
 function colorFor(d: MapDistrict, mode: Mode): string {
-  if (mode === "klub") return KLUB_COLORS[d.klub] ?? "var(--muted-foreground)";
-  if (mode === "turnout") return turnoutColor(d.turnout);
+  if (mode === "klub") return d.klub ? KLUB_COLORS[d.klub] ?? "var(--border)" : "var(--border)";
+  if (mode === "turnout") return d.turnout != null ? turnoutColor(d.turnout) : "var(--border)";
   if (mode === "age") return d.avgAge != null ? ageColor(d.avgAge) : "var(--border)";
   return d.mpCount != null ? mpColor(d.mpCount) : "var(--border)";
 }
@@ -101,7 +101,7 @@ export function MapaOkregow({ data }: { data: MapData }) {
 
   const sel = hoverId != null ? data.districts.find((d) => d.id === hoverId) : null;
   const klubsInLegend = useMemo(
-    () => Array.from(new Set(data.districts.map((d) => d.klub))),
+    () => Array.from(new Set(data.districts.map((d) => d.klub).filter((klub): klub is string => klub != null))),
     [data.districts],
   );
 
@@ -114,6 +114,8 @@ export function MapaOkregow({ data }: { data: MapData }) {
         sub="41 okręgów wyborczych do Sejmu RP. Najedź lub kliknij okręg — szczegóły po prawej."
         isMock={data.isMock}
       />
+
+      {data.districts.some(d => d.klub == null || d.turnout == null) && <p className="mb-4 text-sm text-muted-foreground">Część statystyk jest niedostępna. Okręgi bez danych dla wybranego widoku oznaczamy neutralnym kolorem.</p>}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
         <span className="text-muted-foreground text-[11px] shrink-0 font-medium">dataset</span>
@@ -169,7 +171,7 @@ export function MapaOkregow({ data }: { data: MapData }) {
                   opacity={dim ? 0.5 : 0.92}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Okręg ${d.id} ${d.name}: ${mode === "klub" ? d.klub : mode === "turnout" ? `${d.turnout}%` : mode === "age" ? `${d.avgAge ?? "—"} lat` : `${d.mpCount ?? "—"} mandatów`}`}
+                  aria-label={`Okręg ${d.id} ${d.name}: ${mode === "klub" ? d.klub ?? "brak danych" : mode === "turnout" ? d.turnout != null ? `${d.turnout}%` : "brak danych" : mode === "age" ? `${d.avgAge ?? "—"} lat` : `${d.mpCount ?? "—"} mandatów`}`}
                   onMouseEnter={() => setHoverId(d.id)}
                   onMouseLeave={() => setHoverId(null)}
                   onFocus={() => setHoverId(d.id)}
@@ -298,11 +300,11 @@ export function MapaOkregow({ data }: { data: MapData }) {
               <dl className="grid grid-cols-[1fr_auto] gap-y-2 text-[12px]">
                 <dt className="text-muted-foreground">Dominujący klub</dt>
                 <dd className="text-right text-foreground inline-flex items-center gap-2 justify-end">
-                  <ClubLogo klub={sel.klub} size={18} />
-                  {KLUB_LABELS[sel.klub] ?? sel.klub}
+                  {sel.klub && <ClubLogo klub={sel.klub} size={18} />}
+                  {sel.klub ? KLUB_LABELS[sel.klub] ?? sel.klub : "Brak danych"}
                 </dd>
                 <dt className="text-muted-foreground">Frekwencja głosowań</dt>
-                <dd className="text-right font-mono text-foreground">{sel.turnout}%</dd>
+                <dd className="text-right font-mono text-foreground">{sel.turnout != null ? `${sel.turnout}%` : "Brak danych"}</dd>
                 {sel.mpCount != null && (
                   <>
                     <dt className="text-muted-foreground">Liczba mandatów</dt>

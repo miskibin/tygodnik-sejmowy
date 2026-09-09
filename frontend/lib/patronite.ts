@@ -24,7 +24,7 @@ export type PatroniteStats = {
   inactiveCount: number;       // ever-supported, currently lapsed
   totalEverCount: number;      // active + inactive
   fetchedAt: string;           // ISO
-  ok: boolean;                 // false → fall back to mock in caller
+  ok: boolean;                 // false → hide unavailable metrics in caller
 };
 
 async function fetchPage(path: string, page: number, token: string): Promise<PatronRow[]> {

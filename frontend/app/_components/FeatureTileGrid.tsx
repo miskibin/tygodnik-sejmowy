@@ -377,6 +377,7 @@ export async function FeatureTileGrid() {
             title="Budżet"
             description="Transparentny budżet projektu: ile wpływa od patronów, ile kosztuje serwer, gdzie idzie reszta."
             preview={
+              patronite.ok ? (
               <div>
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className="text-[26px] font-medium leading-none">
@@ -398,6 +399,9 @@ export async function FeatureTileGrid() {
                   <span>{budzetMonth}</span>
                 </div>
               </div>
+              ) : (
+                <p className="text-sm leading-relaxed text-muted-foreground">Dane o wpłatach są chwilowo niedostępne. Aktualne wsparcie sprawdzisz na profilu Patronite.</p>
+              )
             }
             href="/budzet"
             ctaLabel="zobacz budżet →"

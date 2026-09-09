@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getEventsBySitting, getSittingsIndex } from "@/lib/db/events";
+import { getSittingsIndex } from "@/lib/db/events";
+import { getWeeklyEdition } from "@/lib/db/weekly-stories";
 import { BriefList } from "../../_components/BriefList";
 
 export const revalidate = 300;
@@ -57,6 +58,6 @@ export default async function TygodnikSittingPage({
   const sitting = sittings.find((s) => s.sittingNum === sittingNum);
   if (!sitting) notFound();
 
-  const events = await getEventsBySitting(sitting.term, sitting.sittingNum);
-  return <BriefList events={events} sitting={sitting} sittings={sittings} />;
+  const edition = await getWeeklyEdition(sitting.term, sitting.sittingNum);
+  return <BriefList edition={edition} sitting={sitting} sittings={sittings} />;
 }

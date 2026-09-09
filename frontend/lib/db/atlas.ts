@@ -224,61 +224,60 @@ export async function getTopicTrends(term = 10): Promise<TopicTrend> {
 export type MapDistrict = {
   id: number;
   name: string;
-  klub: string;          // dominant
-  turnout: number;       // %
+  klub: string | null;   // dominant, when available
+  turnout: number | null; // %, when available
   mpCount: number | null;
   avgAge: number | null;
   lon: number;
   lat: number;
-  isMock: boolean;       // true = klub/turnout fabricated; false = from view
+  isMock: boolean;       // retained for callers; no fabricated values
 };
 
 export type MapData = { districts: MapDistrict[]; isMock: boolean };
 
-// Hardcoded coords + fallback klub assignment (used when view returns no row
-// for a district). Lifted from mockup; coords are real city centroids.
-const OKREGI_COORDS: Array<[number, string, string, number, number, number]> = [
-  [1, "Legnica", "KO", 91, 16.16, 51.21],
-  [2, "Wałbrzych", "KO", 88, 16.28, 50.78],
-  [3, "Wrocław", "KO", 93, 17.04, 51.11],
-  [4, "Bydgoszcz", "PiS", 86, 18.0, 53.12],
-  [5, "Toruń", "PiS", 82, 18.6, 53.01],
-  [6, "Lublin", "PiS", 88, 22.57, 51.25],
-  [7, "Chełm", "PiS", 79, 23.47, 51.14],
-  [8, "Zielona Góra", "KO", 90, 15.51, 51.94],
-  [9, "Łódź", "KO", 92, 19.46, 51.76],
-  [10, "Piotrków", "PiS", 83, 19.7, 51.4],
-  [11, "Sieradz", "KO", 85, 18.73, 51.6],
-  [12, "Chrzanów", "KO", 88, 19.4, 50.14],
-  [13, "Kraków", "Lewica", 94, 19.94, 50.06],
-  [14, "Nowy Sącz", "PiS", 76, 20.69, 49.62],
-  [15, "Tarnów", "PiS", 81, 20.99, 50.01],
-  [16, "Płock", "PSL-TD", 87, 19.71, 52.55],
-  [17, "Radom", "PiS", 84, 21.15, 51.4],
-  [18, "Siedlce", "PiS", 80, 22.27, 52.17],
-  [19, "Warszawa I", "KO", 95, 21.01, 52.23],
-  [20, "Warszawa II", "KO", 93, 21.1, 52.3],
-  [21, "Opole", "KO", 89, 17.92, 50.67],
-  [22, "Krosno", "PiS", 78, 21.77, 49.69],
-  [23, "Rzeszów", "PiS", 82, 22.0, 50.04],
-  [24, "Białystok", "PiS", 83, 23.16, 53.13],
-  [25, "Gdańsk", "KO", 92, 18.65, 54.35],
-  [26, "Gdynia", "KO", 91, 18.53, 54.52],
-  [27, "Bielsko-Biała", "KO", 90, 19.04, 49.82],
-  [28, "Częstochowa", "PiS", 82, 19.12, 50.81],
-  [29, "Katowice", "KO", 91, 19.02, 50.27],
-  [30, "Rybnik", "KO", 86, 18.55, 50.1],
-  [31, "Sosnowiec", "Lewica", 93, 19.13, 50.29],
-  [32, "Katowice II", "KO", 89, 19.06, 50.2],
-  [33, "Kielce", "PiS", 85, 20.63, 50.87],
-  [34, "Elbląg", "PiS", 79, 19.4, 54.16],
-  [35, "Olsztyn", "PiS", 81, 20.49, 53.78],
-  [36, "Kalisz", "KO", 87, 18.08, 51.76],
-  [37, "Konin", "PSL-TD", 85, 18.25, 52.22],
-  [38, "Piła", "KO", 86, 16.74, 53.15],
-  [39, "Poznań", "KO", 93, 16.93, 52.41],
-  [40, "Koszalin", "KO", 88, 16.18, 54.19],
-  [41, "Szczecin", "KO", 91, 14.55, 53.43],
+// Geographic coordinates only. Statistics must come from the data source.
+const OKREGI_COORDS: Array<[number, string, number, number]> = [
+  [1, "Legnica", 16.16, 51.21],
+  [2, "Wałbrzych", 16.28, 50.78],
+  [3, "Wrocław", 17.04, 51.11],
+  [4, "Bydgoszcz", 18.0, 53.12],
+  [5, "Toruń", 18.6, 53.01],
+  [6, "Lublin", 22.57, 51.25],
+  [7, "Chełm", 23.47, 51.14],
+  [8, "Zielona Góra", 15.51, 51.94],
+  [9, "Łódź", 19.46, 51.76],
+  [10, "Piotrków", 19.7, 51.4],
+  [11, "Sieradz", 18.73, 51.6],
+  [12, "Chrzanów", 19.4, 50.14],
+  [13, "Kraków", 19.94, 50.06],
+  [14, "Nowy Sącz", 20.69, 49.62],
+  [15, "Tarnów", 20.99, 50.01],
+  [16, "Płock", 19.71, 52.55],
+  [17, "Radom", 21.15, 51.4],
+  [18, "Siedlce", 22.27, 52.17],
+  [19, "Warszawa I", 21.01, 52.23],
+  [20, "Warszawa II", 21.1, 52.3],
+  [21, "Opole", 17.92, 50.67],
+  [22, "Krosno", 21.77, 49.69],
+  [23, "Rzeszów", 22.0, 50.04],
+  [24, "Białystok", 23.16, 53.13],
+  [25, "Gdańsk", 18.65, 54.35],
+  [26, "Gdynia", 18.53, 54.52],
+  [27, "Bielsko-Biała", 19.04, 49.82],
+  [28, "Częstochowa", 19.12, 50.81],
+  [29, "Katowice", 19.02, 50.27],
+  [30, "Rybnik", 18.55, 50.1],
+  [31, "Sosnowiec", 19.13, 50.29],
+  [32, "Katowice II", 19.06, 50.2],
+  [33, "Kielce", 20.63, 50.87],
+  [34, "Elbląg", 19.4, 54.16],
+  [35, "Olsztyn", 20.49, 53.78],
+  [36, "Kalisz", 18.08, 51.76],
+  [37, "Konin", 18.25, 52.22],
+  [38, "Piła", 16.74, 53.15],
+  [39, "Poznań", 16.93, 52.41],
+  [40, "Koszalin", 16.18, 54.19],
+  [41, "Szczecin", 14.55, 53.43],
 ];
 
 export async function getDistrictMap(term = 10): Promise<MapData> {
@@ -299,38 +298,29 @@ export async function getDistrictMap(term = 10): Promise<MapData> {
   const byNum = new Map<number, Row>();
   for (const r of (data ?? []) as Row[]) byNum.set(r.district_num, r);
 
-  let anyMock = false;
-  const districts: MapDistrict[] = OKREGI_COORDS.map(([id, name, fbKlub, fbTurn, lon, lat]) => {
+  const districts: MapDistrict[] = OKREGI_COORDS.map(([id, name, lon, lat]) => {
     const row = byNum.get(id);
-    if (!row || !row.dominant_club_short) {
-      anyMock = true;
-      return { id, name, klub: fbKlub, turnout: fbTurn, mpCount: null, avgAge: null, lon, lat, isMock: true };
-    }
-    const turnout = typeof row.turnout_pct === "string" ? parseFloat(row.turnout_pct) : (row.turnout_pct ?? fbTurn);
-    const avgAge = typeof row.avg_age === "string" ? parseFloat(row.avg_age) : row.avg_age;
+    const turnout = typeof row?.turnout_pct === "string" ? parseFloat(row.turnout_pct) : row?.turnout_pct;
+    const avgAge = typeof row?.avg_age === "string" ? parseFloat(row.avg_age) : row?.avg_age;
     return {
       id, name,
-      klub: row.dominant_club_short,
-      turnout: turnout ?? fbTurn,
-      mpCount: row.mp_count ?? null,
+      klub: row?.dominant_club_short ?? null,
+      turnout: turnout != null && Number.isFinite(turnout) ? turnout : null,
+      mpCount: row?.mp_count ?? null,
       avgAge: avgAge ?? null,
       lon, lat,
       isMock: false,
     };
   });
-  return { districts, isMock: anyMock };
+  return { districts, isMock: false };
 }
 
-// Kept for back-compat so callers that imported the old name still build;
-// internally just delegates to getDistrictMap and falls back to coords-only
-// if the view query throws.
-// Coords-only fallback if district_klub_stats query fails. Uses the same
-// hardcoded coords as getDistrictMap; klub + turnout are illustrative.
+// Preserve the navigable geography when statistics are unavailable.
 export function getMapPlaceholder(): MapData {
-  const districts: MapDistrict[] = OKREGI_COORDS.map(([id, name, klub, turnout, lon, lat]) => ({
-    id, name, klub, turnout, mpCount: null, avgAge: null, lon, lat, isMock: true,
+  const districts: MapDistrict[] = OKREGI_COORDS.map(([id, name, lon, lat]) => ({
+    id, name, klub: null, turnout: null, mpCount: null, avgAge: null, lon, lat, isMock: false,
   }));
-  return { isMock: true, districts };
+  return { isMock: false, districts };
 }
 
 // ──────────────────────────────────────────────────────────────────────────

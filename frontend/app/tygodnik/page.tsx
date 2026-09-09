@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
-  getEventsBySitting,
   getLatestSittingWithEvents,
   getSittingsIndex,
 } from "@/lib/db/events";
 import { BriefList } from "./_components/BriefList";
+import { getWeeklyEdition } from "@/lib/db/weekly-stories";
 
 // ISR: `unstable_cache` in `lib/db/events` bounds cold PostgREST work; 300s matches that layer.
 export const revalidate = 300;
@@ -20,6 +20,6 @@ export default async function TygodnikPage() {
     getSittingsIndex(10),
   ]);
   if (!latest) notFound();
-  const events = await getEventsBySitting(latest.term, latest.sittingNum);
-  return <BriefList events={events} sitting={latest} sittings={sittings} isIndex />;
+  const edition = await getWeeklyEdition(latest.term, latest.sittingNum);
+  return <BriefList edition={edition} sitting={latest} sittings={sittings} isIndex />;
 }

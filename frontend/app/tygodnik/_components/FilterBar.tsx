@@ -1,17 +1,18 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useProfile } from "@/lib/profile";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
 import { TOPICS, TOPIC_IDS, type TopicId } from "@/lib/topics";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // Filter state lives in useProfile (localStorage). We additionally mirror it
 // to URL query params (?topics=a,b&personas=x,y) so links are deep-shareable.
@@ -70,12 +71,12 @@ function ChipRack({
                 className="cursor-pointer rounded-full transition-all duration-150 inline-flex items-center gap-1.5"
                 style={{
                   padding: stacked ? "5px 12px" : "3px 10px",
-                  background: on ? "var(--foreground)" : "transparent",
-                  color: on ? "var(--background)" : "var(--secondary-foreground)",
+                  background: on ? "var(--primary)" : "transparent",
+                  color: on ? "var(--primary-foreground)" : "var(--secondary-foreground)",
                   border: `1px solid ${on ? "var(--foreground)" : "var(--border)"}`,
                 }}
               >
-                <span style={{ color: on ? "var(--background)" : t.color, opacity: on ? 0.85 : 0.7 }}>
+                <span style={{ color: on ? "var(--primary-foreground)" : t.color, opacity: 1 }}>
                   {t.icon}
                 </span>
                 {t.label}
@@ -117,12 +118,12 @@ function ChipRack({
                   className="cursor-pointer rounded-full transition-all duration-150 inline-flex items-center gap-1.5"
                   style={{
                     padding: stacked ? "5px 12px" : "3px 10px",
-                    background: on ? "var(--foreground)" : "transparent",
-                    color: on ? "var(--background)" : "var(--secondary-foreground)",
+                    background: on ? "var(--primary)" : "transparent",
+                    color: on ? "var(--primary-foreground)" : "var(--secondary-foreground)",
                     border: `1px solid ${on ? "var(--foreground)" : "var(--border)"}`,
                   }}
                 >
-                  <span style={{ color: on ? "var(--background)" : p.color, opacity: on ? 0.85 : 0.7 }}>
+                  <span style={{ color: on ? "var(--primary-foreground)" : p.color, opacity: 1 }}>
                     {p.icon}
                   </span>
                   {p.label}
@@ -146,31 +147,27 @@ export function FilterBar() {
     setTopics,
     setShowPersonas,
   } = useProfile();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
-  const titleId = useId();
 
   // URL → state hydration: on first load, if URL has filters and they differ
   // from localStorage, URL wins. Runs only once after hydration so we don't
   // fight subsequent local toggles.
-  const [urlHydrated, setUrlHydrated] = useState(false);
+  const urlHydrated = useRef(false);
   useEffect(() => {
-    if (!hydrated || urlHydrated) return;
-    const urlTopics = parseList<TopicId>(searchParams.get("topics"), TOPIC_IDS);
-    const urlPersonas = parseList<PersonaId>(searchParams.get("personas"), PERSONA_KEYS);
-    if (urlTopics.length > 0) setTopics(urlTopics);
-    if (urlPersonas.length > 0) {
-      setPersonas(urlPersonas);
-      setShowPersonas(true);
+    if (!hydrated) return;
+    if (!urlHydrated.current) {
+      urlHydrated.current = true;
+      if (searchParams.has("topics") || searchParams.has("personas")) {
+        setTopics(parseList<TopicId>(searchParams.get("topics"), TOPIC_IDS));
+        const nextPersonas = parseList<PersonaId>(searchParams.get("personas"), PERSONA_KEYS);
+        setPersonas(nextPersonas);
+        if (nextPersonas.length) setShowPersonas(true);
+        // Wait for the profile update before mirroring it back to the URL.
+        return;
+      }
     }
-    setUrlHydrated(true);
-  }, [hydrated, urlHydrated, searchParams, setTopics, setPersonas, setShowPersonas]);
-
-  // state → URL mirror. Use replaceState to avoid scroll jumps and history
-  // pollution; deep-link still works because the params are present on copy.
-  useEffect(() => {
-    if (!hydrated || !urlHydrated) return;
+    // state → URL mirror, without scroll jumps or extra history entries.
     const params = new URLSearchParams(Array.from(searchParams.entries()));
     if (topics.length > 0) params.set("topics", topics.join(","));
     else params.delete("topics");
@@ -181,7 +178,7 @@ export function FilterBar() {
     if (next !== `${window.location.pathname}${window.location.search}` && next !== window.location.search) {
       window.history.replaceState(null, "", next);
     }
-  }, [topics, personas, hydrated, urlHydrated, searchParams]);
+  }, [topics, personas, hydrated, searchParams, setTopics, setPersonas, setShowPersonas]);
 
   const togglePersona = (id: PersonaId) => {
     setPersonas(personas.includes(id) ? personas.filter((x) => x !== id) : [...personas, id]);
@@ -200,14 +197,13 @@ export function FilterBar() {
   );
 
   return (
-    <>
-      {/* Mobile trigger only */}
-      <div className="md:hidden">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <div>
+        <DialogTrigger asChild>
         <button
-          onClick={() => setOpen(true)}
           aria-expanded={open}
           aria-haspopup="dialog"
-          className="cursor-pointer w-full inline-flex items-center justify-between gap-2 rounded-full border border-border bg-muted px-4 py-2 font-sans text-[13px] text-foreground transition-colors hover:border-foreground"
+          className="cursor-pointer inline-flex items-center gap-2 py-2 font-sans text-[12px] text-secondary-foreground hover:text-foreground"
         >
           <span className="inline-flex items-center gap-2">
             <span className="text-destructive">⌕</span>
@@ -215,42 +211,25 @@ export function FilterBar() {
           </span>
           <span className="text-muted-foreground">▾</span>
         </button>
+        </DialogTrigger>
       </div>
 
-      {/* Desktop inline rack */}
-      <div className="hidden md:block">
-        <ChipRack
-          topics={topics}
-          personas={personas}
-          showPersonas={showPersonas}
-          onToggleTopic={toggleTopic}
-          onTogglePersona={togglePersona}
-          onToggleShowPersonas={setShowPersonas}
-          hydrated={hydrated}
-          layout="inline"
-        />
-      </div>
-
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="bottom"
-          aria-labelledby={titleId}
-          className="bg-background text-foreground max-h-[85vh] overflow-y-auto rounded-t-2xl border-t-2 border-rule"
+        <DialogContent
+          className="bg-background text-foreground max-h-[85dvh] overflow-y-auto gap-0 p-0 md:max-w-xl max-md:left-0 max-md:top-auto max-md:bottom-0 max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-b-none"
         >
-          <SheetHeader className="pt-5 pb-1">
-            <SheetTitle
-              id={titleId}
+          <DialogHeader className="px-6 pt-6 pb-5 pr-12">
+            <DialogTitle
               className="text-foreground"
               style={{ fontSize: 20 }}
             >
               {activeCount > 0 ? `Filtry (${activeCount})` : "Filtruj tematy"}
-            </SheetTitle>
-            <SheetDescription className="font-sans text-[12px] text-muted-foreground">
-              Dotyczy sekcji „Nowe projekty”. Pozostałe sekcje zostają niezmienione.
-            </SheetDescription>
-          </SheetHeader>
+            </DialogTitle>
+            <DialogDescription className="font-sans text-[12px] leading-relaxed text-muted-foreground">
+              Wybierz tematy, które chcesz przeczytać. Bez filtrów zobaczysz całe wydanie.
+            </DialogDescription>
+          </DialogHeader>
 
-          <div className="px-4 pb-4">
+          <div className="px-6 pb-6">
             <ChipRack
               topics={topics}
               personas={personas}
@@ -280,8 +259,7 @@ export function FilterBar() {
               Zastosuj
             </button>
           </div>
-        </SheetContent>
-      </Sheet>
-    </>
+        </DialogContent>
+    </Dialog>
   );
 }

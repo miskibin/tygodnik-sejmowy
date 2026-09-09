@@ -116,14 +116,14 @@ export default async function AboutProjectPage() {
   const costRows: Array<[string, number]> = costs.isEmpty
     ? [...COSTS_MONTHLY]
     : Array.from(
-        costs.rows.reduce<Map<string, number>>((m, r) => {
-          if (!m.has(r.category)) m.set(r.category, r.zl);
+        costs.rows.filter(r => r.month === costs.rows[0]?.month).reduce<Map<string, number>>((m, r) => {
+          m.set(r.category, (m.get(r.category) ?? 0) + r.zl);
           return m;
         }, new Map()),
       );
 
   const costsTotal = costRows.reduce((s, [, v]) => s + v, 0);
-  const totalSixMonths = costsTotal * 6;
+
   const monthlyIncome = patron.ok ? patron.monthlyAmount : 0;
   const patronCount = patron.ok ? patron.activeCount : 0;
   const totalEverCount = patron.ok ? patron.totalEverCount : 0;
@@ -301,6 +301,7 @@ export default async function AboutProjectPage() {
               <h3 className="text-[18px] font-medium m-0 mb-3 pb-2 border-b border-rule">
                 Koszty miesięczne
               </h3>
+              <p className="mb-4 text-sm text-muted-foreground">{costs.isEmpty ? "Szacunkowe koszty miesięczne zadeklarowane przez zespół; nie są zestawieniem faktur." : "Ostatni miesiąc w zestawieniu: " + new Date(costs.rows[0].month).toLocaleDateString("pl-PL", { month: "long", year: "numeric" }) + "."}</p>
               {costRows.map(([label, zl]) => {
                 const pct = (zl / costsTotal) * 100;
                 return (
@@ -321,9 +322,9 @@ export default async function AboutProjectPage() {
                 );
               })}
               <div className="flex items-baseline justify-between pt-3 mt-2 border-t-2 border-foreground">
-                <span className="text-[16px] font-medium">Razem · 6 miesięcy</span>
+                <span className="text-[16px] font-medium">Razem · miesięcznie</span>
                 <span className="font-mono text-[16px] font-semibold text-destructive tabular-nums">
-                  {fmtPL(totalSixMonths)} zł
+                  {fmtPL(costsTotal)} zł
                 </span>
               </div>
             </div>

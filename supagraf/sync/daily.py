@@ -87,6 +87,7 @@ def _load_phase(ctx: SyncContext, ledger: RunLedger, full: bool) -> None:
     from supagraf.backfill import backfill_print_committee_sitting_links
     from supagraf.backfill.agenda_refs import relink_agenda_print_refs
     from supagraf.backfill.mp_club_history import backfill_mp_club_history
+    from supagraf.backfill.sitting_links import relink_changed_sittings
     from supagraf.db import call_rpc_scalar
     from supagraf.fetch.acts import refresh_stale_eli
 
@@ -103,6 +104,10 @@ def _load_phase(ctx: SyncContext, ledger: RunLedger, full: bool) -> None:
              lambda: {"affected": call_rpc_scalar("backfill_process_act_links", {"p_term": term})})
     if "votings" in dirty or full:
         _run(ledger, "backfill:mp_club_history", lambda: dict(backfill_mp_club_history(term=term) or {}))
+    if {"proceedings", "votings", "prints"} & dirty or full:
+        _run(ledger, "backfill:sitting_links", lambda: relink_changed_sittings(
+            term=term, sittings=ctx.changed_keys.get("proceedings", set()) | ctx.changed_keys.get("votings", set()),
+            full=full, today=ctx.today, window_days=ctx.window_days))
 
     def stale_eli() -> dict:
         out = refresh_stale_eli(term=term)

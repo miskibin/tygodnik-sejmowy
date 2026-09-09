@@ -42,6 +42,8 @@ def stubs(monkeypatch):
             return {}
 
     import supagraf.backfill.mp_club_history as mch
+    import supagraf.backfill.sitting_links as sl
+    monkeypatch.setattr(sl, "relink_changed_sittings", lambda **kwargs: calls.setdefault("sitting_links", []).append(kwargs) or {})
     import supagraf.db as db
 
     # Never let the orchestrator reach a real database from a unit test.
@@ -68,6 +70,7 @@ def test_dirty_prints_runs_selective_load_and_relink(stubs):
     led = daily.run_daily(skip_enrich=True, skip_embed=True, persist_ledger=False)
     assert stubs["loaders"] == [(["prints"], False)]
     assert stubs["relink"] == [10]
+    assert stubs["sitting_links"][0]["term"] == 10
     assert stubs["refresh"] == [(["prints"], False)]
     # votings sync reported an item error → step failed → exit 1
     assert led.exit_code == 1
