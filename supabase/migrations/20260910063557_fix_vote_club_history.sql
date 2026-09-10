@@ -46,7 +46,7 @@ select
   v.voting_id,
   v.mp_id,
   v.term,
-  c.id                    as club_id_at_vote,
+  c.club_id               as club_id_at_vote,
   cm.modal_choice         as club_modal_choice,
   v.vote                  as mp_choice,
   (v.vote = cm.modal_choice) as aligned
