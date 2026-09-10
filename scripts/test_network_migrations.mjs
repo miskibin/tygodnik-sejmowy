@@ -46,11 +46,11 @@ await db.exec(`
     term integer not null, natural_id text not null, payload jsonb not null
   );
   create table public.mp_club_membership (
-    term integer not null, mp_id integer not null, club_id bigint not null
+    term integer not null, mp_id integer not null, club_id text not null
   );
 
   create view public.mp_vote_discipline as
-  select v.voting_id, v.mp_id, v.term, c.id as club_id_at_vote,
+  select v.voting_id, v.mp_id, v.term, c.club_id as club_id_at_vote,
          v.vote as club_modal_choice, v.vote as mp_choice, true as aligned
   from public.votes v join public.clubs c
     on c.term = v.term and c.club_id = v.club_ref
@@ -93,7 +93,7 @@ await db.exec(`
     (20,10,40,'A','YES'), (20,10,41,'A','YES'), (20,10,42,'A','YES'),
     (20,10,43,'A','YES'), (20,10,44,'A','YES'),
     (10,10,99,'A','YES'), (11,10,99,'B','YES'), (12,10,99,'A','YES');
-  insert into public.mp_club_membership values (10,1,2);
+  insert into public.mp_club_membership values (10,1,'B');
 `);
 
 const discipline = await db.query(`
@@ -102,7 +102,7 @@ const discipline = await db.query(`
 `);
 assert.equal(discipline.rows.length, 5, "only the five eligible club A roll-call rows remain");
 assert.deepEqual(discipline.rows[0], {
-  mp_id: 1, club_id_at_vote: 1, club_modal_choice: "YES", mp_choice: "NO", aligned: false,
+  mp_id: 1, club_id_at_vote: "A", club_modal_choice: "YES", mp_choice: "NO", aligned: false,
 });
 assert.deepEqual(discipline.rows.map((row) => row.mp_id), [1, 2, 3, 4, 5]);
 
