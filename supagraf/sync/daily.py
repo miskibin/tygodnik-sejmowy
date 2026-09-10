@@ -27,6 +27,7 @@ from loguru import logger
 from supagraf.sync.context import SyncContext
 from supagraf.sync.http import SejmApi
 from supagraf.sync.loaders import run_loaders, run_refreshes
+from supagraf.sync.load_recovery import PendingLoad, clear_pending, merge_pending, read_pending, write_pending
 from supagraf.sync.runlog import RunLedger, ensure_schema
 from supagraf.sync.stage import SyncResult
 
@@ -83,7 +84,7 @@ def _sync_phase(ctx: SyncContext, ledger: RunLedger, only: tuple[str, ...] | Non
         _run(ledger, "sync:polls", polls)
 
 
-def _load_phase(ctx: SyncContext, ledger: RunLedger, full: bool) -> None:
+def _load_phase(ctx: SyncContext, ledger: RunLedger, full: bool) -> bool:
     from supagraf.backfill import backfill_print_committee_sitting_links
     from supagraf.backfill.agenda_refs import relink_agenda_print_refs
     from supagraf.backfill.mp_club_history import backfill_mp_club_history
@@ -92,8 +93,11 @@ def _load_phase(ctx: SyncContext, ledger: RunLedger, full: bool) -> None:
     from supagraf.fetch.acts import refresh_stale_eli
 
     term, dirty = ctx.term, ctx.dirty
+    first_step = len(ledger.steps)
     _run(ledger, "load", lambda: {"dirty": sorted(dirty),
                                   **run_loaders(term, dirty, full=full, changed_keys=ctx.changed_keys)})
+    if ledger.steps[-1].status == "failed":
+        return False
     if {"prints", "processes"} & dirty and "proceedings" not in dirty:
         _run(ledger, "load:relink_agenda_refs", lambda: relink_agenda_print_refs(term=term))
     if {"prints", "committee_sittings"} & dirty or full:
@@ -114,6 +118,7 @@ def _load_phase(ctx: SyncContext, ledger: RunLedger, full: bool) -> None:
         ctx.mark("acts", bool(out.get("fetched_acts")))
         return {k: v for k, v in out.items() if k != "sample_eli"}
     _run(ledger, "backfill:refresh_stale_eli", stale_eli)
+    return not any(s.status == "failed" for s in ledger.steps[first_step:])
 
 
 def _enrich_phase(ctx: SyncContext, ledger: RunLedger, workers: int | None) -> None:
@@ -145,6 +150,21 @@ def _embed_phase(ctx: SyncContext, ledger: RunLedger) -> None:
     _run(ledger, "embed:promises", lambda: cmd_enrich_promises(kind="embed", limit=limit))
 
 
+def _network_phase(ctx: SyncContext, ledger: RunLedger, *, skip_load: bool, load_succeeded: bool) -> None:
+    """Publish only when source dependencies are healthy. Retry every daily run.
+
+    A bounded rebuild also expires documents outside the rolling time window,
+    even when upstream is unchanged, and retries earlier publication failures.
+    """
+    dependencies = {"sync:mps", "sync:clubs", "sync:questions", "sync:votings",
+                    "sync:prints", "sync:processes", "load", "backfill:sitting_links"}
+    if skip_load or not load_succeeded or any(s.name in dependencies for s in ledger.failed_steps):
+        ledger.skip("network", "source sync/load incomplete or --skip-load; previous snapshot preserved")
+        return
+    from supagraf.network_publish import refresh_network
+    _run(ledger, "network", lambda: refresh_network(term=ctx.term))
+
+
 def run_daily(
     *,
     term: int = 10,
@@ -169,6 +189,7 @@ def run_daily(
     own_api = api is None
     api = api or SejmApi(concurrency=concurrency)
     ctx = SyncContext(term=term, api=api, full=full, window_days=window_days)
+    load_succeeded = True
     try:
         if skip_fetch:
             ledger.skip("sync", "--skip-fetch (all resources treated as dirty)")
@@ -176,27 +197,63 @@ def run_daily(
         else:
             _sync_phase(ctx, ledger, only)
 
-        if skip_load:
-            ledger.skip("load", "--skip-load")
-        elif not ctx.dirty and not full:
-            ledger.skip("load", "nothing changed upstream")
-        else:
-            _load_phase(ctx, ledger, full)
+        if full:
+            # Preserve the complete plan for a retry even if --full found no diff.
+            ctx.dirty |= set(RESOURCES) | EXTERNAL
+            ctx.changed_keys.clear()
 
-        if skip_enrich:
+        pending: PendingLoad | None = None
+        with ledger.step("load:recover") as step:
+            pending = merge_pending(
+                PendingLoad(dirty=set(ctx.dirty), changed_keys={k: set(v) for k, v in ctx.changed_keys.items()}),
+                read_pending(term),
+            )
+            ctx.dirty, ctx.changed_keys = pending.dirty, pending.changed_keys
+            step.counts = {"dirty": sorted(ctx.dirty)}
+        if ledger.steps[-1].status == "failed":
+            load_succeeded = False
+            ledger.skip("load", "pending-load cursor unavailable")
+        elif ctx.dirty or full:
+            with ledger.step("load:checkpoint") as step:
+                write_pending(term, pending or PendingLoad())
+                step.counts = {"dirty": sorted(ctx.dirty)}
+            if ledger.steps[-1].status == "failed":
+                load_succeeded = False
+                ledger.skip("load", "pending-load checkpoint failed")
+            elif skip_load:
+                ledger.skip("load", "--skip-load; pending checkpoint preserved")
+            else:
+                load_succeeded = _load_phase(ctx, ledger, full)
+                if load_succeeded:
+                    with ledger.step("load:clear_checkpoint"):
+                        clear_pending(term)
+                    load_succeeded = ledger.steps[-1].status != "failed"
+        elif skip_load:
+            ledger.skip("load", "--skip-load")
+        else:
+            ledger.skip("load", "nothing changed upstream")
+
+        if not load_succeeded:
+            ledger.skip("enrich", "load failed")
+        elif skip_enrich:
             ledger.skip("enrich", "--skip-enrich")
         else:
             _enrich_phase(ctx, ledger, workers)
 
-        if skip_embed or os.environ.get("SUPAGRAF_DAILY_SKIP_EMBED") == "1":
+        if not load_succeeded:
+            ledger.skip("embed", "load failed")
+        elif skip_embed or os.environ.get("SUPAGRAF_DAILY_SKIP_EMBED") == "1":
             ledger.skip("embed", "--skip-embed / SUPAGRAF_DAILY_SKIP_EMBED")
         else:
             _embed_phase(ctx, ledger)
 
-        if skip_load:
+        if not load_succeeded:
+            ledger.skip("refresh", "load failed")
+        elif skip_load:
             ledger.skip("refresh", "--skip-load")
         else:
             _run(ledger, "refresh", lambda: run_refreshes(term, ctx.dirty, full=full))
+        _network_phase(ctx, ledger, skip_load=skip_load, load_succeeded=load_succeeded)
     finally:
         if own_api:
             api.close()

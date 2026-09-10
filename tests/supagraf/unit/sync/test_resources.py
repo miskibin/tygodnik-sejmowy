@@ -108,18 +108,68 @@ def test_votings_plan_sittings():
 
 
 def test_votings_sync_fetches_missing_detail_only(routes, ctx, fake_stage, monkeypatch):
-    fake_stage.seed("_stage_votings", {"64__1": {"votingNumber": 1}})
+    fake_stage.seed("_stage_votings", {"64__1": {
+        "votingNumber": 1, "totalVoted": 1, "notParticipating": 0,
+        "votes": [{"MP": 1, "vote": "YES"}],
+    }})
     fake_stage.sealed["voting"] = {"term10__64__1"}
     monkeypatch.setattr(votings, "Voting", type("V", (), {"model_validate": staticmethod(lambda p: p)}))
     routes.add(f"{B}/votings", [{"date": "2026-09-03", "proceeding": 64, "votingsNum": 2}])
     routes.add(f"{B}/votings/64", [{"votingNumber": 1}, {"votingNumber": 2}])
-    routes.add(f"{B}/votings/64/2", {"sitting": 64, "votingNumber": 2, "votes": [{"MP": 1}]})
+    routes.add(f"{B}/votings/64/2", {"sitting": 64, "votingNumber": 2,
+                                              "totalVoted": 1, "notParticipating": 0,
+                                              "votes": [{"MP": 1, "vote": "YES"}]})
     res = votings.sync(ctx)
     assert res.fetched == 1 and res.upserted == 1 and res.skipped == 1
     assert routes.count("/votings/64/1") == 0
     assert fake_stage.sealed["voting"] == {"term10__64__1", "term10__64__2"}
     assert "votings" in ctx.dirty
     assert ctx.changed_keys["votings"] == {64}
+
+
+def test_vote_rows_complete_only_when_participation_totals_match():
+    complete = {"totalVoted": 2, "notParticipating": 1,
+                "votes": [{"vote": "YES"}, {"vote": "VOTE_VALID"}, {"vote": "ABSENT"}]}
+    assert votings.has_complete_vote_rows(complete)
+    assert not votings.has_complete_vote_rows({**complete, "votes": complete["votes"][:1]})
+    assert not votings.has_complete_vote_rows({**complete, "votes": [{"vote": "YES"}] * 3})
+
+
+def test_votings_refetches_previously_sealed_partial_payload(routes, ctx, fake_stage, monkeypatch):
+    partial = {"votingNumber": 1, "totalVoted": 2, "notParticipating": 0,
+               "votes": [{"MP": 1, "vote": "YES"}]}
+    complete = {**partial, "votes": [{"MP": 1, "vote": "YES"}, {"MP": 2, "vote": "NO"}]}
+    fake_stage.seed("_stage_votings", {"64__1": partial})
+    fake_stage.sealed["voting"] = {"term10__64__1"}
+    monkeypatch.setattr(votings, "Voting", type("V", (), {"model_validate": staticmethod(lambda p: p)}))
+    routes.add(f"{B}/votings", [{"date": "2026-09-03", "proceeding": 64, "votingsNum": 1}])
+    routes.add(f"{B}/votings/64", [{"votingNumber": 1}])
+    routes.add(f"{B}/votings/64/1", complete)
+
+    res = votings.sync(ctx)
+
+    assert res.fetched == 1 and res.upserted == 1
+    assert routes.count("/votings/64/1") == 1
+    assert votings.has_complete_vote_rows(fake_stage.tables["_stage_votings"]["64__1"])
+
+
+def test_votings_reads_payloads_only_for_planned_targets(routes, ctx, fake_stage, monkeypatch):
+    complete = {"votingNumber": 1, "totalVoted": 1, "notParticipating": 0,
+                "votes": [{"MP": 1, "vote": "YES"}]}
+    fake_stage.seed("_stage_votings", {"64__1": complete})
+    fake_stage.sealed["voting"] = {"term10__64__1"}
+    routes.add(f"{B}/votings", [{"date": "2026-09-03", "proceeding": 64, "votingsNum": 1}])
+    seen_ids = []
+    original = fake_stage.read_payloads
+
+    def bounded_read(table, term, ids=None, *, key_col="natural_id"):
+        seen_ids.append(ids)
+        assert ids is not None, "voting sync must not transfer every staged ballot payload"
+        return original(table, term, ids, key_col=key_col)
+
+    monkeypatch.setattr(votings.stage, "read_payloads", bounded_read)
+    votings.sync(ctx)
+    assert seen_ids == [[]]
 
 
 # ---- mps / clubs / committees ------------------------------------------------
