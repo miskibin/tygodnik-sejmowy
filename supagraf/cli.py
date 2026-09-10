@@ -15,6 +15,30 @@ from supagraf.stage import mp_office_expenses as stage_mp_office_expenses
 from supagraf.stage import promises as stage_promises
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
+
+
+@app.command("network")
+def cmd_network(
+    term: int = typer.Option(10, min=1),
+    days: int = typer.Option(180, min=1, max=365),
+    output: Path | None = typer.Option(None, "--output", help="Save the research snapshot as JSON"),
+    publish: bool = typer.Option(False, "--publish", help="Publish to the database after a successful build"),
+):
+    """Build the experimental network. Read-only unless --publish is supplied."""
+    import json
+    from supagraf.network import build_network
+
+    payload = build_network(term=term, days=days)
+    if output:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    if publish:
+        from supagraf.network_publish import publish_network
+        publish_network(payload)
+    typer.echo(json.dumps({"term": term, "nodes": len(payload["nodes"]),
+                           "sampling": payload["sampling"], "published": publish}, ensure_ascii=False))
+
+
 enrich_app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(enrich_app, name="enrich", help="LLM/embedding enrichment over loaded prints")
 

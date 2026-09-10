@@ -20,6 +20,7 @@ export const SIDEBAR_MAIN_NAV = [
 export const SECONDARY_NAV = [
   { href: "/szukaj",       label: "Szukaj",      hint: "wyszukiwarka" },
   { href: "/atlas",        label: "Atlas",       hint: "wykresy" },
+  { href: "/powiazania",   label: "Powiązania",  hint: "eksperyment" },
   { href: "/sondaze",      label: "Sondaże",     hint: "poparcie partii" },
   { href: "/proces",       label: "Procesy",     hint: "ścieżka ustaw" },
   { href: "/mowa",         label: "Mowa",        hint: "transkrypcje" },

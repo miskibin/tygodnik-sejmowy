@@ -96,4 +96,9 @@ def fake_stage(monkeypatch) -> FakeStage:
     monkeypatch.setattr(watermark, "load_sealed", lambda entity: fs.sealed.get(entity, set()))
     monkeypatch.setattr(watermark, "bulk_seal", lambda entity, keys, source: fs.sealed.setdefault(entity, set()).update(keys))
     monkeypatch.setattr(watermark, "seal", lambda entity, key, source="predicate": fs.sealed.setdefault(entity, set()).add(key))
+    from supagraf.sync.resources import votings
+    monkeypatch.setattr(votings, "_incomplete_staged_ids", lambda term: {
+        nid for nid, payload in fs.tables.get("_stage_votings", {}).items()
+        if not votings.has_complete_vote_rows(payload)
+    })
     return fs

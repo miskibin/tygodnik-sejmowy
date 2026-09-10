@@ -83,6 +83,7 @@ mobile/expo-env.d.ts
 
 # Stray root node_modules (frontend/ has its own — none expected at repo root)
 /node_modules/
+.pnpm-store/
 
 # Debug / one-off screenshot dumps from quote-share + verdict overflow checks.
 # Output of scripts/quote_share_*.mjs and scripts/verdict_overflow_*.mjs.

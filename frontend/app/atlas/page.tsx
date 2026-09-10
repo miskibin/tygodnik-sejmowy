@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/atlas" },
@@ -54,6 +55,10 @@ export default async function AtlasPage() {
           subtitle={`Aktualizacja: ${formatDataUpdate(lastUpdate)} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: ETL sejmograf + API Sejmu RP`}
         />
 
+        <Link href="/powiazania" className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 p-5 hover:bg-muted">
+          <span><span className="text-xs uppercase tracking-wider text-muted-foreground">Eksperyment</span><span className="mt-1 block text-xl font-medium">Co łączy posłów?</span></span>
+          <span className="text-sm">Odkryj mapę powiązań →</span>
+        </Link>
         <div className="grid gap-12 sm:gap-16 md:gap-20 min-w-0 [&>*]:min-w-0">
           <MapaOkregow data={mapData} />
           <HeatmapaKoalicji data={heatmap} />
