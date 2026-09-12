@@ -11,12 +11,9 @@ export const metadata: Metadata = {
 
 const UPDATED_AT = "13 maja 2026";
 
-function Section({ kicker, title, children }: { kicker: string; title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-10">
-      <div className="text-[11px] text-muted-foreground mb-2 font-medium">
-        {kicker}
-      </div>
       <h2 className="text-[22px] font-medium tracking-[-0.02em] leading-tight text-foreground mt-0 mb-3">
         {title}
       </h2>
@@ -42,7 +39,7 @@ export default function PolitykaPrywatnosciPage() {
           zgody.
         </p>
 
-        <Section kicker="01" title="Administrator danych">
+        <Section title="Administrator danych">
           <p>
             Administratorem danych jest osoba prowadząca projekt Tygodnik Sejmowy. Kontakt
             w sprawach prywatności:{" "}
@@ -56,7 +53,7 @@ export default function PolitykaPrywatnosciPage() {
           </p>
         </Section>
 
-        <Section kicker="02" title="Jakie dane zbieramy">
+        <Section title="Jakie dane zbieramy">
           <p>
             Tylko zagregowane statystyki ruchu: liczba odsłon, kraj, urządzenie, przeglądarka,
             system, strona odsyłająca oraz kliknięcia w wybrane przyciski (np. Wsparcie,
@@ -82,7 +79,7 @@ export default function PolitykaPrywatnosciPage() {
           </p>
         </Section>
 
-        <Section kicker="03" title="Pliki cookies">
+        <Section title="Pliki cookies">
           <p>
             Strona zapisuje wyłącznie cookies <strong>niezbędne</strong> do działania
             (np. <code className="font-mono text-[12.5px] bg-muted px-1 rounded">sidebar_state</code>{" "}
@@ -91,14 +88,14 @@ export default function PolitykaPrywatnosciPage() {
           </p>
         </Section>
 
-        <Section kicker="04" title="Podstawa prawna przetwarzania">
+        <Section title="Podstawa prawna przetwarzania">
           <p>
             Art. 6 ust. 1 lit. f RODO — prawnie uzasadniony interes administratora (zapewnienie
             działania strony i analiza ruchu w sposób nieidentyfikujący użytkowników).
           </p>
         </Section>
 
-        <Section kicker="05" title="Twoje prawa">
+        <Section title="Twoje prawa">
           <p>
             Masz prawo do dostępu, sprostowania, usunięcia, ograniczenia, sprzeciwu wobec
             przetwarzania i przenoszenia danych oraz <strong>skargi do Prezesa UODO</strong>{" "}
@@ -119,14 +116,14 @@ export default function PolitykaPrywatnosciPage() {
           </p>
         </Section>
 
-        <Section kicker="06" title="Linki zewnętrzne">
+        <Section title="Linki zewnętrzne">
           <p>
             Strona linkuje m.in. do Patronite, GitHub, X, YouTube, sejm.gov.pl, ELI (Dz.U. / M.P.).
             Po kliknięciu obowiązują polityki tych serwisów.
           </p>
         </Section>
 
-        <Section kicker="07" title="Zmiany">
+        <Section title="Zmiany">
           <p>
             Aktualizacje tej polityki publikujemy na tej stronie z datą zmiany.
           </p>

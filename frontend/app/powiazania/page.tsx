@@ -22,9 +22,9 @@ export default async function NetworkPage() {
         </div>
         <Link href="/atlas" className="inline-flex min-h-11 items-center gap-1 text-sm hover:underline"><span className="sm:hidden">Atlas</span><span className="hidden sm:inline">Wróć do Atlasu</span><ArrowUpRight size={14} /></Link>
       </div>
-      <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">Co ich łączy?</h1>
+      <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">Powiązania posłów</h1>
       <p className="mt-3 mb-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:mt-4 sm:mb-8 sm:text-lg">
-        <span className="hidden sm:inline">Wspólne sprawy, podobne głosy, nieoczywiste połączenia. </span>Wybierz osobę i sprawdź, jakie działania stoją za każdą relacją.
+        Wybierz osobę i sprawdź podobieństwo głosowań oraz działania stojące za każdą relacją.
       </p>
       {snapshot ? <NetworkExplorer data={snapshot} stale={stale} /> : (
         <section className="rounded-2xl border border-border bg-muted/40 p-8 sm:p-12" role="status">

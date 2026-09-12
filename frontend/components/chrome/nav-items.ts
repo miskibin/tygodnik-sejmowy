@@ -5,7 +5,7 @@
 // entry below for discoverability.
 export const PRIMARY_NAV = [
   { href: "/tygodnik",  label: "Tygodnik" },
-  { href: "/posel",     label: "Twój poseł" },
+  { href: "/posel",     label: "Posłowie" },
   { href: "/obietnice", label: "Obietnice" },
 ] as const;
 
@@ -27,6 +27,7 @@ export const SECONDARY_NAV = [
   { href: "/komisja",      label: "Komisja",     hint: "posiedzenia" },
   { href: "/o-projekcie",  label: "O projekcie", hint: "warsztat" },
   { href: "/alerty",       label: "Alerty",      hint: "subskrypcje" },
+  { href: "/preferencje",  label: "Preferencje", hint: "wybór tematów" },
 ] as const;
 
 export function isActive(pathname: string, href: string) {

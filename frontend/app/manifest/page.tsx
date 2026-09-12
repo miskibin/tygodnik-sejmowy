@@ -21,7 +21,6 @@ export default function ManifestPage() {
       <div className="px-4 sm:px-8 md:px-14 pt-8" style={{ maxWidth: 980, margin: "0 auto" }}>
         <PageBreadcrumb
           items={[{ label: "Manifest" }]}
-          subtitle="Tygodniowy list do mieszkańców Rzeczypospolitej — i kontrakt z patronami, którzy płacą, żeby to istniało."
         />
       </div>
 

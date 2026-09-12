@@ -159,3 +159,25 @@ export function CitationText({
     </span>
   );
 }
+
+// Link citations after Markdown parsing so emphasis and existing links stay intact.
+type CitationNode = { type: string; value?: string; url?: string; children?: CitationNode[] };
+export function remarkCitations({ term = 10 }: { term?: number } = {}) {
+  return (tree: CitationNode) => {
+    function walk(node: CitationNode) {
+      if (!node.children || ["link", "linkReference", "code", "inlineCode", "html"].includes(node.type)) return;
+      node.children = node.children.flatMap(child => {
+        if (child.type !== "text" || !child.value) { walk(child); return [child]; }
+        return tokenize(child.value).flatMap((token): CitationNode[] => {
+          const text = (value: string): CitationNode => ({ type: "text", value });
+          const link = (value: string, url: string): CitationNode => ({ type: "link", url, children: [text(value)] });
+          if (token.kind === "text") return [text(token.value)];
+          if (token.kind === "statement") return [link(`wypowiedź ${token.id}`, `/mowa/${token.id}`)];
+          if (token.kind === "act") return [link(token.raw, isapLink(token.publisher, token.year, token.pos))];
+          return token.raw.split(/([0-9]+(?:-[0-9]+)?)/g).filter(Boolean).map(part => token.numbers.includes(part) ? link(part, `/proces/${term}/${encodeURIComponent(part)}`) : text(part));
+        });
+      });
+    }
+    walk(tree);
+  };
+}

@@ -56,12 +56,11 @@ export default async function BudzetPage() {
       <div className="max-w-[1100px] mx-auto">
         <PageBreadcrumb
           items={[{ label: "Budżet" }]}
-          subtitle="Koszty utrzymania projektu i dostępne dane o wsparciu patronów."
         />
 
         {!patron.ok && (
           <aside className="mb-8 rounded-xl border border-border bg-muted p-6">
-            <h1 className="mb-2 text-xl font-semibold tracking-tight">Wsparcie, które utrzymuje Tygodnik</h1>
+            <h1 className="mb-2 text-xl font-semibold tracking-tight">Dane o wsparciu niedostępne</h1>
             <p className="max-w-2xl text-sm leading-relaxed text-secondary-foreground">Dane o wpłatach są chwilowo niedostępne. Aktualną liczbę patronów i kwotę wsparcia sprawdzisz bezpośrednio na Patronite.</p>
             <PatroniteTrackedLink placement="budget" className="mt-4 inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">Zobacz profil Patronite ↗</PatroniteTrackedLink>
           </aside>
@@ -92,8 +91,7 @@ export default async function BudzetPage() {
         {/* Costs breakdown */}
         <section className="mb-16">
           <SectionTitle
-            kicker="Koszty miesięczne"
-            title="Na co idzie kasa"
+            title="Koszty miesięczne"
           />
           <p className="mb-5 text-sm text-muted-foreground">{costs.isEmpty ? "Szacunkowe koszty miesięczne zadeklarowane przez zespół. Nie są zestawieniem faktur." : "Koszty z ostatniego miesiąca dostępnego w zestawieniu: " + new Date(costs.rows[0].month).toLocaleDateString("pl-PL", { month: "long", year: "numeric" }) + "."}</p>
           <div className="grid md:grid-cols-2 gap-10">
@@ -164,8 +162,7 @@ export default async function BudzetPage() {
         {/* Team */}
         <section className="mb-4">
           <SectionTitle
-            kicker="Zespół"
-            title="Kto za tym stoi"
+            title="Zespół"
           />
           <div className="grid md:grid-cols-2 gap-8">
             <TeamCard
@@ -220,23 +217,18 @@ function BigStat({
 }
 
 function SectionTitle({
-  kicker,
   title,
   note,
 }: {
-  kicker: string;
   title: string;
   note?: React.ReactNode;
 }) {
   return (
     <header className="mb-6 pb-3 border-b border-rule">
-      <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
-        {kicker}
-        {note}
-      </div>
       <h2 className="font-medium m-0 text-[28px] leading-[1.05]" style={{ letterSpacing: "-0.01em" }}>
         {title}
       </h2>
+      {note && <div className="text-[11px] text-muted-foreground mt-1.5 font-medium">{note}</div>}
     </header>
   );
 }

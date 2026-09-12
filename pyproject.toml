@@ -34,3 +34,6 @@ pythonpath = ["."]
 # Repo root on sys.path so `import supagraf` resolves to /supagraf/. Keep
 # tests/supagraf/ WITHOUT an __init__.py; `unit/`, `contract/`, `e2e/` have one
 # so duplicate basenames live in distinct module namespaces.
+
+[tool.setuptools.package-data]
+"supagraf.enrich" = ["image_catalog.json"]

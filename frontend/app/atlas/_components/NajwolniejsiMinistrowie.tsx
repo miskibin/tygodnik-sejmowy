@@ -47,8 +47,6 @@ export function NajwolniejsiMinistrowie({ data }: { data: SlowMinisters }) {
   return (
     <section className="min-w-0">
       <SectionHead
-        num="04"
-        kicker="Odpowiedzialność"
         title="Najwolniejsi ministrowie"
         sub="Średni czas odpowiedzi na interpelację poselską według resortu adresata. Limit ustawowy: 21 dni (możliwe przedłużenie do 30)."
         isMock={data.isMock}

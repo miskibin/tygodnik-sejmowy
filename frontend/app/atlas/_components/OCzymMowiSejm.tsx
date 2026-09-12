@@ -40,7 +40,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
   if (data.buckets.length === 0) {
     return (
       <section className="min-w-0">
-        <SectionHead num="06" kicker="Agenda" title="O czym mówi Sejm" sub="Brak druków z otagowanym tematem w bazie." />
+        <SectionHead title="Tematy projektów ustaw" sub="Brak druków z otagowanym tematem w bazie." />
       </section>
     );
   }
@@ -69,9 +69,7 @@ export function OCzymMowiSejm({ data }: { data: TopicTrend }) {
   return (
     <section className="min-w-0">
       <SectionHead
-        num="06"
-        kicker="Agenda"
-        title="O czym mówi Sejm"
+        title="Tematy projektów ustaw"
         sub={`Top tematy projektów ustaw w czasie. Próba: ${totalPrints.toLocaleString("pl-PL")} druków z ${data.buckets.length} kwartałów (X kadencja).`}
       />
       <div

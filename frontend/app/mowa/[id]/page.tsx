@@ -185,7 +185,6 @@ export default async function StatementPage({
                 <SectionLabel
                   icon={Clock}
                   label="Kontekst posiedzenia"
-                  subtitle="Kto mówił przed i po"
                 />
                 <StatementContextStrip items={s.contextStrip} />
               </>
@@ -196,7 +195,7 @@ export default async function StatementPage({
                 <SectionLabel
                   icon={ListChecks}
                   label="Kluczowe tezy"
-                  subtitle="Wyciągnięte przez model językowy"
+                  subtitle="Wybrane automatycznie przez model"
                 />
                 <ul className="my-3 pl-5 text-foreground" style={{ fontSize: 15, lineHeight: 1.55 }}>
                   {s.keyClaims.slice(0, 3).map((c, i) => (
@@ -211,7 +210,6 @@ export default async function StatementPage({
                 <SectionLabel
                   icon={FileText}
                   label="Powiązane druki"
-                  subtitle="Dokumenty omawiane w wypowiedzi"
                 />
                 <div className="my-3 p-4 border-l-2 border-destructive" style={{ background: "var(--muted)" }}>
                   <ul className="" style={{ fontSize: 14, lineHeight: 1.5 }}>

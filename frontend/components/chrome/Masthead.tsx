@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { SearchIcon } from "lucide-react";
-import { useProfile } from "@/lib/profile";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
@@ -12,15 +11,12 @@ import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { GlobalSearchDialog } from "./GlobalSearchDialog";
 import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
 
-// Tablet (768–1023) inherits the mobile burger nav. At iPad widths the 6 primary
-// pills + Więcej + okręg pill + Wesprzyj wrapped to 6 stacked rows because the
-// 1fr middle column got squeezed by the auto side columns. Promoting the
-// mobile→desktop threshold to lg: gives us a clean burger on tablets, and we
-// only re-introduce supplementary chrome (issue label, postcode pill) at xl:.
+// Tablet (768–1023) inherits the mobile burger nav. At iPad widths the primary
+// pills + Więcej + support action need more room than the middle column offers,
+// so the mobile threshold stays at lg:.
 
 export function Masthead() {
   const pathname = usePathname();
-  const { postcode, district } = useProfile();
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -51,17 +47,6 @@ export function Masthead() {
     };
   }, [moreOpen]);
 
-  // Compute date client-side after mount so the prerender pass doesn't pin
-  // current-time data into the static shell (Cache Components rejects raw
-  // `new Date()` in the prerender; this also avoids hydration mismatch).
-  const [dateLabel, setDateLabel] = useState<{ day: string; full: string } | null>(null);
-  useEffect(() => {
-    const t = new Date();
-    setDateLabel({
-      day: t.toLocaleDateString("pl-PL", { weekday: "short" }).replace(".", ""),
-      full: t.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" }),
-    });
-  }, []);
   const secondaryActive = SECONDARY_NAV.find((s) => isActive(pathname, s.href));
 
   return (
@@ -80,14 +65,6 @@ export function Masthead() {
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
           </Link>
-          {dateLabel && (
-            <>
-              <span className="hidden xl:inline w-px h-[18px] bg-border" />
-              <span className="hidden xl:inline text-[11px] text-muted-foreground font-medium">
-                {dateLabel.day}&nbsp;{dateLabel.full}
-              </span>
-            </>
-          )}
         </div>
 
         {/* Primary nav (lg+ only — tablet falls back to burger) */}
@@ -191,21 +168,6 @@ export function Masthead() {
           >
             <SearchIcon className="size-4" aria-hidden="true" />
           </button>
-          <Link
-            href="/posel"
-            title="Twój okręg"
-            className="hidden xl:flex items-center gap-2 px-3 py-1.5 border border-border rounded-full text-secondary-foreground bg-background"
-          >
-            <span className="w-1.5 h-1.5 bg-destructive rounded-full" />
-            <span className="font-mono text-[11px]" suppressHydrationWarning>
-              {dateLabel ? (postcode || "--–---") : "--–---"}
-            </span>
-            <span className="text-muted-foreground">·</span>
-            <span suppressHydrationWarning>
-              Okręg&nbsp;{dateLabel ? (district?.num ?? "—") : "—"}
-            </span>
-          </Link>
-
           <ThemeToggle />
 
           <PatroniteTrackedLink

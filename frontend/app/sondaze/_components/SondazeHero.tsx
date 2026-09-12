@@ -51,7 +51,7 @@ export function SondazeHero({ rows, lastUpdateLabel }: { rows: PollAverageRow[];
     <section className="grid gap-8 md:gap-12 lg:gap-16 md:grid-cols-[1.25fr_1fr] items-start pb-10 md:pb-12 border-b border-border">
       <div className="min-w-0">
         <div className="font-sans text-[11px] text-muted-foreground mb-4 font-medium">
-          ✶ &nbsp; Gdyby wybory były w niedzielę
+          Gdyby wybory były w niedzielę
         </div>
         <h1
           className="font-medium m-0 leading-[0.98] tracking-[-0.035em] text-balance"

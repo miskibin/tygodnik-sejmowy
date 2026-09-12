@@ -96,3 +96,35 @@ test("a viral excerpt cut mid-sentence is completed using its original source", 
   const story = buildWeeklyStories(10, [speech({body_text:body(1,"100",whole),viral_quote:fragment,viral_score:0.9})], [], prints)[0];
   assert.equal(story.quote.text, whole);
 });
+
+test("citizen summary keeps concrete conditions instead of using the impact headline", () => {
+  const details = "Projekt obejmuje pracowników. Limit wynosi 20 dni. Dotyczy umów zawartych po ogłoszeniu. Wniosek składa się u pracodawcy. Podany limit obejmuje cały rok. Termin wejścia w życie nie jest ustalony.";
+  const story = buildWeeklyStories(10, [speech()], [], [{ ...prints[0], summary_plain: details, impact_punch: "Więcej praw dla pracowników" }])[0];
+  assert.equal(story.summary, details);
+});
+
+test("joint debate preserves separate summaries and conditions for every proposal", () => {
+  const first = "Pierwszy projekt dotyczy pracowników.";
+  const second = "Drugi projekt dotyczy pracodawców.";
+  const story = buildWeeklyStories(10, [speech()], [], [
+    { ...prints[0], summary_plain: first },
+    { ...prints[1], document_category: "projekt_ustawy", is_meta_document: false, summary_plain: second },
+  ])[0];
+  assert.deepEqual(story.projectSummaries.map(p => [p.number, p.text]), [["100", first], ["200", second]]);
+});
+
+const { readWeeklyFilters, matchesWeeklyFilters } = load(root + "lib/weekly-filters.ts");
+test("an ordinary edition link always includes stories without classification", () => {
+  assert.equal(matchesWeeklyFilters({ topics: [], personas: [] }, readWeeklyFilters({})), true);
+});
+
+test("invalid or duplicated URL filters cannot create an invisible active filter", () => {
+  assert.deepEqual(readWeeklyFilters({ topics: "unknown,zdrowie,zdrowie", personas: "unknown" }), { topics: ["zdrowie"], personas: [] });
+  assert.deepEqual(readWeeklyFilters({ topics: "", personas: "" }), { topics: [], personas: [] });
+});
+
+test("only explicitly selected topics narrow an edition", () => {
+  const filters = readWeeklyFilters({ topics: "zdrowie" });
+  assert.equal(matchesWeeklyFilters({ topics: ["zdrowie"], personas: [] }, filters), true);
+  assert.equal(matchesWeeklyFilters({ topics: ["transport"], personas: [] }, filters), false);
+});

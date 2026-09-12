@@ -210,8 +210,6 @@ export function SankeyKluby({ data }: { data: SankeyData }) {
   return (
     <section className="min-w-0">
       <SectionHead
-        num="03"
-        kicker="Migracje"
         title="Przepływ posłów między klubami"
         sub={quarterLabel ? `${quarterLabel}. Wstęgi pokazują tylko realne przejścia między klubami — posłowie którzy zostali, są oznaczeni liczbą wewnątrz słupka.` : "Wstęgi pokazują tylko realne przejścia między klubami."}
       />

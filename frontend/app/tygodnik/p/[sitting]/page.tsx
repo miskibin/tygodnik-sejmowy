@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSittingsIndex } from "@/lib/db/events";
 import { getWeeklyEdition } from "@/lib/db/weekly-stories";
 import { BriefList } from "../../_components/BriefList";
+import { readWeeklyFilters } from "@/lib/weekly-filters";
 
 export const revalidate = 300;
 
@@ -47,8 +48,10 @@ export async function generateMetadata({
 
 export default async function TygodnikSittingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ sitting: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { sitting: raw } = await params;
   const sittingNum = Number(raw);
@@ -59,5 +62,6 @@ export default async function TygodnikSittingPage({
   if (!sitting) notFound();
 
   const edition = await getWeeklyEdition(sitting.term, sitting.sittingNum);
-  return <BriefList edition={edition} sitting={sitting} sittings={sittings} />;
+  const filters = readWeeklyFilters(await searchParams);
+  return <BriefList key={`${sittingNum}-${JSON.stringify(filters)}`} edition={edition} sitting={sitting} sittings={sittings} filters={filters} />;
 }

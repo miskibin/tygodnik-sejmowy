@@ -41,7 +41,7 @@ export default async function ProcesIndexPage() {
       <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 md:pt-10">
         <PageBreadcrumb
           items={[{ label: "Procesy" }]}
-          subtitle="Projekty ustaw w 10. kadencji — wyszukaj po druku lub tytule, filtruj po fazie. Aktywność w ostatnich 90 dniach."
+          subtitle={`${items.length} projektów w 10. kadencji · aktywność z ostatnich 90 dni.`}
         />
 
         <ProcesDirectoryClient items={items} />

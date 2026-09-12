@@ -83,7 +83,7 @@ export default async function MowaPage() {
           items={[{ label: "Mowa sejmowa" }]}
           subtitle={
             <span className="text-[11px] text-muted-foreground font-medium">
-              cytaty rezonansowe · X kadencja
+              Cytaty wybrane wg viral_score · X kadencja
             </span>
           }
         />
@@ -99,7 +99,7 @@ export default async function MowaPage() {
                 className="font-medium tracking-[-0.025em] leading-none m-0"
                 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)" }}
               >
-                Pozostałe <span className="italic text-destructive">cytaty</span>
+                Pozostałe cytaty
               </h2>
               <p className="italic text-[14px] text-secondary-foreground m-0">
                 Każdy klikalny — prowadzi do pełnej wypowiedzi.

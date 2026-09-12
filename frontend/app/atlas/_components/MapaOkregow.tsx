@@ -50,7 +50,7 @@ const MODES: Array<{ id: Mode; label: string }> = [
   { id: "klub", label: "Klub dominujący" },
   { id: "turnout", label: "Frekwencja głos." },
   { id: "age", label: "Średnia wieku" },
-  { id: "mp_count", label: "Liczba MP" },
+  { id: "mp_count", label: "Liczba posłów" },
 ];
 
 // Continuous color scales for each numeric mode (red-ramp 75→100% / 35→65 / 6→14).
@@ -108,8 +108,6 @@ export function MapaOkregow({ data }: { data: MapData }) {
   return (
     <section className="min-w-0">
       <SectionHead
-        num="01"
-        kicker="Geografia władzy"
         title="Mapa Polski po okręgach"
         sub="41 okręgów wyborczych do Sejmu RP. Najedź lub kliknij okręg — szczegóły po prawej."
         isMock={data.isMock}
@@ -118,7 +116,7 @@ export function MapaOkregow({ data }: { data: MapData }) {
       {data.districts.some(d => d.klub == null || d.turnout == null) && <p className="mb-4 text-sm text-muted-foreground">Część statystyk jest niedostępna. Okręgi bez danych dla wybranego widoku oznaczamy neutralnym kolorem.</p>}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 mb-4 sm:mb-5 font-sans text-[12px] items-stretch sm:items-center min-w-0">
-        <span className="text-muted-foreground text-[11px] shrink-0 font-medium">dataset</span>
+        <span className="text-muted-foreground text-[11px] shrink-0 font-medium">Widok</span>
         <div className="min-w-0 w-full max-w-full overflow-x-auto pb-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:overflow-visible">
         <ToggleGroup
           type="single"
@@ -328,7 +326,7 @@ export function MapaOkregow({ data }: { data: MapData }) {
             </div>
           )}
           <div className="mt-4 font-mono text-[10px] text-muted-foreground leading-relaxed tracking-wide">
-            Projekcja Mercator (uproszczona). Granice okręgów: GeoElections Poland 1.0. Dane: district_klub_stats (mig 0053).
+            Granice okręgów: GeoElections Poland 1.0. Dane statystyczne: Sejm RP (X kadencja).
           </div>
         </aside>
       </div>

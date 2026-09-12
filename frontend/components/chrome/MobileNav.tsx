@@ -6,12 +6,10 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
-import { useProfile } from "@/lib/profile";
 import { ThemeToggle } from "./ThemeToggle";
 import { SIDEBAR_MAIN_NAV, SECONDARY_NAV, isActive } from "./nav-items";
 export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
   const pathname = usePathname();
-  const { postcode, district } = useProfile();
   const [open, setOpen] = useState(false);
 
   const close = () => setOpen(false);
@@ -47,14 +45,6 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
           </Link>
-          {postcode && (
-            <div className="mt-3 inline-flex items-center gap-2 px-2.5 py-1 border border-border rounded-full text-secondary-foreground text-[11px]">
-              <span className="w-1.5 h-1.5 bg-destructive rounded-full" />
-              <span className="font-mono">{postcode}</span>
-              <span className="text-muted-foreground">·</span>
-              <span>Okręg&nbsp;{district?.num ?? "—"}</span>
-            </div>
-          )}
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
