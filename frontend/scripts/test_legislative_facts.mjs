@@ -16,6 +16,7 @@ function load(path) {
 }
 const { predictStages } = load(root + "lib/voting/predict_stages.ts");
 const { voteMeaning } = load(root + "lib/weekly-stories.ts");
+const { shouldProjectLawTimeline } = load(root + "lib/process-timeline.ts");
 const date = s => new Date(s + "T00:00:00Z");
 const base = { sejmVoteDate: date("2026-09-01"), passed: true, motionPolarity: "pass", documentType: "BILL" };
 test("passage alone supplies no Senate, signature or publication date", () => {
@@ -45,6 +46,12 @@ test("resolution and unclassified motion do not acquire a law timeline", () => {
  assert.equal(predictStages({ ...base, documentType:null }).length,1);
  assert.equal(predictStages({ ...base, motionPolarity:null }).length,1);
  assert.equal(predictStages({ ...base, motionPolarity:"reject", passed:false }).length,1);
+});
+test("only a bill receives projected Senate, President and publication stages", () => {
+ assert.equal(shouldProjectLawTimeline("projekt_ustawy"), true);
+ for (const category of ["projekt_uchwaly", "wniosek_personalny", "sprawozdanie_komisji", null]) {
+  assert.equal(shouldProjectLawTimeline(category), false);
+ }
 });
 test("a recorded publication date is never called entry into force", () => {
  const stage=predictStages({ ...base, promulgationDate:date("2026-09-12") })[3];

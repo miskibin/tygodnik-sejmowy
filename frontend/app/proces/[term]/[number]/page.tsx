@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPrint } from "@/lib/db/prints";
 import { getProcessCitations } from "@/lib/db/statements";
+import { shouldProjectLawTimeline } from "@/lib/process-timeline";
 import { documentCategoryLabel, opinionSourceLabel, opinionSourceShort, promiseStatusLabel } from "@/lib/labels";
 import { PrintCard } from "@/components/print/PrintCard";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
@@ -140,7 +141,12 @@ export default async function DrukPage({
         <Hero print={print} outcome={outcome} />
       </div>
 
-      <Timeline stages={stages} votings={relatedVotings} processStillOpen={!!processStillOpen} />
+      <Timeline
+        stages={stages}
+        votings={relatedVotings}
+        processStillOpen={!!processStillOpen}
+        projectFutureLawPath={shouldProjectLawTimeline(print.documentCategory)}
+      />
 
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
         <Summary print={print} />

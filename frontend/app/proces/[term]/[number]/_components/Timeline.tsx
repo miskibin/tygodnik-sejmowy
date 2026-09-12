@@ -186,18 +186,18 @@ const PHASE_META: Record<PhaseKey, { label: string; actor: string; note: string 
   },
   senate: {
     label: "Senat",
-    actor: "30 dni na decyzję",
-    note: "Senat przyjmie, odrzuci lub zaproponuje poprawki.",
+    actor: "Senat",
+    note: "Senat może przyjąć ustawę, zaproponować poprawki albo ją odrzucić. Termin zależy od trybu prac.",
   },
   president: {
     label: "Prezydent",
-    actor: "21 dni",
-    note: "Podpis, weto albo skierowanie do Trybunału Konstytucyjnego.",
+    actor: "Prezydent",
+    note: "Prezydent może podpisać ustawę, zawetować ją albo przed podpisaniem skierować ją do Trybunału Konstytucyjnego. Termin zależy od trybu prac.",
   },
   promulgation: {
-    label: "Dz.U.",
-    actor: "wejście w życie",
-    note: "14 dni od ogłoszenia, chyba że ustawa stanowi inaczej.",
+    label: "Publikacja w Dz.U.",
+    actor: "Dziennik Ustaw",
+    note: "Po podpisie ustawa jest ogłaszana w Dzienniku Ustaw. Datę wejścia w życie określa jej treść; poszczególne przepisy mogą mieć różne terminy.",
   },
 };
 
@@ -257,14 +257,17 @@ export function Timeline({
   stages,
   votings,
   processStillOpen,
+  projectFutureLawPath,
 }: {
   stages: ProcessStage[];
   votings: LinkedVoting[];
   processStillOpen: boolean;
+  projectFutureLawPath: boolean;
 }) {
   const real = buildStations(stages, votings);
-  const future = processStillOpen ? projectFutureStations(stages) : [];
+  const future = processStillOpen && projectFutureLawPath ? projectFutureStations(stages) : [];
   const stations: Station[] = [...real, ...future];
+  const sectionTitle = projectFutureLawPath ? "Ścieżka projektu ustawy" : "Przebieg sprawy";
   const hasFailedTerminal = stages.some(
     (s) => s.depth === 0 && (s.stageType === "Rejected" || s.stageType === "Withdrawn"),
   );
@@ -280,9 +283,9 @@ export function Timeline({
     return (
       <section className="px-0 py-10 border-b border-border" style={{ background: "var(--muted)" }}>
         <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
-          <SectionHead title="Ścieżka projektu" />
+          <SectionHead title={sectionTitle} />
           <p className="text-muted-foreground">
-            Brak etapów procesu legislacyjnego dla tego druku.
+            Brak etapów procesu dla tego druku.
           </p>
         </div>
       </section>
@@ -294,7 +297,7 @@ export function Timeline({
   return (
     <section className="py-12 md:py-14 border-b border-border" style={{ background: "var(--muted)" }}>
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
-        <SectionHead title="Ścieżka projektu" />
+        <SectionHead title={sectionTitle} />
 
         {/* Horizontal station strip — md+ */}
         <div
