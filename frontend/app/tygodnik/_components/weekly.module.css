@@ -93,20 +93,24 @@
 .markdown table { border-collapse:collapse; font-size:14px; }
 .markdown :is(th,td) { border:1px solid var(--border); padding:8px 12px; text-align:left; }
 
-.storyPhoto { float:right; width:min(34%, 240px); margin:0 0 16px 24px; }
-.storyPhoto img { display:block; width:100%; height:auto; border-radius:4px; object-fit:contain; }
-.storyPhoto figcaption { display:flex; flex-direction:column; gap:4px; margin-top:9px; font-size:11px; line-height:1.6; color:var(--muted-foreground); }
-.storyPhoto figcaption a { text-decoration:underline; text-underline-offset:3px; }
-
+.storyLeadIllustrated { display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:28px; align-items:start; margin-bottom:20px; }
+.storyHeading { min-width:0; grid-column:1; grid-row:1; }
+.storyLeadIllustrated .storyTitle { margin-bottom:0; }
+.storyPhoto { float:none; position:relative; grid-column:2; grid-row:1; width:100%; margin:0; }
+.storyPhoto img { display:block; width:100%; height:auto; border-radius:8px; }
+.storyPhoto figcaption { position:absolute; top:10px; right:10px; max-width:calc(100% - 20px); font-size:11px; line-height:1.6; color:var(--foreground); z-index:2; }
+.storyPhoto details { background:color-mix(in srgb,var(--background) 94%,transparent); border:1px solid var(--border); border-radius:8px; padding:5px 9px; }
 .storyPhoto summary { cursor:pointer; width:fit-content; }
-.storyPhoto details p { margin-top:6px; }
-
-/* Keep voting evidence and actions below the illustrated introduction. */
-.mainVote, .links, .voteDetails, .debateDetails { clear:both; }
+.storyPhoto details[open] { max-width:320px; }
+.storyPhoto details p { margin:8px 0 0; overflow-wrap:anywhere; }
+.storyPhoto figcaption a { text-decoration:underline; text-underline-offset:3px; }
 .storyIntro { display:flow-root; }
 .storyIntroText { min-width:0; }
 @media(max-width:760px) {
-  .storyIntro { display:flex; flex-direction:column; }
-  .storyIntroText { order:0; width:100%; }
-  .storyIntro .storyPhoto { order:1; float:none; width:min(100%, 240px); margin:16px 0 20px; }
+  .storyLeadIllustrated { display:block; margin-bottom:20px; }
+  .storyLeadIllustrated .storyPhoto { width:calc(100% + 40px); margin:0 -20px; }
+  .storyLeadIllustrated .storyPhoto img { border-radius:0; mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%); }
+  .storyLeadIllustrated .storyHeading { position:relative; margin-top:-48px; }
+  .storyLeadIllustrated .storyMeta { margin-bottom:10px; }
+  .storyLeadIllustrated .storyTitle { font-size:clamp(26px,7vw,32px); line-height:1.16; letter-spacing:-.035em; }
 }
