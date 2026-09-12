@@ -27,16 +27,16 @@ def article_payload(article: Article) -> str:
 
 def requires_authentic(article: Article, plan: Plan) -> bool:
     """Known institutions and an LLM-declared identity require a source photo."""
-    return bool(_AUTHENTIC_ONLY.search(" ".join([article.title, plan.required_identity]))) or bool(plan.required_identity.strip())
+    return bool(_AUTHENTIC_ONLY.search(" ".join([article.title, plan.subject, plan.prompt, plan.required_identity]))) or bool(plan.required_identity.strip())
 
 
 def guard_plan(article: Article, plan: Plan) -> Plan:
     """Apply deterministic policy after an LLM response; never trust its route alone."""
     if requires_authentic(article, plan):
-        match = _AUTHENTIC_ONLY.search(article.title + " " + plan.required_identity)
+        match = _AUTHENTIC_ONLY.search(" ".join([article.title, plan.subject, plan.prompt, plan.required_identity]))
         identity = plan.required_identity.strip() or (match.group(0) if match else article.title)
         queries = plan.search_queries or [identity]
-        return Plan(route="authentic", subject=plan.subject or identity,
+        return Plan(route="authentic", subject=identity,
                     reason="Exact real identity requires an authenticated source image.",
                     prompt="", search_queries=queries[:2], required_identity=identity)
     if plan.route == "generate" and _INVENTED_INTERIOR.search(plan.prompt + " " + plan.subject):

@@ -40,17 +40,16 @@ class GPUError(RuntimeError):
 
 
 def runtime_fingerprint() -> dict[str, str]:
-    """Version the remote runtime from its immutable model and local worker inputs."""
+    """Version cache inputs including the exact image ID currently on SFGPU."""
     root = Path(__file__).resolve().parents[3]
     worker = root / "scripts" / "illustrations" / "worker.py"
     dockerfile = root / "scripts" / "illustrations" / "Dockerfile"
     worker_sha = hashlib.sha256(worker.read_bytes()).hexdigest()
     dockerfile_sha = hashlib.sha256(dockerfile.read_bytes()).hexdigest()
-    fingerprint = hashlib.sha256(
-        f"{MODEL}:{REVISION}:{worker_sha}:{dockerfile_sha}".encode("utf-8")
-    ).hexdigest()
+    image_id = _image_identity()
+    fingerprint = hashlib.sha256(f"{MODEL}:{REVISION}:{worker_sha}:{dockerfile_sha}:{image_id}".encode()).hexdigest()
     return {"model": MODEL, "revision": REVISION, "worker_sha256": worker_sha,
-            "dockerfile_sha256": dockerfile_sha, "fingerprint": fingerprint}
+            "dockerfile_sha256": dockerfile_sha, "image_id": image_id, "fingerprint": fingerprint}
 
 def _run(args: list[str], *, timeout: int, check: bool = True) -> subprocess.CompletedProcess[str]:
     return subprocess.run(args, text=True, capture_output=True, timeout=timeout, check=check)
@@ -60,6 +59,15 @@ def _remote(command: str, *, timeout: int = 45, check: bool = True) -> subproces
     # command strings only contain constants and a UUID made below.
     return _run([*SSH, command], timeout=timeout, check=check)
 
+
+def _image_identity() -> str:
+    """Resolve the exact local Docker image ID; unavailable means no stale cache reuse."""
+    try:
+        result = _remote("docker image inspect --format '{{.Id}}' " + IMAGE, timeout=30)
+        image_id = result.stdout.strip()
+        return image_id if re.fullmatch(r"sha256:[0-9a-f]{64}", image_id) else "unavailable"
+    except (OSError, subprocess.SubprocessError):
+        return "unavailable"
 
 def _gpu_memory() -> tuple[int, int] | None:
     try:

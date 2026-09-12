@@ -30,7 +30,7 @@ def test_authentic_identity_mismatch_is_rejected_before_vision(tmp_path):
     image = tmp_path / "x.png"
     image.write_bytes(b"not reviewed")
     plan = Plan(route="authentic", subject="ETPC", reason="", required_identity="ETPC")
-    candidate = Candidate(id="x", provider="commons", local_path=str(image), identity="Leipzig court")
+    candidate = Candidate(id="x", provider="wikimedia_commons", local_path=str(image), identity="Leipzig court", source_url="https://commons.wikimedia.org/wiki/File:Leipzig.jpg", author="Author", license="CC BY-SA 4.0", license_url="https://creativecommons.org/licenses/by-sa/4.0/", metadata={"source_title": "Leipzig court"})
     review, _ = review_mod.review_candidate(_article(), plan, candidate, llm=lambda **_: (_ for _ in ()).throw(AssertionError()))
     assert review.status == "rejected" and "identity" in review.reason.lower()
 
@@ -144,3 +144,20 @@ def test_review_images_has_full_frame_four_crops_and_keeps_input_bytes():
     assert len(frames) == 5 and original == raw.getvalue()
     sizes = [Image.open(BytesIO(frame)).size for frame in frames]
     assert sizes[0] == (800, 600) and sizes[1:] == [(400, 300)] * 4
+
+
+def test_protected_identity_in_subject_or_prompt_forces_authentic_without_identity_field():
+    neutral = Article(number="safe-1", title="Analiza instytucji")
+    for plan in (
+        Plan(route="generate", subject="ETPC w Strasburgu", reason="", prompt="neutral reeds"),
+        Plan(route="generate", subject="neutral subject", reason="", prompt="Editorial photograph of the European Court of Human Rights"),
+    ):
+        guarded = guard_plan(neutral, plan)
+        assert guarded.route == "authentic"
+        assert guarded.prompt == "" and guarded.subject == guarded.required_identity
+
+
+def test_plan_rejects_undeclared_llm_fields():
+    import pytest
+    with pytest.raises(Exception):
+        Plan.model_validate({"route":"none","subject":"x","reason":"x","requiredIdentity":"ETPC"})

@@ -4,7 +4,7 @@ import hashlib
 import re
 from pathlib import Path
 from .models import Plan, Candidate
-from .providers import search_commons, search_pixabay
+from .providers import ProviderError, search_commons, search_pixabay
 
 # Reviewed source identity, not a generated claim or a photograph search guess.
 AUTHENTIC_SOURCES = {

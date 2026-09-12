@@ -48,18 +48,24 @@ def _safe_url(url: str, hosts: set[str] = ALLOWED_IMAGE_HOSTS) -> bool:
 
 
 def _json(client: httpx.Client, url: str, params: dict) -> dict:
+    """Read a bounded JSON response without materializing an unbounded body."""
     try:
-        r = client.get(url, params=params, follow_redirects=False)
-        r.raise_for_status()
-        if len(r.content) > MAX_BYTES:
-            raise ProviderError('Provider response too large')
-        result = r.json()
+        with client.stream('GET', url, params=params, follow_redirects=False) as response:
+            response.raise_for_status()
+            chunks, size = [], 0
+            for chunk in response.iter_bytes(65536):
+                size += len(chunk)
+                if size > MAX_BYTES:
+                    raise ProviderError('Provider response too large')
+                chunks.append(chunk)
+        result = json.loads(b''.join(chunks))
         if not isinstance(result, dict) or 'error' in result:
             raise ProviderError('Provider returned an API error')
         return result
-    except (httpx.HTTPError, ValueError):
+    except ProviderError:
+        raise
+    except (httpx.HTTPError, ValueError, json.JSONDecodeError):
         raise ProviderError('Provider request failed') from None
-
 
 def _download(client: httpx.Client, url: str, target: Path) -> tuple[Path, int, int, str]:
     current = url
@@ -116,10 +122,11 @@ def _cached(path: Path) -> list[dict] | None:
         if time.time() - path.stat().st_mtime > CACHE_TTL:
             return None
         result = json.loads(path.read_text(encoding='utf8'))
-        return result if isinstance(result,list) else None
-    except (OSError,ValueError):
+        if not isinstance(result, list) or not all(isinstance(record, dict) and isinstance(record.get('download_url'), str) for record in result):
+            return None
+        return result
+    except (OSError, ValueError, TypeError):
         return None
-
 
 def _run(provider, query, output_dir, limit, client, fetch, options) -> list[Candidate]:
     _limit(limit)

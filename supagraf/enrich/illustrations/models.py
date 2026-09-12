@@ -14,6 +14,7 @@ class Article(BaseModel):
 
 
 class Plan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     route: Literal["generate", "authentic", "none"]
     subject: str
     reason: str

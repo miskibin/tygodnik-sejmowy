@@ -116,6 +116,10 @@ def run_images(*, term: int = 10, sitting: int | None = None, dry_run: bool = Fa
             title = " ".join(filter(None, [row.get("title"), row.get("short_title")]))
             subject_hash = hashlib.sha256(title.encode()).hexdigest()
             old = existing.get(row["id"])
+            # Explicit editorial selections are immutable to the daily Commons matcher.
+            if old and isinstance(old.get("image"), dict) and old["image"].get("editorial_selected") is True:
+                stats["skipped"] += 1
+                continue
             if not force and old and old["subject_hash"] == subject_hash and old["catalog_hash"] == catalog_hash:
                 stamp = re.sub(r"\.(\d+)", lambda m: "." + m[1].ljust(6, "0")[:6], old["checked_at"])
                 checked = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
@@ -140,3 +144,4 @@ def run_images(*, term: int = 10, sitting: int | None = None, dry_run: bool = Fa
                 stats["failed"] += 1
                 stats["results"].append({"number": row["number"], "error": str(exc)[:200]})
     return stats
+
