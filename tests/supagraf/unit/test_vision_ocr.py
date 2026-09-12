@@ -100,3 +100,57 @@ def test_extract_pdf_falls_back_to_tesseract_when_vision_fails(tmp_path, monkeyp
     res = pdf_mod.extract_pdf(scan)
     assert res.model_version == pdf_mod.TESSERACT_MODEL_VERSION
     assert res.text == "tess"
+
+
+def test_mixed_pdf_preserves_native_text_and_only_pays_for_scan(tmp_path, monkeypatch):
+    import fitz
+    from supagraf.enrich.llm import TokenUsage
+    path = tmp_path / "mixed.pdf"
+    with fitz.open() as doc:
+        doc.new_page().insert_text((72, 72), "Native legal text")
+        doc.new_page()
+        doc.save(path)
+    monkeypatch.setattr(vision_ocr, "vision_ocr_available", lambda: True)
+    calls = []
+    def fake_call(**kwargs):
+        calls.append(kwargs)
+        return "Scanned attachment", TokenUsage(input_tokens=10, output_tokens=4)
+    monkeypatch.setattr(vision_ocr, "call_vision_text", fake_call)
+    text, counts = vision_ocr.transcribe_pdf(path, native_pages=["Native legal text", ""])
+    assert len(calls) == 1
+    assert counts == [len("Native legal text"), len("Scanned attachment")]
+    assert text.index("Native legal text") < text.index("Scanned attachment")
+
+
+def test_layout_failure_uses_source_text_without_implicit_ocr(tmp_path, monkeypatch):
+    import fitz
+    import pymupdf4llm
+    from supagraf.enrich import pdf as pdf_mod
+    path = tmp_path / "text.pdf"
+    with fitz.open() as doc:
+        doc.new_page().insert_text((72, 72), "Article 1: verified source text")
+        doc.save(path)
+    def fail(*args, **kwargs):
+        assert kwargs["use_ocr"] is False
+        raise RuntimeError("broken layout")
+    monkeypatch.setattr(pymupdf4llm, "to_markdown", fail)
+    # Exercise the pure worker implementation so the monkeypatch stays local.
+    text, counts = pdf_mod._extract_pymupdf.__wrapped__(path)
+    assert "Article 1: verified source text" in text
+    assert counts == [len(text)]
+
+
+def test_incomplete_legacy_extract_is_not_reused(tmp_path, monkeypatch):
+    from supagraf.enrich import pdf as pdf_mod
+    path = tmp_path / "mixed.pdf"
+    path.write_bytes(b"test source identity")
+    old = {"text": "cover", "page_count": 2, "ocr_used": False, "char_count_per_page": [5, 0]}
+    monkeypatch.setattr(pdf_mod, "_cache_lookup", lambda sha, ver: old if ver == pdf_mod.LEGACY_PYMUPDF_MODEL_VERSION else None)
+    monkeypatch.setattr(pdf_mod, "_cache_insert", lambda *args: None)
+    monkeypatch.setattr(pdf_mod, "_extract_pymupdf", lambda path: ("cover", [5, 0]))
+    monkeypatch.setattr(pdf_mod, "_native_pages", lambda path: ["cover", ""])
+    monkeypatch.setattr(pdf_mod, "_extract_scan", lambda path, native_pages: ("cover and attachment", [5, 14], vision_ocr.VISION_OCR_MODEL_VERSION))
+    result = pdf_mod.extract_pdf(path)
+    assert result.ocr_used and not result.cache_hit
+    assert result.text == "cover and attachment"
+    assert result.model_version.endswith("-mixed")

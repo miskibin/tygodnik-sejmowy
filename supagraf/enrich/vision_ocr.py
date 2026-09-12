@@ -3,7 +3,7 @@
 Roughly a quarter of Sejm prints are scans (signed transmittal letters,
 opinions, Senate resolutions) with no text layer. Historically those went
 through Tesseract+`pol` (fine on clean typewriter pages, poor on stamps,
-handwriting, tables and faxed copies). `deepseek-v4-flash-vision-exp` reads
+handwriting, tables and faxed copies). `deepseek-flash` reads
 them as images at flash prices, so it is now the primary OCR path; Tesseract
 stays as the fallback when the vision call fails or is disabled.
 
@@ -30,6 +30,7 @@ from pathlib import Path
 from loguru import logger
 
 from supagraf.enrich import DEFAULT_LLM_BACKEND, LLM_MODELS
+from supagraf.enrich.pdf_worker import pdf_task
 from supagraf.enrich.llm import LLMHTTPError, LLMResponseError, call_vision_text
 
 VISION_OCR_MODEL = os.environ.get("SUPAGRAF_VISION_OCR_MODEL", LLM_MODELS["vision"])
@@ -123,7 +124,21 @@ def transcribe_page(images: list[bytes], *, page_no: int, page_total: int) -> st
     return text.strip()
 
 
-def transcribe_pdf(path: Path) -> tuple[str, list[int]]:
+@pdf_task
+def _page_count(path: Path) -> int:
+    import fitz
+    with fitz.open(path) as doc:
+        return doc.page_count
+
+
+@pdf_task
+def _render_path_page(path: Path, idx: int) -> list[bytes]:
+    import fitz
+    with fitz.open(path) as doc:
+        return render_page_strips(doc.load_page(idx))
+
+
+def transcribe_pdf(path: Path, *, native_pages: list[str] | None = None) -> tuple[str, list[int]]:
     """OCR a scanned PDF page by page. Returns (markdown, chars_per_page).
 
     `chars_per_page` has one entry per *source* page (omitted middle pages
@@ -133,26 +148,24 @@ def transcribe_pdf(path: Path) -> tuple[str, list[int]]:
     """
     if not vision_ocr_available():
         raise VisionOcrUnavailable("vision OCR disabled or DEEPSEEK_API_KEY missing")
-    import fitz  # type: ignore[import-not-found]
-
+    page_count = len(native_pages) if native_pages else _page_count(path)
+    wanted, _ = choose_pages(page_count)
+    per_page = [0] * page_count
     parts: list[str] = []
-    with fitz.open(path) as doc:
-        page_count = doc.page_count
-        wanted, omitted = choose_pages(page_count)
-        per_page = [0] * page_count
-        for idx in wanted:
-            if omitted and idx == page_count - MAX_TAIL_PAGES:
-                parts.append(
-                    f"\n\n<!-- pages {MAX_HEAD_PAGES + 1}..{page_count - MAX_TAIL_PAGES} omitted; "
-                    f"first {MAX_HEAD_PAGES} + last {MAX_TAIL_PAGES} only ({VISION_OCR_MODEL_VERSION}) -->\n\n"
-                )
-            strips = render_page_strips(doc.load_page(idx))
+    for idx in range(page_count):
+        if native_pages and native_pages[idx]:
+            text = native_pages[idx]
+        elif idx not in wanted:
+            parts.append(f"<!-- page {idx + 1} omitted: OCR sample -->")
+            continue
+        else:
+            strips = _render_path_page(path, idx)
             try:
                 text = transcribe_page(strips, page_no=idx + 1, page_total=page_count)
             except (LLMHTTPError, LLMResponseError) as e:
                 raise RuntimeError(f"vision OCR failed on page {idx + 1} of {path.name}: {e}") from e
-            per_page[idx] = len(text)
-            parts.append(f"<!-- page {idx + 1} -->\n{text}")
+        per_page[idx] = len(text)
+        parts.append(f"<!-- page {idx + 1} -->\n{text}")
     if sum(per_page) == 0:
         raise RuntimeError(f"vision OCR returned 0 chars across {page_count} pages for {path.name}")
     return "\n\n".join(parts), per_page

@@ -24,6 +24,7 @@ export function Summary({ print }: { print: PrintDetail }) {
     <section className="py-12 border-b border-border">
       <div className="max-w-[1280px] mx-auto px-0">
         <SectionHead title="Po polsku, prosto" />
+        <p className="text-sm text-muted-foreground mb-6">Streszczenie AI treści dokumentu{print.documentDate ? ` z ${new Date(print.documentDate).toLocaleDateString("pl-PL")}` : ""}. Opis odnosi się do dokumentu na jego etapie prac; aktualny przebieg sprawdź w ścieżce procesu i źródłach.</p>
 
         <div className="grid gap-10 lg:gap-14 grid-cols-1 lg:[grid-template-columns:1.3fr_1fr]">
           {/* LEFT — lede paragraph */}

@@ -20,6 +20,8 @@ export type VotingHeader = {
   majority_votes: number | null;
   present: number | null;
   topic: string | null;
+  description: string | null;
+  kind: string | null;
   // Classifier label from `classify_motion_polarity()` (migration 0087).
   // Drives polarity-aware timeline copy on /glosowanie/[id] — see issue #25.
   motion_polarity: import("@/lib/promiseAlignment").MotionPolarity | null;
@@ -73,7 +75,7 @@ export async function getVotingHeader(votingId: number): Promise<VotingHeader | 
   const sb = supabase();
   const { data, error } = await sb
     .from("votings")
-    .select("id, term, voting_number, title, date, yes, no, abstain, not_participating, total_voted, sitting, sitting_day, majority_type, majority_votes, present, topic, motion_polarity")
+    .select("id, term, voting_number, title, date, yes, no, abstain, not_participating, total_voted, sitting, sitting_day, majority_type, majority_votes, present, topic, description, kind, motion_polarity")
     .eq("id", votingId)
     .maybeSingle();
   if (error) throw error;
@@ -95,6 +97,8 @@ export async function getVotingHeader(votingId: number): Promise<VotingHeader | 
     majority_votes: (data.majority_votes as number) ?? null,
     present: (data.present as number) ?? null,
     topic: (data.topic as string) ?? null,
+    description: (data.description as string) ?? null,
+    kind: (data.kind as string) ?? null,
     motion_polarity: (data.motion_polarity as VotingHeader["motion_polarity"]) ?? null,
   };
 }
@@ -188,8 +192,8 @@ export type ClubBreakdownRow = ClubTallyRow & {
   club_ref: string;
   clubColor: string;
   dominant: "YES" | "NO" | "ABSTAIN";
-  brokenCount: number;
-  disciplineLabel: "ZA" | "PRZECIW" | "WSTRZ." | "wolne" | "—";
+  differentCount: number;
+  disciplineLabel: "ZA" | "PRZECIW" | "WSTRZ." | "brak przewagi" | "—";
 };
 
 export type Seat = {
@@ -213,9 +217,6 @@ export type Rebel = {
   district_num: number | null;
   district_name: string | null;
   photo_url: string | null;
-  // Cumulative rebellion count for this MP across the term, from
-  // mp_rebellion_count_mv. Includes the current voting.
-  priorRebellions: number;
 };
 
 export type LinkedPrintRich = {
@@ -246,7 +247,7 @@ const VOTE_LABEL_FROM_DOMINANT: Record<"YES" | "NO" | "ABSTAIN", "ZA" | "PRZECIW
 };
 
 function dominantVote(row: { yes: number; no: number; abstain: number }): "YES" | "NO" | "ABSTAIN" {
-  // Tiebreak: YES > NO > ABSTAIN — matches Polish convention of "klub poparł" reading.
+  // Deterministic tie order; ties are excluded from majority comparisons.
   if (row.yes >= row.no && row.yes >= row.abstain) return "YES";
   if (row.no >= row.abstain) return "NO";
   return "ABSTAIN";
@@ -309,22 +310,22 @@ export async function getVotingPageData(votingId: number): Promise<VotingPageDat
   const clubs: ClubBreakdownRow[] = ((clubsRaw.data ?? []) as ClubTallyRow[])
     .map(c => {
       const dom = dominantVote(c);
-      // brokenCount = members who voted but didn't go with the dominant vote.
+      // Members who voted differently from the club's dominant recorded vote.
       // NOT_VOTING (absences) doesn't count as breaking discipline.
       const voted = c.yes + c.no + c.abstain;
       const dominantCount = dom === "YES" ? c.yes : dom === "NO" ? c.no : c.abstain;
-      const brokenCount = voted - dominantCount;
-      // Tiny clubs / "wolne głosowanie" heuristic: if dominant is < 60% of votes, call it free.
+      const differentCount = voted - dominantCount;
+      // Only describe a dominant position when one option received at least 60% of cast votes.
       const isFree = voted > 0 && dominantCount / voted < 0.6;
       const disciplineLabel: ClubBreakdownRow["disciplineLabel"] = isFree
-        ? "wolne"
+        ? "brak przewagi"
         : VOTE_LABEL_FROM_DOMINANT[dom];
       return {
         ...c,
         club_ref: c.club_short,
         clubColor: KLUB_COLORS[c.club_short] ?? "#6e6356",
         dominant: dom,
-        brokenCount,
+        differentCount,
         disciplineLabel,
       };
     })
@@ -361,11 +362,11 @@ export async function getVotingPageData(votingId: number): Promise<VotingPageDat
 
   // ─── Rebels: MPs whose vote ≠ club dominant, excluding free-vote clubs ───
   const clubByRef = new Map(clubs.map(c => [c.club_ref, c]));
-  const rebelDraft: Array<Omit<Rebel, "priorRebellions">> = [];
+  const rebelDraft: Rebel[] = [];
   for (const seat of seats) {
     const club = clubByRef.get(seat.club_ref);
     if (!club) continue;
-    if (club.disciplineLabel === "wolne" || club.disciplineLabel === "—") continue;
+    if (club.disciplineLabel === "brak przewagi" || club.disciplineLabel === "—") continue;
     if (seat.vote !== "YES" && seat.vote !== "NO" && seat.vote !== "ABSTAIN") continue;
     if (seat.vote === club.dominant) continue;
     const mp = mpById.get(seat.mp_id);
@@ -382,39 +383,24 @@ export async function getVotingPageData(votingId: number): Promise<VotingPageDat
     });
   }
 
-  // Enrich rebels with prior-rebellion count from materialized view (E2).
-  // The view contains the cumulative count per (term, mp_id) across the
-  // entire term — includes this voting if it has been refreshed since.
-  let rebelCounts = new Map<number, number>();
-  if (rebelDraft.length > 0) {
-    const ids = rebelDraft.map(r => r.mp_id);
-    const { data: counts } = await sb
-      .from("mp_rebellion_count_mv")
-      .select("mp_id, total_rebellions")
-      .eq("term", header.term)
-      .in("mp_id", ids);
-    rebelCounts = new Map(((counts ?? []) as Array<{ mp_id: number; total_rebellions: number }>)
-      .map(r => [r.mp_id, r.total_rebellions]));
-  }
-  const rebels: Rebel[] = rebelDraft.map(r => ({
-    ...r,
-    priorRebellions: rebelCounts.get(r.mp_id) ?? 1,
-  }));
+  const rebels = rebelDraft;
 
   // ─── Linked print (richest one — sprawozdanie > main > joint > poprawka) ───
-  const ROLE_RANK: Record<string, number> = { sprawozdanie: 1, main: 2, joint: 3, poprawka: 4, autopoprawka: 5 };
+  const ROLE_RANK: Record<string, number> = { main: 1, sprawozdanie: 2, joint: 3, poprawka: 4, autopoprawka: 5 };
   let linkedPrint: LinkedPrintRich | null = null;
   let topPrintId: number | null = null;
+  let documentType: string | null = null;
   const linkRows = (printLinks.data ?? []) as Array<{ print_id: number; role: string }>;
   if (linkRows.length > 0) {
     const top = [...linkRows].sort((a, b) => (ROLE_RANK[a.role] ?? 9) - (ROLE_RANK[b.role] ?? 9))[0];
     topPrintId = top.print_id;
     const { data: pr } = await sb
       .from("prints")
-      .select("id, number, parent_number, short_title, summary_plain, impact_punch, affected_groups, iso24495_class")
+      .select("id, number, parent_number, short_title, summary_plain, impact_punch, affected_groups, iso24495_class, document_category")
       .eq("id", top.print_id)
       .maybeSingle();
     if (pr) {
+      documentType = pr.document_category as string | null;
       linkedPrint = {
         id: pr.id as number,
         number: pr.number as string,
@@ -445,10 +431,12 @@ export async function getVotingPageData(votingId: number): Promise<VotingPageDat
     }
     predictedStages = predictStages({
       sejmVoteDate: new Date(header.date),
+      documentType,
+      toSenateDate: byType.ToSenate ? new Date(byType.ToSenate) : null,
       senatePositionDate: byType.SenatePosition ? new Date(byType.SenatePosition) : null,
       toPresidentDate: byType.ToPresident ? new Date(byType.ToPresident) : null,
       presidentSignatureDate: byType.PresidentSignature ? new Date(byType.PresidentSignature) : null,
-      promulgationDate: null, // Wired below from acts
+      promulgationDate: null, // No confirmed publication date in this query.
       passed,
       motionPolarity: header.motion_polarity,
     });

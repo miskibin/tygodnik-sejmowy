@@ -101,18 +101,10 @@ function StageItem({ stage }: { stage: PredictedStage }) {
   const dotBg = isPastOrCurrent ? "var(--destructive)" : "var(--background)";
   const dotBorder = isPastOrCurrent ? "var(--destructive)" : "var(--border)";
 
-  let dateLabel: string;
-  if (stage.key === "senate" && stage.expectedDate == null) {
-    dateLabel = `do ${fmtDate(stage.deadlineDate)}`;
-  } else if (stage.expectedDate) {
-    dateLabel = fmtDate(stage.expectedDate);
-  } else {
-    dateLabel = fmtDate(stage.deadlineDate);
-  }
-
-  const showDeadlineSuffix =
-    stage.expectedDate != null &&
-    !sameDay(stage.expectedDate, stage.deadlineDate);
+  const dateLabel = stage.expectedDate ? fmtDate(stage.expectedDate)
+    : stage.deadlineDate ? `do ${fmtDate(stage.deadlineDate)}` : "Brak potwierdzonej daty";
+  const showDeadlineSuffix = stage.expectedDate != null && stage.deadlineDate != null
+    && !sameDay(stage.expectedDate, stage.deadlineDate);
 
   return (
     <li style={{ position: "relative", paddingRight: 24 }}>
@@ -148,7 +140,7 @@ function StageItem({ stage }: { stage: PredictedStage }) {
       >
         {dateLabel}
       </div>
-      {showDeadlineSuffix && stage.expectedDate && (
+      {showDeadlineSuffix && stage.expectedDate && stage.deadlineDate && (
         <div
           className="font-mono"
           style={{
@@ -191,11 +183,11 @@ const CLOSED_COPY: Record<Exclude<BillOutcome, "passed">, { subtitle: string; li
     // Senate/President timeline doesn't apply yet; show why the timeline
     // stops here instead of pretending the law was rejected.
     subtitle: "projekt wraca do dalszych prac",
-    line: "Wniosek o odrzucenie nie uzyskał większości — projekt skierowany do dalszej pracy w komisji. Dalsze etapy zostaną wyznaczone po kolejnych głosowaniach.",
+    line: "Wniosek o odrzucenie nie uzyskał większości — projekt pozostaje w toku. Dalsze etapy zostaną wyznaczone po kolejnych głosowaniach.",
   },
   indeterminate: {
     subtitle: "głosowanie proceduralne",
-    line: "Głosowanie nad wnioskiem proceduralnym — etap projektu w Sejmie bez zmian.",
+    line: "Wynik tego głosowania sam w sobie nie rozstrzyga o uchwaleniu ani odrzuceniu całego projektu.",
   },
 };
 
@@ -210,10 +202,10 @@ export default function WhatsNextTimeline({
       ? (passed ? "passed" : "rejected")
       : computeBillOutcome(motionPolarity, passed);
 
-  if (!billAdvancesToSenate(outcome)) {
+  if (!billAdvancesToSenate(outcome) || stages.length <= 1) {
     // `outcome` here is narrowed: billAdvancesToSenate is true only for "passed",
     // so this branch is "rejected" | "continues" | "indeterminate".
-    const copy = CLOSED_COPY[outcome as Exclude<BillOutcome, "passed">];
+    const copy = stages.length <= 1 ? { subtitle: "dalsze etapy niepotwierdzone", line: stages[0]?.detail ?? "Brak potwierdzonych dalszych etapów w danych." } : outcome === "passed" ? { subtitle: "dalsze etapy niepotwierdzone", line: "To głosowanie nie wystarcza do określenia dalszych etapów. Sprawdź rodzaj dokumentu i zapis przebiegu prac w źródle Sejmu." } : CLOSED_COPY[outcome];
     return (
       <section
         className="px-4 sm:px-8 md:px-14 py-12 sm:py-16"
@@ -224,7 +216,7 @@ export default function WhatsNextTimeline({
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <SectionHead
             label="V"
-            title="Co dalej z tą ustawą"
+            title="Co dalej po głosowaniu"
             subtitle={copy.subtitle}
           />
           <p
@@ -254,7 +246,7 @@ export default function WhatsNextTimeline({
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <SectionHead
           label="V"
-          title="Co dalej z tą ustawą"
+          title="Co dalej po głosowaniu"
           subtitle="droga od Sejmu do Dziennika Ustaw"
         />
         <ol
@@ -283,7 +275,7 @@ export default function WhatsNextTimeline({
                 color: "var(--foreground)",
               }}
             >
-              Realizuje konkret{" "}
+              Powiązanie tematyczne z obietnicą{" "}
               <Link
                 href={`/obietnice/${promiseLink.party_code}`}
                 style={{
@@ -294,7 +286,7 @@ export default function WhatsNextTimeline({
               >
                 {promiseLink.party_code}
               </Link>{" "}
-              z kampanii: „{promiseLink.title}”.
+              z kampanii: „{promiseLink.title}”. Samo powiązanie nie potwierdza realizacji obietnicy.
             </p>
           </div>
         )}

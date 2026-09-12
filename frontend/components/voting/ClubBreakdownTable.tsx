@@ -88,7 +88,7 @@ function ClubRow({ c }: { c: ClubBreakdownRow }) {
   ];
   const total = c.total;
   const showBroken =
-    c.brokenCount > 0 &&
+    c.differentCount > 0 &&
     (c.disciplineLabel === "ZA" ||
       c.disciplineLabel === "PRZECIW" ||
       c.disciplineLabel === "WSTRZ.");
@@ -137,7 +137,7 @@ function ClubRow({ c }: { c: ClubBreakdownRow }) {
           color: "var(--muted-foreground)",
         }}
       >
-        za klubem{" "}
+        najczęstszy głos{" "}
       </span>
       <span
         style={{
@@ -156,7 +156,7 @@ function ClubRow({ c }: { c: ClubBreakdownRow }) {
             fontSize: 11,
           }}
         >
-          ↪ złamań: {c.brokenCount}
+          ↪ inaczej: {c.differentCount}
         </span>
       )}
     </div>
@@ -242,7 +242,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
   ];
   const total = c.total;
   const showBroken =
-    c.brokenCount > 0 &&
+    c.differentCount > 0 &&
     (c.disciplineLabel === "ZA" ||
       c.disciplineLabel === "PRZECIW" ||
       c.disciplineLabel === "WSTRZ.");
@@ -390,7 +390,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
             textTransform: "uppercase",
           }}
         >
-          za klubem{" "}
+          najczęstszy głos{" "}
         </span>
         <span
           style={{
@@ -410,7 +410,7 @@ function PngClubRow({ c, isLast }: { c: ClubBreakdownRow; isLast: boolean }) {
               textTransform: "uppercase",
             }}
           >
-            ↪ {c.brokenCount}
+            ↪ {c.differentCount}
           </span>
         )}
       </div>
@@ -458,7 +458,7 @@ export function ClubBreakdownTable({ clubs, header, shortTitle, printNumber }: P
         <SectionHead
           label="II"
           title="Jak głosowały kluby"
-          subtitle="każdy rząd to jeden klub. szare słupki — odsetek mandatów; kolory — głosy"
+          subtitle="każdy wiersz to jeden klub. szare słupki — odsetek mandatów; kolory — głosy"
           rightSlot={<CopyAsPngButton targetRef={captureRef} filename={`glosowanie-${header.sitting}-${header.voting_number}.png`} />}
         />
 

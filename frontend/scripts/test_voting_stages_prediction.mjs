@@ -1,3 +1,5 @@
+// Historical experiment for the retired date-guessing model; not a production regression test.
+// Current evidence-only timeline tests: node scripts/test_legislative_facts.mjs
 // Validate predict_stages model against historical term-10 process_stages.
 //
 // For each historical process where we have actual stage dates, predict

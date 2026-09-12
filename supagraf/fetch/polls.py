@@ -25,7 +25,7 @@ class PollsFetchError(RuntimeError):
 
 
 @retry(
-    retry=retry_if_exception_type((httpx.HTTPError, PollsFetchError)),
+    retry=retry_if_exception_type((httpx.TransportError, PollsFetchError)),
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=4),
     reraise=True,
@@ -34,7 +34,7 @@ def _get(url: str) -> str:
     headers = {"User-Agent": USER_AGENT, "Accept": "text/html"}
     with httpx.Client(timeout=30.0, follow_redirects=True) as client:
         r = client.get(url, headers=headers)
-        if r.status_code >= 500:
+        if r.status_code == 429 or r.status_code >= 500:
             raise PollsFetchError(f"{url} -> {r.status_code}")
         r.raise_for_status()
         return r.text

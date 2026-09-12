@@ -24,3 +24,23 @@ def test_empty_key_set_also_means_whole_term():
         PendingLoad({"votings"}, {"votings": set()}),
     )
     assert merged.changed_keys == {}
+
+
+def test_failed_shared_checkpoint_remains_recoverable_locally(monkeypatch, tmp_path):
+    import pytest
+    from supagraf.sync import load_recovery as mod
+    monkeypatch.setattr(mod, "STATE_DIR", tmp_path)
+    def fail(*args):
+        raise RuntimeError("503")
+    monkeypatch.setattr(mod.cursors, "set_cursor", fail)
+    pending = PendingLoad({"prints", "proceedings"}, {"proceedings": {64}})
+    with pytest.raises(RuntimeError):
+        mod.write_pending(10, pending)
+    monkeypatch.setattr(mod.cursors, "get_cursor", lambda name: None)
+    assert mod.read_pending(10) == pending
+    with pytest.raises(RuntimeError):
+        mod.clear_pending(10)
+    assert mod.read_pending(10) == pending
+    monkeypatch.setattr(mod.cursors, "set_cursor", lambda *args: None)
+    mod.clear_pending(10)
+    assert mod.read_pending(10) == PendingLoad()

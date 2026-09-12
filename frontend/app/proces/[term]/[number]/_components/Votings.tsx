@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ClubBadge } from "@/components/clubs/ClubBadge";
 import { isUnaffiliated } from "@/lib/clubs/filter";
-import { computeBillOutcome, verdictChipLabel } from "@/lib/voting/bill_outcome";
+import { voteMeaning } from "@/lib/weekly-stories";
 import type { ClubTally, LinkedVoting } from "@/lib/db/prints";
 
 function SectionHead({ title, subtitle }: { title: string; subtitle?: string | null }) {
@@ -41,20 +41,13 @@ export function Votings({
   votings,
   mainVotingId,
   votingByClub,
-  processStillOpen,
 }: {
   votings: LinkedVoting[];
   mainVotingId: number | null;
   votingByClub: ClubTally[];
-  processStillOpen: boolean;
 }) {
   const hasAny = votings.length > 0;
-  // Show a future placeholder only when the process is still open AND we
-  // don't already have a "main" (pass-polarity) voting on file. We don't
-  // know the upcoming sitting/voting number, so the placeholder is generic.
-  const showFuture = processStillOpen && !votings.some((v) => v.role === "main");
-
-  if (!hasAny && !showFuture) return null;
+  if (!hasAny) return null;
 
   return (
     <section className="py-12 border-b border-border">
@@ -69,7 +62,6 @@ export function Votings({
               clubTallies={v.votingId === mainVotingId ? votingByClub : []}
             />
           ))}
-          {showFuture && <FutureVoting />}
         </div>
       </div>
     </section>
@@ -79,24 +71,17 @@ export function Votings({
 function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTally[] }) {
   const total = v.yes + v.no + v.abstain + v.notParticipating;
   const hasClubTallies = clubTallies.length > 0;
-  const motionPassed = v.majorityVotes != null ? v.yes >= v.majorityVotes : v.yes > v.no;
-  const billOutcome = computeBillOutcome(v.motionPolarity, motionPassed);
+  const meaning = voteMeaning({
+    id: v.votingId, voting_number: v.votingNumber, title: v.title,
+    date: v.date, topic: v.topic ?? null, description: v.description ?? null,
+    short_title: null, yes: v.yes, no: v.no, abstain: v.abstain,
+    majority_votes: v.majorityVotes, motion_polarity: v.motionPolarity, kind: v.kind,
+  });
   const chip = votingChip(v.motionPolarity, v.role);
   const emphasizedChip = chip === "całość projektu" || chip === "poprawki";
-
-  const verdictLabel = billOutcome === "indeterminate"
-    ? motionPassed
-      ? "PRZYJĘTY"
-      : "ODRZUCONY"
-    : verdictChipLabel(billOutcome).toUpperCase();
-  const verdictGood = billOutcome === "passed" || billOutcome === "continues";
-  const verdictColor = billOutcome === "indeterminate"
-    ? motionPassed
-      ? "var(--success)"
-      : "var(--destructive)"
-    : verdictGood
-    ? "var(--success)"
-    : "var(--destructive)";
+  const verdictLabel = meaning.label;
+  const verdictColor = meaning.tone === "positive" ? "var(--success)"
+    : meaning.tone === "negative" ? "var(--destructive)" : "var(--foreground)";
 
   const turnoutPct = total > 0
     ? Math.round(((v.yes + v.no + v.abstain) / total) * 1000) / 10
@@ -166,7 +151,7 @@ function VotingCard({ v, clubTallies }: { v: LinkedVoting; clubTallies: ClubTall
           {verdictLabel}
         </div>
         <div className="font-sans text-secondary-foreground" style={{ fontSize: 13, lineHeight: 1.55 }}>
-          większością {v.yes}–{v.no}
+          głosy za i przeciw: {v.yes}–{v.no}
           {turnoutPct > 0 && <> &nbsp;·&nbsp; frekwencja {turnoutPct}%</>}
         </div>
       </div>
@@ -337,45 +322,5 @@ function ClubMini({ c }: { c: ClubTally }) {
         {c.total}
       </span>
     </div>
-  );
-}
-
-function FutureVoting() {
-  return (
-    <article
-      className="p-6 md:p-7 flex items-center gap-6 flex-wrap"
-      style={{ background: "var(--background)", border: "1px dashed var(--muted-foreground)" }}
-    >
-      <div className="flex-1 min-w-[260px]">
-        <div
-          className="mb-1.5 font-medium"
-          style={{
-            fontSize: 11,
-            color: "var(--muted-foreground)",
-          }}
-        >
-          planowane głosowanie
-        </div>
-        <div
-          className="font-medium text-foreground"
-          style={{ fontSize: 22, lineHeight: 1.2 }}
-        >
-          Głosowanie nad całością projektu.
-        </div>
-        <div className="font-sans text-muted-foreground mt-0.5" style={{ fontSize: 12.5 }}>
-          oczekuje na trzecie czytanie
-        </div>
-      </div>
-      <div
-        className="px-3 py-1.5 rounded-full font-medium"
-        style={{
-          fontSize: 11,
-          color: "var(--destructive)",
-          border: "1px solid var(--destructive)",
-        }}
-      >
-        oczekuje
-      </div>
-    </article>
   );
 }

@@ -8,7 +8,6 @@ import {
   Crown,
   FileSearch,
   FileSignature,
-  HelpCircle,
   Info,
   Landmark,
   Megaphone,
@@ -155,9 +154,7 @@ const STAGES: Stage[] = [
         <strong>Senatowi</strong>, <strong>posłom</strong> oraz{" "}
         <strong>grupie co najmniej 100 tysięcy obywateli</strong> mających prawo
         wybierania do Sejmu. To ostatnie nazywa się{" "}
-        <strong>inicjatywą obywatelską</strong> — droga, którą bardzo niewiele
-        ustaw faktycznie pokonuje (kilka rocznie), ale formalnie istnieje od
-        1999 roku.
+        <strong>inicjatywą obywatelską</strong>. Jej szczegółowy tryb określa ustawa z 24 czerwca 1999 r.
       </>,
       <>
         <strong>WYJĄTEK — zmiana Konstytucji.</strong> Przy projektach
@@ -168,24 +165,17 @@ const STAGES: Stage[] = [
         Konstytucji (art. 235 ust. 1 Konstytucji RP).
       </>,
       <>
-        W praktyce po stronie posłów projekt może wnieść <strong>klub poselski</strong>{" "}
-        (każdy poseł zrzeszony w klubie automatycznie podpisuje) albo{" "}
-        <strong>grupa co najmniej 15 posłów</strong> niezależnie od przynależności.
-        Komisje sejmowe również mają prawo inicjatywy — wnosi je przewodniczący
-        komisji w imieniu jej członków. To wszystko reguluje Regulamin Sejmu,
-        nie sama Konstytucja.
+        Poselski projekt ustawy może wnieść <strong>komisja sejmowa</strong> albo <strong>co najmniej 15 posłów podpisujących projekt</strong> (art. 32 ust. 2 Regulaminu Sejmu). Przynależność do klubu nie oznacza automatycznego podpisania projektu.
       </>,
       <>
-        Każdy projekt musi zawierać <strong>uzasadnienie</strong> oraz{" "}
-        <strong>ocenę skutków finansowych</strong> — to wymóg konstytucyjny.
+        Do projektu dołącza się <strong>uzasadnienie</strong> zgodnie z Regulaminem Sejmu. Przedstawienie <strong>skutków finansowych wykonania ustawy</strong> jest wymogiem art. 118 ust. 3 Konstytucji.
         Marszałek Sejmu nadaje projektowi numer druku (np. „druk nr 1650”)
         i publikuje go w Systemie Informacyjnym Sejmu. Od tej chwili każdy
         obywatel może przeczytać pełną treść projektu wraz z uzasadnieniem.
-        Sam moment „wpłynięcia” niczego nie rozstrzyga — projekt po prostu
-        wchodzi do kalendarza prac Sejmu.
+        Samo wpłynięcie projektu nie oznacza skierowania do czytania ani uchwalenia ustawy.
       </>,
     ],
-    branches: [{ kind: "forward", label: "I czytanie", detail: "Zawsze następny krok." }],
+    branches: [{ kind: "forward", label: "I czytanie", detail: "Po nadaniu biegu; wcześniej mogą być wymagane konsultacje lub uzupełnienia." }],
     sources: ["Art. 118 Konstytucji RP", "Art. 32 ust. 2 Regulaminu Sejmu"],
   },
   {
@@ -212,8 +202,7 @@ const STAGES: Stage[] = [
         konkretny projekt na salę, jeśli „uzasadniają to ważne względy”.
       </>,
       <>
-        Pierwsze czytanie nie może odbyć się{" "}
-        <strong>wcześniej niż 7 dni od doręczenia druku posłom</strong>. Ten
+        Pierwsze czytanie odbywa się co do zasady <strong>nie wcześniej niż siódmego dnia od doręczenia druku posłom</strong>, chyba że Sejm lub komisja postanowi inaczej. Dla zmiany Konstytucji obowiązuje minimum 30 dni od przedłożenia projektu Sejmowi. Ten
         termin daje opozycji i mediom czas na zapoznanie się z treścią. W
         czytaniu projekt przedstawia jego autor (np. minister, jeśli to projekt
         rządowy) lub jego reprezentant — to nazywa się{" "}
@@ -305,8 +294,7 @@ const STAGES: Stage[] = [
       <>
         Po zakończeniu prac komisja głosuje nad treścią projektu z wszystkimi
         wprowadzonymi poprawkami. Tworzy się <strong>sprawozdanie komisji</strong>{" "}
-        — odrębny dokument publikowany jako kolejny druk sejmowy (zazwyczaj z
-        sufiksem „-A”, np. „druk 1234-A”). Sprawozdanie zawiera{" "}
+        — odrębny dokument z własnym numerem druku sejmowego. Sufiks „-A” może oznaczać dodatkowe sprawozdanie do już wydanego sprawozdania. Sprawozdanie zawiera{" "}
         <strong>pełną listę poprawek</strong>, proponowane stanowisko (za
         przyjęciem, za odrzuceniem albo z dalszymi zmianami) oraz informacje o
         głosach mniejszości.
@@ -342,8 +330,7 @@ const STAGES: Stage[] = [
         II czytanie odbywa się na sali plenarnej. Otwiera je{" "}
         <strong>poseł-sprawozdawca</strong>, który przedstawia raport z prac
         komisji. Następnie kluby poselskie wygłaszają stanowiska — każdy klub
-        ma określony czas wystąpienia (zwykle 5-10 minut, zależnie od długości
-        debaty), proporcjonalny do liczby posłów.
+        ma czas wystąpienia ustalony zgodnie z formą debaty. II czytanie odbywa się co do zasady nie wcześniej niż siódmego dnia od doręczenia sprawozdania, chyba że Sejm postanowi inaczej.
       </>,
       <>
         Na tym etapie posłowie mogą zgłaszać <strong>nowe poprawki</strong> —
@@ -359,7 +346,7 @@ const STAGES: Stage[] = [
       <>
         To <strong>ostatni moment</strong>, w którym wnioskodawca może
         formalnie wycofać projekt (art. 119 ust. 4 Konstytucji). Po II
-        czytaniu już tylko głosowanie nad całością może projekt zatrzymać.
+        czytaniu projekt może jeszcze zostać odrzucony, a ustawa po uchwaleniu podlega dalszym etapom, w tym rozpatrzeniu przez Senat i Prezydenta.
       </>,
     ],
     branches: [
@@ -391,9 +378,7 @@ const STAGES: Stage[] = [
     blurb: "Sejm głosuje nad pojedynczymi poprawkami, ustalając finalną treść.",
     paragraphs: [
       <>
-        III czytanie to <strong>etap głosowań technicznych</strong>. Sejm
-        kolejno przegłosowuje każdą zgłoszoną poprawkę osobno: przyjąć czy
-        odrzucić. Sprawozdawca komisji może rekomendować, jak głosować — jego
+        III czytanie obejmuje przedstawienie dodatkowego sprawozdania, jeśli projekt wrócił do komisji, oraz <strong>głosowania</strong>. Najpierw rozpatruje się wniosek o odrzucenie projektu, jeśli został zgłoszony, potem poprawki, a na końcu całość projektu. Niektóre poprawki można głosować łącznie, a wynik jednego głosowania może uczynić inne bezprzedmiotowym. Sprawozdawca komisji może rekomendować, jak głosować — jego
         rekomendacja nie jest wiążąca, ale ma wagę dla posłów własnego klubu.
       </>,
       <>
@@ -424,7 +409,7 @@ const STAGES: Stage[] = [
     paragraphs: [
       <>
         To pojedyncze głosowanie nad <strong>pełną wersją ustawy</strong> ze
-        wszystkimi przyjętymi poprawkami. Wymagana jest{" "}
+        wszystkimi przyjętymi poprawkami. Co do zasady wymagana jest{" "}
         <strong>zwykła większość</strong> — więcej głosów ZA niż PRZECIW, przy
         obecności co najmniej połowy ustawowej liczby posłów. Praktycznie:{" "}
         <strong>kworum to 230 posłów z 460</strong>. Głosy wstrzymujące się
@@ -438,7 +423,7 @@ const STAGES: Stage[] = [
         kontroli władzy.
       </>,
       <>
-        Jeśli ustawa przejdzie, Marszałek Sejmu w ciągu <strong>3 dni</strong>{" "}
+        Jeśli ustawa przejdzie, Marszałek Sejmu
         przekazuje ją Senatowi. Jeśli głosy ZA nie zbiorą zwykłej większości —
         proces się kończy, ustawa upada.
       </>,
@@ -447,7 +432,7 @@ const STAGES: Stage[] = [
       {
         kind: "forward",
         label: "Senat",
-        detail: "Marszałek przekazuje uchwaloną ustawę do Senatu w 3 dni.",
+        detail: "Marszałek przekazuje uchwaloną ustawę Senatowi; od przekazania biegnie termin jej rozpatrzenia.",
       },
       {
         kind: "terminal",
@@ -492,6 +477,7 @@ const STAGES: Stage[] = [
           <strong>14 dni</strong> — dla ustaw uchwalanych w trybie pilnym
           (art. 123 ust. 3 Konstytucji)
         </li>
+        <li><strong>60 dni od uchwalenia ustawy przez Sejm</strong> — dla zmiany Konstytucji. Senat musi uchwalić identyczny tekst bezwzględną większością przy obecności co najmniej połowy senatorów; samo milczenie nie wystarcza (art. 235 ust. 2 i 4).</li>
       </ul>,
       <>
         Senat pracuje przez swoje komisje, podobnie jak Sejm. Pełna sala Senatu
@@ -531,27 +517,20 @@ const STAGES: Stage[] = [
     paragraphs: [
       <>
         Jeśli Senat zgłosił poprawki lub odrzucił ustawę w całości, sprawa
-        wraca do Sejmu. Sejm głosuje <strong>nad każdą poprawką osobno</strong>{" "}
-        — może je odrzucać selektywnie, jedne przyjmując a inne odrzucając.
+        wraca do Sejmu. Sejm głosuje nad odrzuceniem senackich poprawek; poprawki powiązane mogą być głosowane łącznie.
         Aby ODRZUCIĆ stanowisko Senatu, Sejm musi zebrać{" "}
         <strong>bezwzględną większość</strong>.
       </>,
       <>
         <strong>UWAGA — częsta pomyłka.</strong>{" "}
-        Bezwzględna większość TO NIE JEST „50% obecnych + 1”. To wymaganie
-        kworum, czyli czegoś innego. Bezwzględna większość oznacza, że głosów
+        Kworum i większość to dwa różne warunki. Kworum wynosi tu co najmniej 230 posłów. Bezwzględna większość oznacza, że głosów
         ZA musi być <strong>więcej niż PRZECIW i WSTRZYMUJĄCYCH RAZEM</strong>{" "}
         — czyli ponad połowa wszystkich głosów oddanych w danym głosowaniu.
         Wstrzymujący się NIE są neutralni — działają jak głosy „przeciw” w tym
         progu.
       </>,
       <>
-        Jeśli Sejm nie zbierze bezwzględnej większości — stanowisko Senatu
-        wchodzi do ustawy. To oznacza, że senackie poprawki (lub odrzucenie
-        całej ustawy) stają się skuteczne, mimo że Sejm tego nie chciał.
-        Wymagany próg bezwzględnej większości daje Senatowi realną siłę
-        veta — w praktyce mniejszościowy rząd często nie ma głosów, żeby
-        senackie poprawki obalić.
+        Jeśli Sejm nie odrzuci stanowiska Senatu wymaganą większością, poprawki Senatu pozostają w tekście. Jeśli stanowiskiem Senatu było odrzucenie całej ustawy, postępowanie kończy się bez jej uchwalenia.
       </>,
     ],
     branches: [
@@ -579,7 +558,7 @@ const STAGES: Stage[] = [
       <ol key="president-options" className="list-decimal pl-6 space-y-2 my-3">
         <li>
           <strong>PODPISAĆ</strong> — ustawa zostaje promulgowana (zarządza jej
-          publikację w Dzienniku Ustaw). Po publikacji zaczyna obowiązywać.
+          publikację w Dzienniku Ustaw). Wejście w życie następuje w terminie określonym w ustawie, po jej ogłoszeniu.
         </li>
         <li>
           <strong>ZAWETOWAĆ</strong> — odmówić podpisania i przekazać ustawę
@@ -618,7 +597,7 @@ const STAGES: Stage[] = [
       </>,
       <ul key="president-deadlines" className="list-disc pl-6 space-y-1 my-3">
         <li>
-          <strong>7 dni</strong> dla ustaw uchwalanych w trybie pilnym
+          <strong>7 dni</strong> dla ustaw uchwalanych w trybie pilnym oraz ustawy budżetowej i ustawy o prowizorium budżetowym
         </li>
         <li>
           <strong>7 dni</strong> po obaleniu weta przez Sejm
@@ -638,7 +617,7 @@ const STAGES: Stage[] = [
           </li>
           <li>
             <strong>Zmiana Konstytucji</strong> — Prezydent
-            <strong> nie ma prawa weta ani prawa kierowania do TK</strong>.
+            <strong> nie ma prawa weta</strong>.
             Musi podpisać w ciągu 21 dni (art. 235 ust. 7 Konstytucji).
           </li>
         </ul>
@@ -656,7 +635,7 @@ const STAGES: Stage[] = [
       {
         kind: "forward",
         label: "Dziennik Ustaw",
-        detail: "Po podpisie ustawa wchodzi w życie.",
+        detail: "Po podpisie następuje ogłoszenie. Termin wejścia w życie określają przepisy ustawy.",
       },
       {
         kind: "back",
@@ -673,17 +652,17 @@ const STAGES: Stage[] = [
       "Art. 122 Konstytucji RP",
       "Art. 123 ust. 3 Konstytucji RP (tryb pilny)",
       "Art. 224 Konstytucji RP (ustawa budżetowa — brak weta)",
-      "Art. 235 ust. 7 Konstytucji RP (zmiana Konstytucji — brak weta i TK)",
+      "Art. 235 ust. 7 Konstytucji RP (zmiana Konstytucji)",
     ],
   },
   {
     slug: "publikacja",
     num: "11",
-    label: "Publikacja w Dzienniku Ustaw — ustawa wchodzi w życie",
+    label: "Publikacja w Dzienniku Ustaw i termin wejścia w życie",
     bucket: "PREZYDENT",
     phase: "prezydent",
     icon: Crown,
-    blurb: "Ostatni krok. Od tej chwili ustawa obowiązuje wszystkich.",
+    blurb: "Ogłoszenie i wejście w życie to różne zdarzenia. Sprawdź termin w ustawie.",
     paragraphs: [
       <>
         Po podpisaniu przez Prezydenta ustawa jest publikowana w{" "}
@@ -710,10 +689,7 @@ const STAGES: Stage[] = [
         — obywateli, firmy, organy państwa, sądy. Nieznajomość prawa nie
         zwalnia z odpowiedzialności (znana łacińska zasada{" "}
         <em>ignorantia iuris nocet</em>). Jeśli ktoś uważa ustawę za niezgodną
-        z Konstytucją, może po jej wejściu w życie wystąpić z wnioskiem do TK
-        za pośrednictwem skargi konstytucyjnej albo wystąpienia uprawnionego
-        podmiotu (np. Rzecznik Praw Obywatelskich, grupa 50 posłów, 30
-        senatorów).
+        z Konstytucją, może zwrócić się do uprawnionego podmiotu, np. Rzecznika Praw Obywatelskich. Skarga konstytucyjna jest odrębnym środkiem: dotyczy przepisu będącego podstawą ostatecznego rozstrzygnięcia o konstytucyjnych prawach, wolnościach lub obowiązkach skarżącego i wymaga spełnienia warunków ustawowych (art. 79 Konstytucji).
       </>,
     ],
     branches: [],
@@ -730,17 +706,14 @@ const FAQ: FaqItem[] = [
   {
     q: "Ile czasu trwa cały proces legislacyjny?",
     aText:
-      "Od kilku tygodni dla ustaw w trybie pilnym do kilku lat dla skomplikowanych reform. Standardowo: 3-6 miesięcy.",
+      "Nie ma jednego terminu dla całego procesu. Czas zależy od trybu i przebiegu prac; poszczególne etapy mają własne terminy.",
     a: (
       <>
         Konstytucja nie określa maksymalnego czasu — proces może trwać tak
         długo, jak komisja sejmowa nad nim pracuje. W praktyce:{" "}
         <strong>od kilku tygodni</strong> (tryb pilny, prosta ustawa) do{" "}
         <strong>kilku lat</strong> (kompleksowe reformy, kodeksy).
-        Standardowo: <strong>3-6 miesięcy</strong> od wpłynięcia projektu
-        do podpisu Prezydenta. Ustawy nieuchwalone w danej kadencji Sejmu
-        wygasają (zasada <em>dyskontynuacji</em>) i muszą być ponownie
-        wniesione w nowej kadencji.
+        Nie ma uniwersalnego czasu trwania. Zasadą na koniec kadencji jest <em>dyskontynuacja</em> niezakończonych prac, ale są wyjątki: obywatelski projekt nierozpatrzony w kadencji wniesienia jest rozpatrywany przez Sejm następnej kadencji (art. 4 ust. 3 ustawy o wykonywaniu inicjatywy ustawodawczej przez obywateli).
       </>
     ),
   },
@@ -781,7 +754,7 @@ const FAQ: FaqItem[] = [
         pilny — ani posłowie, ani Senat, ani Prezydent. Skutki: Senat dostaje{" "}
         <strong>14 dni</strong> zamiast 30, Prezydent <strong>7 dni</strong>{" "}
         zamiast 21. Tryb pilny <strong>nie może</strong> dotyczyć ustaw
-        podatkowych, kodeksów, ustaw o wyborach Prezydenta lub posłów oraz ustaw
+        podatkowych, kodeksów, ustaw o wyborach Prezydenta, Sejmu, Senatu i organów samorządu terytorialnego oraz ustaw
         regulujących ustrój i właściwość władz publicznych.
       </>
     ),
@@ -798,8 +771,7 @@ const FAQ: FaqItem[] = [
         Sejmu. Komitet inicjatywy obywatelskiej musi spełnić formalne wymogi:
         zarejestrować się u Marszałka, zebrać podpisy w określonym czasie,
         przedstawić projekt z uzasadnieniem i oceną skutków finansowych.
-        Praktycznie udaje się to kilka razy rocznie — większość inicjatyw nie
-        zbiera wymaganej liczby podpisów. Tryb określa{" "}
+        Tryb określa{" "}
         <em>ustawa z dnia 24 czerwca 1999 r. o wykonywaniu inicjatywy
         ustawodawczej przez obywateli</em>.
       </>
@@ -823,7 +795,7 @@ const FAQ: FaqItem[] = [
   {
     q: "Czym różni się Dziennik Ustaw od Monitora Polskiego?",
     aText:
-      "Dz.U. publikuje powszechnie obowiązujące akty (ustawy, rozporządzenia). M.P. — akty wewnętrzne (uchwały Sejmu, zarządzenia ministrów).",
+      "Dz.U. publikuje powszechnie obowiązujące akty (ustawy, rozporządzenia). M.P. — akty wewnętrzne (m.in. uchwały Sejmu, zarządzenia Prezesa Rady Ministrów).",
     a: (
       <>
         <strong>Dziennik Ustaw RP (Dz.U.)</strong> publikuje akty prawa
@@ -832,7 +804,7 @@ const FAQ: FaqItem[] = [
         <br />
         <strong>Monitor Polski (M.P.)</strong> publikuje akty o charakterze
         wewnętrznym i nie-normatywnym — uchwały Sejmu i Senatu (niebędące
-        ustawami), zarządzenia Prezesa Rady Ministrów i ministrów, akty
+        ustawami), zarządzenia Prezesa Rady Ministrów, inne akty
         wewnętrznego kierownictwa. Obie publikacje wydaje Rządowe Centrum
         Legislacji.
       </>
@@ -841,16 +813,10 @@ const FAQ: FaqItem[] = [
   {
     q: "Co się stanie, jeśli Prezydent zignoruje termin?",
     aText:
-      "Konstytucja nie reguluje tej sytuacji wprost. W doktrynie są różne interpretacje, a w praktyce taki przypadek nie wystąpił.",
+      "Upływ terminu nie zastępuje podpisu ani nie upoważnia automatycznie Marszałka Sejmu do podpisania ustawy.",
     a: (
       <>
-        Konstytucja nie reguluje wprost sytuacji, w której Prezydent nie
-        podpisze ani nie zawetuje ustawy w terminie 21 dni. W literaturze
-        prawniczej spotyka się różne interpretacje — najczęściej przyjmuje
-        się, że Marszałek Sejmu może wydać akt zastępczy (analogicznie do
-        sytuacji niemożności pełnienia funkcji przez Prezydenta). W praktyce
-        polskiej takiej sytuacji nie było — Prezydenci dotrzymywali terminu
-        albo wnosili weto/skargę do TK.
+        Art. 122 Konstytucji nakłada na Prezydenta określone obowiązki i terminy. Samo ich przekroczenie nie oznacza podpisania ustawy i nie daje Marszałkowi Sejmu automatycznego prawa do zastępczego podpisu. Zastępowanie Prezydenta z art. 131 wymaga odrębnych przesłanek. Skierowanie ustawy do TK lub weto wstrzymuje bieg terminu z art. 122 ust. 2.
       </>
     ),
   },
@@ -1271,7 +1237,7 @@ export default function JakPowstajeUstawaPage() {
         <div className="max-w-[1100px] mx-auto">
           <PageBreadcrumb
             items={[{ label: "Jak powstaje ustawa" }]}
-            subtitle="11 etapów procesu legislacyjnego — od wpłynięcia projektu do publikacji w Dzienniku Ustaw."
+            subtitle="Typowa droga ustawy — od wniesienia projektu do ogłoszenia w Dzienniku Ustaw."
           />
         </div>
       </section>
@@ -1299,8 +1265,8 @@ export default function JakPowstajeUstawaPage() {
                 className="text-secondary-foreground m-0 mb-4 md:mb-5"
                 style={{ fontSize: "clamp(15px, 4vw, 18px)", lineHeight: 1.55 }}
               >
-                Każda ustawa w Polsce przechodzi przez{" "}
-                <strong>11 proceduralnych etapów</strong> — od wniesienia
+                Ten przewodnik dzieli typowy proces uchwalania ustawy na{" "}
+                <strong>11 części</strong> — od wniesienia
                 projektu przez uprawniony podmiot, przez prace komisji i
                 głosowania w Sejmie i Senacie, aż po podpis Prezydenta i
                 publikację w Dzienniku Ustaw.

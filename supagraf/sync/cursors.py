@@ -10,7 +10,8 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone, tzinfo
 
-from supagraf.db import supabase
+from supagraf.db import DB_RETRY_EXC, supabase
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 # Overlap subtracted from a stored cursor so clock skew / same-second writes
 # on the upstream side cannot drop an item between two runs.
@@ -32,11 +33,15 @@ def now_upstream() -> str:
     return datetime.now(_warsaw()).strftime(UPSTREAM_TS_FMT)
 
 
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(4),
+       wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
 def get_cursor(name: str) -> str | None:
     rows = supabase().table("etl_cursors").select("value").eq("name", name).limit(1).execute().data or []
     return rows[0]["value"] if rows else None
 
 
+@retry(retry=retry_if_exception_type(DB_RETRY_EXC), stop=stop_after_attempt(4),
+       wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
 def set_cursor(name: str, value: str) -> None:
     supabase().table("etl_cursors").upsert(
         {"name": name, "value": value, "updated_at": datetime.now(timezone.utc).isoformat()},

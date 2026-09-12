@@ -43,14 +43,15 @@ function stageActor(stageType: string): string | null {
     case "CommitteeReport":
       return "Komisja";
     case "SenatePosition":
+      return "Senat";
     case "SenatePositionConsideration":
     case "SenateAmendments":
-      return "Senat";
+    case "PresidentMotionConsideration":
+      return "Sejm";
     case "ToPresident":
     case "PresidentSignature":
     case "PresidentVeto":
     case "Veto":
-    case "PresidentMotionConsideration":
       return "Prezydent";
     case "Promulgation":
       return "Dz.U.";

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { supabase } from "@/lib/supabase";
+import { isSourceQuote } from "@/lib/source-quote";
 
 const DEFAULT_TERM = 10;
 
@@ -913,6 +914,7 @@ export async function getProcessCitations(
     speaker_name: string | null;
     function: string | null;
     viral_quote: string | null;
+    body_text: string | null;
     viral_reason: string | null;
     viral_score: number | string | null;
     tone: string | null;
@@ -930,7 +932,7 @@ export async function getProcessCitations(
     const { data: stmtRows, error: sErr } = await sb
       .from("proceeding_statements")
       .select(
-        "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+        "id, mp_id, speaker_name, function, body_text, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
       )
       .in("id", stmtIds)
       .eq("term", term)
@@ -939,7 +941,7 @@ export async function getProcessCitations(
       .limit(40);
     if (sErr) throw sErr;
     rows = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
-      (r) => r.viral_quote && r.viral_quote.trim().length > 0,
+      (r) => isSourceQuote(r.body_text, r.speaker_name, r.viral_quote),
     );
   }
   if (rows.length === 0) {
@@ -947,7 +949,7 @@ export async function getProcessCitations(
     const { data: stmtRows, error: sErr } = await sb
       .from("proceeding_statements")
       .select(
-        "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+        "id, mp_id, speaker_name, function, body_text, viral_quote, viral_reason, viral_score, tone, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
       )
       .eq("term", term)
       .not("viral_quote", "is", null)
@@ -956,7 +958,7 @@ export async function getProcessCitations(
       .limit(40);
     if (sErr) throw sErr;
     rows = ((stmtRows ?? []) as unknown as StmtRow[]).filter(
-      (r) => r.viral_quote && r.viral_quote.trim().length > 0,
+      (r) => isSourceQuote(r.body_text, r.speaker_name, r.viral_quote),
     );
   }
   if (rows.length === 0) return [];

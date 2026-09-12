@@ -1,149 +1,72 @@
-import { computeBillOutcome, billOutcomeLabel, billAdvancesToSenate, type BillOutcome } from "./bill_outcome";
+import { computeBillOutcome, billOutcomeLabel } from "./bill_outcome";
 import type { MotionPolarity } from "@/lib/promiseAlignment";
-
-// Predicted legislative timeline for a Sejm-passed law.
-//
-// Validated against term-10 historical processes (BILL only, n=29-18 per
-// stage). See VOTING_PREDICTION_VALIDATION.md for full report.
-//
-// One-step-ahead conditional MAE (UI behaviour — uses actual prior dates):
-//   sejm → senate          MAE 8.2d, within-14d 100% — DEADLINE-ONLY (no point estimate)
-//   senate → toPresident   MAE 2.3d, within-7d 82%  — point estimate OK
-//   toPres → presSig       MAE 4.9d, within-7d 83%  — point estimate OK
-//   presSig → promulgation MAE 2.1d, within-7d 94%  — point estimate OK
-//
-// Senate stage shows no point estimate because Sejm→Senate gap genuinely
-// varies 0–26 days. Constitutional deadline (30d, art. 121 ust. 2) is the
-// only honest commitment. Other stages have tight enough variance to
-// predict.
-//
-// Deadline coverage 100% across all stages — UI's binding upper bound never
-// misses for term-10 data.
 
 export type PredictedStage = {
   key: "sejm" | "senate" | "president" | "promulgation";
   label: string;
   detail: string;
-  // expectedDate omitted for stages where point prediction is not honest
-  // (currently only `senate`). UI must render `deadlineDate` for those.
+  // Only recorded event dates. Unknown dates must remain unknown.
   expectedDate: Date | null;
-  deadlineDate: Date;
+  deadlineDate: Date | null;
   constitutionRef?: string;
   current: boolean;
 };
 
-// Empirical medians (in days) and constitutional caps observed in term 10.
-const STAGE_GAPS = {
-  sejmToSenate: { median: 13, deadline: 30 },        // art. 121 ust. 2
-  senateToPresident: { median: 1, deadline: 10 },    // empirical p90
-  presidentConsider: { median: 18, deadline: 21 },   // art. 122 ust. 2
-  signatureToPromulgation: { median: 5, deadline: 14 }, // empirical p90
-} as const;
-
-function addDays(d: Date, days: number): Date {
-  const out = new Date(d);
-  out.setDate(out.getDate() + days);
-  return out;
-}
-
 export type PredictInput = {
   sejmVoteDate: Date;
-  // Optional historical anchors — when present, predictions hang off real dates
-  // instead of cascading from Sejm vote.
+  toSenateDate?: Date | null;
   senatePositionDate?: Date | null;
   toPresidentDate?: Date | null;
   presidentSignatureDate?: Date | null;
   promulgationDate?: Date | null;
   passed: boolean;
-  // Motion polarity for this specific vote (issue #25). When provided the
-  // stage label reflects bill-level outcome (a failed "wniosek o odrzucenie"
-  // means the bill CONTINUES — not "ustawa odrzucona"). When omitted the
-  // function falls back to legacy `passed`-only semantics for callers that
-  // haven't been wired yet.
   motionPolarity?: MotionPolarity | null;
+  documentType?: string | null;
+  // Unknown procedure or possible suspension: no calculated deadline.
+  procedure?: "ordinary" | "urgent" | "budget" | "constitutional" | null;
+  presidentialDeadlineSuspended?: boolean;
 };
 
-function sejmStageDetail(outcome: BillOutcome): string {
-  return billOutcomeLabel(outcome);
-}
-
-function sejmStageLabel(outcome: BillOutcome): string {
-  if (outcome === "passed") return "Sejm uchwalił";
-  if (outcome === "rejected") return "Sejm odrzucił";
-  if (outcome === "continues") return "Sejm: I czytanie";
-  return "Głosowanie w Sejmie";
+function addDays(date: Date, days: number): Date {
+  const out = new Date(date);
+  out.setUTCDate(out.getUTCDate() + days);
+  return out;
 }
 
 export function predictStages(input: PredictInput): PredictedStage[] {
-  const { sejmVoteDate, senatePositionDate, toPresidentDate, presidentSignatureDate, promulgationDate, passed, motionPolarity } = input;
-
-  // Resolve bill-level outcome. Without polarity, mimic the legacy boolean so
-  // unmigrated callers keep working — but produce a fresh BillOutcome so the
-  // downstream label/branch logic stays uniform.
-  const outcome: BillOutcome =
-    motionPolarity === undefined
-      ? (passed ? "passed" : "rejected")
-      : computeBillOutcome(motionPolarity, passed);
-
-  // Stage 1 — Sejm vote (always known, always past).
-  const stages: PredictedStage[] = [
-    {
-      key: "sejm",
-      label: sejmStageLabel(outcome),
-      detail: sejmStageDetail(outcome),
-      expectedDate: sejmVoteDate,
-      deadlineDate: sejmVoteDate,
-      // Sejm stage is terminal unless the bill actually moves to Senate.
-      current: !billAdvancesToSenate(outcome),
-    },
-  ];
-
-  if (!billAdvancesToSenate(outcome)) return stages;
-
-  // Stage 2 — Senate. No point estimate (gap is 0–26d in observed data).
-  const senateActual = senatePositionDate ?? null;
-  const senateDeadline = addDays(sejmVoteDate, STAGE_GAPS.sejmToSenate.deadline);
+  const outcome = computeBillOutcome(input.motionPolarity ?? null, input.passed);
+  const resolution = input.documentType === "RESOLUTION" || input.documentType === "projekt_uchwaly";
+  const bill = input.documentType === "BILL" || input.documentType === "projekt_ustawy";
+  const advances = outcome === "passed" && bill;
+  const stages: PredictedStage[] = [{
+    key: "sejm", label: resolution ? "Głosowanie nad uchwałą" : "Głosowanie w Sejmie",
+    detail: resolution ? (input.passed ? "Sejm przyjął projekt uchwały" : "Projekt uchwały nie uzyskał większości") : bill ? billOutcomeLabel(outcome) : "Wynik dotyczy tego głosowania. Brak potwierdzonej ścieżki ustawy w danych.",
+    expectedDate: input.sejmVoteDate, deadlineDate: null, current: !advances,
+  }];
+  if (!advances) return stages;
+  const senateDays = { ordinary: 30, urgent: 14, budget: 20 };
+  const presidentDays = { ordinary: 21, urgent: 7, budget: 7, constitutional: 21 };
+  const procedure = input.procedure;
   stages.push({
-    key: "senate",
-    label: "Senat",
-    detail: "30 dni na rozpatrzenie — może przyjąć, odrzucić lub wprowadzić poprawki",
-    expectedDate: senateActual,    // null until actual happens
-    deadlineDate: senateDeadline,
-    constitutionRef: "art. 121 ust. 2",
-    current: senatePositionDate == null,
+    key: "senate", label: "Senat",
+    detail: "Termin rozpatrzenia biegnie od przekazania ustawy Senatowi: zwykle 30 dni, w trybie pilnym 14, dla budżetu 20. Zmiana Konstytucji wymaga uchwalenia identycznego tekstu przez Senat w odrębnym trybie z art. 235; jego 60 dni liczy się od uchwalenia ustawy przez Sejm. Stanowisko Senatu może wymagać kolejnego głosowania Sejmu.",
+    expectedDate: input.senatePositionDate ?? null,
+    // Art. 235 has a separate procedure; do not apply the ordinary transmission rule.
+    deadlineDate: procedure && procedure !== "constitutional" && input.toSenateDate ? addDays(input.toSenateDate, senateDays[procedure]) : null,
+    current: !!input.toSenateDate && !input.senatePositionDate && !input.toPresidentDate,
   });
-
-  // Stage 3 — President. Point estimate honest (MAE 4.9d).
-  // For prediction without senate actual, anchor at sejmVote + sejmToSenate.median.
-  const baseForPres = senatePositionDate ?? addDays(sejmVoteDate, STAGE_GAPS.sejmToSenate.median);
-  const presExpected = presidentSignatureDate
-    ?? addDays(toPresidentDate ?? baseForPres, STAGE_GAPS.presidentConsider.median);
-  const presDeadline = addDays(toPresidentDate ?? baseForPres, STAGE_GAPS.presidentConsider.deadline);
   stages.push({
-    key: "president",
-    label: "Prezydent",
-    detail: "21 dni na podpis lub weto — możliwe skierowanie do TK",
-    expectedDate: presExpected,
-    deadlineDate: presDeadline,
-    constitutionRef: "art. 122 ust. 2",
-    current: senatePositionDate != null && presidentSignatureDate == null,
+    key: "president", label: "Prezydent",
+    detail: "Termin biegnie od przedstawienia ustawy Prezydentowi: zwykle 21 dni, w trybie pilnym i dla budżetu 7. Weto lub skierowanie do TK wstrzymuje bieg terminu; dla budżetu i zmiany Konstytucji obowiązują odrębne reguły.",
+    expectedDate: input.presidentSignatureDate ?? null,
+    deadlineDate: procedure && input.toPresidentDate && !input.presidentialDeadlineSuspended && !input.presidentSignatureDate ? addDays(input.toPresidentDate, presidentDays[procedure]) : null,
+    current: !!input.toPresidentDate && !input.presidentSignatureDate,
   });
-
-  // Stage 4 — Promulgation. Point estimate honest (MAE 2.1d).
-  const baseForPub = presidentSignatureDate ?? presExpected;
-  const pubExpected = promulgationDate ?? addDays(baseForPub, STAGE_GAPS.signatureToPromulgation.median);
-  const pubDeadline = addDays(baseForPub, STAGE_GAPS.signatureToPromulgation.deadline);
   stages.push({
-    key: "promulgation",
-    label: "Wejście w życie",
-    detail: "publikacja w Dz.U. i wejście w życie wg klauzuli ustawy (zwykle 14 dni od publikacji)",
-    expectedDate: pubExpected,
-    deadlineDate: pubDeadline,
-    current: presidentSignatureDate != null && promulgationDate == null,
+    key: "promulgation", label: "Publikacja w Dzienniku Ustaw",
+    detail: "Ogłoszenie i wejście w życie to różne zdarzenia. Termin wejścia w życie ustala się z przepisów ogłoszonej ustawy; poszczególne przepisy mogą mieć różne daty.",
+    expectedDate: input.promulgationDate ?? null, deadlineDate: null,
+    current: !!input.presidentSignatureDate && !input.promulgationDate,
   });
-
   return stages;
 }
-
-// Inputs not exported for production but kept for the validation harness.
-export const _STAGE_GAPS_INTERNAL = STAGE_GAPS;

@@ -125,7 +125,8 @@ def run_loaders(term: int, dirty: set[str], *, full: bool = False,
         if target and keys and not full:
             out[l.fn] = _call_targeted(target[1], term, keys)
             continue
-        n = _rpc_int(l.fn, term)
+        fn = "load_questions_changed" if l.fn == "load_questions" and not full else l.fn
+        n = _rpc_int(fn, term)
         logger.info("load {}: affected={}", l.fn, n)
         out[l.fn] = n
     return out

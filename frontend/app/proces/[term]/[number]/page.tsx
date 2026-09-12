@@ -4,7 +4,6 @@ import { getPrint } from "@/lib/db/prints";
 import { getProcessCitations } from "@/lib/db/statements";
 import { documentCategoryLabel, opinionSourceLabel, opinionSourceShort, promiseStatusLabel } from "@/lib/labels";
 import { PrintCard } from "@/components/print/PrintCard";
-import { NotFoundPage } from "@/components/chrome/NotFoundPage";
 import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { Hero } from "./_components/Hero";
 import { Timeline } from "./_components/Timeline";
@@ -28,7 +27,7 @@ export async function generateMetadata({
 }: { params: Promise<{ term: string; number: string }> }): Promise<Metadata> {
   const { term: tRaw, number } = await params;
   const term = Number(tRaw);
-  if (!Number.isFinite(term)) return {};
+  if (!Number.isSafeInteger(term) || term <= 0) return {};
   const data = await getPrint(term, number);
   if (!data) return {};
   const p = data.print;
@@ -71,21 +70,7 @@ export default async function DrukPage({
   const term = Number(rawTerm);
   if (!Number.isFinite(term)) notFound();
 
-  // Fail closed on DB errors → branded 404 instead of Next default page.
-  let data: Awaited<ReturnType<typeof getPrint>> = null;
-  try {
-    data = await getPrint(term, number);
-  } catch (err) {
-    console.error("[/proces/[term]/[number]] getPrint failed", { term, number, err });
-    return (
-      <NotFoundPage
-        entity="Druk"
-        gender="m"
-        id={`${term}/${number}`}
-        message="Nie udało się załadować druku. Spróbuj odświeżyć stronę lub sprawdź jego stronę w Sejmie."
-      />
-    );
-  }
+  const data = await getPrint(term, number);
   if (!data) notFound();
   const {
     print,
@@ -164,7 +149,6 @@ export default async function DrukPage({
           votings={relatedVotings}
           mainVotingId={mainVoting?.votingId ?? null}
           votingByClub={votingByClub}
-          processStillOpen={!!processStillOpen}
         />
         <Committees stages={stages} committeeSittings={committeeSittings} />
         <ProceedingPoints points={proceedingPoints} />

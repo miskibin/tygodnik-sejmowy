@@ -3,9 +3,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import httpx
+
 from loguru import logger
 from postgrest.exceptions import APIError
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from supagraf.db import DB_RETRY_EXC, call_rpc_scalar, supabase
 
@@ -94,8 +96,20 @@ _PRE_STEPS = (
 )
 
 
+def _retryable_rpc(exc: BaseException) -> bool:
+    # A gateway/client timeout does not cancel the PostgreSQL transaction.
+    # Replaying immediately can queue duplicate whole-term loads behind it.
+    if isinstance(exc, httpx.TimeoutException) or _is_timeout(exc):
+        return False
+    if isinstance(exc, APIError) and str(getattr(exc, "code", "")) in {"504", "524"}:
+        return False
+    if getattr(exc, "sqlstate", None) == "57014":
+        return False
+    return isinstance(exc, _RPC_RETRY_EXC)
+
+
 @retry(
-    retry=retry_if_exception_type(_RPC_RETRY_EXC),
+    retry=retry_if_exception(_retryable_rpc),
     stop=stop_after_attempt(4),
     wait=wait_exponential(multiplier=1, min=1, max=10),
     reraise=True,

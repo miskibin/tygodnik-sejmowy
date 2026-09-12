@@ -22,18 +22,19 @@ function splitTitle(title: string): { head: string; tail: string | null } {
 }
 
 function statusLabel(p: PrintDetail, outcome: ProcessOutcome | null): string {
-  if (outcome?.passed && outcome.act) return "Opublikowano w Dz.U.";
-  if (outcome?.passed) return "Uchwalono — oczekuje na publikację";
+  if (outcome?.act?.publishedAt) return outcome.act.eliId.startsWith("MP/") ? "Opublikowano w Monitorze Polskim" : "Opublikowano w Dz.U.";
   const stageType = p.currentStageType;
-  if (!stageType) return "W toku";
+  if (!stageType) return outcome?.passed ? "Uchwalono — brak potwierdzonej publikacji w danych" : "Brak potwierdzonego etapu w danych";
   if (stageType === "Withdrawn") return "Wycofany";
   if (stageType === "Rejected") return "Odrzucony";
   if (stageType === "End") return "Zakończono";
-  if (stageType === "PresidentSignature" || stageType === "ToPresident") return "U Prezydenta";
-  if (stageType === "SenatePosition" || stageType === "SenateAmendments") return "W Senacie";
+  if (stageType === "PresidentSignature") return "Podpisano przez Prezydenta";
+  if (stageType === "ToPresident") return "Przekazano Prezydentowi";
+  if (stageType === "SenatePosition") return "Stanowisko Senatu";
+  if (stageType === "SenateAmendments") return "Rozpatrywanie poprawek Senatu";
   if (stageType === "CommitteeWork" || stageType === "CommitteeReport") return "W komisji";
   if (stageType === "SejmReading" || stageType === "Voting") return "W Sejmie";
-  return "W toku";
+  return "Brak rozpoznanego etapu w danych";
 }
 
 export function Hero({
