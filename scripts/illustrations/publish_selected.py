@@ -1,9 +1,9 @@
 """Publish only hashes explicitly approved in an editorial manifest."""
 from __future__ import annotations
-import argparse, hashlib, json
+import argparse, hashlib, json, sys
 from datetime import datetime, timezone
 from pathlib import Path
-from PIL import Image
+from PIL import Image`nsys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from supagraf.db import supabase
 
 def sha(path: Path) -> str: return hashlib.sha256(path.read_bytes()).hexdigest()
