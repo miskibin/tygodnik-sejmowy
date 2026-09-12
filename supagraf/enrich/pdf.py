@@ -22,8 +22,10 @@ from pydantic import BaseModel
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from supagraf.db import DB_RETRY_EXC, supabase
+from supagraf.enrich.pdf_worker import pdf_task
 
-PYMUPDF_MODEL_VERSION = f"pymupdf-{fitz.__version__}-md-primary"
+LEGACY_PYMUPDF_MODEL_VERSION = f"pymupdf-{fitz.__version__}-md-primary"
+PYMUPDF_MODEL_VERSION = f"pymupdf-{fitz.__version__}-md-text-fallback-v3"
 DOCX_MODEL_VERSION = "python-docx-1.2-primary"
 TESSERACT_MODEL_VERSION = "tesseract-5.5-pol-fallback"
 TESSERACT_DPI = int(os.environ.get("SUPAGRAF_TESSERACT_DPI", "300"))
@@ -81,26 +83,44 @@ def _extract_docx(path: Path) -> tuple[str, list[int]]:
     return text, [len(text)]
 
 
+@pdf_task
 def _extract_pymupdf(path: Path) -> tuple[str, list[int]]:
     """Markdown for text-layer pages; ('', per_page) when the PDF is a scan."""
     import pymupdf4llm
 
     with fitz.open(path) as doc:
-        per_page = [len(p.get_text("text").strip()) for p in doc]
+        native_pages = [p.get_text("text").strip() for p in doc]
+        per_page = [len(p) for p in native_pages]
     if not sum(per_page):
         return "", per_page
     text_pages = [i for i, n in enumerate(per_page) if n]
-    return pymupdf4llm.to_markdown(str(path), pages=text_pages, show_progress=False), per_page
+    try:
+        text = pymupdf4llm.to_markdown(str(path), pages=text_pages, show_progress=False, use_ocr=False)
+        if text.strip():
+            return text, per_page
+    except Exception as exc:
+        logger.warning("PDF layout extraction failed for {}: {}; using native text", path.name, exc)
+    return "\n\n".join(native_pages), per_page
 
 
-def _extract_tesseract(path: Path) -> tuple[str, list[int]]:
+@pdf_task
+def _native_pages(path: Path) -> list[str]:
+    with fitz.open(path) as doc:
+        return [p.get_text("text").strip() for p in doc]
+
+
+@pdf_task
+def _extract_tesseract(path: Path, native_pages: list[str] | None = None) -> tuple[str, list[int]]:
     import pytesseract
     from PIL import Image
 
     matrix = fitz.Matrix(TESSERACT_DPI / 72, TESSERACT_DPI / 72)
     pages: list[str] = []
     with fitz.open(path) as doc:
-        for page in doc:
+        for idx, page in enumerate(doc):
+            if native_pages and native_pages[idx]:
+                pages.append(native_pages[idx])
+                continue
             png = page.get_pixmap(matrix=matrix, alpha=False).tobytes("png")
             pages.append(pytesseract.image_to_string(Image.open(io.BytesIO(png)), lang=TESSERACT_LANG).strip())
     if not any(pages):
@@ -108,24 +128,26 @@ def _extract_tesseract(path: Path) -> tuple[str, list[int]]:
     return "\n\n".join(pages), [len(p) for p in pages]
 
 
-def _extract_scan(path: Path) -> tuple[str, list[int], str]:
+def _extract_scan(path: Path, native_pages: list[str] | None = None) -> tuple[str, list[int], str]:
     """Vision OCR first (cheap, best on stamps/tables), Tesseract fallback."""
     from supagraf.enrich import vision_ocr
 
     if vision_ocr.vision_ocr_available():
         try:
-            text, per_page = vision_ocr.transcribe_pdf(path)
+            text, per_page = (vision_ocr.transcribe_pdf(path, native_pages=native_pages)
+                              if native_pages else vision_ocr.transcribe_pdf(path))
             return text, per_page, vision_ocr.VISION_OCR_MODEL_VERSION
         except RuntimeError as e:  # transcription failed after retries
             logger.warning("vision OCR failed for {}: {} — falling back", path.name, e)
     if not TESSERACT_ENABLED:
         raise RuntimeError(f"{path.name} has no text layer and no OCR path is enabled")
-    text, per_page = _extract_tesseract(path)
+    text, per_page = (_extract_tesseract(path, native_pages=native_pages)
+                      if native_pages else _extract_tesseract(path))
     return text, per_page, TESSERACT_MODEL_VERSION
 
 
 def extract_pdf(path: Path) -> ExtractionResult:
-    """Extract text (see module docstring), served from `pdf_extracts` when possible."""
+    """Extract every available source page, reusing complete cached results."""
     if not path.exists():
         raise FileNotFoundError(path)
     sha = _sha256(path)
@@ -133,24 +155,38 @@ def extract_pdf(path: Path) -> ExtractionResult:
     version = DOCX_MODEL_VERSION if is_docx else PYMUPDF_MODEL_VERSION
     if cached := _cache_lookup(sha, version):
         return ExtractionResult(sha256=sha, model_version=version, cache_hit=True, **cached)
+    if not is_docx:
+        # Older mixed PDFs silently omitted scans. Reuse complete text-only
+        # caches while allowing incomplete documents to be repaired.
+        legacy = _cache_lookup(sha, LEGACY_PYMUPDF_MODEL_VERSION)
+        if legacy and legacy.get("char_count_per_page") and all(legacy["char_count_per_page"]):
+            return ExtractionResult(sha256=sha, model_version=LEGACY_PYMUPDF_MODEL_VERSION,
+                                    cache_hit=True, **legacy)
     if is_docx:
         text, per_page, ocr = *_extract_docx(path), False
     else:
         text, per_page = _extract_pymupdf(path)
         ocr = False
-        if not text:
+        if not text or any(n == 0 for n in per_page):
             from supagraf.enrich import vision_ocr
 
-            if cached := _cache_lookup(sha, vision_ocr.VISION_OCR_MODEL_VERSION):
-                return ExtractionResult(sha256=sha, model_version=vision_ocr.VISION_OCR_MODEL_VERSION,
-                                        cache_hit=True, **cached)
-            text, per_page, version = _extract_scan(path)
+            mixed = bool(text)
+            def scan_version(model):
+                return f"{PYMUPDF_MODEL_VERSION}+{model}-mixed" if mixed else model
+            for model in (vision_ocr.VISION_OCR_MODEL_VERSION, TESSERACT_MODEL_VERSION):
+                if cached := _cache_lookup(sha, scan_version(model)):
+                    return ExtractionResult(sha256=sha, model_version=scan_version(model),
+                                            cache_hit=True, **cached)
+            text, per_page, model = (_extract_scan(path, native_pages=_native_pages(path))
+                                     if mixed else _extract_scan(path))
+            version = scan_version(model)
             ocr = True
     _cache_insert(sha, version, text, ocr, per_page)
     return ExtractionResult(sha256=sha, text=text, page_count=len(per_page), ocr_used=ocr,
                             char_count_per_page=per_page, model_version=version, cache_hit=False)
 
 
+@pdf_task
 def extract_pdf_cover(pdf_path: Path, max_pages: int = 2) -> str:
     """Plain text of the first pages — the signers list of a poselski projekt.
 

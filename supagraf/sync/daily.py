@@ -180,6 +180,8 @@ def run_daily(
     persist_ledger: bool = True,
     api: SejmApi | None = None,
 ) -> RunLedger:
+    from supagraf.enrich.llm import usage_snapshot, usage_since
+    usage0 = usage_snapshot()
     ledger = RunLedger(kind="daily", term=term, persist=persist_ledger, args={
         "skip_fetch": skip_fetch, "skip_load": skip_load, "skip_enrich": skip_enrich,
         "skip_embed": skip_embed, "full": full, "window_days": window_days, "only": only})
@@ -255,6 +257,8 @@ def run_daily(
             _run(ledger, "refresh", lambda: run_refreshes(term, ctx.dirty, full=full))
         _network_phase(ctx, ledger, skip_load=skip_load, load_succeeded=load_succeeded)
     finally:
+        with ledger.step("llm:usage") as step:
+            step.counts = usage_since(usage0)
         if own_api:
             api.close()
         logger.info("daily {}: {}", ledger.status, json.dumps(ledger.finish(), ensure_ascii=False, default=str))

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from dataclasses import dataclass, field
 
 from supagraf.sync import cursors
+
+STATE_DIR = Path(__file__).resolve().parents[2] / ".cache" / "supagraf"
 
 
 @dataclass
@@ -18,18 +21,18 @@ def cursor_name(term: int) -> str:
     return f"pending_load.term{term}"
 
 
-def read_pending(term: int) -> PendingLoad:
-    raw = cursors.get_cursor(cursor_name(term))
-    if not raw:
-        return PendingLoad()
-    value = json.loads(raw)
+def _decode(raw: str | None) -> PendingLoad:
+    value = json.loads(raw) if raw else {}
     dirty = {str(name) for name in value.get("dirty", [])}
-    keys = {
-        str(name): {int(key) for key in items}
-        for name, items in value.get("changed_keys", {}).items()
-        if name in dirty
-    }
+    keys = {str(name): {int(key) for key in items}
+            for name, items in value.get("changed_keys", {}).items() if name in dirty}
     return PendingLoad(dirty=dirty, changed_keys=keys)
+
+
+def read_pending(term: int) -> PendingLoad:
+    path = STATE_DIR / f"pending_load.term{term}.json"
+    local = _decode(path.read_text(encoding="utf-8")) if path.exists() else PendingLoad()
+    return merge_pending(local, _decode(cursors.get_cursor(cursor_name(term))))
 
 
 def merge_pending(current: PendingLoad, previous: PendingLoad) -> PendingLoad:
@@ -48,20 +51,20 @@ def merge_pending(current: PendingLoad, previous: PendingLoad) -> PendingLoad:
 
 
 def write_pending(term: int, pending: PendingLoad) -> None:
-    cursors.set_cursor(
-        cursor_name(term),
-        json.dumps(
-            {
-                "dirty": sorted(pending.dirty),
-                "changed_keys": {
-                    name: sorted(keys)
-                    for name, keys in sorted(pending.changed_keys.items())
-                },
-            },
-            separators=(",", ":"),
-        ),
-    )
+    raw = json.dumps({"dirty": sorted(pending.dirty), "changed_keys": {
+        name: sorted(keys) for name, keys in sorted(pending.changed_keys.items())
+    }}, separators=(",", ":"))
+    # Persist before HTTP: upstream cursors may already have advanced. Keep a
+    # recoverable plan even when PostgREST rejects the shared checkpoint.
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    path = STATE_DIR / f"pending_load.term{term}.json"
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(raw, encoding="utf-8")
+    temporary.replace(path)
+    cursors.set_cursor(cursor_name(term), raw)
 
 
 def clear_pending(term: int) -> None:
-    write_pending(term, PendingLoad())
+    cursors.set_cursor(cursor_name(term), '{"dirty":[],"changed_keys":{}}')
+    path = STATE_DIR / f"pending_load.term{term}.json"
+    path.unlink(missing_ok=True)

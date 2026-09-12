@@ -733,7 +733,7 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
     if (printIds.length > 0) {
       const { data: linkRows, error: ve } = await sb
         .from("voting_print_links")
-        .select("print_id, role, votings:voting_id(id, date, yes, no, voting_number)")
+        .select("print_id, role, votings:voting_id(id, date, yes, no, majority_votes, voting_number)")
         .in("print_id", printIds);
       if (ve) throw ve;
       type Linked = { print_id: number; role: string; v: Record<string, unknown> };
@@ -755,7 +755,7 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
         const no = Number(v.no ?? 0);
         const date = (v.date as string | null) ?? null;
         let result: "passed" | "failed" | "pending" = "pending";
-        if (yes + no > 0) result = yes > no ? "passed" : "failed";
+        if (yes + no > 0) result = (v.majority_votes != null ? yes >= Number(v.majority_votes) : yes > no) ? "passed" : "failed";
         votingByPrint.set(print_id, {
           votingId: v.id as number,
           date,
@@ -812,17 +812,18 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
   // Voting metadata join.
   const votingRaw = (votingRes.data ?? []) as Array<Record<string, unknown>>;
   const votingIds = [...new Set(votingRaw.map((v) => v.voting_id as number))];
-  const votingMeta = new Map<number, { date: string | null; title: string | null; yes: number; no: number }>();
+  const votingMeta = new Map<number, { date: string | null; title: string | null; yes: number; no: number; majority: number | null }>();
   if (votingIds.length > 0) {
     const { data: vData, error: vErr } = await sb
       .from("votings")
-      .select("id, date, title, yes, no")
+      .select("id, date, title, yes, no, majority_votes")
       .in("id", votingIds);
     if (vErr) throw vErr;
     for (const v of (vData ?? []) as Array<Record<string, unknown>>) {
       votingMeta.set(v.id as number, {
         date: (v.date as string | null) ?? null,
         title: (v.title as string | null) ?? null,
+        majority: v.majority_votes == null ? null : Number(v.majority_votes),
         yes: typeof v.yes === "number" ? v.yes : Number(v.yes ?? 0),
         no: typeof v.no === "number" ? v.no : Number(v.no ?? 0),
       });
@@ -835,7 +836,7 @@ async function buildDetail(p: Record<string, unknown>): Promise<PromiseDetail> {
     const yes = meta?.yes ?? 0;
     const no = meta?.no ?? 0;
     let result: "passed" | "failed" | "pending" | null = null;
-    if (yes + no > 0) result = yes > no ? "passed" : "failed";
+    if (yes + no > 0) result = (meta?.majority != null ? yes >= meta.majority : yes > no) ? "passed" : "failed";
     return {
       votingId: vid,
       term: r.term as number,

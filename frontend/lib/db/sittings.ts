@@ -236,7 +236,7 @@ function deriveResult(
   result: Vote["result"];
   motionPolarity: Vote["motionPolarity"];
 } {
-  const passed = v.yes > v.no;
+  const passed = v.majority_votes != null ? v.yes >= v.majority_votes : v.yes > v.no;
   const rawPolarity = v.motion_polarity ?? null;
   const motionPolarity: Vote["motionPolarity"] =
     rawPolarity && rawPolarity !== "other" ? rawPolarity : null;

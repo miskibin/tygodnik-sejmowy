@@ -2,8 +2,8 @@ import type { Rebel } from "@/lib/db/voting";
 import { RebelCard } from "./RebelCard";
 
 function rebelsSubtitle(n: number): string {
-  if (n === 1) return "1 poseł zagłosował inaczej, niż zalecała jego partia";
-  return `${n} posłów zagłosowało inaczej, niż zalecała ich partia`;
+  if (n === 1) return "1 poseł zagłosował inaczej, niż większość głosujących z jego klubu";
+  return `${n} posłów zagłosowało inaczej, niż większość głosujących z ich klubów`;
 }
 
 function SectionHead({
@@ -78,10 +78,11 @@ export function RebelGrid({ rebels, term }: { rebels: Rebel[]; term: number }) {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <SectionHead
           label="III"
-          title="Wbrew klubowi"
+          title="Inaczej niż większość klubu"
           subtitle={rebelsSubtitle(rebels.length)}
         />
 
+        <p className="text-sm text-muted-foreground mb-6">Porównanie wyników głosowania nie potwierdza, czy klub zarządził dyscyplinę. Uwzględniamy kluby z wyraźną przewagą jednego stanowiska.</p>
         {rebels.length === 0 ? (
           <p
             className="text-center"
@@ -93,7 +94,7 @@ export function RebelGrid({ rebels, term }: { rebels: Rebel[]; term: number }) {
               padding: "32px 0",
             }}
           >
-            Wszyscy posłowie zagłosowali zgodnie z dyscypliną klubową.
+            W tej próbce nie znaleziono głosów odmiennych od wyraźnej większości klubu.
           </p>
         ) : (
           <div

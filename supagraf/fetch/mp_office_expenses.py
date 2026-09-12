@@ -403,7 +403,7 @@ def _ocr_page(page) -> str:
 
 # -------- LLM fallback for OCR'd reports --------
 # Heuristic regex on OCR text is unreliable — column layout gets scrambled.
-# We use deepseek-v4-flash (per CLAUDE.md: short structured outputs, ~10% of
+# We use deepseek-flash (per CLAUDE.md: short structured outputs, ~10% of
 # pro cost) to parse the standardized form. Invoked only when regex parser
 # returns all-zeros (the digital-PDF template path stays fast and offline).
 
@@ -424,7 +424,7 @@ class _LLMExtractResult(BaseModel):
 
 
 def llm_extract(text: str) -> dict[str, Any]:
-    """Pass OCR text through deepseek-v4-flash → 23 categories + 6 funds fields.
+    """Pass OCR text through deepseek-flash → 23 categories + 6 funds fields.
 
     Returns dict shaped like parse_pdf_text() output. Falls back to all-zeros if
     DEEPSEEK_API_KEY is missing (caller will then ship raw report with empty
@@ -438,7 +438,7 @@ def llm_extract(text: str) -> dict[str, Any]:
 
     model = os.environ.get(
         "SUPAGRAF_MP_OFFICE_EXPENSES_LLM_MODEL",
-        os.environ.get("SUPAGRAF_LLM_MODEL_FLASH", "deepseek-v4-flash"),
+        os.environ.get("SUPAGRAF_LLM_MODEL_FLASH", "deepseek-flash"),
     )
     call = call_structured(
         model=model,

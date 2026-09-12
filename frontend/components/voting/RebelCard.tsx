@@ -14,19 +14,6 @@ function actualBg(actual: "YES" | "NO" | "ABSTAIN"): string {
   return "var(--warning)";
 }
 
-// Polish ordinal phrasing: "Drugie złamanie", "Czwarte..." etc. Used to keep
-// the design's editorial voice ("Drugie głosowanie wbrew klubowi w tej kadencji.").
-const ORDINALS_PL = [
-  "Pierwsze", "Drugie", "Trzecie", "Czwarte", "Piąte", "Szóste",
-  "Siódme", "Ósme", "Dziewiąte", "Dziesiąte",
-] as const;
-
-function rebellionNote(count: number): string {
-  if (count <= 0) return "";
-  if (count <= 10) return `${ORDINALS_PL[count - 1]} złamanie dyscypliny w tej kadencji.`;
-  return `${count}. złamanie dyscypliny w tej kadencji.`;
-}
-
 export function RebelCard({ rebel, term }: { rebel: Rebel; term: number }) {
   const expectedLabel = VOTE_LABEL[rebel.expected];
   const actualLabel = VOTE_LABEL[rebel.actual];
@@ -55,7 +42,7 @@ export function RebelCard({ rebel, term }: { rebel: Rebel; term: number }) {
         >
           <span>
             <span style={{ color: "var(--destructive)" }}>● </span>
-            złamanie dyscypliny
+            inaczej niż większość klubu
           </span>
         </div>
         {rebel.photo_url && (
@@ -109,7 +96,7 @@ export function RebelCard({ rebel, term }: { rebel: Rebel; term: number }) {
             textDecoration: "line-through",
           }}
         >
-          klub: {expectedLabel}
+          większość klubu: {expectedLabel}
         </span>
         <span style={{ color: "var(--destructive)" }}>→</span>
         <span
@@ -124,19 +111,6 @@ export function RebelCard({ rebel, term }: { rebel: Rebel; term: number }) {
         </span>
       </div>
 
-      {rebel.priorRebellions > 0 && (
-        <p
-          className="italic"
-          style={{
-            fontSize: 14,
-            lineHeight: 1.5,
-            color: "var(--secondary-foreground)",
-            margin: "12px 0 0",
-          }}
-        >
-          {rebellionNote(rebel.priorRebellions)}
-        </p>
-      )}
     </article>
   );
 }

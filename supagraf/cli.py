@@ -751,7 +751,7 @@ def cmd_enrich_utterances(
                                 help="Limit to a single sitting_num"),
     limit: int = typer.Option(0, "--limit", "-n", help="0 = no cap"),
     model: str = typer.Option(None, "--model", "-m",
-                              help="LLM model (default: SUPAGRAF_UTTERANCE_LLM_MODEL or deepseek-v4-flash)"),
+                              help="LLM model (default: SUPAGRAF_UTTERANCE_LLM_MODEL or deepseek-flash)"),
 ):
     """LLM enrichment over proceeding_statements: viral_score/quote/reason +
     tone + topic_tags + mentioned_entities + key_claims + addressee + summary.
@@ -783,14 +783,14 @@ def cmd_enrich_act_short_title(
     days: int = typer.Option(0, "--days", "-d",
                              help="Limit to acts with legal_status_date in last N days (0 = no time limit)"),
     force: bool = typer.Option(False, "--force",
-                               help="Re-enrich rows already enriched (default: skip <30 days)"),
+                               help="Re-enrich rows already enriched (default: reuse existing titles)"),
     model: str = typer.Option(None, "--model", "-m",
-                              help="LLM model (default: SUPAGRAF_ACT_LLM_MODEL or deepseek-v4-flash)"),
+                              help="LLM model (default: SUPAGRAF_ACT_LLM_MODEL or deepseek-flash)"),
 ):
     """Plain-Polish short_title for ELI acts. LLM-only path
-    (deepseek-v4-flash) — rewrites ceremonial Obwieszczenie/Ustawa/Rozp.
+    (deepseek-flash) — rewrites ceremonial Obwieszczenie/Ustawa/Rozp.
     titles into ≤80-char headlines for the tygodnik card. Idempotent: skips
-    rows enriched <30 days unless --force.
+    existing short titles unless --force.
     """
     from supagraf.enrich.act_short_title import (
         ACT_LLM_MODEL,
@@ -843,13 +843,13 @@ def cmd_enrich_voting_short_title(
     days: int = typer.Option(0, "--days", "-d",
                              help="Limit to votings in last N days (0 = no time limit)"),
     force: bool = typer.Option(False, "--force",
-                               help="Re-enrich rows already enriched (default: skip <30 days)"),
+                               help="Re-enrich rows already enriched (default: reuse existing titles)"),
     model: str = typer.Option(None, "--model", "-m",
-                              help="LLM model (default: SUPAGRAF_VOTING_LLM_MODEL or deepseek-v4-flash)"),
+                              help="LLM model (default: SUPAGRAF_VOTING_LLM_MODEL or deepseek-flash)"),
 ):
     """Plain-Polish short_title for votings. Fast-path via voting_print_links
     role='main' linked print short_title (no LLM cost), fallback to LLM
-    (deepseek-v4-flash) for the rest. Idempotent: skips rows enriched <30 days
+    (deepseek-flash) for the rest. Idempotent: skips existing short titles
     unless --force.
     """
     from supagraf.enrich.voting_short_title import (

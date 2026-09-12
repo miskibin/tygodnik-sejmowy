@@ -25,3 +25,28 @@ def test_unknown_addressee_and_topic_are_salvaged():
     o = _out(addressee="minister", topic_tags=["zdrowie", "konsument"])
     assert o.addressee == "inne"
     assert o.topic_tags == ["zdrowie"]
+
+
+def test_unverified_quote_is_not_persisted(monkeypatch):
+    from types import SimpleNamespace
+    from supagraf.enrich import utterance_enrich as mod
+    output = _out(viral_score=0.9, viral_quote="Cytat wymyślony.", viral_reason="Powód")
+    monkeypatch.setattr(mod, "call_structured", lambda **kwargs: SimpleNamespace(
+        parsed=output, prompt=SimpleNamespace(version=1, sha256="test")))
+    written = []
+    monkeypatch.setattr(mod, "_persist", lambda entity, payload: written.append(payload))
+    mod.enrich_one_statement.__wrapped__(entity_type="proceeding_statement", entity_id="1", body_text="Rzeczywista wypowiedź.")
+    assert written[0]["viral_quote"] is None
+    assert written[0]["viral_reason"] is None
+
+
+def test_verbatim_quote_is_preserved(monkeypatch):
+    from types import SimpleNamespace
+    from supagraf.enrich import utterance_enrich as mod
+    output = _out(viral_score=0.9, viral_quote="Rzeczywista wypowiedź.", viral_reason="Powód")
+    monkeypatch.setattr(mod, "call_structured", lambda **kwargs: SimpleNamespace(
+        parsed=output, prompt=SimpleNamespace(version=1, sha256="test")))
+    written = []
+    monkeypatch.setattr(mod, "_persist", lambda entity, payload: written.append(payload))
+    mod.enrich_one_statement.__wrapped__(entity_type="proceeding_statement", entity_id="1", body_text="Rzeczywista wypowiedź.")
+    assert written[0]["viral_quote"] == "Rzeczywista wypowiedź."

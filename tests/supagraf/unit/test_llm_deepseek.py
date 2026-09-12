@@ -201,3 +201,32 @@ def test_usage_totals_accumulate_per_call(monkeypatch):
     llm_mod.call_structured(model="m", prompt_name="p", user_input="u", output_model=Out)
     d = llm_mod.usage_since(before)
     assert d["calls"] == 2 and d["input"] == 200 and d["cache_hit"] == 128 and d["output"] == 10
+
+
+def test_paid_empty_retries_are_counted(monkeypatch):
+    _capture(monkeypatch, [_ok(""), _ok('{"a": 1}')])
+    before = llm_mod.usage_snapshot()
+    llm_mod.call_structured(model="deepseek-flash", prompt_name="p", user_input="u", output_model=Out)
+    delta = llm_mod.usage_since(before)
+    assert delta["calls"] == 2 and delta["output"] == 10
+    assert delta["estimated_usd"] > 0
+
+
+def test_truncated_response_is_counted_but_not_retried(monkeypatch):
+    response = _ok('{"a": 1}')
+    response._body["choices"][0]["finish_reason"] = "length"
+    calls = _capture(monkeypatch, [response])
+    before = llm_mod.usage_snapshot()
+    with pytest.raises(llm_mod.LLMResponseError, match="truncated"):
+        llm_mod.call_structured(model="deepseek-flash", prompt_name="p", user_input="u", output_model=Out)
+    assert len(calls) == 1
+    assert llm_mod.usage_since(before)["calls"] == 1
+
+
+def test_flash_41_price_includes_cache_and_does_not_double_count_reasoning():
+    usage = llm_mod.TokenUsage(input_tokens=1_000_000, cache_hit_tokens=500_000,
+                               output_tokens=1_000_000, reasoning_tokens=500_000)
+    assert llm_mod.estimate_cost_usd(usage, "deepseek-flash", peak=True) == pytest.approx(1.353)
+    assert llm_mod.estimate_cost_usd(usage, "deepseek-flash", peak=False) == pytest.approx(0.6765)
+    assert llm_mod.estimate_cost_usd(usage, "unknown", peak=False) is None
+    assert llm_mod.estimate_cost_usd(llm_mod.TokenUsage(), "deepseek-flash", peak=False) is None

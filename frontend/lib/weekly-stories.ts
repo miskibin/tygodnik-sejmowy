@@ -25,6 +25,7 @@ export type DebateContext = { ord: number; title: string; printNumbers: string[]
 export type WeeklyStory = {
   id: string; ord: number | null; title: string; officialTitle: string;
   summary: string | null; topics: TopicId[]; personas: PersonaId[];
+  projectSummaries?: { number: string; title: string; text: string }[];
   prints: { number: string; title: string; isProject: boolean }[];
   votes: StoryVote[]; speechCount: number;
   quote: { id: number; text: string; speaker: string; mpId: number | null } | null;
@@ -59,12 +60,12 @@ function voteContext(vote: StoryVote): DebateContext | null {
 const normal = (s: string) => s.toLocaleLowerCase("pl").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 const sentenceSegmenter = new Intl.Segmenter("pl", { granularity: "sentence" });
 
-export function shortSummary(text: string | null, max = 380): string | null {
+export function shortSummary(text: string | null, max = 750): string | null {
   if (!text?.trim()) return null;
   const plain = text.replace(/\*\*/g, "").trim();
   const sentences = [...sentenceSegmenter.segment(plain)].map(s => s.segment.trim());
   let out = "";
-  for (const sentence of sentences.slice(0, 2)) {
+  for (const sentence of sentences.slice(0, 4)) {
     if (out && out.length + sentence.length > max) break;
     out += (out ? " " : "") + sentence;
   }
@@ -145,7 +146,7 @@ export function voteMeaning(v: StoryVote): VoteMeaning {
     return { label: passed ? "Sejm odrzucił projekt" : "Wniosek o odrzucenie projektu upadł", question, tone: passed ? "negative" : "neutral" };
   }
   if (v.motion_polarity === "pass" || /całoś(?:cią|ć) projektu/i.test(question)) {
-    const resolution = /uchwały/i.test(v.description ?? "");
+    const resolution = /projekt(?:u)? uchwały/i.test(`${v.description ?? ""} ${v.title} ${question}`);
     return { label: resolution ? (passed ? "Sejm przyjął uchwałę" : "Sejm odrzucił projekt uchwały") : (passed ? "Sejm uchwalił ustawę" : "Sejm odrzucił projekt ustawy"), question, tone: passed ? "positive" : "negative" };
   }
   return { label: passed ? "Wniosek przyjęty" : "Wniosek odrzucony", question, tone: "neutral" };
@@ -198,15 +199,20 @@ export function buildWeeklyStories(term: number, statements: StoryStatement[], v
     const title = projects.length > 1
       ? `${projects[0].short_title || projects[0].title} — wspólna debata`
       : projects[0]?.short_title || vote?.short_title || primary?.short_title || context.title.replace(/\s*\(druki?\s+nr[^)]*\)\.?/i, "");
+    // Keep each proposal separate; prefer substance over a punchline.
+    const projectSummaries = projects.length > 1 ? projects.flatMap(p => {
+      const text = shortSummary(p.summary_plain || p.impact_punch || null);
+      return text ? [{ number: p.number, title: p.short_title || p.title, text }] : [];
+    }) : [];
     const summary = vote?.kind === "ON_LIST"
       ? (vote.options?.length ? `Kandydatury: ${vote.options.map(o => o.name).join("; ")}.` : null)
       : projects.length > 1
-      ? shortSummary(projects.map(p => p.impact_punch || p.summary_plain).filter(Boolean).join(" "))
-      : shortSummary(primary?.impact_punch || primary?.summary_plain || null);
+      ? projectSummaries.map(p => p.text).join(" ") || null
+      : shortSummary(primary?.summary_plain || primary?.impact_punch || null);
     const phase = isVeto ? "Weto prezydenta" : senate ? "Poprawki Senatu" : /Pierwsze czytanie/i.test(context.title) ? "Pierwsze czytanie" : ballots.length ? "Debata i głosowania" : "Debata w Sejmie";
     return {
       id: `${term}-${context.ord}-${context.printNumbers[0] ?? "debata"}`, ord: context.ord,
-      title, officialTitle: context.title, summary,
+      title, officialTitle: context.title, summary, projectSummaries,
       topics: [...new Set([...projects.flatMap(p => dbTagsToTopics(p.topic_tags)), ...speeches.flatMap(s => dbTagsToTopics(s.topic_tags))])],
       personas: [...new Set(projects.flatMap(p => dbTagsToPersonas(p.persona_tags)))],
       prints: (projects.length ? projects : related).map(p => ({ number: p.number, title: p.short_title || p.title, isProject: projects.includes(p) })),

@@ -100,6 +100,8 @@ def _resolve_prompt(name: str, version: int | None = None) -> PromptRef:
 def is_deepseek_peak_hour(now: datetime | None = None) -> bool:
     """True when DeepSeek bills at peak rate (weekdays 01-04 & 06-10 UTC)."""
     now = now or datetime.now(timezone.utc)
+    if now.tzinfo is not None:
+        now = now.astimezone(timezone.utc)
     return now.weekday() < 5 and any(lo <= now.hour < hi for lo, hi in PEAK_WINDOWS_UTC)
 
 
@@ -130,6 +132,11 @@ def _post(payload: dict, timeout: float) -> dict:
     if r.status_code >= 400:
         raise LLMResponseError(f"deepseek {r.status_code}: {r.text[:300]}")
     body = r.json()
+    # Count every billed response, including empty replies that get retried and
+    # malformed/truncated output that cannot be persisted as enrichment.
+    _count_usage(_parse_usage(body), payload["model"])
+    if (body.get("choices") or [{}])[0].get("finish_reason") == "length":
+        raise LLMResponseError("DeepSeek output truncated at max_tokens; enrichment not saved")
     content = ((body.get("choices") or [{}])[0].get("message") or {}).get("content")
     if not isinstance(content, str) or not content.strip():
         raise LLMHTTPError(f"empty deepseek content: {str(body)[:300]}")
@@ -160,22 +167,46 @@ def _chat(*, model: str, messages: list[dict], timeout_s: float, json_mode: bool
     else:
         payload |= {"thinking": {"type": "enabled"}, "reasoning_effort": mode}
     body = _post(payload, timeout=timeout_s)
+    return body["choices"][0]["message"]["content"], _parse_usage(body)
+
+
+def _parse_usage(body: dict) -> TokenUsage:
     u = body.get("usage") or {}
-    usage = TokenUsage(
+    return TokenUsage(
         input_tokens=u.get("prompt_tokens"), output_tokens=u.get("completion_tokens"),
         cache_hit_tokens=u.get("prompt_cache_hit_tokens"), cache_miss_tokens=u.get("prompt_cache_miss_tokens"),
         reasoning_tokens=(u.get("completion_tokens_details") or {}).get("reasoning_tokens"),
     )
-    _count_usage(usage)
-    return body["choices"][0]["message"]["content"], usage
 
 
 _usage_lock = threading.Lock()
-_usage_totals: dict[str, int] = {"calls": 0, "input": 0, "cache_hit": 0, "output": 0, "reasoning": 0}
+_usage_totals: dict[str, int | float] = {"calls": 0, "input": 0, "cache_hit": 0, "output": 0, "reasoning": 0, "estimated_usd": 0.0, "unpriced_calls": 0}
 
 
-def _count_usage(u: TokenUsage) -> None:
+def estimate_cost_usd(u: TokenUsage, model: str, *, peak: bool) -> float | None:
+    """Published direct-API rates checked 2026-09-12; estimate, not invoice.
+
+    https://api-docs.deepseek.com/quick_start/pricing/
+    Completion tokens already include reasoning tokens: never add them twice.
+    """
+    if model in {"deepseek-flash", "deepseek-v4-flash", "deepseek-v4-flash-vision-exp"}:
+        hit_rate, input_rate, output_rate = 0.006, 0.3, 1.2
+    elif model == "deepseek-v4-pro":
+        hit_rate, input_rate, output_rate = 0.044, 1.32, 3.96
+    else:
+        return None
+    if u.input_tokens is None or u.output_tokens is None:
+        return None
+    hits = min(u.cache_hit_tokens or 0, u.input_tokens)
+    cost = (hits * hit_rate + (u.input_tokens - hits) * input_rate + u.output_tokens * output_rate) / 1_000_000
+    return cost if peak else cost / 2
+
+
+def _count_usage(u: TokenUsage, model: str) -> None:
     with _usage_lock:
+        cost = estimate_cost_usd(u, model, peak=is_deepseek_peak_hour())
+        _usage_totals["estimated_usd"] += cost or 0.0
+        _usage_totals["unpriced_calls"] += int(cost is None)
         _usage_totals["calls"] += 1
         _usage_totals["input"] += u.input_tokens or 0
         _usage_totals["cache_hit"] += u.cache_hit_tokens or 0
@@ -183,13 +214,13 @@ def _count_usage(u: TokenUsage) -> None:
         _usage_totals["reasoning"] += u.reasoning_tokens or 0
 
 
-def usage_snapshot() -> dict[str, int]:
+def usage_snapshot() -> dict[str, int | float]:
     """Process-wide DeepSeek token totals so far (all models, all jobs)."""
     with _usage_lock:
         return dict(_usage_totals)
 
 
-def usage_since(before: dict[str, int]) -> dict[str, int]:
+def usage_since(before: dict[str, int | float]) -> dict[str, int | float]:
     now = usage_snapshot()
     return {k: now[k] - before.get(k, 0) for k in now}
 

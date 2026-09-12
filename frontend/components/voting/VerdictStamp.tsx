@@ -1,9 +1,8 @@
 import type { VotingHeader } from "@/lib/db/voting";
-import { verdictStampWords } from "@/lib/voting/bill_outcome";
+import { voteMeaning } from "@/lib/weekly-stories";
 
 export function VerdictStamp({
   header,
-  passed,
 }: {
   header: VotingHeader;
   // `passed` here is the MOTION result (yes >= majority). The bill-level
@@ -18,7 +17,10 @@ export function VerdictStamp({
       ? Math.round(((header.yes + header.no + header.abstain) / turnoutDenom) * 1000) / 10
       : 0;
 
-  const { headline, tone, motionDescription } = verdictStampWords(header.motion_polarity, passed);
+  const meaning = voteMeaning({ ...header, id: header.voting_id, short_title: null, kind: header.kind ?? undefined });
+  const headline = meaning.label.toLocaleUpperCase("pl");
+  const tone = meaning.tone === "positive" ? "success" : meaning.tone === "negative" ? "destructive" : "neutral";
+  const motionDescription = meaning.question;
   // Headline color comes from BILL outcome (not motion outcome) so a citizen
   // sees green/red that matches what happened to the project, not what
   // happened to a procedural motion. neutral = amendment/minority/procedural.
@@ -72,7 +74,7 @@ export function VerdictStamp({
         }}
       >
         <div>
-          większością{" "}
+          głosy za i przeciw{" "}
           <span style={{ color: "var(--foreground)", fontWeight: 500 }}>
             {header.yes}–{header.no}
           </span>

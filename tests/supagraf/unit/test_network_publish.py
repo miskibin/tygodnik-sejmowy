@@ -66,3 +66,26 @@ def test_daily_retries_network_without_dirty_sources(monkeypatch):
         load_succeeded=True,
     )
     refresh.assert_called_once_with(term=10)
+
+
+def test_transient_gateway_failure_retries_without_clearing_snapshot(monkeypatch):
+    from postgrest.exceptions import APIError
+    from tenacity import wait_none
+    attempts = []
+    publications = []
+    def build(**kwargs):
+        attempts.append(kwargs)
+        if len(attempts) == 1:
+            raise APIError({"code": 503, "message": "gateway unavailable", "details": None, "hint": None})
+        return {"ready": True}
+    monkeypatch.setattr(network, "build_network", build)
+    monkeypatch.setattr(network_publish, "publish_network", lambda payload: publications.append(payload) or {"ok": True})
+    monkeypatch.setattr(network_publish.refresh_network.retry, "wait", wait_none())
+    assert network_publish.refresh_network() == {"ok": True}
+    assert len(attempts) == 2
+    assert publications == [{"ready": True}]
+
+
+def test_schema_errors_are_not_retried():
+    from postgrest.exceptions import APIError
+    assert not network_publish._transient_failure(APIError({"code": "42703", "message": "missing column", "details": None, "hint": None}))

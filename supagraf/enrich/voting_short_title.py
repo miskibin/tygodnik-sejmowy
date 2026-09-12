@@ -7,11 +7,10 @@ plain-Polish short_title parallel to prints.short_title.
 Two paths:
   1. fast-path — voting linked via voting_print_links.role='main' to a
      print that already has short_title. Copy it. No LLM cost.
-  2. llm — deepseek-v4-flash prompt with raw voting.title + any linked print
+  2. llm — deepseek-flash prompt with raw voting.title + any linked print
      short_titles for context. ≤120 char hard cap (Pydantic + DB CHECK).
 
-Idempotent: rows with short_title_enriched_at within RECENT_THRESHOLD_DAYS
-are skipped unless force=True.
+Idempotent: existing short titles are reused unless force=True.
 """
 from __future__ import annotations
 
@@ -24,14 +23,13 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from supagraf.db import supabase
 from supagraf.enrich.audit import with_model_run
-from supagraf.enrich.llm import call_structured
+from supagraf.enrich.llm import LLMBudgetError, call_structured
 
 JOB_NAME = "voting_short_title"
 PROMPT_NAME = "voting_short_title"
 
-VOTING_LLM_MODEL = os.environ.get("SUPAGRAF_VOTING_LLM_MODEL", "deepseek-v4-flash")
+VOTING_LLM_MODEL = os.environ.get("SUPAGRAF_VOTING_LLM_MODEL", "deepseek-flash")
 MAX_SHORT_TITLE_CHARS = 120
-RECENT_THRESHOLD_DAYS = 30
 
 _PKT_PREFIX_RE = re.compile(r"^(?:Pkt\.?|Punkt)\s*\d+[.:]?\s*", re.IGNORECASE)
 
@@ -132,6 +130,7 @@ def enrich_one_voting(
         user_input=user_input,
         output_model=ShortTitleOut,
         prompt_version=prompt_version,
+        max_tokens=256,
     )
     parsed: ShortTitleOut = call.parsed  # type: ignore[assignment]
     cleaned = _strip_pkt_prefix(parsed.short_title)[:MAX_SHORT_TITLE_CHARS]
@@ -155,9 +154,7 @@ def fetch_pending_votings(
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
         q = q.gte("date", cutoff)
     if not force:
-        threshold = (datetime.now(timezone.utc) - timedelta(days=RECENT_THRESHOLD_DAYS)).isoformat()
-        # short_title null OR enrichment older than threshold
-        q = q.or_(f"short_title.is.null,short_title_enriched_at.lt.{threshold}")
+        q = q.is_("short_title", "null")
     q = q.order("date", desc=True)
     if limit > 0:
         q = q.limit(limit)
@@ -204,6 +201,8 @@ def enrich_votings(
                     "enriched {}/{}: fast={} llm={}",
                     n_fast + n_llm, len(pending), n_fast, n_llm,
                 )
+        except LLMBudgetError:
+            raise  # Stop on invalid credentials/balance; leave remaining rows pending.
         except Exception as e:
             n_failed += 1
             logger.error("voting {} failed: {!r}", vid, e)

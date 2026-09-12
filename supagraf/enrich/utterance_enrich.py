@@ -4,7 +4,7 @@ One LLM pass extracts viral_score/quote/reason + tone + topic_tags +
 mentioned_entities + key_claims + addressee + summary_one_line. Persisted to
 proceeding_statements columns added in migration 0061.
 
-Default model: deepseek-v4-flash (faster + cheaper than the v4-pro used for
+Default model: deepseek-flash (faster + cheaper than the v4-pro used for
 prints; Polish parliamentary speech is voluminous and most utterances are
 short → flash handles it well). Override via SUPAGRAF_UTTERANCE_LLM_MODEL.
 
@@ -194,6 +194,9 @@ def enrich_one_statement(
     # here (not in Pydantic) because the prompt may comply or not; we'd
     # rather coerce than fail the whole batch.
     quote = parsed.viral_quote if parsed.viral_score >= 0.4 else ""
+    if quote and quote not in body_text[:MAX_INPUT_CHARS]:
+        logger.warning("discarding non-verbatim quote for statement {}", entity_id)
+        quote = ""
     reason = parsed.viral_reason if quote else ""
 
     _persist(int(entity_id), {

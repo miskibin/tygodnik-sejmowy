@@ -19,7 +19,7 @@ def _clean_env(monkeypatch):
 
 
 def test_default_routing_is_single_vision_model():
-    assert pick_model({"document_category": "projekt_ustawy"}) == "deepseek-v4-flash-vision-exp"
+    assert pick_model({"document_category": "projekt_ustawy"}) == "deepseek-flash"
     assert pick_model({"document_category": "opinia_organu"}) == LLM_MODELS["vision"]
     assert pick_model({"is_meta_document": True}) == LLM_MODELS["vision"]
 
@@ -27,17 +27,17 @@ def test_default_routing_is_single_vision_model():
 def test_legacy_pro_flash_routing_behind_env(monkeypatch):
     monkeypatch.setenv("SUPAGRAF_LLM_ROUTING", "pro_flash")
     assert pick_model({"document_category": "projekt_ustawy"}) == "deepseek-v4-pro"
-    assert pick_model({"document_category": "opinia_organu"}) == "deepseek-v4-flash"
-    assert pick_model({"is_meta_document": True}) == "deepseek-v4-flash"
+    assert pick_model({"document_category": "opinia_organu"}) == "deepseek-flash"
+    assert pick_model({"is_meta_document": True}) == "deepseek-flash"
 
 
 def test_env_override_pins_every_print(monkeypatch):
     """Documented escape hatch for cost-capped runs — it has to beat the
     routing, including for prints the picker would send to pro."""
-    monkeypatch.setenv("SUPAGRAF_LLM_MODEL", "deepseek-v4-flash")
-    assert pick_model({"document_category": "projekt_ustawy"}) == "deepseek-v4-flash"
+    monkeypatch.setenv("SUPAGRAF_LLM_MODEL", "deepseek-flash")
+    assert pick_model({"document_category": "projekt_ustawy"}) == "deepseek-flash"
     monkeypatch.setenv("SUPAGRAF_LLM_ROUTING", "pro_flash")
-    assert pick_model({"document_category": "sprawozdanie_komisji"}) == "deepseek-v4-flash"
+    assert pick_model({"document_category": "sprawozdanie_komisji"}) == "deepseek-flash"
 
 
 def test_over_long_mention_is_truncated_not_rejected():

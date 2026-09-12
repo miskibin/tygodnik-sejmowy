@@ -6,13 +6,12 @@ z dnia ... w sprawie ogłoszenia jednolitego tekstu ustawy o ...`). We
 materialize a plain-Polish short_title parallel to prints.short_title and
 votings.short_title.
 
-Single path: LLM rewrite of `acts.title` via deepseek-v4-flash. No PDF read,
+Single path: LLM rewrite of `acts.title` via deepseek-flash. No PDF read,
 no print fast-path — `processes.eli_act_id → process_stages.print_id` linkage
 is multi-print without a "main" marker, and Obwieszczenia / MP entries lack
 any sejm print at all.
 
-Idempotent: rows enriched within RECENT_THRESHOLD_DAYS are skipped unless
-force=True.
+Idempotent: existing short titles are reused unless force=True.
 """
 from __future__ import annotations
 
@@ -25,14 +24,13 @@ from pydantic import BaseModel, ConfigDict, Field
 from supagraf.db import supabase
 from supagraf.enrich import LLM_MODELS
 from supagraf.enrich.audit import with_model_run
-from supagraf.enrich.llm import call_structured
+from supagraf.enrich.llm import LLMBudgetError, call_structured
 
 JOB_NAME = "act_short_title"
 PROMPT_NAME = "act_short_title"
 
 ACT_LLM_MODEL = os.environ.get("SUPAGRAF_ACT_LLM_MODEL", LLM_MODELS["flash"])
 MAX_SHORT_TITLE_CHARS = 120
-RECENT_THRESHOLD_DAYS = 30
 
 
 class ShortTitleOut(BaseModel):
@@ -82,6 +80,7 @@ def enrich_one_act(
         user_input=user_input,
         output_model=ShortTitleOut,
         prompt_version=prompt_version,
+        max_tokens=256,
     )
     parsed: ShortTitleOut = call.parsed  # type: ignore[assignment]
     cleaned = parsed.short_title.strip()[:MAX_SHORT_TITLE_CHARS]
@@ -110,8 +109,7 @@ def fetch_pending_acts(
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).date().isoformat()
         q = q.gte("legal_status_date", cutoff)
     if not force:
-        threshold = (datetime.now(timezone.utc) - timedelta(days=RECENT_THRESHOLD_DAYS)).isoformat()
-        q = q.or_(f"short_title.is.null,short_title_enriched_at.lt.{threshold}")
+        q = q.is_("short_title", "null")
     q = q.order("legal_status_date", desc=True)
     if limit > 0:
         q = q.limit(limit)
@@ -151,6 +149,8 @@ def enrich_acts(
             n_llm += 1
             if n_llm % 25 == 0:
                 logger.info("enriched {}/{}", n_llm, len(pending))
+        except LLMBudgetError:
+            raise  # Stop on invalid credentials/balance; leave remaining rows pending.
         except Exception as e:
             n_failed += 1
             logger.error("act {} failed: {!r}", aid, e)
