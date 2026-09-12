@@ -23,6 +23,14 @@ FEEDBACK_POLICY_VERSION = "2026-09-12-courtroom-rejection-v1"
 REJECTED_SHA256 = {
     "4edd75f9d6d41a13c9537876d019f336f562bdadae6ffc73933d3d1ee5285592",
     "14f1e01b8bde723099391617a8067c10d69583860bab1f1e17e7d1326a11bc08",
+    # Human editorial rejection: generic institutional-corridor candidates, 2026-09-12.
+    "a962303015fbbd8fb26d3b7878b1ccb17000e89f5d113d2720f0f4201b2488ca",
+    "ad5346a582b521987ad5bca448f120caa5ccba46f1b33796bfe0348a41ad2da9",
+    # Human editorial rejection: weak crypto metaphor and visible fingers/marks, 2026-09-12.
+    "3d3638b09408cc1d4ed9e898bfe90944a45cc5f85abef9e2a6da9ef05da93b41",
+    "2a40c5f8dd443c21636913e5dfdbebb80d31f5bd1ad5309cb0f305596e73640e",
+    "85b20b0a8ab4b250e3b688c11b2d46795baccfcd6dc7d5274a6d0ffc2051d3e6",
+    "c1b7540537d956c71663ebec5826c0a440f70bc6de25f9df95c936347fa8df79",
 }
 
 
