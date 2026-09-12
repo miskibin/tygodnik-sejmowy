@@ -58,3 +58,9 @@ Model kontrolny pozostaje omylny. `approved` oznacza przejście kontroli automat
 Trzy artykuły, sześciu kandydatów: cztery generacje (jezioro/wiatrak) oraz dwa autentyczne zdjęcia ETPC. Kontrola szczegółów odrzuciła fotografię `(2).jpg` z widocznym graffiti i wybrała `(1).jpg`. Wszystkie trzy artykuły otrzymały kandydaturę w `selected.json`; odrzucone wnętrza są wyłączone trwałą polityką redakcyjną. Galeria wyników: `artifacts/image-trial-20260912/pipeline-v1/index.html`.
 
 Pełna ocena sześciu kandydatów z analizą zbliżeń zużyła 18 001 tokenów wejścia i 662 wyjścia; estymacja klienta wyniosła około 0,0028 USD za ten etap (bez wcześniejszych prób deweloperskich). Ponowne wykonanie tego samego przebiegu korzysta z cache; osobny `cached-run.json` dokumentuje zerowe wywołania.
+
+## Wydanie obrazów bieżącej edycji — 12 września 2026
+
+Prompt planowania v2 wyklucza każde wnętrze, powtarzalne dekoracje biurkowe, osoby i czytelne oznaczenia. Dla sześciu nowych artykułów użyto zapisanych `editorial_override` wyłącznie po tym, gdy plan automatyczny proponował sceny niedopuszczalne; proweniencja override’u, modelu, rewizji, seeda i recenzji jest w manifeście publikacji. Redaktor wizualnie zatwierdza konkretny hash przed publikacją. Ręcznie odrzucone korytarze, urządzenia z niejednoznaczną tematyką oraz warianty z palcami lub oznaczeniami są w `REJECTED_SHA256` i nie mogą wrócić pod inną nazwą.
+
+`scripts/illustrations/publish_selected.py` publikuje tylko pełny manifest: przed jednym upsertem sprawdza hashe i wymiary wszystkich assetów oraz jednoznaczność każdego `term/number`, a przed zapisem tworzy prywatny snapshot rollbacku. W publikowanym `image.metadata` pozostają model, rewizja, seed i hashe recenzji.

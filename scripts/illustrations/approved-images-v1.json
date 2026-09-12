@@ -1,15 +1,6 @@
 [
   {
     "term": 10,
-    "number": "2866",
-    "sha256": "bbb1ae85748c8faa2464b2a41343fd03af4e60d87492fafeb7a044ff1824a11e",
-    "url": "/editorial/term-10/2866-lake-bbb1ae85.png",
-    "provider": "generated",
-    "caption": "Puste kąpielisko nad jeziorem z drewnianym pomostem, bez osób i oznakowania.",
-    "alt": "Puste kąpielisko nad jeziorem z drewnianym pomostem."
-  },
-  {
-    "term": 10,
     "number": "1130",
     "sha256": "d735ef28cc728a40aa24b50b720dc1ee83b187fde7093e9664844d318f503ac3",
     "url": "/editorial/term-10/1367-wind-d735ef28.png",
@@ -30,5 +21,164 @@
     "license": "CC BY-SA 4.0",
     "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
     "source_url": "https://commons.wikimedia.org/wiki/File:Cour_europ%C3%A9enne_des_droits_de_l%27homme_(Strasbourg)_(1).jpg"
+  },
+  {
+    "term": 10,
+    "number": "2670",
+    "sha256": "afdffa1149bc2a8236d840c65675dabb067a9762faacf0a1123a6465317993b4",
+    "url": "/editorial/term-10/2670-election-paper-afdffa11.png",
+    "provider": "generated",
+    "caption": "Złożona kartka papieru — ilustracja tematu wyborów.",
+    "alt": "Złożona biała kartka papieru na drewnianym tle.",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — FLUX.2 [klein] 4B",
+    "metadata": {
+      "model": "black-forest-labs/FLUX.2-klein-4B",
+      "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+      "seed": 257151421,
+      "review_model": "deepseek-flash",
+      "review_prompt_version": 4,
+      "review_image_sha256": "afdffa1149bc2a8236d840c65675dabb067a9762faacf0a1123a6465317993b4",
+      "review_raw_response_sha256": "59ec228016506c2ef247b686761187e1fabcb79792906d7569973124293b1f01",
+      "planner": {
+        "model": "editorial_override",
+        "policy": "current-edition-v3-non-interior-objects",
+        "article_number": "2670"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2710",
+    "sha256": "b7ad52556eae4557f79f1062a8d5af6620df0d5a1ad5657631e7d3ea140c095c",
+    "url": "/editorial/term-10/2710-crypto-security-b7ad5255.png",
+    "provider": "generated",
+    "caption": "Kłódka — ilustracja bezpieczeństwa aktywów cyfrowych.",
+    "alt": "Nieoznakowana kłódka na ciemnym kamieniu.",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — FLUX.2 [klein] 4B",
+    "metadata": {
+      "model": "black-forest-labs/FLUX.2-klein-4B",
+      "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+      "seed": 127483824,
+      "review_model": "deepseek-flash",
+      "review_prompt_version": 4,
+      "review_image_sha256": "b7ad52556eae4557f79f1062a8d5af6620df0d5a1ad5657631e7d3ea140c095c",
+      "review_raw_response_sha256": "db13546d6b9e7f5fbad6cba6f954c132c82905c231e9af6330981e838191b893",
+      "planner": {
+        "model": "editorial_override",
+        "policy": "current-edition-v4-final-subjects",
+        "article_number": "2710"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2737",
+    "sha256": "91dd9c2e7d4e2eee805e3cb52428d136c54eb7b182c9eb2384d6ee6738fb5823",
+    "url": "/editorial/term-10/2737-company-notice-91dd9c2e.png",
+    "provider": "generated",
+    "caption": "Koperta i papier — ilustracja zawiadomień i pełnomocnictw.",
+    "alt": "Koperta i kartka papieru na neutralnym tle.",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — FLUX.2 [klein] 4B",
+    "metadata": {
+      "model": "black-forest-labs/FLUX.2-klein-4B",
+      "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+      "seed": 1008368278,
+      "review_model": "deepseek-flash",
+      "review_prompt_version": 4,
+      "review_image_sha256": "91dd9c2e7d4e2eee805e3cb52428d136c54eb7b182c9eb2384d6ee6738fb5823",
+      "review_raw_response_sha256": "c4f770889a3dbf282e57ff74caed36b7b61b502e2919322f6ef827394307cbd6",
+      "planner": {
+        "model": "editorial_override",
+        "policy": "current-edition-v3-non-interior-objects",
+        "article_number": "2737"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2769",
+    "sha256": "36aee3e2b9b639b258d45daed005adc1969d2a4def743ecc93ef855f1e7afe97",
+    "url": "/editorial/term-10/2769-political-ad-36aee3e2.png",
+    "provider": "generated",
+    "caption": "Pusty nośnik reklamy przy drodze. Ilustracja tematu reklamy politycznej.",
+    "alt": "Pusty biały nośnik reklamy przy drodze.",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — FLUX.2 [klein] 4B",
+    "metadata": {
+      "model": "black-forest-labs/FLUX.2-klein-4B",
+      "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+      "seed": 156017192,
+      "review_model": "deepseek-flash",
+      "review_prompt_version": 4,
+      "review_image_sha256": "36aee3e2b9b639b258d45daed005adc1969d2a4def743ecc93ef855f1e7afe97",
+      "review_raw_response_sha256": "bcb3685511017a31dba1c2669c2238be6ea8470228103f60dec5924f18a5bc1c",
+      "planner": {
+        "model": "editorial_override",
+        "policy": "current-edition-v3-non-interior-objects",
+        "article_number": "2769"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2799",
+    "sha256": "ee36538b30bf871394ef9ed5740fe79f6ee3e5150b1997f39457f4682bcd0be7",
+    "url": "/editorial/term-10/2799-repairability-ee36538b.png",
+    "provider": "generated",
+    "caption": "Elementy złączne i uszczelka — ilustracja naprawialności produktów.",
+    "alt": "Elementy złączne i gumowa uszczelka na drewnianej powierzchni.",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — FLUX.2 [klein] 4B",
+    "metadata": {
+      "model": "black-forest-labs/FLUX.2-klein-4B",
+      "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+      "seed": 1428087308,
+      "review_model": "deepseek-flash",
+      "review_prompt_version": 4,
+      "review_image_sha256": "ee36538b30bf871394ef9ed5740fe79f6ee3e5150b1997f39457f4682bcd0be7",
+      "review_raw_response_sha256": "0216da7a47cf8b6dffca71b639a8fdc0cb0b112c64eca0088ef7a8727b8a2314",
+      "planner": {
+        "model": "editorial_override",
+        "policy": "current-edition-v4-final-subjects",
+        "article_number": "2799"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2801",
+    "sha256": "b7bb5fec1551150be27f64fa11d6d3f3cde2cffbb82663beae828700fa1b2db9",
+    "url": "/editorial/term-10/2801-electronic-communication-b7bb5fec.png",
+    "provider": "generated",
+    "caption": "Zamknięty laptop z podłączonymi przewodami.",
+    "alt": "Zamknięty laptop z podłączonymi przewodami.",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — FLUX.2 [klein] 4B",
+    "metadata": {
+      "model": "black-forest-labs/FLUX.2-klein-4B",
+      "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+      "seed": 1282300532,
+      "review_model": "deepseek-flash",
+      "review_prompt_version": 4,
+      "review_image_sha256": "b7bb5fec1551150be27f64fa11d6d3f3cde2cffbb82663beae828700fa1b2db9",
+      "review_raw_response_sha256": "c920bf39d8d85db73e0341a88977131f8913c0b01f3facd5741a30bff62674ec",
+      "planner": {
+        "model": "editorial_override",
+        "policy": "current-edition-v3-non-interior-objects",
+        "article_number": "2801"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2866",
+    "sha256": "bbb1ae85748c8faa2464b2a41343fd03af4e60d87492fafeb7a044ff1824a11e",
+    "url": "/editorial/term-10/2866-lake-bbb1ae85.png",
+    "provider": "generated",
+    "caption": "Puste kąpielisko nad jeziorem z drewnianym pomostem, bez osób i oznakowania.",
+    "alt": "Puste kąpielisko nad jeziorem z drewnianym pomostem."
   }
 ]

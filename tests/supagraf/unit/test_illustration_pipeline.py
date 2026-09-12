@@ -161,3 +161,22 @@ def test_plan_rejects_undeclared_llm_fields():
     import pytest
     with pytest.raises(Exception):
         Plan.model_validate({"route":"none","subject":"x","reason":"x","requiredIdentity":"ETPC"})
+
+
+def test_generic_corridor_is_never_generated():
+    article = _article("Reklama polityczna — organy i kary")
+    plan = guard_plan(article, Plan(route="generate", subject="empty institutional corridor", reason="", prompt="empty administrative corridor"))
+    assert plan.route == "none"
+    assert "interior" in plan.reason.lower()
+
+
+def test_outdoor_political_ad_panel_remains_a_safe_generated_subject():
+    article = _article("Reklama polityczna — organy i kary")
+    plan = guard_plan(article, Plan(route="generate", subject="blank outdoor advertising panel beside an empty street", reason="", prompt="realistic photograph of one blank outdoor advertising panel beside an empty street, no people, no text, no logos"))
+    assert plan.route == "generate"
+    assert plan.subject.startswith("blank outdoor advertising panel")
+
+def test_explicit_no_interiors_does_not_turn_an_outdoor_plan_into_an_interior():
+    article = _article("Reklama polityczna — organy i kary")
+    plan = guard_plan(article, Plan(route="generate", subject="blank outdoor advertising panel", reason="", prompt="realistic outdoor advertising panel by an empty street, no people, no text, no logos, no signs, no letters, no interiors"))
+    assert plan.route == "generate"

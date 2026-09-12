@@ -22,7 +22,7 @@ def publish(manifest: Path, assets_root: Path, *, dry_run: bool = True, rollback
         rows = sb.table("prints").select("id,title,short_title").eq("term",term).eq("number",number).limit(2).execute().data or []
         if len(rows) != 1: raise ValueError(f"print not uniquely found: {term}/{number}")
         title = " ".join(filter(None,[rows[0].get("title"),rows[0].get("short_title")]))
-        image={"url":item["url"],"source_url":item.get("source_url", ""),"author":item.get("author", "Tygodnik Sejmowy"),"license":item.get("license", "Ilustracja AI — FLUX.2 [klein] 4B"),"license_url":item.get("license_url", ""),"caption":item["caption"],"alt":item["alt"],"provider":item["provider"],"editorial_selected":True,"width":width,"height":height,"sha256":expected,"source_print_number":item.get("source_print_number", number)}
+        image={"url":item["url"],"source_url":item.get("source_url", ""),"author":item.get("author", "Tygodnik Sejmowy"),"license":item.get("license", "Ilustracja AI — FLUX.2 [klein] 4B"),"license_url":item.get("license_url", ""),"caption":item["caption"],"alt":item["alt"],"provider":item["provider"],"editorial_selected":True,"width":width,"height":height,"sha256":expected,"source_print_number":item.get("source_print_number", number),"metadata":item.get("metadata", {})}
         payloads.append({"print_id":rows[0]["id"],"status":"matched","subject_hash":hashlib.sha256(title.encode()).hexdigest(),"catalog_hash":f"approved-v1:{expected}","image":image}); print_ids.append(rows[0]["id"])
     if dry_run: return payloads
     existing = sb.table("print_images").select("*").in_("print_id",print_ids).execute().data or []

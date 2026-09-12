@@ -11,14 +11,15 @@ from .models import Article, Plan
 
 PLANNER_MODEL = LLM_MODELS["flash"]
 PLAN_PROMPT = "illustration_plan"
-PLAN_PROMPT_VERSION = 1
+PLAN_PROMPT_VERSION = 2
 
 # The rejected ETPC courtroom concept must never be regenerated as generic decor.
 _AUTHENTIC_ONLY = re.compile(
     r"\b(?:ETPC|ECHR|Europejski Trybunał Praw Człowieka|European Court of Human Rights|"
     r"Strasbourg|Trybunał Konstytucyjny|Sąd Najwyższy|Sejm|Senat)\b", re.I
 )
-_INVENTED_INTERIOR = re.compile(r"\b(?:courtroom|court room|sala sądowa|sądowa|hearing room|interior)\b", re.I)
+_INVENTED_INTERIOR = re.compile(r"\b(?:courtroom|court room|sala sądowa|sądowa|hearing room|interior|office|corridor|meeting room|workplace|workshop|polling station|ballot box|biuro|korytarz|sala spotkań|miejsce pracy|warsztat|lokal wyborczy|urna wyborcza)\b", re.I)
+_NEGATED_INTERIOR = re.compile(r"\b(?:no|without)\s+(?:any\s+)?interiors?\b", re.I)
 
 
 def article_payload(article: Article) -> str:
@@ -39,9 +40,9 @@ def guard_plan(article: Article, plan: Plan) -> Plan:
         return Plan(route="authentic", subject=identity,
                     reason="Exact real identity requires an authenticated source image.",
                     prompt="", search_queries=queries[:2], required_identity=identity)
-    if plan.route == "generate" and _INVENTED_INTERIOR.search(plan.prompt + " " + plan.subject):
+    if plan.route == "generate" and _INVENTED_INTERIOR.search(_NEGATED_INTERIOR.sub("", plan.prompt) + " " + plan.subject):
         return Plan(route="none", subject=plan.subject,
-                    reason="Generic courtroom or institutional interiors are not generated.",
+                    reason="Generic interior scenes are not generated.",
                     prompt="", search_queries=[], required_identity="")
     if plan.route == "generate":
         return Plan(route="generate", subject=plan.subject, reason=plan.reason,
