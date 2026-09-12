@@ -55,14 +55,17 @@ def _fingerprint(adapter: CandidateFinder | None, supplied: str) -> str:
 
 
 def _reuse_candidates(entry: dict | None, expires_s: int = 0) -> list[Candidate]:
-    if not entry:
+    """Reuse only well-formed, current manifests whose files match recorded hashes."""
+    if not isinstance(entry, dict):
         return []
-    values = [Candidate.model_validate(v) for v in entry.get("candidates", [])]
     try:
-        return values if values and all(_file_sha(c.local_path) and _file_sha(c.local_path) == entry.get("sha256", {}).get(c.id) for c in values) else []
-    except (TypeError, AttributeError):
+        if expires_s and datetime.fromisoformat(entry["created_at"]) < datetime.now(timezone.utc) - timedelta(seconds=expires_s):
+            return []
+        values = [Candidate.model_validate(value) for value in entry["candidates"]]
+        hashes = entry["sha256"]
+        return values if values and all(_file_sha(c.local_path) and _file_sha(c.local_path) == hashes.get(c.id) for c in values) else []
+    except (KeyError, TypeError, ValueError, OSError):
         return []
-
 
 def run_pipeline(articles: list[Article], output_dir: Path, generate: bool = False, *,
                  planner: Planner = plan_article, reviewer: Reviewer = review_candidate,
@@ -114,8 +117,12 @@ def run_pipeline(articles: list[Article], output_dir: Path, generate: bool = Fal
             review_key = _digest({"plan": plan_hash, "candidate": candidate.model_dump(exclude={"local_path"}), "image_sha256": image_sha,
                                   "model": REVIEW_MODEL, "prompt": _prompt_sha("illustration_review", REVIEW_PROMPT_VERSION), "feedback": {"version": FEEDBACK_POLICY_VERSION, "hashes": sorted(__import__("supagraf.enrich.illustrations.review", fromlist=["REJECTED_SHA256"]).REJECTED_SHA256)}})
             cached_review = review_cache.get(review_key)
-            if cached_review:
-                review, review_provenance, review_hit = Review.model_validate(cached_review["review"]), cached_review.get("provenance", {}), True
+            try:
+                cached_review_valid = Review.model_validate(cached_review["review"]) if cached_review else None
+            except (KeyError, TypeError, ValueError):
+                cached_review_valid = None
+            if cached_review_valid:
+                review, review_provenance, review_hit = cached_review_valid, cached_review.get("provenance", {}), True
             else:
                 report["metrics"]["review_calls"] += 1
                 try:
