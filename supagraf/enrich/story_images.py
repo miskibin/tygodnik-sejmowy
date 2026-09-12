@@ -34,7 +34,7 @@ def trusted_url(url: str, hosts: set[str]) -> bool:
 def match_rule(title: str, catalog: list[dict]) -> dict | None:
     matches = [rule for rule in catalog if re.search(rule["pattern"], title, re.I)]
     # Ambiguous multiple subjects are better left without a picture.
-    return matches[0] if len(matches) == 1 else None
+    return matches[0] if len(matches) == 1 and matches[0].get("enabled", True) else None
 
 
 def parse_image(page: dict, rule: dict) -> dict | None:

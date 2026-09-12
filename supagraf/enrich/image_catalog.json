@@ -9,7 +9,9 @@
     "id": "elections",
     "pattern": "\\b(?:kodeks\\w* wyborcz\\w*|komisj\\w* wyborcz\\w*|obwod\\w* głosowania)\\b",
     "file": "File:2010 Poland elections round 2 ballot box.jpg",
-    "caption": "Urna podczas wyborów prezydenckich w Polsce w 2010 r. Zdjęcie archiwalne, ilustracyjne."
+    "caption": "Urna podczas wyborów prezydenckich w Polsce w 2010 r. Zdjęcie archiwalne, ilustracyjne.",
+    "enabled": false,
+    "editorial_note": "Rejected by the editor: dated ballot-box snapshot does not fit the publication."
   },
   {
     "id": "bathing",

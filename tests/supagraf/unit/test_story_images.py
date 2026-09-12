@@ -24,7 +24,7 @@ def page():
 
 
 def test_concrete_subject_only_and_ambiguity_abstains():
-    assert match_rule('Zmiana Kodeksu wyborczego', CATALOG)['id'] == 'elections'
+    assert match_rule('Zmiana Kodeksu wyborczego', CATALOG) is None
     assert match_rule('Jakość wody w kąpieliskach', CATALOG)['id'] == 'bathing'
     assert match_rule('Sprawozdanie komisji', CATALOG) is None
     assert match_rule('Kodeks wyborczy i elektrownie wiatrowe', CATALOG) is None
@@ -73,7 +73,7 @@ class Client:
 
     def execute(self):
         if self.table_name == 'prints':
-            return SimpleNamespace(data=[{'id': 1, 'number': '123', 'title': 'Kodeks wyborczy', 'short_title': None}])
+            return SimpleNamespace(data=[{'id': 1, 'number': '123', 'title': 'Jakość wody w kąpieliskach', 'short_title': None}])
         return SimpleNamespace(data=copy.deepcopy(self.saved))
 
     def upsert(self, payload, **_):
