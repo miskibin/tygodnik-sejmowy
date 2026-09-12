@@ -11,7 +11,7 @@ export function StoryPhoto({ image }: { image: StoryImage }) {
   const generated = image.provider === "generated";
   return <figure className={styles.storyPhoto}>
     <Image src={image.url} alt={image.alt} width={image.width} height={image.height}
-      sizes="(max-width: 760px) 160px, 240px" loading="lazy"
+      sizes="240px" loading="lazy"
       onError={() => setFailed(true)} />
     <figcaption>
       <details>
@@ -24,3 +24,4 @@ export function StoryPhoto({ image }: { image: StoryImage }) {
     </figcaption>
   </figure>;
 }
+

@@ -46,7 +46,9 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
             {!amendmentsOnly && result.label.startsWith("Wniosek") && !/odrzucenie projektu/.test(result.label) && <p className={styles.procedure}>{result.question}</p>}
           </div>
         )}
-        {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
+        <div className={styles.storyIntro}>
+          {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
+          <div className={styles.storyIntroText}>
         {story.projectSummaries && story.projectSummaries.length > 0 ? (
           story.projectSummaries.map(p => <div key={p.number} className={styles.summary}>
             <Link href={`/proces/${term}/${p.number}`} className={styles.summaryLabel}>Projekt {p.number}: </Link>
@@ -56,6 +58,8 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
           {hasProjects && <span className={styles.summaryLabel}>Założenia projektu: </span>}
           <WeeklySummary term={term} text={story.summary} />
         </div>}
+          </div>
+        </div>
         {main && !amendmentsOnly && <figure className={styles.mainVote}>
           <figcaption>Głosowanie nr {main.voting_number} · {result?.question}</figcaption>
           <VoteBreakdown vote={main} />
