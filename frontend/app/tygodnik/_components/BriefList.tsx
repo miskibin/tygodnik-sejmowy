@@ -32,17 +32,12 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
 
   return (
     <article className={styles.story} id={`sprawa-${story.id}`} aria-labelledby={`tytul-${story.id}`}>
-      <div className={story.image ? styles.storyLeadIllustrated : styles.storyLead}>
-        {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
-        <div className={styles.storyHeading}>
       <div className={styles.storyMeta}>
         {(story.phase !== "Debata i głosowania" || !main) && !story.title.toLocaleLowerCase("pl").includes(story.phase.toLocaleLowerCase("pl")) && <span>{story.phase}</span>}
         {main?.date && <time dateTime={main.date}>{new Date(main.date).toLocaleDateString("pl-PL", { day: "numeric", month: "long" })}</time>}
       </div>
       <h2 id={`tytul-${story.id}`} className={styles.storyTitle}>{href ? <Link href={href}>{story.title}</Link> : story.title}</h2>
-        </div>
-      </div>
-      <div className={styles.storyBody}>
+      <div className={`${styles.storyBody} ${story.image ? styles.storyBodyIllustrated : ""}`}>
         {main && result && (
           <div className={styles.result}>
             <p><strong>{amendmentsOnly ? senateResult : result.label}</strong></p>
@@ -51,6 +46,7 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
             {!amendmentsOnly && result.label.startsWith("Wniosek") && !/odrzucenie projektu/.test(result.label) && <p className={styles.procedure}>{result.question}</p>}
           </div>
         )}
+        {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
         <div className={styles.storyIntro}>
           <div className={styles.storyIntroText}>
         {story.projectSummaries && story.projectSummaries.length > 0 ? (
