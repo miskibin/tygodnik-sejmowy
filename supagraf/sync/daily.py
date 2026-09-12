@@ -130,6 +130,8 @@ def _enrich_phase(ctx: SyncContext, ledger: RunLedger, workers: int | None) -> N
         logger.warning("DeepSeek peak pricing window (weekdays 01-04 & 06-10 UTC) — enrichment costs 2x")
     w, term = workers or DEFAULT_WORKERS, ctx.term
     _run(ledger, "enrich:prints", lambda: enrich_pending_prints(term=term, workers=w).to_dict())
+    from supagraf.enrich.story_images import run_images
+    _run(ledger, "enrich:images", lambda: run_images(term=term))
     _run(ledger, "enrich:statements", lambda: enrich_pending_statements(term=term, workers=w).to_dict())
     _run(ledger, "enrich:voting_short_title",
          lambda: dict(zip(("fast", "llm", "failed"), enrich_votings(term=term, days=30))))

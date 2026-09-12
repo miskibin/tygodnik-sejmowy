@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { SectionHead } from "./SectionHead";
 import type { KlubHeatmap } from "@/lib/db/atlas";
 import { KLUB_LABELS } from "@/lib/atlas/constants";
@@ -54,7 +54,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
   if (data.klubs.length === 0) {
     return (
       <section className="min-w-0">
-        <SectionHead num="02" kicker="Koalicje" title="Kto z kim głosuje" sub="Brak danych — zapytanie do bazy nie zwróciło wyników." />
+        <SectionHead title="Zgodność klubów w głosowaniach" sub="Brak danych — zapytanie do bazy nie zwróciło wyników." />
       </section>
     );
   }
@@ -82,9 +82,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
   return (
     <section className="min-w-0">
       <SectionHead
-        num="02"
-        kicker="Realne koalicje"
-        title="Kto z kim faktycznie głosuje"
+        title="Zgodność klubów w głosowaniach"
         sub="Macierz % zgodności w głosowaniach plenarnych. Bazujemy na większości w klubie — dwa kluby „zgodne” w danym głosowaniu, jeśli ich modalny głos się pokrywa."
       />
 
@@ -130,9 +128,8 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
               </div>
             ))}
             {klubs.map((ka, i) => (
-              <>
+              <Fragment key={`row-${ka}`}>
                 <div
-                  key={`row-${ka}`}
                   className="bg-background flex items-center justify-center gap-0 pr-2 md:justify-end md:gap-2 md:pr-3 font-sans text-[12px] font-medium text-foreground"
                 >
                   <span className="inline-flex origin-center scale-[1.85] md:scale-100">
@@ -185,7 +182,7 @@ export function HeatmapaKoalicji({ data }: { data: KlubHeatmap }) {
                     </button>
                   );
                 })}
-              </>
+              </Fragment>
             ))}
           </div>
           </div>

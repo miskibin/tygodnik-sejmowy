@@ -26,7 +26,7 @@ export default async function PosiedzenieIndexPage() {
       <div className="max-w-[1280px] mx-auto px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 min-w-0">
         <PageBreadcrumb
           items={[{ label: "Posiedzenia" }]}
-          subtitle={`${rows.length} posiedzeń w X kadencji — wyszukaj po numerze lub tytule.`}
+          subtitle={`Ostatnie ${rows.length} posiedzeń X kadencji.`}
         />
 
         <PosiedzeniaDirectoryClient rows={rows} />

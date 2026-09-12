@@ -10,6 +10,7 @@ import { SearchHero } from "@/components/lists/SearchHero";
 import { FilterChipRow, type FilterChipOption } from "@/components/lists/FilterChipRow";
 import { SortButtons } from "@/components/lists/SortButtons";
 import { ViewToggle } from "@/components/lists/ViewToggle";
+import { PostcodeDistrictLookup } from "./PostcodeDistrictLookup";
 
 type MpRow = MpListItem & {
   attendancePct: number | null;
@@ -96,6 +97,7 @@ export function PoselDirectoryClient({ mps }: { mps: MpRow[] }) {
 
   return (
     <div className="min-w-0">
+      <PostcodeDistrictLookup />
       <SearchHero
         value={query}
         onChange={setQuery}
@@ -111,7 +113,7 @@ export function PoselDirectoryClient({ mps }: { mps: MpRow[] }) {
       />
 
       <div className="flex flex-wrap items-center gap-3 mb-6 font-sans text-[12px]">
-        {district ? (
+        {district && (
           <button
             type="button"
             onClick={() => setDistrictOnly((v) => !v)}
@@ -125,10 +127,6 @@ export function PoselDirectoryClient({ mps }: { mps: MpRow[] }) {
             <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-destructive" />
             Tylko Twój okręg {district.num}
           </button>
-        ) : (
-          <span className="text-[12px] text-muted-foreground">
-            Ustaw kod pocztowy na stronie głównej, żeby filtrować po Twoim okręgu.
-          </span>
         )}
 
         <span className="flex-1" aria-hidden />

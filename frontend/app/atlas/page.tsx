@@ -52,12 +52,12 @@ export default async function AtlasPage() {
       <div className="max-w-[1280px] mx-auto min-w-0 w-full">
         <PageBreadcrumb
           items={[{ label: "Atlas" }]}
-          subtitle={`Aktualizacja: ${formatDataUpdate(lastUpdate)} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: ETL sejmograf + API Sejmu RP`}
+          subtitle={`Aktualizacja: ${formatDataUpdate(lastUpdate)} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: Sejm RP`}
         />
 
         <Link href="/powiazania" className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 p-5 hover:bg-muted">
-          <span><span className="text-xs uppercase tracking-wider text-muted-foreground">Eksperyment</span><span className="mt-1 block text-xl font-medium">Co łączy posłów?</span></span>
-          <span className="text-sm">Odkryj mapę powiązań →</span>
+          <span><span className="text-xs uppercase tracking-wider text-muted-foreground">Eksperyment</span><span className="mt-1 block text-xl font-medium">Powiązania posłów</span></span>
+          <span className="text-sm">Zobacz powiązania posłów →</span>
         </Link>
         <div className="grid gap-12 sm:gap-16 md:gap-20 min-w-0 [&>*]:min-w-0">
           <MapaOkregow data={mapData} />
@@ -70,7 +70,7 @@ export default async function AtlasPage() {
 
         <footer className="mt-12 sm:mt-20 pt-6 border-t border-rule text-[13px] sm:text-[14px] text-muted-foreground leading-[1.6]">
           <p className="m-0 max-w-[760px]">
-            Wszystkie wykresy odświeżane na żywo z bazy supagraf (district_klub_stats, klub_pair_agreement_mv, voting_by_club_mv, prints.topic, klub_flow_quarter, mp_minister_reply_lag).
+             Wykresy są odświeżane automatycznie na podstawie danych Sejmu RP.
           </p>
         </footer>
       </div>

@@ -8,7 +8,9 @@ const nextConfig: NextConfig = {
   // cacheComponents disabled — pages still hit dynamic APIs (Date(), useProfile)
   // without Suspense/use-cache wrappers. Re-enable after sweep.
   productionBrowserSourceMaps: false,
-  images: { formats: ["image/avif", "image/webp"] },
+  images: { formats: ["image/avif", "image/webp"], remotePatterns: [
+    { protocol: "https", hostname: "upload.wikimedia.org", pathname: "/wikipedia/commons/**" },
+  ] },
   experimental: {
     optimizePackageImports: [
       "lucide-react",

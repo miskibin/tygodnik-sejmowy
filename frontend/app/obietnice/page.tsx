@@ -51,7 +51,7 @@ export default async function ObietnicePage({
       <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-6 md:pt-8">
         <PageBreadcrumb
           items={[{ label: "Obietnice" }]}
-          subtitle={`${total} obietnic z kampanii 2023 — co partie obiecały, co rusza w Sejmie.`}
+          subtitle={`${total} obietnic z kampanii 2023.`}
         />
         <ObietniceClient rows={rows} counts={counts} total={total} />
       </div>

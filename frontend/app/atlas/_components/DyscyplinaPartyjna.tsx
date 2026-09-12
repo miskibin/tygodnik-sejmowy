@@ -10,7 +10,7 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
   if (data.length === 0) {
     return (
       <section className="min-w-0">
-        <SectionHead num="05" kicker="Monolit czy fronda?" title="Dyscyplina klubowa" sub="Brak danych." />
+        <SectionHead title="Dyscyplina klubowa" sub="Brak danych." />
       </section>
     );
   }
@@ -20,8 +20,6 @@ export function DyscyplinaPartyjna({ data }: { data: DisciplineRow[] }) {
   return (
     <section className="min-w-0">
       <SectionHead
-        num="05"
-        kicker="Monolit czy fronda?"
         title="Dyscyplina klubowa"
         sub={`Średni odsetek głosów zgodnych z linią klubu (czyli głosów „w stronę większości"). Próba: ${top.votings.toLocaleString("pl-PL")} głosowań w X kadencji.`}
       />

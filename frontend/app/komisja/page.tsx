@@ -23,7 +23,7 @@ const GROUP_HEADING: Record<GroupKey, string> = {
 };
 
 const GROUP_BLURB: Record<GroupKey, string> = {
-  STANDING: "Stałe komitety przedmiotowe (zdrowie, edukacja, finanse…). Pracują przez całą kadencję.",
+  STANDING: "Stałe komisje przedmiotowe (zdrowie, edukacja, finanse…). Pracują przez całą kadencję.",
   EXTRAORDINARY: "Powołane ad hoc do konkretnego tematu lub projektu ustawy.",
   INVESTIGATIVE: "Sejmowe komisje badające konkretne sprawy publiczne. Funkcja zbliżona do procesu sądowego.",
   OTHER: "Komisje pozostałe — np. regulaminowa, etyki, sprawozdawcza.",
@@ -142,13 +142,13 @@ export default async function KomisjaIndexPage() {
 
           return (
             <section key={k}>
-              <div
-                className={`font-sans text-[11px] font-medium mb-2 ${
+              <h2
+                className={`font-sans text-[18px] font-medium mb-2 ${
                   isDim ? "text-muted-foreground" : "text-destructive"
                 }`}
               >
-                ✶ {GROUP_HEADING[k]} · {list.length}
-              </div>
+                {GROUP_HEADING[k]} <span className="ml-1 text-muted-foreground">({list.length})</span>
+              </h2>
               <p className="font-sans text-[12px] text-muted-foreground max-w-[680px] mb-4 leading-relaxed">
                 {GROUP_BLURB[k]}
               </p>

@@ -131,7 +131,7 @@ export function NetworkExplorer({ data, stale = false }: { data: NetworkSnapshot
         </section>
 
         <aside className="min-w-0 space-y-5" aria-label="Wyjaśnienie powiązania" aria-live="polite">
-          <div className="hidden md:block">{focused ? <ConnectionDetail connection={focused} selected={selected} onExplore={selectPerson} /> : <div className="rounded-2xl border border-border p-6"><GitBranch size={22} className="mb-4 text-muted-foreground" /><h2 className="text-lg font-medium">Każda linia ma swoją historię</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Wybierz osobę i relację, aby zobaczyć wspólne działania oraz ich źródła.</p></div>}</div>
+          <div className="hidden md:block">{focused ? <ConnectionDetail connection={focused} selected={selected} onExplore={selectPerson} /> : <div className="rounded-2xl border border-border p-6"><GitBranch size={22} className="mb-4 text-muted-foreground" /><h2 className="text-lg font-medium">Wybierz relację</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Zobacz wspólne działania i źródła.</p></div>}</div>
           {deviation && deviation.n > 0 && <div className="rounded-2xl bg-muted/60 p-5"><p className="mb-2 text-xs text-muted-foreground">{selected.name} · głosowania w próbie</p><h3 className="text-base font-medium">Inaczej niż większość klubu</h3><p className="mt-3 text-2xl font-semibold tabular-nums">{deviation.deviations} <span className="text-base font-normal text-muted-foreground">z {deviation.n} głosowań</span></p><p className="mt-2 text-xs leading-relaxed text-muted-foreground">Porównanie z klubem w dniu głosowania. Pomijamy remisy, nieobecności i zbyt małe grupy. To opis zachowania w próbie.</p></div>}
           <Link href={`/posel/${selected.mp_id}`} className="flex items-center justify-between px-1 py-3 text-sm hover:underline">Profil: {selected.name} <ArrowUpRight size={16} /></Link>
         </aside>
@@ -154,15 +154,15 @@ function ConnectionDetail({ connection, selected, onExplore, compact = false }: 
   const question = isQuestion(edge);
   const evidence: Evidence[] = edge.evidence;
   return <section className={compact ? "bg-muted/40 px-3 py-5" : "rounded-2xl border border-border bg-card p-5 sm:p-6"}>
-    <p className="mb-4 text-xs uppercase tracking-wider text-muted-foreground">Dlaczego są połączeni?</p>
+    <p className="mb-4 text-xs uppercase tracking-wider text-muted-foreground">Podstawa powiązania</p>
     {!compact && <div className="mb-5 flex items-center gap-3"><Avatar node={peer} /><div><h2 className="font-semibold">{peer.name}</h2><p className="text-xs text-muted-foreground">{peer.current_club ?? "Klub nieznany"}</p></div></div>}
     <p className="text-4xl font-semibold tracking-tight tabular-nums">{question ? edge.coauthored_count : percent(edge.agreement)}</p>
     <p className="mt-2 text-sm leading-relaxed">{question ? `wspólnych interpelacji i zapytań z osobą: ${selected.name}.` : `zgodnych głosów z osobą: ${selected.name}, w ${edge.n} porównywalnych głosowaniach.`}</p>
     {!question && <div className="mt-4 rounded-lg bg-muted p-3 text-sm"><p>Typowa zgodność ich klubów: <strong>{percent(edge.baseline_agreement)}</strong></p><p className="mt-1">Nadwyżka zgodności: <strong>{edge.excess >= 0 ? "+" : ""}{(edge.excess * 100).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} pkt proc.</strong></p></div>}
-    <div className="mt-6 border-t border-border pt-4"><h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">Sprawdź źródła · przykłady</h3>
+    <div className="mt-6 border-t border-border pt-4"><h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">Źródła i przykłady</h3>
       {evidence.length ? <><EvidenceList evidence={evidence.slice(0, 2)} />{evidence.length > 2 && <details className="mt-4"><summary className="cursor-pointer text-xs font-medium underline underline-offset-4">Więcej przykładów ({evidence.length - 2})</summary><div className="mt-4"><EvidenceList evidence={evidence.slice(2)} /></div></details>}</> : <p className="text-sm text-muted-foreground">Brak źródeł do wyświetlenia.</p>}
     </div>
-    <button onClick={() => onExplore(peer.mp_id)} className="mt-6 inline-flex min-h-11 w-full items-center justify-between gap-2 rounded-lg bg-primary px-4 py-3 text-left text-sm font-medium text-primary-foreground">Odkryj powiązania tej osoby <ArrowRight size={16} /></button>
+    <button onClick={() => onExplore(peer.mp_id)} className="mt-6 inline-flex min-h-11 w-full items-center justify-between gap-2 rounded-lg bg-primary px-4 py-3 text-left text-sm font-medium text-primary-foreground">Zobacz powiązania tej osoby <ArrowRight size={16} /></button>
   </section>;
 }
 

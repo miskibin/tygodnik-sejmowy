@@ -138,14 +138,12 @@ export default async function AboutProjectPage() {
       <div className="max-w-[1100px] mx-auto">
         <PageBreadcrumb
           items={[{ label: "O projekcie" }]}
-          subtitle="Warsztat, źródła i transparentność — najpierw dane, dopiero potem tekst."
         />
 
         <section className="mb-16 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <SectionTitle
-              kicker="Jak to powstaje"
-              title="Prosty pipeline, mała warstwa AI"
+              title="Jak powstają dane"
             />
             <div className="grid gap-4">
               {FLOW_STEPS.map((step, index) => (
@@ -183,10 +181,10 @@ export default async function AboutProjectPage() {
             <div className="border border-rule rounded-lg bg-muted/40 p-5">
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="text-[11px] text-muted-foreground font-medium">
-                  Rola AI
+                  Zakres AI
                 </div>
                 <span className="px-2.5 py-1 rounded-full border border-border bg-background font-sans text-[11px] text-muted-foreground">
-                  prawie nie dotyka źródeł
+                  pomocnicza warstwa
                 </span>
               </div>
               <p className="m-0 text-[17px] leading-[1.55] text-foreground">
@@ -216,8 +214,7 @@ export default async function AboutProjectPage() {
 
         <section className="mb-16">
           <SectionTitle
-            kicker="Zespół"
-            title="Kto za tym stoi"
+            title="Zespół"
           />
           <div className="grid gap-6 md:grid-cols-2">
             {TEAM.map((person) => (
@@ -263,7 +260,6 @@ export default async function AboutProjectPage() {
 
         <section className="mb-16">
           <SectionTitle
-            kicker="Transparentność"
             title="Finanse projektu"
           />
           <p
@@ -403,17 +399,12 @@ function BigStat({
 }
 
 function SectionTitle({
-  kicker,
   title,
 }: {
-  kicker: string;
   title: string;
 }) {
   return (
     <header className="mb-6 pb-3 border-b border-rule">
-      <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
-        {kicker}
-      </div>
       <h2 className="font-medium m-0 text-[28px] leading-[1.05]" style={{ letterSpacing: "-0.01em" }}>
         {title}
       </h2>

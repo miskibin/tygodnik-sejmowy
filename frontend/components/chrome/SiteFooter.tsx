@@ -32,7 +32,7 @@ function relativeLabel(d: Date): string {
 
 const SITEMAP = [
   { href: "/tygodnik", label: "Tygodnik" },
-  { href: "/posel", label: "Twój poseł" },
+  { href: "/posel", label: "Posłowie" },
   { href: "/obietnice", label: "Obietnice" },
   { href: "/atlas", label: "Atlas" },
   { href: "/mowa", label: "Mowa" },
@@ -40,6 +40,7 @@ const SITEMAP = [
   { href: "/proces", label: "Procesy" },
   { href: "/szukaj", label: "Szukaj" },
   { href: "/alerty", label: "Alerty" },
+  { href: "/preferencje", label: "Preferencje" },
   { href: "/manifest", label: "Manifest" },
   { href: "/o-projekcie", label: "O projekcie" },
   { href: "/jak-powstaje-ustawa", label: "Jak powstaje ustawa" },
@@ -60,9 +61,6 @@ export async function SiteFooter() {
               Tygodnik<span className="italic text-destructive"> Sejmowy</span>
             </span>
           </Link>
-          <p className="italic text-[13.5px] text-secondary-foreground mt-3 mb-0 leading-snug max-w-[320px]">
-            Cotygodniowy przegląd prac Sejmu RP. Wydanie piątkowe, dopasowane do okręgu.
-          </p>
           {lastUpdate && (
             <div className="mt-4 flex items-center gap-2 text-[11px] text-muted-foreground font-medium">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive/70" aria-hidden />
@@ -187,7 +185,6 @@ export async function SiteFooter() {
                 >
                   Polityka prywatności
                 </Link>
-                <span className="text-muted-foreground"> — cookieless, brak danych osobowych</span>
               </div>
             </li>
           </ul>

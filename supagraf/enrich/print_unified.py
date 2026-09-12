@@ -46,6 +46,7 @@ from supagraf.enrich.pdf_fetch import resolve_print_pdf
 
 JOB_NAME = "print_unified"
 PROMPT_NAME = "print_unified"
+SCOPED_PROMPT_NAME = "print_citizen_review"
 
 # Persona taxonomy (26 tags, mig 0016/0031). Must match the prompt's list.
 PERSONA_TAGS = (
@@ -201,6 +202,37 @@ ACTION_BANLIST_RE = re.compile(
 )
 
 
+# Scoped citizen-review invariants. These are deliberately applied only to
+# the opt-in print_citizen_review prompt family, so the scheduled
+# print_unified family keeps its existing output contract. The model can
+# still quote a project's entry-into-force wording as if it were enacted;
+# rewrite only the unambiguous project constructions and leave their duration
+# or calendar expression untouched.
+_PROJECT_ENTRY_RE = re.compile(
+    r"\bustawa\s+(?:ma\s+wejść\s+w\s+życie|ma\s+zacząć\s+obowiązywać|"
+    r"wejdzie\s+w\s+życie|zacznie\s+obowiązywać)\b",
+    re.IGNORECASE,
+)
+_PROJECT_CATEGORIES = frozenset({"projekt_ustawy", "projekt_uchwaly"})
+_TAX_TERM_RE = {
+    "podatnik-pit": re.compile(
+        r"\bPIT\b|\bpodat(?:ek|k\w*)\s+dochodow\w*\s+od\s+osób\s+fizycznych\b",
+        re.IGNORECASE,
+    ),
+    "podatnik-vat": re.compile(
+        r"\bVAT\b|\bpodat(?:ek|k\w*)\s+od\s+towar\w*\s+i\s+usług\b",
+        re.IGNORECASE,
+    ),
+}
+_SCOPED_TEXT_FIELDS = (
+    "summary",
+    "summary_plain",
+    "impact_punch",
+    "citizen_action",
+    "stance_rationale",
+    "persona_rationale",
+    "topic_rationale",
+)
 Stance = Literal["FOR", "AGAINST", "NEUTRAL", "MIXED"]
 MentionType = Literal["person", "committee"]
 ISO24495Class = Literal["A1", "A2", "B1", "B2", "C1", "C2"]
@@ -386,6 +418,52 @@ class PrintUnifiedOutput(BaseModel):
         return v
 
 
+def apply_scoped_postvalidation(
+    parsed: PrintUnifiedOutput,
+    *,
+    document_category: str | None,
+    body_text: str,
+    entity_id: str | None = None,
+) -> PrintUnifiedOutput:
+    """Apply deterministic citizen-review invariants before persistence.
+
+    This helper is intentionally called only for SCOPED_PROMPT_NAME.
+    It mutates the already schema-validated model output so the general
+    scheduled print_unified family keeps its historical behavior.
+    """
+    if parsed.is_procedural:
+        parsed.persona_tags = []
+        parsed.affected_groups = []
+        parsed.citizen_action = None
+
+    if document_category in _PROJECT_CATEGORIES:
+        for field_name in _SCOPED_TEXT_FIELDS:
+            value = getattr(parsed, field_name)
+            if isinstance(value, str) and value:
+                setattr(
+                    parsed,
+                    field_name,
+                    _PROJECT_ENTRY_RE.sub("Projekt przewiduje wejście w życie", value),
+                )
+
+    source = body_text or ""
+    for tag, term_re in _TAX_TERM_RE.items():
+        if term_re.search(source):
+            continue
+        parsed.persona_tags = [value for value in parsed.persona_tags if value != tag]
+        parsed.affected_groups = [
+            group for group in parsed.affected_groups if group.tag != tag
+        ]
+
+    if entity_id is not None:
+        logger.info(
+            "scoped postvalidation applied for print {} (procedural={}, category={})",
+            entity_id,
+            parsed.is_procedural,
+            document_category,
+        )
+    return parsed
+
 def trim_body(text: str, budget: int) -> str:
     """Fit `text` into `budget` chars keeping the head and the tail.
 
@@ -459,6 +537,7 @@ def enrich_print_unified(
     prompt_version: int | None = None,
     prompt_sha256: str | None = None,
     llm_model: str | None = None,
+    prompt_name: str = PROMPT_NAME,
 ) -> PrintUnifiedOutput:
     """Public entry point. Resolves the model BEFORE the audit-wrapped inner
     runs so model_runs.model reflects the actually-used model (pro or flash),
@@ -473,6 +552,7 @@ def enrich_print_unified(
         prompt_version=prompt_version,
         prompt_sha256=prompt_sha256,
         llm_model=chosen,
+        prompt_name=prompt_name,
         meta_row=meta_row,
     )
 
@@ -495,6 +575,7 @@ def _enrich_print_unified(
     prompt_version: int | None = None,
     prompt_sha256: str | None = None,
     llm_model: str = DEFAULT_LLM_MODEL,
+    prompt_name: str = PROMPT_NAME,
     meta_row: dict | None = None,
     model_run_id: int | None = None,
 ) -> PrintUnifiedOutput:
@@ -575,7 +656,7 @@ def _enrich_print_unified(
 
     call = call_structured(
         model=llm_model,
-        prompt_name=PROMPT_NAME,
+        prompt_name=prompt_name,
         user_input=user_input,
         output_model=PrintUnifiedOutput,
         prompt_version=prompt_version,
@@ -615,6 +696,16 @@ def _enrich_print_unified(
             f"(original: {nullified_original[:120]})"
         )[:400]
 
+    # Scoped citizen-review prompts have a small deterministic cleanup pass
+    # before the shared payload is built. Default scheduled enrichment keeps
+    # the historical post-parse behavior.
+    if prompt_name == SCOPED_PROMPT_NAME:
+        apply_scoped_postvalidation(
+            parsed,
+            document_category=meta_row.get("document_category"),
+            body_text=body_text,
+            entity_id=entity_id,
+        )
     pv_str = str(call.prompt.version)
     prompt_sha = call.prompt.sha256
 

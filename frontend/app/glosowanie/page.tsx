@@ -24,7 +24,7 @@ export default async function GlosowanieIndexPage() {
       <div className="max-w-[1280px] mx-auto px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 min-w-0">
         <PageBreadcrumb
           items={[{ label: "Głosowania" }]}
-          subtitle={`${rows.length} głosowań w X kadencji — wyszukaj po tytule, numerze lub posiedzeniu.`}
+          subtitle={`${rows.length} głosowań w X kadencji.`}
         />
 
         <GlosowanieDirectoryClient rows={rows} />

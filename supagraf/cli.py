@@ -406,20 +406,56 @@ def cmd_backfill_sponsor_authority(
 # ---- enrich subcommand ----------------------------------------------------
 
 
+@enrich_app.command("images")
+def cmd_enrich_images(
+    term: int = typer.Option(10, "--term"),
+    sitting: int | None = typer.Option(None, "--sitting", help="Default: latest sitting with votes"),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+    force: bool = typer.Option(False, "--force"),
+):
+    """Match optional licensed Commons photos. No LLM calls; one sitting only."""
+    import json
+    from supagraf.enrich.story_images import run_images
+    result = run_images(term=term, sitting=sitting, dry_run=dry_run, force=force)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    if result["failed"]:
+        raise typer.Exit(3)
+
+
 @enrich_app.command("prints")
 def cmd_enrich_prints(
     kind: str = typer.Option("unified", "--kind", "-k", help="unified | embed"),
     term: int = typer.Option(10, "--term", "-t"),
     limit: int = typer.Option(0, "--limit", "-n", help="0 = no cap"),
     workers: int = typer.Option(0, "--workers", "-w", help="concurrent prints (0 = SUPAGRAF_ENRICH_WORKERS)"),
+    sitting: int | None = typer.Option(None, "--sitting", "-s", help="scope unified enrichment to one sitting"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="print the frozen one-sitting manifest; never call the LLM or write"),
+    force: bool = typer.Option(False, "--force", help="with --sitting, re-run rows already processed by this prompt"),
+    prompt_version: int = typer.Option(9, "--prompt-version", help="with --sitting, opt-in citizen-review prompt version"),
 ):
     """Unified LLM enrichment (all citizen-facing fields in one call) or the
     qwen3 embedding pass over prints that still lack it. Exit 3 on failures."""
     from supagraf.enrich.jobs import DEFAULT_WORKERS, embed_pending_prints, enrich_pending_prints
 
     if kind == "unified":
-        st = enrich_pending_prints(term=term, limit=limit, workers=workers or DEFAULT_WORKERS)
+        if sitting is not None:
+            from supagraf.enrich.scoped_prints import run_scoped_prints
+            st = run_scoped_prints(
+                term=term, sitting=sitting, dry_run=dry_run, force=force,
+                prompt_version=prompt_version, limit=limit, workers=workers or 1,
+            )
+            if dry_run:
+                import json
+                typer.echo(json.dumps(st.to_dict(), ensure_ascii=False, indent=2))
+        else:
+            if dry_run or force:
+                logger.error("--dry-run and --force require --sitting")
+                raise typer.Exit(1)
+            st = enrich_pending_prints(term=term, limit=limit, workers=workers or DEFAULT_WORKERS)
     elif kind == "embed":
+        if sitting is not None or dry_run or force:
+            logger.error("--sitting/--dry-run/--force are supported only for unified enrichment")
+            raise typer.Exit(1)
         st = embed_pending_prints(term=term, limit=limit)
     else:
         logger.error("unknown kind {!r}: expected unified | embed", kind)

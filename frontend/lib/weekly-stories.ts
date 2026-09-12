@@ -15,7 +15,12 @@ export type StoryStatement = {
   viral_quote: string | null; viral_score: number | null;
   summary_one_line: string | null; topic_tags: string[] | null;
 };
+export type StoryImage = {
+  url: string; source_url: string; author: string; license: string; license_url: string;
+  caption: string; alt: string; width: number; height: number; date?: string;
+};
 export type StoryPrint = {
+  image?: StoryImage | null;
   id: number; number: string; title: string; short_title: string | null;
   impact_punch: string | null; summary_plain: string | null;
   topic_tags: string[] | null; persona_tags: string[] | null;
@@ -23,6 +28,7 @@ export type StoryPrint = {
 };
 export type DebateContext = { ord: number; title: string; printNumbers: string[] };
 export type WeeklyStory = {
+  image?: StoryImage | null;
   id: string; ord: number | null; title: string; officialTitle: string;
   summary: string | null; topics: TopicId[]; personas: PersonaId[];
   projectSummaries?: { number: string; title: string; text: string }[];
@@ -65,7 +71,7 @@ export function shortSummary(text: string | null, max = 750): string | null {
   const plain = text.replace(/\*\*/g, "").trim();
   const sentences = [...sentenceSegmenter.segment(plain)].map(s => s.segment.trim());
   let out = "";
-  for (const sentence of sentences.slice(0, 4)) {
+  for (const sentence of sentences) {
     if (out && out.length + sentence.length > max) break;
     out += (out ? " " : "") + sentence;
   }
@@ -201,18 +207,19 @@ export function buildWeeklyStories(term: number, statements: StoryStatement[], v
       : projects[0]?.short_title || vote?.short_title || primary?.short_title || context.title.replace(/\s*\(druki?\s+nr[^)]*\)\.?/i, "");
     // Keep each proposal separate; prefer substance over a punchline.
     const projectSummaries = projects.length > 1 ? projects.flatMap(p => {
-      const text = shortSummary(p.summary_plain || p.impact_punch || null);
+      const text = (p.summary_plain || p.impact_punch)?.trim() || null;
       return text ? [{ number: p.number, title: p.short_title || p.title, text }] : [];
     }) : [];
     const summary = vote?.kind === "ON_LIST"
       ? (vote.options?.length ? `Kandydatury: ${vote.options.map(o => o.name).join("; ")}.` : null)
       : projects.length > 1
       ? projectSummaries.map(p => p.text).join(" ") || null
-      : shortSummary(primary?.summary_plain || primary?.impact_punch || null);
+      : (primary?.summary_plain || primary?.impact_punch)?.trim() || null;
     const phase = isVeto ? "Weto prezydenta" : senate ? "Poprawki Senatu" : /Pierwsze czytanie/i.test(context.title) ? "Pierwsze czytanie" : ballots.length ? "Debata i głosowania" : "Debata w Sejmie";
     return {
       id: `${term}-${context.ord}-${context.printNumbers[0] ?? "debata"}`, ord: context.ord,
       title, officialTitle: context.title, summary, projectSummaries,
+      image: primary?.image ?? null,
       topics: [...new Set([...projects.flatMap(p => dbTagsToTopics(p.topic_tags)), ...speeches.flatMap(s => dbTagsToTopics(s.topic_tags))])],
       personas: [...new Set(projects.flatMap(p => dbTagsToPersonas(p.persona_tags)))],
       prints: (projects.length ? projects : related).map(p => ({ number: p.number, title: p.short_title || p.title, isProject: projects.includes(p) })),

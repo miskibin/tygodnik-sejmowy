@@ -35,12 +35,12 @@ const jetbrainsMono = JetBrains_Mono({
 const SITE_URL = "https://tygodniksejmowy.pl";
 const SITE_NAME = "Tygodnik Sejmowy";
 const SITE_DESC =
-  "Tygodnik obywatelski. Piątkowy przegląd prac Sejmu RP: głosowania, druki, komisje. Wydanie dopasowane do Twojego okręgu.";
+  "Przegląd posiedzeń Sejmu RP: projekty ustaw, decyzje posłów i ich skutki. Dokumenty źródłowe, wyniki głosowań i wypowiedzi.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — piątkowy skrót posiedzenia`,
+    default: `${SITE_NAME} — przegląd posiedzeń Sejmu`,
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_DESC,
@@ -83,12 +83,12 @@ export const metadata: Metadata = {
     locale: "pl_PL",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — piątkowy skrót posiedzenia`,
+    title: `${SITE_NAME} — przegląd posiedzeń Sejmu`,
     description: SITE_DESC,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — piątkowy skrót posiedzenia`,
+    title: `${SITE_NAME} — przegląd posiedzeń Sejmu`,
     description: SITE_DESC,
   },
   category: "news",

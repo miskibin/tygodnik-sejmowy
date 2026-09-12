@@ -3,7 +3,7 @@ import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import {
   buildWeeklyStories, printNumbers, transcriptContext,
-  type StoryPrint, type StoryStatement, type StoryVote, type WeeklyStory,
+  type StoryImage, type StoryPrint, type StoryStatement, type StoryVote, type WeeklyStory,
 } from "@/lib/weekly-stories";
 
 export type WeeklyEdition = { stories: WeeklyStory[]; voteCount: number; speechCount: number; planned: boolean };
@@ -68,9 +68,19 @@ async function loadWeeklyEdition(term: number, sitting: number): Promise<WeeklyE
     if (error) throw error;
     prints.push(...(data ?? []) as StoryPrint[]);
   }
+  // Optional media never prevents readers from accessing an edition.
+  if (prints.length) {
+    const { data: images, error: imageError } = await sb.from("print_images")
+      .select("print_id,image").eq("status", "matched").in("print_id", prints.map(p => p.id));
+    if (imageError) console.warn("Weekly images unavailable:", imageError.code);
+    else {
+      const byId = new Map((images ?? []).map(row => [row.print_id, row.image as StoryImage]));
+      for (const print of prints) print.image = byId.get(print.id) ?? null;
+    }
+  }
   return { stories: buildWeeklyStories(term, speeches, votes, prints), voteCount: votes.length, speechCount: speeches.length, planned: speeches.length === 0 && votes.length === 0 };
 }
 
 export function getWeeklyEdition(term: number, sitting: number): Promise<WeeklyEdition> {
-  return unstable_cache(() => loadWeeklyEdition(term, sitting), ["weekly-editorial-edition", "v7", String(term), String(sitting)], { revalidate: 300 })();
+  return unstable_cache(() => loadWeeklyEdition(term, sitting), ["weekly-editorial-edition", "v11", String(term), String(sitting)], { revalidate: 300 })();
 }

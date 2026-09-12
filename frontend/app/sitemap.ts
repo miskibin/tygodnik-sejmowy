@@ -13,8 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/`,          lastModified: now, changeFrequency: "weekly",  priority: 1.0 },
-    { url: `${SITE_URL}/tygodnik`,  lastModified: now, changeFrequency: "weekly",  priority: 0.95 },
+    { url: `${SITE_URL}/tygodnik`,  lastModified: now, changeFrequency: "weekly",  priority: 1.0 },
     { url: `${SITE_URL}/posel`,     lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
     { url: `${SITE_URL}/obietnice`, lastModified: now, changeFrequency: "weekly",  priority: 0.85 },
     { url: `${SITE_URL}/atlas`,     lastModified: now, changeFrequency: "monthly", priority: 0.8 },
