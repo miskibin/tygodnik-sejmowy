@@ -1,57 +1,23 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Universal page skeleton — used by every route's loading.tsx.
-// Shape: editorial masthead band (kicker + heading + subtitle) over a body
-// of paragraph bars. Neutral enough to match index, detail and feature
-// pages without per-route customization.
-
-function Bar({
-  w = "100%",
-  h = 14,
-  className = "",
-}: {
-  w?: string | number;
-  h?: string | number;
-  className?: string;
-}) {
-  return (
-    <Skeleton
-      className={`bg-muted ${className}`}
-      style={{
-        width: typeof w === "number" ? `${w}px` : w,
-        height: typeof h === "number" ? `${h}px` : h,
-      }}
-    />
-  );
+function Bar({ width = "100%", tall = false }: { width?: string; tall?: boolean }) {
+  return <Skeleton className={`rounded-sm ${tall ? "h-8 md:h-10" : "h-3"}`} style={{ width }} />;
 }
 
-export function PageSkeleton() {
-  return (
-    <div className="bg-background" style={{ minHeight: "100vh" }}>
-      <span className="sr-only">Wczytywanie…</span>
-      <div className="border-b border-rule">
-        <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 pb-6">
-          <Bar w={140} h={11} className="mb-3" />
-          <Bar w="60%" h={40} className="mb-3" />
-          <Bar w="40%" h={40} className="mb-5" />
-          <Bar w="50%" h={14} />
-        </div>
+export function PageSkeleton({ variant = "page" }: { variant?: "page" | "document" | "weekly" }) {
+  const weekly = variant === "weekly";
+  const label = variant === "document" ? "Wczytywanie dokumentu…" : weekly ? "Wczytywanie tygodnika…" : "Wczytywanie strony…";
+  return <div className={`mx-auto min-h-[70vh] ${weekly ? "max-w-[960px] px-5 md:px-8 py-8" : "max-w-[1280px] px-4 md:px-8 lg:px-14 py-7"}`}>
+    <p role="status" className="text-[13px] text-muted-foreground mb-7">{label}</p>
+    <div aria-hidden="true">
+      <div className="max-w-[1000px] border-b border-border pb-7 space-y-4">
+        {weekly ? <div className="text-[36px] font-semibold tracking-tight">Tygodnik</div> : <><Bar width="78%" tall /><Bar width="52%" tall /></>}
+        <div className="flex gap-6 pt-2"><Bar width="90px" /><Bar width="140px" /></div>
       </div>
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 py-8 md:py-12 flex flex-col gap-6">
-        <Bar w="35%" h={18} className="mb-1" />
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="border-t border-border/60 pt-5 flex flex-col gap-3"
-            style={{ minHeight: 140 }}
-          >
-            <Bar w="80%" h={20} />
-            <Bar w="100%" h={12} />
-            <Bar w="92%" h={12} />
-            <Bar w="50%" h={12} />
-          </div>
-        ))}
-      </div>
+      {Array.from({ length: weekly ? 3 : 2 }, (_, i) => <div key={i} className="py-8 border-b border-border max-w-[760px] space-y-4">
+        <Bar width={weekly ? "70%" : "160px"} tall={weekly} />
+        <div className="pt-3 space-y-3"><Bar /><Bar width="96%" /><Bar width="88%" /><Bar width="64%" /></div>
+      </div>)}
     </div>
-  );
+  </div>;
 }

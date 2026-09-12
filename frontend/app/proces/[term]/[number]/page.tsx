@@ -1,11 +1,12 @@
+import Link from "next/link";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPrint } from "@/lib/db/prints";
 import { getProcessCitations } from "@/lib/db/statements";
 import { shouldProjectLawTimeline } from "@/lib/process-timeline";
-import { documentCategoryLabel, opinionSourceLabel, opinionSourceShort, promiseStatusLabel } from "@/lib/labels";
+import { opinionSourceLabel, opinionSourceShort, promiseStatusLabel } from "@/lib/labels";
 import { PrintCard } from "@/components/print/PrintCard";
-import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
 import { Hero } from "./_components/Hero";
 import { Timeline } from "./_components/Timeline";
 import { Summary } from "./_components/Summary";
@@ -87,75 +88,36 @@ export default async function DrukPage({
     proceedingPoints,
   } = data;
 
-  // Top-viral citations from the most recent sitting that discussed this
-  // process. Tolerant: if enrichment hasn't run for the linked statements,
-  // returns [] and the section silently disappears.
-  let citations: Awaited<ReturnType<typeof getProcessCitations>> = [];
-  try {
-    citations = await getProcessCitations(term, number);
-  } catch (err) {
-    console.error("[/proces/[term]/[number]] getProcessCitations failed", { term, number, err });
-  }
-
   const processStillOpen = !outcome?.passed && !print.currentStageType?.match(/^(End|Withdrawn|Rejected)$/);
 
   return (
-    <div className="bg-background text-foreground pb-20">
+    <main className="bg-background text-foreground pb-20">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14 pt-7 md:pt-9">
-        <PageBreadcrumb
-          items={[
-            { label: "Procesy", href: "/proces" },
-            { label: print.shortTitle || print.title || `Druk ${print.number}` },
-          ]}
-          subtitle={
-            `${documentCategoryLabel(print.documentCategory) ?? "druk sejmowy"}` +
-            (print.changeDate ? ` · ${formatDate(print.changeDate)}` : "")
-          }
-        />
-        {(print.isMetaDocument || print.isProcedural) && (
-          <div
-            className="font-sans text-[12px] text-secondary-foreground mb-5 max-w-[760px] leading-[1.55] px-3 py-2 border-l-2"
-            style={{ borderColor: "var(--warning)", background: "var(--muted)" }}
-          >
-            <span className="font-medium text-foreground">
-              {print.isProcedural ? "Dokument proceduralny" : "Dokument towarzyszący"}
-            </span>{" "}
-            — {print.isProcedural
-              ? "techniczny krok w procesie legislacyjnym, nie zmienia prawa bezpośrednio."
-              : "ten druk nie zmienia prawa bezpośrednio."}
-            {print.parentNumber && (
-              <>
-                {" "}Dotyczy{" "}
-                <a
-                  href={`/proces/${print.term}/${encodeURIComponent(print.parentNumber)}`}
-                  className="text-foreground underline decoration-dotted underline-offset-4"
-                >
-                  druku nr {print.parentNumber}
-                </a>
-                .
-              </>
-            )}
-          </div>
-        )}
-
-        <Hero print={print} outcome={outcome} />
+        <nav aria-label="Powrót" className="flex gap-6 mb-7 text-[13px] text-muted-foreground">
+          <Link href="/tygodnik" className="hover:underline">← Tygodnik</Link>
+          <Link href="/proces" className="hover:underline">Wszystkie dokumenty</Link>
+        </nav>
+        <Hero print={print} outcome={outcome} mainVoting={mainVoting} />
       </div>
 
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
+        <Summary print={print} />
+      </div>
       <Timeline
         stages={stages}
         votings={relatedVotings}
         processStillOpen={!!processStillOpen}
         projectFutureLawPath={shouldProjectLawTimeline(print.documentCategory)}
       />
-
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
-        <Summary print={print} />
-        <Citations items={citations} />
         <Votings
           votings={relatedVotings}
           mainVotingId={mainVoting?.votingId ?? null}
           votingByClub={votingByClub}
         />
+        <Suspense fallback={<p role="status" className="py-6 text-sm text-muted-foreground">Wczytywanie wypowiedzi…</p>}>
+          <ProcessCitations term={term} number={number} />
+        </Suspense>
         <Committees stages={stages} committeeSittings={committeeSittings} />
         <ProceedingPoints points={proceedingPoints} />
 
@@ -263,6 +225,17 @@ export default async function DrukPage({
           subPrints={subPrints}
         />
       </div>
-    </div>
+    </main>
   );
+}
+
+async function ProcessCitations({ term, number }: { term: number; number: string }) {
+  let items: Awaited<ReturnType<typeof getProcessCitations>>;
+  try {
+    items = await getProcessCitations(term, number);
+  } catch (err) {
+    console.error("Process citations unavailable", { term, number, err });
+    return null;
+  }
+  return <Citations items={items} />;
 }

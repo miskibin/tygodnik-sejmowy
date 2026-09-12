@@ -1,16 +1,11 @@
+import Link from "next/link";
+import { voteMeaning } from "@/lib/weekly-stories";
 import { documentCategoryLabel, sponsorAuthorityLabel } from "@/lib/labels";
-import type { PrintDetail, ProcessOutcome } from "@/lib/db/prints";
+import type { PrintDetail, ProcessOutcome, LinkedVoting } from "@/lib/db/prints";
 
 function formatDateShort(iso: string | null): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
-}
-
-function daysSince(iso: string | null): number | null {
-  if (!iso) return null;
-  const then = new Date(iso).getTime();
-  if (!Number.isFinite(then)) return null;
-  return Math.max(0, Math.floor((Date.now() - then) / 86_400_000));
 }
 
 // Split the title at the first " oraz " / " o zmianie " / em-dash so we can
@@ -21,10 +16,10 @@ function splitTitle(title: string): { head: string; tail: string | null } {
   return { head: title, tail: null };
 }
 
-function statusLabel(p: PrintDetail, outcome: ProcessOutcome | null): string {
+function statusLabel(p: PrintDetail, outcome: ProcessOutcome | null): string | null {
   if (outcome?.act?.publishedAt) return outcome.act.eliId.startsWith("MP/") ? "Opublikowano w Monitorze Polskim" : "Opublikowano w Dz.U.";
   const stageType = p.currentStageType;
-  if (!stageType) return outcome?.passed ? "Uchwalono — brak potwierdzonej publikacji w danych" : "Brak potwierdzonego etapu w danych";
+  if (!stageType) return outcome?.passed ? "Uchwalono — brak potwierdzonej publikacji w danych" : null;
   if (stageType === "Withdrawn") return "Wycofany";
   if (stageType === "Rejected") return "Odrzucony";
   if (stageType === "End") return "Zakończono";
@@ -34,15 +29,17 @@ function statusLabel(p: PrintDetail, outcome: ProcessOutcome | null): string {
   if (stageType === "SenateAmendments") return "Rozpatrywanie poprawek Senatu";
   if (stageType === "CommitteeWork" || stageType === "CommitteeReport") return "W komisji";
   if (stageType === "SejmReading" || stageType === "Voting") return "W Sejmie";
-  return "Brak rozpoznanego etapu w danych";
+  return null;
 }
 
 export function Hero({
   print,
   outcome,
+  mainVoting,
 }: {
   print: PrintDetail;
   outcome: ProcessOutcome | null;
+  mainVoting: LinkedVoting | null;
 }) {
   const category = documentCategoryLabel(print.documentCategory) ?? "druk sejmowy";
   const sponsor = sponsorAuthorityLabel(print.sponsorAuthority);
@@ -59,77 +56,38 @@ export function Hero({
     : null;
   const headline = print.shortTitle?.trim() || print.title?.trim() || `Druk ${print.number}`;
   const { head, tail } = splitTitle(headline);
-  const dni = daysSince(print.documentDate);
+
   const status = statusLabel(print, outcome);
   const sejmUrl = `https://www.sejm.gov.pl/Sejm${print.term}.nsf/druk.xsp?nr=${encodeURIComponent(print.number)}`;
 
+  const v = mainVoting;
+  const decision = v ? voteMeaning({
+    id: v.votingId, voting_number: v.votingNumber, title: v.title,
+    date: v.date, topic: v.topic ?? null, description: v.description ?? null,
+    short_title: null, yes: v.yes, no: v.no, abstain: v.abstain,
+    majority_votes: v.majorityVotes, motion_polarity: v.motionPolarity, kind: v.kind,
+  }) : null;
+  const showCategory = !headline.toLocaleLowerCase("pl").includes(category.toLocaleLowerCase("pl"));
   return (
-    <section className="border-b border-border pt-1 pb-8">
-      <div className="text-[11px] text-muted-foreground mb-3 font-medium">
-        {category}
-        {initiative && <> &nbsp;·&nbsp; inicjatywa {initiative}</>}
-        {sponsor && !initiative && <> &nbsp;·&nbsp; {sponsor}</>}
-      </div>
-      <h1
-        className="font-medium text-foreground m-0 mb-3"
-        style={{
-          fontSize: "clamp(28px, 4.4vw, 50px)",
-          lineHeight: 1.04,
-          letterSpacing: "-0.024em",
-          textWrap: "balance" as never,
-          maxWidth: 1000,
-        }}
-      >
-        {head}
-        {tail && (
-          <>
-            <br />
-            <em
-              className="text-destructive font-normal not-italic"
-              style={{
-                fontStyle: "italic",
-                fontSize: "clamp(20px, 2.8vw, 30px)",
-              }}
-            >
-              {tail}.
-            </em>
-          </>
-        )}
+    <header className="border-b border-border pb-7 max-w-[1000px]">
+      <h1 className="font-medium text-foreground m-0 text-[30px] sm:text-[42px] lg:text-[50px] leading-[1.15] tracking-[-.025em] text-pretty">
+        {head}{tail && <em className="block mt-2 text-destructive font-normal text-[.8em]">{tail}</em>}
       </h1>
-      <div className="font-sans text-[13px] text-muted-foreground flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <span>
-          Druk nr <strong className="text-foreground font-medium">{print.number}</strong>
-        </span>
-        {print.documentDate && (
-          <>
-            <span aria-hidden>·</span>
-            <span>
-              wpłynął <strong className="text-foreground font-medium">{formatDateShort(print.documentDate)}</strong>
-            </span>
-            {dni !== null && (
-              <>
-                <span aria-hidden>·</span>
-                <span>{dni} dni temu</span>
-              </>
-            )}
-          </>
-        )}
-        <a
-          href={sejmUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Otwórz stronę druku w serwisie Sejmu"
-          className="text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground"
-        >
-          ↗ strona druku w Sejmie
-        </a>
-        <span
-          className="ml-auto text-[11px] text-muted-foreground font-medium"
-          style={{  }}
-        >
-          ● {status}
-        </span>
+      <div className="mt-5 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-[13px] text-muted-foreground">
+        <span>Druk <strong className="text-foreground font-medium">{print.number}</strong></span>
+        {print.documentDate && <time dateTime={print.documentDate}>Dokument z {formatDateShort(print.documentDate)}</time>}
+        {showCategory && <span>{category}</span>}
       </div>
-    </section>
+      {decision && v ? <p className="mt-5 text-[14px] leading-relaxed">
+        <Link href={`/glosowanie/${v.votingId}`} className="font-medium hover:underline">{decision.label}</Link>
+        <time dateTime={v.date} className="block text-[12px] text-muted-foreground mt-1">Głosowanie z {formatDateShort(v.date)}</time>
+      </p> : status && <p className="mt-4 text-[14px] font-medium">{status}</p>}
+      {decision && status && outcome?.act?.publishedAt && <p className="mt-3 text-[14px]">{status}</p>}
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[13px]">
+        <a href={sejmUrl} target="_blank" rel="noopener noreferrer" className="underline decoration-border underline-offset-4">Dokument w Sejmie ↗</a>
+        {print.parentNumber && <a href={`/proces/${print.term}/${encodeURIComponent(print.parentNumber)}`} className="underline decoration-border underline-offset-4">Dotyczy druku {print.parentNumber}</a>}
+        {initiative ? <span className="text-muted-foreground">Inicjatywa {initiative}</span> : sponsor && <span className="text-muted-foreground">{sponsor}</span>}
+      </div>
+    </header>
   );
 }
