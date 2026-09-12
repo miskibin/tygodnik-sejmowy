@@ -422,6 +422,54 @@ def cmd_enrich_images(
         raise typer.Exit(3)
 
 
+@enrich_app.command("images-pipeline")
+def cmd_images_pipeline(
+    input_file: Path = typer.Option(..., "--input", exists=True, dir_okay=False, help="JSON list: term, number, title, summary"),
+    output: Path = typer.Option(Path("artifacts/illustrations"), "--output", help="Local report, selected assets and HTML gallery"),
+    generate: bool = typer.Option(False, "--generate", help="Enable bounded FLUX inference on SFGPU for generic scenes"),
+):
+    """Plan with DeepSeek, collect images and review them; never publish to the live site."""
+    import json
+    from supagraf.db import load_dotenv
+    load_dotenv()
+    from supagraf.enrich.illustrations.models import Article
+    from supagraf.enrich.illustrations.pipeline import run_pipeline
+    from supagraf.enrich.illustrations.gpu import generate_candidates
+    from supagraf.enrich.illustrations.gallery import render_gallery
+    try:
+        raw = json.loads(input_file.read_text(encoding="utf-8-sig"))
+        if not isinstance(raw, list) or not 1 <= len(raw) <= 20:
+            raise ValueError("Input must contain 1 to 20 articles")
+        articles = [Article.model_validate(row) for row in raw]
+    except (ValueError, OSError) as exc:
+        raise typer.BadParameter(str(exc), param_hint="--input") from None
+
+    from supagraf.enrich.illustrations.sourcing import find_authentic, provider_fingerprint
+    from supagraf.enrich.illustrations.gpu import runtime_fingerprint
+    from supagraf.enrich.llm import usage_snapshot
+    usage_before = usage_snapshot()
+
+    report = run_pipeline(articles, output.resolve(), generate=generate,
+                          authentic_search=find_authentic, generator=generate_candidates,
+                          authentic_fingerprint=provider_fingerprint(), generator_fingerprint=runtime_fingerprint()["fingerprint"])
+    usage_after = usage_snapshot()
+    report["metrics"]["llm_usage"] = {k: usage_after[k] - usage_before[k] for k in usage_after}
+    (output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    selected = [{"article": row["article"], "candidate": item["candidate"],
+                 "review": item["review"], "publication": "not published"}
+                for row in report["articles"] for item in row.get("candidates", [])
+                if item["candidate"]["id"] == row.get("selected_candidate_id")]
+    (output / "selected.json").write_text(json.dumps(selected, ensure_ascii=False, indent=2), encoding="utf-8")
+    gallery = render_gallery(report, output)
+    print(json.dumps({"report": str(output / "report.json"), "gallery": str(gallery),
+                      "metrics": report.get("metrics", {}), "publication": "preview only"},
+                     ensure_ascii=False, indent=2))
+    if any(row.get("candidate_error") or row["plan"]["reason"].startswith("Planning unavailable:")
+           or any("unavailable:" in item["review"]["reason"].lower() for item in row.get("candidates", []))
+           for row in report["articles"]):
+        raise typer.Exit(3)
+
+
 @enrich_app.command("prints")
 def cmd_enrich_prints(
     kind: str = typer.Option("unified", "--kind", "-k", help="unified | embed"),
