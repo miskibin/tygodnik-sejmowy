@@ -280,22 +280,15 @@ export function Timeline({
   const [hover, setHover] = useState<number>(currentIdx >= 0 ? currentIdx : stations.length - 1);
 
   if (stations.length === 0) {
-    return (
-      <section className="px-0 py-10 border-b border-border" style={{ background: "var(--muted)" }}>
-        <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
-          <SectionHead title={sectionTitle} />
-          <p className="text-muted-foreground">
-            Brak etapów procesu dla tego druku.
-          </p>
-        </div>
-      </section>
-    );
+    return <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
+      <p className="py-5 border-b border-border text-[13px] text-muted-foreground">Historia etapów tego dokumentu nie jest dostępna w danych Sejmu.</p>
+    </div>;
   }
 
   const active = stations[hover] ?? stations[stations.length - 1];
 
   return (
-    <section className="py-12 md:py-14 border-b border-border" style={{ background: "var(--muted)" }}>
+    <section className="py-8 md:py-10 border-b border-border" style={{ background: "var(--muted)" }}>
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
         <SectionHead title={sectionTitle} />
 

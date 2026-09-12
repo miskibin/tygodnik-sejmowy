@@ -21,20 +21,20 @@ export function Summary({ print }: { print: PrintDetail }) {
   if (!body && print.affectedGroups.length === 0 && !print.impactPunch) return null;
 
   return (
-    <section className="py-12 border-b border-border">
+    <section className="py-7 md:py-9 border-b border-border">
       <div className="max-w-[1280px] mx-auto px-0">
-        <SectionHead title="Po polsku, prosto" />
-        <p className="text-sm text-muted-foreground mb-6">Streszczenie AI treści dokumentu{print.documentDate ? ` z ${new Date(print.documentDate).toLocaleDateString("pl-PL")}` : ""}. Opis odnosi się do dokumentu na jego etapie prac; aktualny przebieg sprawdź w ścieżce procesu i źródłach.</p>
+        <SectionHead title="Treść dokumentu" />
 
-        <div className="grid gap-10 lg:gap-14 grid-cols-1 lg:[grid-template-columns:1.3fr_1fr]">
+
+        <div className={`grid gap-7 lg:gap-12 ${!print.isProcedural && print.affectedGroups.length > 0 ? "lg:grid-cols-[minmax(0,1.5fr)_minmax(240px,1fr)]" : "max-w-[760px]"}`}>
           {/* LEFT — lede paragraph */}
           <div className="min-w-0">
             {body ? (
               <div
                 className="m-0"
                 style={{
-                  fontSize: 18,
-                  lineHeight: 1.6,
+                  fontSize: 16,
+                  lineHeight: 1.75,
                   color: "var(--secondary-foreground)",
                   textWrap: "pretty" as never,
                 }}
@@ -46,7 +46,7 @@ export function Summary({ print }: { print: PrintDetail }) {
                 Streszczenie nie jest jeszcze dostępne.
               </p>
             )}
-            {print.citizenAction && (
+            {!print.isProcedural && print.citizenAction && (
               <div
                 className="mt-6 px-4 py-3 border-l-2"
                 style={{
@@ -70,8 +70,8 @@ export function Summary({ print }: { print: PrintDetail }) {
             )}
           </div>
 
-          {/* RIGHT — co się dla mnie zmienia */}
-          {(print.affectedGroups.length > 0 || print.impactPunch) && (
+          {/* RIGHT — Kogo dotyczy projekt */}
+          {!print.isProcedural && print.affectedGroups.length > 0 && (
             <aside>
               <div
                 className="mb-4 font-medium"
@@ -80,7 +80,7 @@ export function Summary({ print }: { print: PrintDetail }) {
                   color: "var(--destructive-deep)",
                 }}
               >
-                co się dla mnie zmienia
+                Kogo dotyczy projekt
               </div>
               {print.impactPunch && (
                 <div
@@ -100,6 +100,7 @@ export function Summary({ print }: { print: PrintDetail }) {
             </aside>
           )}
         </div>
+        <p className="mt-5 text-[11px] text-muted-foreground">Streszczenie AI treści dokumentu. Aktualny stan prac przedstawiają głosowania i historia sprawy.</p>
       </div>
     </section>
   );
