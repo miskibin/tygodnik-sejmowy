@@ -17,7 +17,7 @@ export type StoryStatement = {
 };
 export type StoryImage = {
   url: string; source_url: string; author: string; license: string; license_url: string;
-  caption: string; alt: string; width: number; height: number; date?: string;
+  caption: string; alt: string; provider?: "generated" | "wikimedia_commons"; width: number; height: number; date?: string;
 };
 export type StoryPrint = {
   image?: StoryImage | null;
@@ -229,3 +229,4 @@ export function buildWeeklyStories(term: number, statements: StoryStatement[], v
     };
   }).sort((a,b) => b.rank - a.rank || (a.ord ?? 0) - (b.ord ?? 0));
 }
+
