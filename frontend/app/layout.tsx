@@ -16,13 +16,11 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
 });
 
-// Source Serif is now the display face only — the masthead wordmark, which is
-// `font-medium` with an italic second word. Loading the full 400/500/600/700 ×
-// normal/italic matrix shipped 8 font files for one span.
+// Display face for the masthead and editorial headlines; UI and body stay Inter.
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
   subsets: ["latin", "latin-ext"],
-  weight: ["500"],
+  weight: ["400", "500"],
   style: ["normal", "italic"],
 });
 

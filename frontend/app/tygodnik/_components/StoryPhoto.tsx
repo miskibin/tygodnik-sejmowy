@@ -10,8 +10,7 @@ export function StoryPhoto({ image }: { image: StoryImage }) {
   if (failed) return null;
   return <figure className={styles.storyPhoto}>
     <Image src={image.url} alt={image.alt} width={image.width} height={image.height}
-      sizes="(max-width: 760px) calc(100vw - 40px), 320px" loading="lazy"
+      sizes="(max-width: 460px) calc(100vw - 40px), 420px" loading="lazy"
       onError={() => setFailed(true)} />
   </figure>;
 }
-

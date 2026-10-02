@@ -1,72 +1,22 @@
+import { FileText, ExternalLink } from "lucide-react";
 import type { SubPrint } from "@/lib/db/prints";
+import styles from "./process.module.css";
 
-type Source = {
-  href: string;
-  label: string;
-  kind: string | null;
-};
-
-export function Sources({
-  term,
-  number,
-  attachments,
-  subPrints,
-}: {
-  term: number;
-  number: string;
-  attachments: string[];
-  subPrints: SubPrint[];
+type Source = { href: string; label: string; kind: string };
+export function Sources({ term, number, attachments, subPrints, compact = false }: {
+  term: number; number: string; attachments: string[]; subPrints: SubPrint[]; compact?: boolean;
 }) {
   const items: Source[] = [
-    ...attachments.map<Source>((fn) => ({
-      href: `/api/proces/${term}/${encodeURIComponent(number)}/file/${encodeURIComponent(fn)}`,
-      label: fn,
-      kind: null,
-    })),
-    ...subPrints.flatMap<Source>((sp) =>
-      sp.attachments.map((fn) => ({
-        href: `/api/proces/${term}/${encodeURIComponent(sp.number)}/file/${encodeURIComponent(fn)}`,
-        label: fn,
-        kind: sp.shortTitle || sp.number,
-      })),
-    ),
+    ...attachments.map(fn => ({ href: `/api/proces/${term}/${encodeURIComponent(number)}/file/${encodeURIComponent(fn)}`, label: fn, kind: `Druk ${number}` })),
+    ...subPrints.flatMap(sp => sp.attachments.map(fn => ({ href: `/api/proces/${term}/${encodeURIComponent(sp.number)}/file/${encodeURIComponent(fn)}`, label: sp.shortTitle || sp.title || fn, kind: `Druk ${sp.number} · ${fn}` }))),
   ];
-  if (items.length === 0) return null;
-
-  return (
-    <section className="pt-7 pb-9 border-t border-border">
-      <div className="max-w-[1280px] mx-auto flex items-baseline gap-4 flex-wrap" style={{ rowGap: 10 }}>
-        <span
-          className="font-medium"
-          style={{
-            fontSize: 11,
-            color: "var(--muted-foreground)",
-            flex: "0 0 auto",
-          }}
-        >
-          pliki źródłowe
-        </span>
-        <div className="flex flex-wrap flex-1" style={{ gap: "6px 14px" }}>
-          {items.map((it, i) => (
-            <a
-              key={i}
-              href={it.href}
-              className="font-mono no-underline pb-px text-secondary-foreground hover:text-foreground"
-              style={{
-                fontSize: 12,
-                borderBottom: "1px solid var(--border)",
-              }}
-            >
-              {it.label}
-              {it.kind && (
-                <span className="ml-1" style={{ color: "var(--muted-foreground)", borderBottom: "none" }}>
-                  · {it.kind}
-                </span>
-              )}
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  if (items.length === 0) items.push({ href: `https://www.sejm.gov.pl/Sejm${term}.nsf/druk.xsp?nr=${encodeURIComponent(number)}`, label: "Dokument w Sejmie", kind: `Druk ${number}` });
+  const shown = compact ? items.slice(0, 3) : items;
+  return <section className={`${styles.sources} ${compact ? "" : styles.fullSources}`}>
+    <h2>Dokumenty źródłowe</h2>
+    <ul>{shown.map((item, index) => <li key={`${item.href}-${index}`}><a href={item.href} target="_blank" rel="noopener noreferrer">
+      <FileText size={18} aria-hidden /><span>{item.label}<small>{item.kind}</small></span><ExternalLink size={13} aria-hidden />
+    </a></li>)}</ul>
+    {compact && items.length > shown.length && <a href="#dokumenty">Wszystkie dokumenty ({items.length})</a>}
+  </section>;
 }

@@ -51,7 +51,7 @@ export function Masthead() {
 
   return (
     <header className="sticky top-0 z-10 bg-background border-b border-rule">
-      <div className="px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-2.5 lg:py-3 xl:py-3.5 grid items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-7 grid-cols-[auto_1fr_auto]">
+      <div className="px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-2.5 lg:py-0 grid items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-7 grid-cols-[auto_1fr_auto]">
         {/* Hamburger + wordmark (burger shown <lg) */}
         <div className="flex items-center gap-1.5 sm:gap-3.5">
           <MobileNav />
@@ -68,18 +68,20 @@ export function Masthead() {
         </div>
 
         {/* Primary nav (lg+ only — tablet falls back to burger) */}
-        <nav className="hidden lg:flex justify-center gap-0.5 font-sans text-[13px] xl:text-[13.5px] flex-nowrap">
+        <nav className="hidden lg:flex justify-start gap-7 xl:gap-8 font-sans text-[13px] xl:text-[13.5px] flex-nowrap">
           {PRIMARY_NAV.map((item) => {
             const on = isActive(pathname, item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3 xl:px-4 py-2 rounded-full whitespace-nowrap transition-all duration-150 hover:bg-muted"
+                className="relative flex items-center min-h-20 whitespace-nowrap hover:text-foreground"
+                aria-current={on ? "page" : undefined}
                 style={{
-                  color: on ? "var(--background)" : "var(--secondary-foreground)",
-                  background: on ? "var(--foreground)" : "transparent",
-                  fontWeight: on ? 500 : 400,
+                  color: on ? "var(--foreground)" : "var(--muted-foreground)",
+                  borderBottom: on ? "2px solid var(--destructive)" : "2px solid transparent",
+                  marginBottom: -1,
+                  fontWeight: on ? 600 : 400,
                 }}
               >
                 {item.label}
@@ -93,10 +95,11 @@ export function Masthead() {
               onClick={() => setMoreOpen((o) => !o)}
               aria-expanded={moreOpen}
               aria-haspopup="menu"
-              className="px-2.5 xl:px-3.5 py-2 rounded-full flex items-center gap-1 xl:gap-1.5 whitespace-nowrap transition-all duration-150 hover:bg-muted cursor-pointer"
+              className="min-h-20 flex items-center gap-1.5 whitespace-nowrap hover:text-foreground cursor-pointer"
               style={{
-                color: secondaryActive ? "var(--background)" : "var(--secondary-foreground)",
-                background: secondaryActive ? "var(--foreground)" : "transparent",
+                color: secondaryActive ? "var(--foreground)" : "var(--muted-foreground)",
+                borderBottom: secondaryActive ? "2px solid var(--destructive)" : "2px solid transparent",
+                marginBottom: -1,
                 fontWeight: secondaryActive ? 500 : 400,
               }}
             >
@@ -151,7 +154,7 @@ export function Masthead() {
             onClick={() => setSearchOpen(true)}
             aria-label="Szukaj"
             title="Szukaj (Ctrl+K)"
-            className="hidden md:inline-flex items-center gap-2 px-3 py-1.5 border border-border rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+            className="hidden md:inline-flex items-center gap-2 px-3 py-1.5 border border-border rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
           >
             <SearchIcon className="size-3.5" aria-hidden="true" />
             <span className="text-[12px]">Szukaj</span>
@@ -173,7 +176,7 @@ export function Masthead() {
           <PatroniteTrackedLink
             placement="masthead_desktop"
             aria-label="Wesprzyj"
-            className="hidden sm:inline-flex px-4 py-2 rounded-full bg-foreground text-background text-[12.5px] font-medium tracking-wide items-center gap-1.5 transition-opacity hover:opacity-90"
+            className="hidden sm:inline-flex px-4 py-2 rounded-md bg-foreground text-background text-[12.5px] font-medium tracking-wide items-center gap-1.5 transition-opacity hover:opacity-90"
           >
             Wesprzyj
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" /></svg>

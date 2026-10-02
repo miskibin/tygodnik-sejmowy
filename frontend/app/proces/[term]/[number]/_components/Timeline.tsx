@@ -258,11 +258,13 @@ export function Timeline({
   votings,
   processStillOpen,
   projectFutureLawPath,
+  contained = false,
 }: {
   stages: ProcessStage[];
   votings: LinkedVoting[];
   processStillOpen: boolean;
   projectFutureLawPath: boolean;
+  contained?: boolean;
 }) {
   const real = buildStations(stages, votings);
   const future = processStillOpen && projectFutureLawPath ? projectFutureStations(stages) : [];
@@ -280,7 +282,7 @@ export function Timeline({
   const [hover, setHover] = useState<number>(currentIdx >= 0 ? currentIdx : stations.length - 1);
 
   if (stations.length === 0) {
-    return <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
+    return <div className={contained ? "" : "max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14"}>
       <p className="py-5 border-b border-border text-[13px] text-muted-foreground">Historia etapów tego dokumentu nie jest dostępna w danych Sejmu.</p>
     </div>;
   }
@@ -288,8 +290,8 @@ export function Timeline({
   const active = stations[hover] ?? stations[stations.length - 1];
 
   return (
-    <section className="py-8 md:py-10 border-b border-border" style={{ background: "var(--muted)" }}>
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14">
+    <section className="py-8 md:py-10 border-b border-border" style={{ background: contained ? "var(--background)" : "var(--muted)" }}>
+      <div className={contained ? "" : "max-w-[1280px] mx-auto px-4 md:px-8 lg:px-14"}>
         <SectionHead title={sectionTitle} />
 
         {/* Horizontal station strip — md+ */}
