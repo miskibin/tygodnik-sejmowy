@@ -34,11 +34,11 @@ export function VoteSummary({ vote, notParticipating, decision = false }: {
         <dl className={styles.counts} style={{ gridTemplateColumns: `repeat(${parts.length}, minmax(0, 1fr))` }}>
           {parts.map(part => <div key={part.key}><dd>{part.count}</dd><dt><i data-vote={part.key} aria-hidden />{part.label}</dt></div>)}
         </dl>}
-      {total > 0 && <div className={styles.track} role="img" aria-label={parts.map(part => `${part.count} ${part.label}`).join(", ") + (threshold ? `. Próg: ${threshold}` : "")}>
-        {parts.filter(part => part.count > 0).map(part => <span key={part.key} data-vote={part.key} style={{ width: `${part.count / total * 100}%` }} />)}
-        {threshold && <i className={styles.threshold} style={{ left: `${threshold / total * 100}%` }} />}
+      {total > 0 && <div className={styles.track} role="img" aria-label={decision && threshold ? `${vote.yes} z ${threshold} wymaganych głosów za` : parts.map(part => `${part.count} ${part.label}`).join(", ") + (threshold ? `. Próg: ${threshold}` : "")}>
+        {decision && threshold ? <span data-vote="yes" style={{ width: `${Math.min(vote.yes / threshold, 1) * 100}%` }} /> : parts.filter(part => part.count > 0).map(part => <span key={part.key} data-vote={part.key} style={{ width: `${part.count / total * 100}%` }} />)}
+        {threshold && <i className={styles.threshold} style={{ left: decision ? "100%" : `${threshold / total * 100}%` }} />}
       </div>}
-      {total > 0 && <div className={styles.scale} aria-hidden><span>0</span><span>{total} {notParticipating == null ? "głosów oddanych" : "posłów"}</span></div>}
+      {total > 0 && <div className={styles.scale} aria-hidden><span>{decision && threshold ? "Za ponownym uchwaleniem" : "0"}</span><span>{decision && threshold ? "Próg" : `${total} ${notParticipating == null ? "głosów oddanych" : "posłów"}`}</span></div>}
       {!decision && <p className={styles.question}>{meaning.question}</p>}
       {threshold && <p className={styles.thresholdNote}>Do odrzucenia weta potrzeba było <strong>{threshold} głosów za</strong>.{vote.yes < threshold ? ` Zabrakło ${threshold - vote.yes}.` : " Próg został osiągnięty."}</p>}
     </>}

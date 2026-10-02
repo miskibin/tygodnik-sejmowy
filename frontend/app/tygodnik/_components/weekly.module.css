@@ -1,4 +1,4 @@
-.edition { --foreground:#222624; --secondary-foreground:#57645d; --muted-foreground:#74806f; --border:#dfe3da; --rule:var(--border); --muted:#f5f6f1; --vote-yes:#267e68; --vote-no:#bf615a; --vote-abstain:#c59939; max-width:1520px; margin:0 auto; width:100%; padding:44px 32px 64px; }
+.edition { --foreground:#222624; --secondary-foreground:#57645d; --muted-foreground:#74806f; --border:#dfe3da; --rule:var(--border); --muted:#f5f6f1; --vote-yes:#267e68; --vote-no:#bf615a; --vote-abstain:#c59939; max-width:1520px; margin:0 auto; width:100%; color:var(--foreground); padding:44px 32px 64px; }
 :global(.dark) .edition { --foreground:#eef0eb; --secondary-foreground:#c5cec6; --muted-foreground:#a5b0a2; --border:#303b33; --muted:#151c17; }
 .header { display:flex; align-items:center; justify-content:space-between; gap:32px; padding-bottom:28px; border-bottom:1px solid var(--foreground); }
 .sitting { font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:var(--destructive); font-weight:500; margin-bottom:6px; }
@@ -107,7 +107,7 @@
 .markdown code { font-size:.9em; }
 .markdown table { border-collapse:collapse; font-size:14px; }
 .markdown :is(th,td) { border:1px solid var(--border); padding:8px 12px; text-align:left; }
-.storyPhoto { width:100%; max-width:420px; margin:24px 0 0; }
+.storyPhoto { width:100%; max-width:420px; margin:4px 0 18px; }
 .storyPhoto img { display:block; width:100%; height:auto; max-height:240px; object-fit:contain; object-position:left center; border-radius:4px; }
 @media(min-width:1600px) { .story { grid-template-columns:minmax(0,1fr) 426px; gap:80px; } }
 @media(max-width:1023px) { .story { grid-template-columns:minmax(0,1fr) 300px; gap:32px; } .header { gap:20px; } .archive select { max-width:215px; } .summary { font-size:16px; } }

@@ -55,13 +55,16 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
           {hasProjects && <span className={styles.summaryLabel}>Założenia projektu: </span>}
           <WeeklySummary term={term} text={story.summary} />
         </div>}
-        {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
       </div>
       <div className={styles.actions}>
         {href && <Link className={styles.primaryLink} href={href}>{story.prints.length ? "Przebieg sprawy" : main ? "Wynik głosowania" : "Pełna wypowiedź"}<ArrowRight size={17} aria-hidden /></Link>}
         {story.summary && <span className={styles.sourceNote}>Streszczenie AI · źródło: Sejm</span>}
       </div>
       <div className={styles.disclosures}>
+        {story.image && <details className={styles.debateDetails}>
+          <summary>Ilustracja</summary>
+          <StoryPhoto key={story.image.url} image={story.image} />
+        </details>}
         {story.votes.length > 0 && <details className={styles.voteDetails}>
           <summary>Głosowania <span>{story.votes.length}</span></summary>
           <ol>{story.votes.map(v => <li key={v.id}>

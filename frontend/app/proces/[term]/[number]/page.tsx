@@ -71,7 +71,7 @@ async function ProcessCitations({ term, number }: { term: number; number: string
     items = await getProcessCitations(term, number);
   } catch (err) {
     console.error("Process citations unavailable", { term, number, err });
-    return null;
+    return <p className="text-sm text-muted-foreground">Wypowiedzi są chwilowo niedostępne.</p>;
   }
   return items.length > 0 ? <Citations items={items} /> : <p className="text-sm text-muted-foreground">Brak wypowiedzi przypisanych do tego dokumentu w dostępnych danych.</p>;
 }
