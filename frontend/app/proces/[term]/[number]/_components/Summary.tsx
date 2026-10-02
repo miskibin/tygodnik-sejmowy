@@ -1,145 +1,22 @@
 import { MarkdownText } from "@/components/text/MarkdownText";
-import { affectedGroupLabel, severityColor, severityLabel } from "@/lib/labels";
-import type { AffectedGroup, PrintDetail } from "@/lib/db/prints";
-
-function SectionHead({ title, subtitle }: { title: string; subtitle?: string | null }) {
-  return (
-    <div className="mb-5 flex items-baseline gap-4 border-b border-border pb-3">
-      <h2
-        className="font-medium text-foreground m-0"
-        style={{ fontSize: 22, lineHeight: 1, letterSpacing: "-0.015em" }}
-      >
-        {title}
-      </h2>
-      {subtitle && <span className="font-sans text-[11.5px] text-muted-foreground ml-auto">{subtitle}</span>}
-    </div>
-  );
-}
+import { affectedGroupLabel, severityLabel } from "@/lib/labels";
+import type { PrintDetail } from "@/lib/db/prints";
+import styles from "./process.module.css";
 
 export function Summary({ print }: { print: PrintDetail }) {
   const body = (print.summaryPlain ?? print.summary ?? "").trim();
-  if (!body && print.affectedGroups.length === 0 && !print.impactPunch) return null;
-
-  return (
-    <section className="py-7 md:py-9 border-b border-border">
-      <div className="max-w-[1280px] mx-auto px-0">
-        <SectionHead title="Treść dokumentu" />
-
-
-        <div className={`grid gap-7 lg:gap-12 ${!print.isProcedural && print.affectedGroups.length > 0 ? "lg:grid-cols-[minmax(0,1.5fr)_minmax(240px,1fr)]" : "max-w-[760px]"}`}>
-          {/* LEFT — lede paragraph */}
-          <div className="min-w-0">
-            {body ? (
-              <div
-                className="m-0"
-                style={{
-                  fontSize: 16,
-                  lineHeight: 1.75,
-                  color: "var(--secondary-foreground)",
-                  textWrap: "pretty" as never,
-                }}
-              >
-                <MarkdownText text={body} allowLists inline={false} />
-              </div>
-            ) : (
-              <p className="text-muted-foreground m-0">
-                Streszczenie nie jest jeszcze dostępne.
-              </p>
-            )}
-            {!print.isProcedural && print.citizenAction && (
-              <div
-                className="mt-6 px-4 py-3 border-l-2"
-                style={{
-                  borderColor: "var(--destructive)",
-                  background: "var(--muted)",
-                }}
-              >
-                <div
-                  className="mb-1 font-medium"
-                  style={{
-                    fontSize: 11,
-                    color: "var(--destructive)",
-                  }}
-                >
-                  → co możesz zrobić
-                </div>
-                <div className="text-foreground leading-snug" style={{ fontSize: 15 }}>
-                  {print.citizenAction}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT — Kogo dotyczy projekt */}
-          {!print.isProcedural && print.affectedGroups.length > 0 && (
-            <aside>
-              <div
-                className="mb-4 font-medium"
-                style={{
-                  fontSize: 11,
-                  color: "var(--destructive-deep)",
-                }}
-              >
-                Kogo dotyczy projekt
-              </div>
-              {print.impactPunch && (
-                <div
-                  className="italic text-foreground mb-5"
-                  style={{ fontSize: 18, lineHeight: 1.45 }}
-                >
-                  {print.impactPunch}
-                </div>
-              )}
-              {print.affectedGroups.length > 0 && (
-                <div className="grid gap-2.5">
-                  {print.affectedGroups.map((g, i) => (
-                    <AffectedGroupCard key={`${g.tag}-${i}`} g={g} />
-                  ))}
-                </div>
-              )}
-            </aside>
-          )}
-        </div>
-        <p className="mt-5 text-[11px] text-muted-foreground">Streszczenie AI treści dokumentu. Aktualny stan prac przedstawiają głosowania i historia sprawy.</p>
-      </div>
-    </section>
-  );
-}
-
-function AffectedGroupCard({ g }: { g: AffectedGroup }) {
-  const color = severityColor(g.severity);
-  return (
-    <div
-      className="px-3.5 py-2.5 flex items-baseline justify-between gap-3"
-      style={{
-        background: "var(--muted)",
-        borderLeft: `3px solid ${color}`,
-      }}
-    >
-      <span
-        className="text-foreground"
-        style={{ fontSize: 14.5, lineHeight: 1.35 }}
-      >
-        {affectedGroupLabel(g.tag)}
-      </span>
-      <span
-        className="font-mono whitespace-nowrap"
-        style={{
-          fontSize: 11,
-          color,
-          textTransform: "uppercase",
-        }}
-      >
-        {severityLabel(g.severity)}
-        {g.estPopulation && (
-          <>
-            {" · "}
-            <span className="normal-case" style={{ color: "var(--muted-foreground)" }}>
-              ~{(g.estPopulation / 1_000_000).toFixed(1)} mln
-            </span>
-          </>
-        )}
-      </span>
-    </div>
-  );
+  const veto = print.documentCategory === "weto_prezydenta";
+  return <section className={styles.summary}>
+    <h2>{veto ? "Co zakwestionował prezydent?" : "Co zawiera dokument?"}</h2>
+    {body ? <div className={styles.body}><MarkdownText text={body} allowLists inline={false} /></div> : <p className={styles.body}>Streszczenie nie jest jeszcze dostępne.</p>}
+    {!print.isProcedural && print.citizenAction && <div className={styles.action}><h3>Co możesz zrobić</h3><p>{print.citizenAction}</p></div>}
+    {!print.isProcedural && print.affectedGroups.length > 0 && <section className={styles.affected}>
+      <h3>Kogo dotyczy projekt</h3>
+      {print.impactPunch && <p className={styles.body}>{print.impactPunch}</p>}
+      <ul>{print.affectedGroups.map((group, index) => <li key={`${group.tag}-${index}`}>
+        <span>{affectedGroupLabel(group.tag)}</span><small>{severityLabel(group.severity)}{group.estPopulation != null && ` · ~${(group.estPopulation / 1_000_000).toFixed(1)} mln`}</small>
+      </li>)}</ul>
+    </section>}
+    {body && <p className={styles.note}>Streszczenie AI treści dokumentu.{veto ? " Opisuje stanowisko prezydenta." : ""} Aktualny stan prac przedstawiają głosowania i historia sprawy.</p>}
+  </section>;
 }

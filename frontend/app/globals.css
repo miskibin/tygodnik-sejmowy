@@ -10,9 +10,7 @@
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
   --font-heading: var(--font-inter);
-  /* Source Serif is the display face, used by the masthead wordmark only. The
-     newspaper skin applied it to body copy, labels and captions, which is what
-     made the UI read as costume. */
+  /* Serif is reserved for the masthead and editorial display headlines. */
   --font-display: var(--font-source-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

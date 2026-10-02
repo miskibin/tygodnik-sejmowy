@@ -1,0 +1,28 @@
+.voteCard { padding:26px; border:1px solid var(--border); border-radius:6px; background:color-mix(in srgb,var(--background) 55%,var(--muted)); }
+.cardMeta { display:flex; justify-content:space-between; gap:16px; align-items:baseline; font-size:14px; font-weight:600; }
+.cardMeta > span:last-child:not(:first-child) { font-size:11px; font-weight:400; color:var(--muted-foreground); white-space:nowrap; }
+.decision { font-family:var(--font-source-serif),Georgia,serif; font-size:30px; font-weight:400; line-height:1.25; margin:8px 0 28px; text-wrap:pretty; }
+.voteCard:has(.decision) .cardMeta { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.09em; color:var(--muted-foreground); }
+.counts { display:grid; gap:12px; margin:24px 0 26px; font-variant-numeric:tabular-nums; }
+.counts dd { font-size:clamp(24px,2.3vw,36px); font-weight:500; line-height:1.2; letter-spacing:-.035em; }
+.counts dt { display:flex; align-items:center; gap:5px; margin-top:6px; font-size:10px; color:var(--muted-foreground); white-space:nowrap; }
+.counts i { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.majority { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.majority strong { font-size:42px; line-height:1.1; font-weight:500; letter-spacing:-.04em; }
+.majority span { font-size:12px; color:var(--muted-foreground); }
+.track { display:flex; height:10px; position:relative; border-radius:2px; background:var(--border); }
+.track > span:first-child { border-radius:2px 0 0 2px; }
+.track > span:last-of-type { border-radius:0 2px 2px 0; }
+.voteCard [data-vote=yes] { background:var(--editorial-yes,#267e68); }
+.voteCard [data-vote=no] { background:var(--editorial-no,#bf615a); }
+.voteCard [data-vote=abstain] { background:var(--editorial-abstain,#c59939); }
+.voteCard [data-vote=absent] { background:var(--border); }
+.threshold { position:absolute; top:-5px; bottom:-5px; border-left:2px solid var(--foreground); box-shadow:-2px 0 var(--background),2px 0 var(--background); }
+.scale { display:flex; justify-content:space-between; font-size:10px; color:var(--muted-foreground); margin-top:10px; }
+.question, .thresholdNote { font-size:13px; line-height:1.65; color:var(--secondary-foreground); margin-top:18px; overflow-wrap:anywhere; }
+.thresholdNote strong { color:var(--foreground); font-weight:600; }
+.cardLink { border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:16px; padding-top:18px; margin-top:22px; font-size:12px; min-height:44px; }
+.cardLink svg { flex-shrink:0; }
+.cardLink:hover { text-decoration:underline; text-underline-offset:4px; }
+.candidate { display:flex; justify-content:space-between; gap:20px; font-size:13px; margin-top:14px; }
+@media(max-width:600px) { .voteCard { padding:22px; } .counts dd { font-size:32px; } .decision { font-size:28px; } }
