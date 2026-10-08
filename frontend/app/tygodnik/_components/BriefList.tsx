@@ -47,6 +47,7 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
         {!amendmentsOnly && story.phase === "Poprawki Senatu" && <p className={styles.procedure}>{result.question}</p>}
         {amendmentsOnly && <p className={styles.procedure}>Przyjęte poprawki: {acceptedAmendments} z {amendments.length} głosowanych.</p>}
       </div>}
+      {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
       <div className={styles.storyBody}>
         {story.projectSummaries && story.projectSummaries.length > 0 ? story.projectSummaries.map(p => <div key={p.number} className={styles.summary}>
           <Link href={`/proces/${term}/${p.number}`} className={styles.summaryLabel}>Projekt {p.number}: </Link>
@@ -61,10 +62,6 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
         {story.summary && <span className={styles.sourceNote}>Streszczenie AI · źródło: Sejm</span>}
       </div>
       <div className={styles.disclosures}>
-        {story.image && <details className={styles.debateDetails}>
-          <summary>Ilustracja</summary>
-          <StoryPhoto key={story.image.url} image={story.image} />
-        </details>}
         {story.votes.length > 0 && <details className={styles.voteDetails}>
           <summary>Głosowania <span>{story.votes.length}</span></summary>
           <ol>{story.votes.map(v => <li key={v.id}>
@@ -101,6 +98,8 @@ export function BriefList({ edition, sitting, sittings, filters }: {
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Warsaw" }).format(new Date());
+  const inProgress = sitting.firstDate <= today && sitting.lastDate >= today && !edition.planned;
   const [visible, setVisible] = useState(8);
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState<TopicId | "">("");
@@ -126,6 +125,7 @@ export function BriefList({ edition, sitting, sittings, filters }: {
     <header className={styles.header}>
       <div><p className={styles.sitting}>Posiedzenie {sitting.sittingNum}</p><h1>Tygodnik</h1>
         <div className={styles.editionDate}><p>{dateRange(sitting.firstDate, sitting.lastDate)}</p><span>{edition.stories.length} spraw · {edition.voteCount} głosowań</span></div>
+        {inProgress && <p className={styles.sourceNote}>Posiedzenie w trakcie · dane są uzupełniane.</p>}
       </div>
       <nav className={styles.archive} aria-label="Wybór wydania">
         <button disabled={!previous} onClick={() => { if (previous) router.push(`/tygodnik/p/${previous.sittingNum}`); }} aria-label="Poprzednie posiedzenie"><ArrowLeft size={17} aria-hidden /></button>

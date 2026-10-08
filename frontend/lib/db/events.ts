@@ -78,24 +78,21 @@ async function loadLatestSittingWithEvents(term: number): Promise<SittingInfo | 
   const cols =
     "term, sitting_num, sitting_title, first_date, last_date, print_count, event_count, top_topics";
 
-  // Prefer the most recent sitting whose final day is already behind us —
-  // that's the latest week with actually-finished items (votes wrapped,
-  // floor quotes ingested) rather than a queued-but-not-yet-debated
-  // future agenda. Print events alone (event_count > 0) aren't enough
-  // because Sejm publishes drafts days before the sitting opens.
-  const finishedRes = await sb
+  // Include the current sitting once it has started; its edition labels
+  // ongoing proceedings. Exclude future agendas even if drafts exist.
+  const startedRes = await sb
     .from("tygodnik_sittings")
     .select(cols)
     .eq("term", term)
     .gt("event_count", 0)
-    .lt("last_date", today)
+    .lte("first_date", today)
     .order("sitting_num", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (finishedRes.error) throw finishedRes.error;
-  if (finishedRes.data) return mapTygodnikSittingRow(finishedRes.data as TygodnikSittingRow);
+  if (startedRes.error) throw startedRes.error;
+  if (startedRes.data) return mapTygodnikSittingRow(startedRes.data as TygodnikSittingRow);
 
-  // Fallback for the very start of a term when no sitting has wrapped
+  // Fallback for the very start of a term when no sitting has started
   // yet — better to show the upcoming sitting than nothing at all.
   const fallbackRes = await sb
     .from("tygodnik_sittings")
