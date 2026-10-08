@@ -27,6 +27,20 @@ def test_unknown_addressee_and_topic_are_salvaged():
     assert o.topic_tags == ["zdrowie"]
 
 
+def test_agenda_announcement_preserves_more_than_twenty_print_references():
+    references = [f"druk {3000 + i}" for i in range(27)]
+    o = _out(mentioned_entities={"prints": references})
+    assert o.mentioned_entities.prints == references
+
+
+def test_print_reference_limit_remains_bounded():
+    import pytest
+    from pydantic import ValidationError
+    from supagraf.enrich.utterance_enrich import MAX_MENTIONED_PRINTS
+    with pytest.raises(ValidationError):
+        _out(mentioned_entities={"prints": [str(i) for i in range(MAX_MENTIONED_PRINTS + 1)]})
+
+
 def test_unverified_quote_is_not_persisted(monkeypatch):
     from types import SimpleNamespace
     from supagraf.enrich import utterance_enrich as mod

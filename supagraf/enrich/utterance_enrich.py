@@ -35,6 +35,9 @@ MAX_SUMMARY_CHARS = 120
 MAX_KEY_CLAIMS = 3
 MAX_TOPIC_TAGS = 3
 MAX_MENTIONED_PER_LIST = 20
+# Opening agenda announcements can cite more than twenty distinct prints.
+# Preserve those references rather than rejecting or silently truncating them.
+MAX_MENTIONED_PRINTS = 64
 
 # Default to flash for utterances. SUPAGRAF_UTTERANCE_LLM_MODEL > LLM_MODELS["flash"].
 UTTERANCE_LLM_MODEL = os.environ.get("SUPAGRAF_UTTERANCE_LLM_MODEL", LLM_MODELS["flash"])
@@ -82,7 +85,7 @@ class MentionedEntities(BaseModel):
     mps: list[str] = Field(default_factory=list, max_length=MAX_MENTIONED_PER_LIST)
     parties: list[str] = Field(default_factory=list, max_length=MAX_MENTIONED_PER_LIST)
     ministers: list[str] = Field(default_factory=list, max_length=MAX_MENTIONED_PER_LIST)
-    prints: list[str] = Field(default_factory=list, max_length=MAX_MENTIONED_PER_LIST)
+    prints: list[str] = Field(default_factory=list, max_length=MAX_MENTIONED_PRINTS)
 
 
 def _smart_truncate(s: str, limit: int) -> str:
@@ -271,9 +274,18 @@ def fetch_pending_statements(
         if not day_ids:
             return []
         q = q.in_("proceeding_day_id", day_ids)
-    if limit > 0:
-        q = q.limit(limit)
-    return q.execute().data or []
+    # PostgREST caps each response; a sitting often contains over 1000
+    # statements. Stable ordering keeps pages complete and deterministic.
+    q = q.order("id")
+    rows: list[dict] = []
+    page_size = 500
+    while limit <= 0 or len(rows) < limit:
+        size = min(page_size, limit - len(rows)) if limit > 0 else page_size
+        page = q.range(len(rows), len(rows) + size - 1).execute().data or []
+        rows.extend(page)
+        if len(page) < size:
+            break
+    return rows
 
 
 def enrich_statements(

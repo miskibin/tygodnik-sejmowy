@@ -113,7 +113,19 @@ def _statement(s, bodies: dict[int, tuple[str, str]]) -> dict:
 
 def compose(ctx: SyncContext, detail: dict, res: SyncResult) -> dict:
     """Build the `_stage_proceedings` payload for one proceeding."""
-    proc = ProceedingIn.model_validate(detail)
+    agenda_pending = False
+    if "agenda" not in detail:
+        planned = ProceedingIn.model_validate({**detail, "agenda": ""})
+        # Sejm can announce future dates before publishing an agenda. Keep
+        # those dates without accepting missing agendas for active/past sittings.
+        if planned.dates and not planned.current and min(planned.dates) > ctx.today:
+            proc = planned
+            agenda_pending = True
+            res.bump("planned_without_agenda")
+        else:
+            proc = ProceedingIn.model_validate(detail)
+    else:
+        proc = ProceedingIn.model_validate(detail)
     day_ids = _day_ids(ctx.term, proc.number)
     days: list[dict] = []
     for d in sorted(proc.dates):
@@ -138,6 +150,7 @@ def compose(ctx: SyncContext, detail: dict, res: SyncResult) -> dict:
                      "statements": [_statement(s, bodies) for s in day.statements]})
     return {
         "number": proc.number, "title": proc.title, "current": proc.current,
+        **({"agenda_status": "not_published"} if agenda_pending else {}),
         "dates": [d.isoformat() for d in proc.dates], "agenda_html": proc.agenda, "days": days,
         "agenda_items": [{"ord": a.ord, "title": a.title, "raw_html": a.raw_html,
                           "process_refs": a.process_refs, "print_refs": a.print_refs}
