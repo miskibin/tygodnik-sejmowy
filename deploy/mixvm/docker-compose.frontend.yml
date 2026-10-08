@@ -44,9 +44,14 @@ services:
       # Join supabase_default so SSR can hit Kong over the internal bridge
       # (~10× faster than going out → Cloudflare → back in).
       - supabase
+      # Legal query embeddings use the existing Ollama service over its bridge.
+      - embeddings
 
 networks:
   default:
   supabase:
     external: true
     name: supabase_default
+  embeddings:
+    external: true
+    name: sejmograf_default
