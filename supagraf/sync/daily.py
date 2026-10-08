@@ -167,6 +167,21 @@ def _network_phase(ctx: SyncContext, ledger: RunLedger, *, skip_load: bool, load
     _run(ledger, "network", lambda: refresh_network(term=ctx.term))
 
 
+def _law_phase(ledger: RunLedger, *, skip_embed: bool) -> None:
+    """Opt-in until source coverage is reviewed; use the same ETL error ledger."""
+    if os.environ.get("SUPAGRAF_ENABLE_LAW") != "1":
+        return
+    from pathlib import Path
+    from supagraf.law.ingest import sync_law
+    result = _run(ledger, "law", lambda: {
+        "errors": 0 if (result := sync_law(output=Path("artifacts/law")))["status"] == "ok" else 1,
+        "run_id": result["run_id"], "status": result["status"],
+    })
+    if not skip_embed and result and result.get("errors") == 0:
+        from supagraf.law.embed import build_index
+        _run(ledger, "law:embed", lambda: build_index(activate=True))
+
+
 def run_daily(
     *,
     term: int = 10,
@@ -258,6 +273,8 @@ def run_daily(
         else:
             _run(ledger, "refresh", lambda: run_refreshes(term, ctx.dirty, full=full))
         _network_phase(ctx, ledger, skip_load=skip_load, load_succeeded=load_succeeded)
+        if load_succeeded and not skip_load:
+            _law_phase(ledger, skip_embed=skip_embed)
     finally:
         with ledger.step("llm:usage") as step:
             step.counts = usage_since(usage0)

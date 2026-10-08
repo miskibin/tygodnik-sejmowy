@@ -55,6 +55,11 @@ def refresh_stale_eli(term: int = 10, max_age_days: int = 7) -> dict:
                 continue
             act_rows.append({"eli_id": eli, "payload": act, "source_path": api.url(f"/eli/acts/{eli}"),
                              "captured_at": now_iso})
+    # Several processes can reference the same published act. PostgreSQL
+    # rejects duplicate conflict keys within one upsert batch.
+    unique_acts = {row["eli_id"]: row for row in act_rows}
+    out["duplicate_acts"] = len(act_rows) - len(unique_acts)
+    act_rows = list(unique_acts.values())
     out["fetched_acts"] = stage.upsert_rows("_stage_acts", act_rows, on_conflict="eli_id", errors=errors)
     if act_rows:
         _rpc_int("load_acts", term)

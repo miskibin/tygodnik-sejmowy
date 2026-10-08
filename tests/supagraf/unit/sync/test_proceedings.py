@@ -2,10 +2,30 @@ from __future__ import annotations
 
 from datetime import date
 
+import pytest
+from pydantic import ValidationError
+
 from supagraf.sync.resources import proceedings as pr
 
 B = "/sejm/term10"
 TODAY = date(2026, 9, 7)
+
+
+def test_future_sitting_without_agenda_retains_unpublished_status(ctx, monkeypatch):
+    monkeypatch.setattr(pr, "_day_ids", lambda *args: {})
+    detail = {"number": 67, "title": "Future sitting", "current": False,
+              "dates": ["2026-10-20"]}
+    result = pr.SyncResult(resource="proceedings")
+    payload = pr.compose(ctx, detail, result)
+    assert payload["agenda_status"] == "not_published"
+    assert payload["days"] == []
+    assert result.notes["planned_without_agenda"] == 1
+
+
+@pytest.mark.parametrize("current, dates", [(True, ["2026-10-20"]), (False, ["2026-09-03"]), (False, [])])
+def test_missing_agenda_still_fails_for_active_or_past_sitting(ctx, current, dates):
+    with pytest.raises(ValidationError):
+        pr.compose(ctx, {"number": 67, "title": "t", "current": current, "dates": dates}, pr.SyncResult(resource="proceedings"))
 
 
 def test_in_scope_rules():

@@ -10,9 +10,10 @@ export function StoryPhoto({ image }: { image: StoryImage }) {
   if (failed) return null;
   return <figure className={styles.storyPhoto}>
     <Image src={image.url} alt={image.alt} width={image.width} height={image.height}
+      title={image.provider === "generated" ? undefined : `${image.author} · ${image.license}`}
       sizes="(max-width: 460px) calc(100vw - 40px), 420px" loading="lazy"
       onError={() => setFailed(true)} />
-    <figcaption className="mt-2 text-xs leading-relaxed text-muted-foreground">
+    <figcaption className="sr-only">
       {image.caption && <span>{image.caption} </span>}
       {image.provider === "generated" ? <span>Ilustracja AI · {image.author}</span> : <>
         <span>Fot.: {image.author} · </span>

@@ -5,6 +5,7 @@
 // entry below for discoverability.
 export const PRIMARY_NAV = [
   { href: "/tygodnik",  label: "Tygodnik" },
+  { href: "/prawo",     label: "Prawo" },
   { href: "/posel",     label: "Posłowie" },
   { href: "/obietnice", label: "Obietnice" },
 ] as const;
