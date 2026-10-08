@@ -63,7 +63,7 @@ export default async function LawActPage({ params, searchParams }: {
         <p>Dokument {document.selected.document_eli_id} · opublikowany {document.selected.document_date ?? "—"} · pobrany {document.selected.captured_at.slice(0, 10)}</p>
         <a href={document.selected.source_url}>Oficjalny dokument ELI</a>
         <details className={styles.provenance}><summary>Źródło i weryfikacja tekstu</summary>
-          <p>{document.selected.extraction_quality === "structured" ? "Zachowano strukturę artykułów z oficjalnego HTML." : "Ekstrakcja PDF wymaga kontroli. Tekst nie jest zweryfikowaną podstawą odpowiedzi."}</p>
+          <p>{document.selected.extraction_quality === "structured" ? "Zachowano strukturę artykułów z oficjalnego HTML." : "Ekstrakcja tekstu wymaga kontroli. Tekst nie jest zweryfikowaną podstawą odpowiedzi."}</p>
           <p>SHA-256: {document.selected.source_sha256}</p><p>Wersja: {document.selected.id}</p>
         </details>
       </div>

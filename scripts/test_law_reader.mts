@@ -27,6 +27,7 @@ assert.ok(lawInline("art. 5–7 ustawy o nieznanym przedmiocie", current, links,
 assert.equal(lawInline("pkt 1", current, links, ids, "par-1")[0].href, "#art-2-par-1-pkt-1");
 assert.equal(lawInline("lit. a", current, links, ids, "par-1-pkt-1")[0].href, "#art-2-par-1-pkt-1-lit-a");
 assert.equal(lawInline("art. 9999", current, links, ids)[0].href, undefined);
+assert.ok(lawInline("ustawa o prawach konsumenta", current, links, ids).every(p => !p.href));
 assert.deepEqual(mentionedActs("Dz. U. z 2024 r. poz. 1461"), ["DU/2024/1461"]);
 assert.equal(lawInline("Dz. U. z 2024 r. poz. 1461", current, links, ids)[0].href, "/prawo/DU/2024/1461");
 assert.equal(lawInline("Dz. U. z 1900 r. poz. 999", current, links, ids)[0].href, "https://eli.gov.pl/eli/DU/1900/999/ogl");

@@ -91,6 +91,7 @@ export function lawInline(text: string, unit: Pick<LawUnit, "root_eli_id" | "ver
     if (href) tokens.push({ start: match.index!, end: match.index! + match[0].length, value: { text: match[0], href } });
   }
   for (const name of knownLawNames) {
+    if (name.root === unit.root_eli_id) continue;
     const regex = new RegExp(name.pattern.source, "giu");
     for (const match of text.matchAll(regex)) {
       const act = links.acts.find(a => a.root === name.root);
