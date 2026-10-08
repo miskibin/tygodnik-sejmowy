@@ -1,0 +1,464 @@
+[
+  {
+    "term": 10,
+    "number": "258",
+    "sha256": "b835de65537cc331b9aaa25ec2fdf993f6d600783daea7208dae37b04f265c09",
+    "url": "/editorial/term-10/258-week66-b835de65537c.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Gęsi na skraju jesiennego pola uprawnego.",
+    "source_print_number": "258",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: editorial illustration for Tygodnik Sejmowy, Polish parliamentary bill 10/258 on compensation for crop damage caused by birds. A realistic neutral documentary-style photograph of a small flock of three geese foraging at the edge of an autumn Polish agricultural field, sparse seedlings and crop stubble, low distant rural horizon, overcast daylight, natural muted green and earth tones. Wide landscape 3:2, birds recognizable and large enough on the left-center, clean right side for responsive cropping, realistic bird anatomy and feet, quiet editorial photography with natural irregular detail. This is a thematic generated illustration, not evidence of a specific incident. No people, faces, hands, buildings with signs, text, letters, logos, watermarks, flags, dramatic effects or stylized CGI. Save image to local disk if supported and include its path in the output metadata.",
+      "review_image_sha256": "b835de65537cc331b9aaa25ec2fdf993f6d600783daea7208dae37b04f265c09",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2107",
+    "sha256": "7b884d61745f92d773ccacb18bcbfb1bcab8006ac980ead3e64e0090ba37a0e2",
+    "url": "/editorial/term-10/2107-week66-7b884d61745f.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Mosiężna waga z dwiema szalami na kamiennym cokole.",
+    "source_print_number": "2107",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, latest sitting 66. Wide landscape 3:2 photograph, natural believable irregular materials, restrained Polish newspaper aesthetic, subdued daylight, moderate depth of field. The illustration must communicate the subject without pretending to document a specific real institution or incident. No people, faces, hands, text, letters, numbers, logos, watermarks, flags, dramatic effects, CGI gloss, false factual evidence, or invented institutional interiors. Independence and appointment of judges: a small antique brass balance scale sitting directly on a plain weathered stone plinth outside, against softly blurred neutral limestone in natural side light. Both pans at the same level, exactly two suspended pans with mechanically plausible chains and one central beam. Close editorial still-life, no gavel, no papers, no courtroom, no named building.",
+      "review_image_sha256": "7b884d61745f92d773ccacb18bcbfb1bcab8006ac980ead3e64e0090ba37a0e2",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2868",
+    "sha256": "7b884d61745f92d773ccacb18bcbfb1bcab8006ac980ead3e64e0090ba37a0e2",
+    "url": "/editorial/term-10/2107-week66-7b884d61745f.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Mosiężna waga z dwiema szalami na kamiennym cokole.",
+    "source_print_number": "2107",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, latest sitting 66. Wide landscape 3:2 photograph, natural believable irregular materials, restrained Polish newspaper aesthetic, subdued daylight, moderate depth of field. The illustration must communicate the subject without pretending to document a specific real institution or incident. No people, faces, hands, text, letters, numbers, logos, watermarks, flags, dramatic effects, CGI gloss, false factual evidence, or invented institutional interiors. Independence and appointment of judges: a small antique brass balance scale sitting directly on a plain weathered stone plinth outside, against softly blurred neutral limestone in natural side light. Both pans at the same level, exactly two suspended pans with mechanically plausible chains and one central beam. Close editorial still-life, no gavel, no papers, no courtroom, no named building.",
+      "review_image_sha256": "7b884d61745f92d773ccacb18bcbfb1bcab8006ac980ead3e64e0090ba37a0e2",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3007",
+    "sha256": "cdc611e4ab7e55475bd1a49bc58043c231721cf1cbdeea590a9b28eb7673e9cb",
+    "url": "/editorial/term-10/3007-week66-cdc611e4ab7e.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Pompa ciepła przy elewacji domu jednorodzinnego.",
+    "source_print_number": "3007",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, latest sitting 66. Wide landscape 3:2 photograph, natural believable irregular materials, restrained Polish newspaper aesthetic, subdued daylight, moderate depth of field. The illustration must communicate the subject without pretending to document a specific real institution or incident. No people, faces, hands, text, letters, numbers, logos, watermarks, flags, dramatic effects, CGI gloss, false factual evidence, or invented institutional interiors. Financial help for households harmed during the Clean Air home retrofit programme: a modest unbranded air-source heat pump mounted correctly on the outside of an ordinary Polish detached house, pale plaster, modest garden, quiet autumn morning. Close three-quarter view with a physically plausible single fan grille, real plumbing at rear, clearly exterior. No person, no text or labels, no artificial luxury.",
+      "review_image_sha256": "cdc611e4ab7e55475bd1a49bc58043c231721cf1cbdeea590a9b28eb7673e9cb",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3000",
+    "sha256": "5eb9bfcbcf02f39199aa0c1b1bc7d94946dee5e3142b777f31b93b63a00a7531",
+    "url": "/editorial/term-10/3000-week66-5eb9bfcbcf02.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Archiwalne dokumenty papierowe.",
+    "source_print_number": "3000",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, latest sitting 66. Wide landscape 3:2 photograph, natural believable irregular materials, restrained Polish newspaper aesthetic, subdued daylight, moderate depth of field. The illustration must communicate the subject without pretending to document a specific real institution or incident. No people, faces, hands, text, letters, numbers, logos, watermarks, flags, dramatic effects, CGI gloss, false factual evidence, or invented institutional interiors. Digitisation and preservation of archives: close still-life of a slightly uneven stack of aged folded paper sheets tied with one simple cotton archival tape, placed on a single weathered dark stone surface outside, neutral blurred background. Tactile cream paper edges, realistic age and subtle shadow. No writing on sheets, no desk, no corridor, no fanciful library.",
+      "review_image_sha256": "5eb9bfcbcf02f39199aa0c1b1bc7d94946dee5e3142b777f31b93b63a00a7531",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2800",
+    "sha256": "c9ea7012bcba16da885769cdf07826a85c4f9cb09da57250579e6a0b727b398a",
+    "url": "/editorial/term-10/2800-week66-c9ea7012bcba.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Koperta i telefon — ilustracja doręczeń elektronicznych.",
+    "source_print_number": "2800",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, latest sitting 66. Wide landscape 3:2 photograph, natural believable irregular materials, restrained Polish newspaper aesthetic, subdued daylight, moderate depth of field. The illustration must communicate the subject without pretending to document a specific real institution or incident. No people, faces, hands, text, letters, numbers, logos, watermarks, flags, dramatic effects, CGI gloss, false factual evidence, or invented institutional interiors. Electronic delivery of criminal procedure documents: a single unmarked cream paper envelope with a simple closed flap beside a dark unbranded smartphone with screen off, on a slate exterior surface in soft natural light. Restrained documentary still-life, clean composition, credible proportions, no desk office interior, no symbols or illuminated screen.",
+      "review_image_sha256": "c9ea7012bcba16da885769cdf07826a85c4f9cb09da57250579e6a0b727b398a",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3030",
+    "sha256": "e0e7d02962cf3247a01d42118cdb1dd57adc44e4466cec313da593eeab9be73a",
+    "url": "/editorial/term-10/3030-week66-e0e7d02962cf.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Koparka przy nasypie budowanej drogi.",
+    "source_print_number": "3030",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, sitting 66. Wide landscape 3:2 photograph, believable materials and restrained Polish newspaper aesthetic, natural soft daylight. No people, faces, hands, text, letters, numbers, logos, signs, watermarks, flags or invented specific institution. Not a documentary record of a specific event. Accelerating major infrastructure investment: a yellow unbranded excavator with plausible joints and one bucket parked beside a partially built highway embankment in the Polish countryside. Foreground compacted earth and gravel, empty unfinished road curving toward a low autumn horizon, realistic scale and modest construction setting. No workers, no vehicle registration markings, no decorative dramatic smoke. Natural muted colours.",
+      "review_image_sha256": "e0e7d02962cf3247a01d42118cdb1dd57adc44e4466cec313da593eeab9be73a",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2865",
+    "sha256": "2ce3d1aa3a0710af6bf3dd708fd7adf3512ce8536b6a423c502cf5734edef4f3",
+    "url": "/editorial/term-10/2865-week66-2ce3d1aa3a07.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Klucz na progu domu.",
+    "source_print_number": "2865",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, sitting 66. Wide landscape 3:2 photograph, believable materials and restrained Polish newspaper aesthetic, natural soft daylight. No people, faces, hands, text, letters, numbers, logos, signs, watermarks, flags or invented specific institution. Not a documentary record of a specific event. Registration of short-term property rentals: a single ordinary unmarked metal house key resting on a stone doorstep, blurred ordinary apartment entrance in the background, warm natural side light. Key clearly visible in the foreground, physically plausible simple teeth, no keycard, no signs, no property brands, no address numbers, no office interior. Quiet realistic editorial close-up.",
+      "review_image_sha256": "2ce3d1aa3a0710af6bf3dd708fd7adf3512ce8536b6a423c502cf5734edef4f3",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2999",
+    "sha256": "7b2593d03f1b011ef789f03b1b01dea63c3901782f428381c263a8e19d769b9d",
+    "url": "/editorial/term-10/2999-week66-7b2593d03f1b.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Łódź rybacka na wodzie.",
+    "source_print_number": "2999",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: editorial thematic illustration for Tygodnik Sejmowy, latest sitting 66. Wide landscape 3:2, natural understated newspaper photography, plausible physical geometry, muted colours. No people, faces, hands, text, letters, numbers, logos, registration markings, watermarks or flags. Not a documentary photo of a named place, person or event. Maritime fishing control and catch reporting: a modest small fishing boat moored beside an ordinary Baltic harbour quay, one practical deck winch and coiled ropes, quiet grey sea and overcast sky. Broad side three-quarter view, boat with coherent hull, believable low railings, one simple mast, no complicated rigging or repeated details. Empty quay, no fish gore, no romantic sunset.",
+      "review_image_sha256": "7b2593d03f1b011ef789f03b1b01dea63c3901782f428381c263a8e19d769b9d",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "2644",
+    "sha256": "54b6f6f8bed1886d3e89d214d1c43466470cabe3578315b60df90a26310dc36d",
+    "url": "/editorial/term-10/2644-week66-54b6f6f8bed1.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Pędzle i paleta malarska.",
+    "source_print_number": "2644",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: editorial thematic illustration for Tygodnik Sejmowy, latest sitting 66. Wide landscape 3:2, natural understated newspaper photography, plausible physical geometry, muted colours. No people, faces, hands, text, letters, numbers, logos, registration markings, watermarks or flags. Not a documentary photo of a named place, person or event. Social insurance for professional artists: a handful of used paintbrushes of varied sizes and a small unmarked ceramic jar beside a lightly paint-stained wooden artist palette resting on one stone ledge outdoors. Authentic traces of dried paint, quiet still-life in soft daylight, earthy ochre and muted blue, restrained human work tools without any person. Not an office desk or invented interior.",
+      "review_image_sha256": "54b6f6f8bed1886d3e89d214d1c43466470cabe3578315b60df90a26310dc36d",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3091",
+    "sha256": "d4b4fe850bba464dd5b54bf3b848550ba758c370bae902304681ebf04092c2cc",
+    "url": "/editorial/term-10/3091-week66-d4b4fe850bba.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Biała róża — symboliczna ilustracja upamiętnienia.",
+    "source_print_number": "3091",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, sitting 66. Wide landscape 3:2, quiet real-world photographic still-life, natural soft overcast daylight and believable fine textures. No people, faces, hands, text, letters, numbers, logos, watermarks or specific named architecture. The image is a symbolic editorial illustration, not a depiction of a historical person or authentic historical artifact. A single fresh white rose with a few natural green leaves resting horizontally on a plain weathered pale stone ledge outside. Subdued, dignified remembrance, soft blurred greenery in the distance, rose left of centre, uninscribed stone. For an article commemorating Queen Anna Jagiellon, do not invent a crown, tomb, portrait or regalia.",
+      "review_image_sha256": "d4b4fe850bba464dd5b54bf3b848550ba758c370bae902304681ebf04092c2cc",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3161",
+    "sha256": "5c847ddd452c727e1f8b87c9a4e5cb5e3499da0c8dc1b54e49810415c4f8ff19",
+    "url": "/editorial/term-10/3161-week66-5c847ddd452c.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Baletki — symboliczna ilustracja tańca i choreografii.",
+    "source_print_number": "3161",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, sitting 66. Wide landscape 3:2, quiet real-world photographic still-life, natural soft overcast daylight and believable fine textures. No people, faces, hands, text, letters, numbers, logos, watermarks or specific named architecture. The image is a symbolic editorial illustration, not a depiction of a historical person or authentic historical artifact. A pair of visibly used soft canvas ballet slippers in neutral pale beige, resting side by side on a rough stone ledge outdoors. Thin tied ribbons with plausible continuity, scuffed fabric and authentic stitching, dignified dance-themed still-life with blurred quiet green background. For a commemorative article about a choreographer, no human body, feet or stage, no claim these are anyone's actual possessions.",
+      "review_image_sha256": "5c847ddd452c727e1f8b87c9a4e5cb5e3499da0c8dc1b54e49810415c4f8ff19",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3166",
+    "sha256": "5c847ddd452c727e1f8b87c9a4e5cb5e3499da0c8dc1b54e49810415c4f8ff19",
+    "url": "/editorial/term-10/3161-week66-5c847ddd452c.png",
+    "provider": "generated",
+    "caption": "Wygenerowana ilustracja tematyczna.",
+    "alt": "Baletki — symboliczna ilustracja tańca i choreografii.",
+    "source_print_number": "3161",
+    "source_url": "",
+    "author": "Tygodnik Sejmowy",
+    "license": "Ilustracja AI — wbudowany generator obrazów",
+    "license_url": "",
+    "metadata": {
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural. Asset type: neutral editorial thematic illustration for Tygodnik Sejmowy, sitting 66. Wide landscape 3:2, quiet real-world photographic still-life, natural soft overcast daylight and believable fine textures. No people, faces, hands, text, letters, numbers, logos, watermarks or specific named architecture. The image is a symbolic editorial illustration, not a depiction of a historical person or authentic historical artifact. A pair of visibly used soft canvas ballet slippers in neutral pale beige, resting side by side on a rough stone ledge outdoors. Thin tied ribbons with plausible continuity, scuffed fabric and authentic stitching, dignified dance-themed still-life with blurred quiet green background. For a commemorative article about a choreographer, no human body, feet or stage, no claim these are anyone's actual possessions.",
+      "review_image_sha256": "5c847ddd452c727e1f8b87c9a4e5cb5e3499da0c8dc1b54e49810415c4f8ff19",
+      "agent_visual_check": {
+        "no_people": true,
+        "no_text": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3182",
+    "sha256": "5f17ddd043e89483fb0b36311529101e446dcbf2efbea130abbaf16e129b9ce6",
+    "url": "/editorial/term-10/3182-week66-5f17ddd043e8.jpg",
+    "provider": "wikimedia_commons",
+    "caption": "Budynek Sejmu RP przy ul. Wiejskiej w Warszawie — fotografia z 10 kwietnia 2026 r.",
+    "alt": "Budynek Sejmu RP przy ulicy Wiejskiej w Warszawie.",
+    "source_print_number": "3182",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Warszawa_ul._Wiejska_Sejm_i_Senat._Sala_Posiedze%C5%84_Sejmu.jpg",
+    "author": "Januszk57",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "metadata": {
+      "source_title": "File:Warszawa ul. Wiejska Sejm i Senat. Sala Posiedzeń Sejmu.jpg",
+      "description": "Warszawa ul. Wiejska 4/6/8. Sejm i Senat. Sala Posiedzeń Sejmu.",
+      "date": "2026-04-10 11:24:31",
+      "width": 1280,
+      "height": 1479,
+      "sha256": "5f17ddd043e89483fb0b36311529101e446dcbf2efbea130abbaf16e129b9ce6",
+      "generator": null,
+      "prompt": null,
+      "review_image_sha256": "5f17ddd043e89483fb0b36311529101e446dcbf2efbea130abbaf16e129b9ce6",
+      "agent_visual_check": {
+        "no_people": true,
+        "identity_supported": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  },
+  {
+    "term": 10,
+    "number": "3162",
+    "sha256": "5f17ddd043e89483fb0b36311529101e446dcbf2efbea130abbaf16e129b9ce6",
+    "url": "/editorial/term-10/3182-week66-5f17ddd043e8.jpg",
+    "provider": "wikimedia_commons",
+    "caption": "Budynek Sejmu RP przy ul. Wiejskiej w Warszawie — fotografia z 10 kwietnia 2026 r.",
+    "alt": "Budynek Sejmu RP przy ulicy Wiejskiej w Warszawie.",
+    "source_print_number": "3182",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Warszawa_ul._Wiejska_Sejm_i_Senat._Sala_Posiedze%C5%84_Sejmu.jpg",
+    "author": "Januszk57",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "metadata": {
+      "source_title": "File:Warszawa ul. Wiejska Sejm i Senat. Sala Posiedzeń Sejmu.jpg",
+      "description": "Warszawa ul. Wiejska 4/6/8. Sejm i Senat. Sala Posiedzeń Sejmu.",
+      "date": "2026-04-10 11:24:31",
+      "width": 1280,
+      "height": 1479,
+      "sha256": "5f17ddd043e89483fb0b36311529101e446dcbf2efbea130abbaf16e129b9ce6",
+      "generator": null,
+      "prompt": null,
+      "review_image_sha256": "5f17ddd043e89483fb0b36311529101e446dcbf2efbea130abbaf16e129b9ce6",
+      "agent_visual_check": {
+        "no_people": true,
+        "identity_supported": true,
+        "topic_fit": true
+      },
+      "editorial_approval": {
+        "type": "human_chat_instruction",
+        "date": "2026-10-08",
+        "instruction": "Jest ok - pushuj te obrazy - chce je na prodzie",
+        "source_manifest": "week-66-20261008/manifest.json"
+      }
+    }
+  }
+]
