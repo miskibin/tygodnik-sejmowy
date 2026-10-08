@@ -16,6 +16,46 @@ from supagraf.stage import promises as stage_promises
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
+law_app = typer.Typer(no_args_is_help=True, add_completion=False)
+app.add_typer(law_app, name="law", help="Official legal document snapshots, coverage and indexes")
+
+
+@law_app.command("sync")
+def cmd_law_sync(
+    output: Path = typer.Option(Path("artifacts/law")),
+    max_dependencies: int = typer.Option(5000, min=1, max=5000),
+):
+    """Audit scoped roots/dependencies and append source-backed document versions."""
+    import json
+    from supagraf.law.ingest import sync_law
+    result = sync_law(output=output, max_dependencies=max_dependencies)
+    typer.echo(json.dumps(result, ensure_ascii=False))
+    raise typer.Exit(0 if result["status"] == "ok" else 1)
+
+
+@law_app.command("bootstrap")
+def cmd_law_bootstrap(
+    publisher: str = typer.Option("DU"), year_from: int = typer.Option(...), year_to: int = typer.Option(...),
+    output: Path = typer.Option(Path("artifacts/law-catalog")),
+):
+    """Initial year catalog import, including old unchanged acts (not the changes feed)."""
+    import json
+    from supagraf.law.ingest import bootstrap_catalog
+    typer.echo(json.dumps(bootstrap_catalog(publisher, year_from, year_to, output=output)))
+
+
+@law_app.command("embed")
+def cmd_law_embed(
+    model: str = typer.Option("qwen3-embedding:0.6b"), limit: int = typer.Option(0, min=0),
+    activate: bool = typer.Option(False),
+):
+    """Index complete articles in an isolated model space; no automatic model switch."""
+    import json
+    from supagraf.law.embed import build_index
+    result = build_index(model=model, limit=limit, activate=activate)
+    typer.echo(json.dumps(result))
+    raise typer.Exit(1 if result["errors"] else 0)
+
 
 @app.command("network")
 def cmd_network(

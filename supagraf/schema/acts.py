@@ -60,6 +60,10 @@ class ActIn(BaseModel):
     announcement_date: Optional[date] = Field(default=None, alias="announcementDate")
     promulgation_date: Optional[date] = Field(default=None, alias="promulgation")
     legal_status_date: Optional[date] = Field(default=None, alias="legalStatusDate")
+    entry_into_force: Optional[date] = Field(default=None, alias="entryIntoForce")
+    binding_from: Optional[date] = Field(default=None, alias="validFrom")
+    repeal_date: Optional[date] = Field(default=None, alias="repealDate")
+    expiration_date: Optional[date] = Field(default=None, alias="expirationDate")
     change_date: Optional[datetime] = Field(default=None, alias="changeDate")
     address: Optional[str] = None
     display_address: Optional[str] = Field(default=None, alias="displayAddress")

@@ -54,6 +54,7 @@ export function ProcessContent({ data, citations }: { data: PrintWithStages; cit
             <p className="mt-3 text-sm">{outcome.act.displayAddress}</p>
             {outcome.act.status && <p className="mt-2 text-xs text-muted-foreground">Status: {outcome.act.status}{outcome.act.publishedAt ? ` · opublikowano ${new Date(outcome.act.publishedAt).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}` : ""}</p>}
             {outcome.act.sourceUrl && <a href={outcome.act.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-xs underline underline-offset-4">Zobacz tekst aktu w ISAP ↗</a>}
+            <Link href={`/prawo/${outcome.act.eliId}`} className="mt-3 block text-sm underline">Tekst i wersje w bazie prawa</Link>
           </section>}
           {matchedPromises.length > 0 && <section className="mt-8 border-t border-border pt-6">
             <h2 className="text-lg font-medium">Powiązane obietnice wyborcze</h2>
