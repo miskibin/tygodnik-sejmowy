@@ -12,5 +12,13 @@ export function StoryPhoto({ image }: { image: StoryImage }) {
     <Image src={image.url} alt={image.alt} width={image.width} height={image.height}
       sizes="(max-width: 460px) calc(100vw - 40px), 420px" loading="lazy"
       onError={() => setFailed(true)} />
+    <figcaption className="mt-2 text-xs leading-relaxed text-muted-foreground">
+      {image.caption && <span>{image.caption} </span>}
+      {image.provider === "generated" ? <span>Ilustracja AI · {image.author}</span> : <>
+        <span>Fot.: {image.author} · </span>
+        {image.license_url ? <a href={image.license_url} target="_blank" rel="noopener noreferrer" className="underline">{image.license}</a> : image.license}
+        {image.source_url && <> · <a href={image.source_url} target="_blank" rel="noopener noreferrer" className="underline">Źródło zdjęcia</a></>}
+      </>}
+    </figcaption>
   </figure>;
 }
