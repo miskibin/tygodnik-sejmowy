@@ -35,60 +35,63 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
 
   return <article className={styles.story} id={`sprawa-${story.id}`} aria-labelledby={`tytul-${story.id}`}>
     <div className={styles.storyContent}>
-      <div className={styles.storyMeta}>
-        {main?.date && <time dateTime={main.date}>{new Date(main.date).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}</time>}
-        {story.topics[0] && <span className={styles.topic}>{TOPICS[story.topics[0]].label}</span>}
-        {story.prints[0] && <span>Druk {story.prints[0].number}</span>}
-        {(story.phase !== "Debata i głosowania" || !main) && !story.title.toLocaleLowerCase("pl").includes(story.phase.toLocaleLowerCase("pl")) && <span>{story.phase}</span>}
-      </div>
-      <h2 id={`tytul-${story.id}`} className={styles.storyTitle}>{href ? <Link href={href}>{story.title}</Link> : story.title}</h2>
-      {main && result && <div className={styles.result}>
-        <p><i aria-hidden /><strong>{amendmentsOnly ? senateResult : result.label}</strong></p>
-        {!amendmentsOnly && story.phase === "Poprawki Senatu" && <p className={styles.procedure}>{result.question}</p>}
-        {amendmentsOnly && <p className={styles.procedure}>Przyjęte poprawki: {acceptedAmendments} z {amendments.length} głosowanych.</p>}
-      </div>}
-      {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
-      <div className={styles.storyBody}>
-        {story.projectSummaries && story.projectSummaries.length > 0 ? story.projectSummaries.map(p => <div key={p.number} className={styles.summary}>
-          <Link href={`/proces/${term}/${p.number}`} className={styles.summaryLabel}>Projekt {p.number}: </Link>
-          <WeeklySummary term={term} text={p.text} />
-        </div>) : story.summary && <div className={styles.summary}>
-          {hasProjects && <span className={styles.summaryLabel}>Założenia projektu: </span>}
-          <WeeklySummary term={term} text={story.summary} />
+      <div className={styles.storyIntro}>
+        <div className={styles.storyMeta}>
+          {main?.date && <time dateTime={main.date}>{new Date(main.date).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}</time>}
+          {story.topics[0] && <span className={styles.topic}>{TOPICS[story.topics[0]].label}</span>}
+          {story.prints[0] && <span>Druk {story.prints[0].number}</span>}
+          {(story.phase !== "Debata i głosowania" || !main) && !story.title.toLocaleLowerCase("pl").includes(story.phase.toLocaleLowerCase("pl")) && <span>{story.phase}</span>}
+        </div>
+        <h2 id={`tytul-${story.id}`} className={styles.storyTitle}>{href ? <Link href={href}>{story.title}</Link> : story.title}</h2>
+        {main && result && <div className={styles.result}>
+          <p><i aria-hidden /><strong>{amendmentsOnly ? senateResult : result.label}</strong></p>
+          {!amendmentsOnly && story.phase === "Poprawki Senatu" && <p className={styles.procedure}>{result.question}</p>}
+          {amendmentsOnly && <p className={styles.procedure}>Przyjęte poprawki: {acceptedAmendments} z {amendments.length} głosowanych.</p>}
         </div>}
       </div>
-      <div className={styles.actions}>
-        {href && <Link className={styles.primaryLink} href={href}>{story.prints.length ? "Przebieg sprawy" : main ? "Wynik głosowania" : "Pełna wypowiedź"}<ArrowRight size={17} aria-hidden /></Link>}
-        {story.summary && <span className={styles.sourceNote}>Streszczenie AI · źródło: Sejm</span>}
-      </div>
-      <div className={styles.disclosures}>
-        {story.votes.length > 0 && <details className={styles.voteDetails}>
-          <summary>Głosowania <span>{story.votes.length}</span></summary>
-          <ol>{story.votes.map(v => <li key={v.id}>
-            <Link href={v.sourceUrl || `/glosowanie/${v.id}`}><span>Nr {v.voting_number} · {voteMeaning(v).question}</span><strong>{voteMeaning(v).label}</strong></Link>
-            <VoteBreakdown vote={v} compact />
-          </li>)}</ol>
-        </details>}
-        {story.quote && <details className={styles.debateDetails}>
-          <summary>Fragment debaty</summary>
-          <figure className={styles.quote}>
-            <blockquote>„{story.quote.text.replace(/^[„“"]|[”"]$/g, "")}”</blockquote>
-            <figcaption>
-              {story.quote.mpId ? <Link href={`/posel/${story.quote.mpId}`}>{story.quote.speaker}</Link> : story.quote.speaker}
-              <Link href={`/mowa/${story.quote.id}`}>Pełna wypowiedź <span aria-hidden>→</span></Link>
-            </figcaption>
-          </figure>
-        </details>}
+      <div className={styles.storyCopy}>
+        <div className={styles.storyBody}>
+          {story.projectSummaries && story.projectSummaries.length > 0 ? story.projectSummaries.map(p => <div key={p.number} className={styles.summary}>
+            <Link href={`/proces/${term}/${p.number}`} className={styles.summaryLabel}>Projekt {p.number}: </Link>
+            <WeeklySummary term={term} text={p.text} />
+          </div>) : story.summary && <div className={styles.summary}>
+            {hasProjects && <span className={styles.summaryLabel}>Założenia projektu: </span>}
+            <WeeklySummary term={term} text={story.summary} />
+          </div>}
+        </div>
+        <div className={styles.actions}>
+          {href && <Link className={styles.primaryLink} href={href}>{story.prints.length ? "Przebieg sprawy" : main ? "Wynik głosowania" : "Pełna wypowiedź"}<ArrowRight size={17} aria-hidden /></Link>}
+        </div>
+        <div className={styles.disclosures}>
+          {story.votes.length > 0 && <details className={styles.voteDetails}>
+            <summary>Głosowania <span>{story.votes.length}</span></summary>
+            <ol>{story.votes.map(v => <li key={v.id}>
+              <Link href={v.sourceUrl || `/glosowanie/${v.id}`}><span>Nr {v.voting_number} · {voteMeaning(v).question}</span><strong>{voteMeaning(v).label}</strong></Link>
+              <VoteBreakdown vote={v} compact />
+            </li>)}</ol>
+          </details>}
+          {story.quote && <details className={styles.debateDetails}>
+            <summary>Fragment debaty</summary>
+            <figure className={styles.quote}>
+              <blockquote>„{story.quote.text.replace(/^[„“"]|[”"]$/g, "")}”</blockquote>
+              <figcaption>
+                {story.quote.mpId ? <Link href={`/posel/${story.quote.mpId}`}>{story.quote.speaker}</Link> : story.quote.speaker}
+                <Link href={`/mowa/${story.quote.id}`}>Pełna wypowiedź <span aria-hidden>→</span></Link>
+              </figcaption>
+            </figure>
+          </details>}
+        </div>
       </div>
     </div>
-    {(main && !amendmentsOnly || story.prints.length > 0) && <aside className={styles.storyAside} aria-label={`Wynik i dokumenty: ${story.title}`}>
+    {(story.image || main && !amendmentsOnly || story.prints.length > 0) && <aside className={styles.storyAside} aria-label={`Ilustracja, wynik i dokumenty: ${story.title}`}>
+      {story.image && <StoryPhoto key={story.image.url} image={story.image} />}
       {main && !amendmentsOnly && <VoteSummary vote={main} />}
-      {story.prints.length > 0 && <section className={styles.documents}>
-        <h3>Dokumenty tej sprawy<FileText size={16} aria-hidden /></h3>
+      {story.prints.length > 0 && <details className={styles.documents}>
+        <summary>Dokumenty źródłowe <span>{story.prints.length}</span></summary>
         <ul>{story.prints.map(print => <li key={print.number}>
           <Link href={`/proces/${term}/${print.number}#dokumenty`}><FileText size={19} aria-hidden /><span>{print.title}<small>Druk {print.number}</small></span><ArrowRight size={15} aria-hidden /></Link>
         </li>)}</ul>
-      </section>}
+      </details>}
     </aside>}
   </article>;
 }
@@ -123,8 +126,8 @@ export function BriefList({ edition, sitting, sittings, filters }: {
 
   return <main className={styles.edition}>
     <header className={styles.header}>
-      <div><p className={styles.sitting}>Posiedzenie {sitting.sittingNum}</p><h1>Tygodnik</h1>
-        <div className={styles.editionDate}><p>{dateRange(sitting.firstDate, sitting.lastDate)}</p><span>{edition.stories.length} spraw · {edition.voteCount} głosowań</span></div>
+      <div><h1>{dateRange(sitting.firstDate, sitting.lastDate) || `Posiedzenie ${sitting.sittingNum}`}</h1>
+        <p className={styles.editionMeta}>Posiedzenie {sitting.sittingNum} · {edition.stories.length} spraw · {edition.voteCount} głosowań</p>
         {inProgress && <p className={styles.sourceNote}>Posiedzenie w trakcie · dane są uzupełniane.</p>}
       </div>
       <nav className={styles.archive} aria-label="Wybór wydania">
@@ -152,6 +155,6 @@ export function BriefList({ edition, sitting, sittings, filters }: {
       {!active && !locallyFiltered && <Link href={`/posiedzenie/${sitting.sittingNum}`}>Informacje o posiedzeniu →</Link>}
     </div>}
     {stories.length > visible && <button className={styles.more} onClick={() => setVisible(n => n + 8)}>Pokaż kolejne sprawy <span>Pozostało: {stories.length - visible} <span aria-hidden>↓</span></span></button>}
-    <footer className={styles.editionFooter}><p>Źródła: druki, stenogramy i wyniki głosowań Sejmu RP.</p><nav aria-label="Opcje tygodnika"><Link href="/preferencje">Preferencje</Link><a href="/rss.xml">RSS</a></nav></footer>
+    <footer className={styles.editionFooter}><p>Streszczenia AI na podstawie druków, stenogramów i wyników głosowań Sejmu RP.</p><nav aria-label="Opcje tygodnika"><Link href="/preferencje">Preferencje</Link><a href="/rss.xml">RSS</a></nav></footer>
   </main>;
 }
