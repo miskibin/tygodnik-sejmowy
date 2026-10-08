@@ -57,6 +57,21 @@ def cmd_law_embed(
     raise typer.Exit(1 if result["errors"] else 0)
 
 
+@law_app.command("fulltext")
+def cmd_law_fulltext(
+    output: Path = typer.Option(Path("artifacts/law-fulltext")),
+    workers: int = typer.Option(3, min=1, max=6),
+    ocr: bool = typer.Option(True), refresh_catalog: bool = typer.Option(False),
+    limit: int = typer.Option(0, min=0),
+):
+    """Import all published ELI statutes, original/latest consolidated texts, with resume and OCR."""
+    import json
+    from supagraf.law.fulltext import import_all_statutes
+    result = import_all_statutes(output=output, workers=workers, ocr=ocr, refresh_catalog=refresh_catalog, limit=limit)
+    typer.echo(json.dumps(result, ensure_ascii=False))
+    raise typer.Exit(0 if result["status"] == "ok" else 1)
+
+
 @app.command("network")
 def cmd_network(
     term: int = typer.Option(10, min=1),

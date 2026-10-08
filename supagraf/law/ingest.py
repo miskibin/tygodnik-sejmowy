@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote, urlsplit
@@ -29,8 +30,17 @@ class Eli:
         self.session = httpx.Client(timeout=45, follow_redirects=True, headers={"User-Agent": "TygodnikSejmowy/1.0"})
 
     def get(self, path: str) -> bytes:
-        response = self.session.get(API + path)
-        response.raise_for_status()
+        for attempt in range(4):
+            try:
+                response = self.session.get(API + path)
+                response.raise_for_status()
+                break
+            except httpx.HTTPError as error:
+                if isinstance(error, httpx.HTTPStatusError) and error.response.status_code not in {408, 429, 500, 502, 503, 504}:
+                    raise
+                if attempt == 3:
+                    raise
+                time.sleep(2 ** attempt)
         parsed = urlsplit(path)
         target = self.output / "sources" / parsed.path.lstrip("/")
         if not target.suffix:
@@ -96,16 +106,26 @@ def related(act: dict) -> list[tuple[str, str]]:
             for entry in entries if isinstance(entry, dict) and entry.get("id")]
 
 
-def capture(api: Eli, sb, root: str, document: dict, dependency_hash: str, unresolved: list) -> dict:
+def capture(api: Eli, sb, root: str, document: dict, dependency_hash: str, unresolved: list,
+            *, full_text: bool = False, ocr: bool = False) -> dict:
     eli = document["ELI"]
     texts = document.get("texts", [])
     # Prefer a structured HTML document. The root's HTML is an original snapshot,
     # not a replacement for a later consolidated document or amendment.
+    extraction = None
     if document.get("textHTML"):
         path, source_type = f"/acts/{eli}/text.html", "html_original_or_consolidated"
-        raw = api.get(path)
-        extraction = html_units(raw)
-    else:
+        try:
+            raw = api.get(path)
+            extraction = html_units(raw)
+            if full_text:
+                from supagraf.law.fulltext import preserve_html
+                extraction = preserve_html(raw, extraction)
+        except (httpx.HTTPError, ValueError):
+            if not full_text:
+                raise
+            extraction = None
+    if extraction is None:
         chosen = next((t for t in texts if t.get("type") == "U"), None) or next((t for t in texts if t.get("type") in {"T", "O"}), None)
         if not chosen:
             raise ValueError("No supported source document")
@@ -113,15 +133,20 @@ def capture(api: Eli, sb, root: str, document: dict, dependency_hash: str, unres
         source_type = "pdf_" + chosen["type"]
         raw = api.get(path)
         extraction = pdf_units(raw)
+        if full_text:
+            from supagraf.law.fulltext import preserve_pdf
+            extraction = preserve_pdf(raw, extraction, ocr=ocr)
     if not extraction.units:
         raise ValueError("No complete articles extracted; previous document preserved")
     source_hash = sha256(raw)
-    version_id = sha256(f"{root}|{eli}|{source_hash}|{PARSER_VERSION}")
+    parser = PARSER_VERSION + ("+fulltext-v1" if full_text else "")
+    version_id = sha256(f"{root}|{eli}|{source_hash}|{parser}")
     version = {"id": version_id, "root_eli_id": root, "document_eli_id": eli, "source_url": API + path,
                "source_sha256": source_hash, "source_type": source_type, "captured_at": datetime.now(timezone.utc).isoformat(),
-               "document_date": document.get("promulgation"), "metadata": document, "parser_version": PARSER_VERSION,
+               "document_date": document.get("promulgation") or document.get("announcementDate"), "metadata": document, "parser_version": parser,
                "extraction_method": extraction.method, "extraction_quality": extraction.quality,
-               "warnings": extraction.warnings, "notes": json.dumps({"preamble": extraction.preamble, "footnotes": extraction.footnotes, "attachments": extraction.attachments}, ensure_ascii=False)}
+               "warnings": extraction.warnings, "notes": json.dumps({"preamble": extraction.preamble, "footnotes": extraction.footnotes, "attachments": extraction.attachments,
+                    **({"document_text": extraction.document_text} if full_text else {})}, ensure_ascii=False)}
     units = [{**{k: v for k, v in u.items() if k != "references"}, "id": sha256(version_id + "|" + u["anchor"]),
               "version_id": version_id, "references_json": u["references"]} for u in extraction.units]
     check = {"dependency_sha256": dependency_hash, "unresolved_changes": unresolved,

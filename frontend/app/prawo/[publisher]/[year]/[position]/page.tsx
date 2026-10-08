@@ -50,9 +50,9 @@ export default async function LawActPage({ params, searchParams }: {
   const entries = document.units.map(unit => {
     const variant = (variants.get(unit.article_number) ?? 0) + 1;
     variants.set(unit.article_number, variant);
-    return { id: unit.anchor, label: unit.label + (totals.get(unit.article_number)! > 1 ? ` (${variant}/${totals.get(unit.article_number)})` : ""), context: unit.context.filter(Boolean) };
+    return { id: unit.anchor, label: unit.label + (unit.article_number && totals.get(unit.article_number)! > 1 ? ` (${variant}/${totals.get(unit.article_number)})` : ""), context: unit.context.filter(Boolean) };
   });
-  let annotations: { preamble?: string; footnotes?: { page: number; text: string }[]; attachments?: { page: number; text: string }[] } = {};
+  let annotations: { document_text?: string; preamble?: string; footnotes?: { page: number; text: string }[]; attachments?: { page: number; text: string }[] } = {};
   try { annotations = JSON.parse(document.selected.notes || "{}"); } catch { /* Older snapshots have no source appendix. */ }
   return <main className={styles.reader}>
     <Link href="/prawo" className={styles.breadcrumb}>Prawo</Link>
@@ -86,7 +86,7 @@ export default async function LawActPage({ params, searchParams }: {
             </section>}
             <article id={unit.anchor} className={styles.article} data-law-article>
               <h3><a href={`#${encodeURIComponent(unit.anchor)}`}>{entries[index].label}</a>{articleFootnote(unit.body) && <sup><a href={annotations.footnotes?.length ? "#source-notes" : unit.source_url} aria-label="Przypis źródłowy">{articleFootnote(unit.body)}</a></sup>}</h3>
-              {totals.get(unit.article_number)! > 1 && <p className={styles.variantNote}>W tym dokumencie są różne brzmienia tego artykułu. Sprawdź warunki w <a href={annotations.footnotes?.length ? "#source-notes" : unit.source_url}>przypisach źródłowych</a>.</p>}
+              {unit.article_number && totals.get(unit.article_number)! > 1 && <p className={styles.variantNote}>W tym dokumencie są różne brzmienia tego artykułu. Sprawdź warunki w <a href={annotations.footnotes?.length ? "#source-notes" : unit.source_url}>przypisach źródłowych</a>.</p>}
               <LawText unit={unit} blocks={blocks.get(unit.id)!} links={links} ids={ids} />
               {previous && old && old.body_sha256 !== unit.body_sha256 && totals.get(unit.article_number) === 1 && <details className={styles.comparison}><summary>Brzmienie w porównywanym dokumencie</summary>
                 <LawText unit={old} blocks={lawBlocks({ ...old, anchor: `compare-${unit.anchor}` })} links={{ acts: [], metadata: [] }} ids={new Set()} />
@@ -107,6 +107,7 @@ export default async function LawActPage({ params, searchParams }: {
         {(annotations.attachments?.length ?? 0) > 0 && <details className={styles.extras}><summary>Załączniki do ustawy</summary>
           {annotations.attachments!.map((attachment, index) => <section key={index}><a href={`${document.selected.source_url}#page=${attachment.page}`}>Strona {attachment.page} dokumentu ELI</a><pre>{attachment.text}</pre></section>)}
         </details>}
+        {annotations.document_text && <details className={styles.extras}><summary>Pełny odczyt dokumentu źródłowego</summary><pre>{annotations.document_text}</pre></details>}
         {document.processes.length > 0 && <details className={styles.extras}><summary>Powiązane prace Sejmu</summary><p>Procesy dotyczą aktu lub powiązanych z nim dokumentów. Zakres zmian w artykułach wymaga sprawdzenia treści.</p>
           {document.processes.map((p: { term: number; number: string; title: string; linked_eli: string; relation: string }) => <p key={`${p.term}/${p.number}/${p.linked_eli}`}><Link href={`/proces/${p.term}/${p.number}`}>Druk {p.term}/{p.number} · {p.title}</Link></p>)}
         </details>}

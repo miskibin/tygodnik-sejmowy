@@ -45,6 +45,8 @@ services:
       # supabase_default network joined below. Kong routes /rest/v1/* to
       # supabase-rest exactly like the public HTTPS endpoint does.
       SUPABASE_URL: "http://supabase-kong:8000"
+      SUPAGRAF_LAW_SCOPE: ${SUPAGRAF_LAW_SCOPE:-scoped}
+      SUPAGRAF_LAW_OUTPUT: /app/law-fulltext
     networks:
       - default
       - supabase
@@ -55,6 +57,7 @@ services:
     volumes:
       - ./fixtures:/app/fixtures
       - ./logs:/app/logs
+      - ./law-fulltext:/app/law-fulltext
     profiles: ["jobs"]   # one-shot: never auto-up, only via `compose run`
     command: ["uv", "run", "python", "-m", "supagraf", "daily", "--term", "10"]
 

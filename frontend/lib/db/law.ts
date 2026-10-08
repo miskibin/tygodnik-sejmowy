@@ -1,7 +1,7 @@
 import "server-only";
 import { supabase } from "@/lib/supabase";
 import { isLegalBasis, lawUnitUrl, packUnits, validDate, type LawUnit } from "@/lib/law-types";
-import { mentionedActs, type LawLinks } from "@/lib/law-reader";
+import { mentionedActs, knownLawNames, type LawLinks } from "@/lib/law-reader";
 
 export type LawSearchOptions = { query: string; date: string; root?: string; article?: string; version?: string; limit?: number; semantic?: boolean };
 
@@ -66,14 +66,16 @@ async function queryVector(query: string): Promise<{ index: string; vector: numb
   return { index: data.id, vector };
 }
 
-export async function getLawRoots() {
+export async function getLawRoots(page = 1, title = "") {
+  let listing = supabase().from("law_roots").select("*,acts!inner(title,status,entry_into_force)", { count: "exact" });
+  if (title) listing = listing.ilike("acts.title", `%${title.replace(/[%_]/g, "")}%`);
   const [roots, future] = await Promise.all([
-    supabase().from("law_roots").select("*,acts(title,status,entry_into_force)").order("family"),
+    listing.order("eli_id").range((page - 1) * 20, page * 20 - 1),
     supabase().from("acts").select("eli_id,title,entry_into_force").gt("entry_into_force", validDate()).order("entry_into_force").limit(30),
   ]);
   if (roots.error) throw roots.error;
   if (future.error) throw future.error;
-  return { roots: roots.data ?? [], future: future.data ?? [] };
+  return { roots: roots.data ?? [], total: roots.count ?? 0, future: future.data ?? [] };
 }
 
 export async function getLawDocument(root: string, version?: string) {
@@ -99,11 +101,26 @@ export async function getLawDocument(root: string, version?: string) {
 
 export async function getLawLinks(units: LawUnit[]): Promise<LawLinks> {
   const sb = supabase();
-  const { data: versions, error } = await sb.from("law_versions").select("id,root_eli_id,document_eli_id,document_date,captured_at")
-    .order("document_date", { ascending: false, nullsFirst: false }).order("captured_at", { ascending: false });
-  if (error) throw error;
-  const latest = new Map<string, NonNullable<typeof versions>[number]>();
-  for (const version of versions ?? []) if (!latest.has(version.root_eli_id)) latest.set(version.root_eli_id, version);
+  const mentions = [...new Set(units.flatMap(u => mentionedActs(u.body)))];
+  const wanted = [...new Set([...mentions, ...knownLawNames.filter(a => units.some(u => a.pattern.test(u.body))).map(a => a.root)])];
+  type VersionLink = { id: string; root_eli_id: string; document_eli_id: string; document_date: string | null; captured_at: string };
+  const versions: VersionLink[] = [];
+  // Load only cited acts. A document must not scan the entire statutory catalog.
+  for (let start = 0; start < wanted.length; start += 100) {
+    const batch = wanted.slice(start, start + 100).join(",");
+    for (let offset = 0; ; offset += 500) {
+      const { data, error } = await sb.from("law_versions").select("id,root_eli_id,document_eli_id,document_date,captured_at")
+        .or(`root_eli_id.in.(${batch}),document_eli_id.in.(${batch})`)
+        .order("document_date", { ascending: false, nullsFirst: false }).order("captured_at", { ascending: false }).order("id")
+        .range(offset, offset + 499);
+      if (error) throw error;
+      versions.push(...(data ?? []) as VersionLink[]);
+      if ((data?.length ?? 0) < 500) break;
+    }
+  }
+  versions.sort((a, b) => (b.document_date ?? "").localeCompare(a.document_date ?? "") || b.captured_at.localeCompare(a.captured_at));
+  const latest = new Map<string, VersionLink>();
+  for (const version of versions) if (!latest.has(version.root_eli_id)) latest.set(version.root_eli_id, version);
   // Same-act references keep the selected document, including historical views.
   const selected = units[0];
   if (selected) latest.set(selected.root_eli_id, { id: selected.version_id, root_eli_id: selected.root_eli_id,
@@ -118,7 +135,6 @@ export async function getLawLinks(units: LawUnit[]): Promise<LawLinks> {
     }
     return { root: version.root_eli_id, version: version.id, documents: [version.document_eli_id], articles };
   }));
-  const mentions = [...new Set(units.flatMap(u => mentionedActs(u.body)))];
   const metadata: string[] = [];
   for (let offset = 0; offset < mentions.length; offset += 100) {
     const { data, error } = await sb.from("acts").select("eli_id").in("eli_id", mentions.slice(offset, offset + 100));

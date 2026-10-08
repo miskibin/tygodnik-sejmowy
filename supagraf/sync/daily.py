@@ -172,12 +172,23 @@ def _law_phase(ledger: RunLedger, *, skip_embed: bool) -> None:
     if os.environ.get("SUPAGRAF_ENABLE_LAW") != "1":
         return
     from pathlib import Path
-    from supagraf.law.ingest import sync_law
+    full_catalog = os.environ.get("SUPAGRAF_LAW_SCOPE") == "all_statutes"
+    if full_catalog:
+        from supagraf.law.fulltext import import_all_statutes
+        synchronize = lambda: import_all_statutes(
+            output=Path(os.environ.get("SUPAGRAF_LAW_OUTPUT", "artifacts/law-fulltext")),
+            refresh_catalog=True,
+        )
+    else:
+        from supagraf.law.ingest import sync_law
+        synchronize = lambda: sync_law(output=Path("artifacts/law"))
     result = _run(ledger, "law", lambda: {
-        "errors": 0 if (result := sync_law(output=Path("artifacts/law")))["status"] == "ok" else 1,
+        "errors": 0 if (result := synchronize())["status"] == "ok" else 1,
         "run_id": result["run_id"], "status": result["status"],
     })
-    if not skip_embed and result and result.get("errors") == 0:
+    if full_catalog:
+        ledger.skip("law:embed", "Full statutory source import uses full-text search; semantic backfill is separate")
+    elif not skip_embed and result and result.get("errors") == 0:
         from supagraf.law.embed import build_index
         _run(ledger, "law:embed", lambda: build_index(activate=True))
 

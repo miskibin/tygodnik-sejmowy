@@ -24,6 +24,7 @@ class Extraction:
     preamble: str = ""
     footnotes: list[dict] = field(default_factory=list)
     attachments: list[dict] = field(default_factory=list)
+    document_text: str = ""
 
 
 def normalize(value: str) -> str:
