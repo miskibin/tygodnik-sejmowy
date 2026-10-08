@@ -1,4 +1,6 @@
 import json
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
 from types import SimpleNamespace
 
 import pymupdf
@@ -7,6 +9,7 @@ import pytest
 from supagraf.law.extract import Extraction, pdf_units
 from supagraf.law.fulltext import (
     consolidated_targets, existing_documents, load_catalog, preserve_html, preserve_pdf, statutory_catalog,
+    initialize_worker,
 )
 
 
@@ -99,3 +102,22 @@ def test_latest_consolidation_is_numeric_and_distinct_from_amendments():
     document = {"references": {"Inf. o tekście jednolitym": [{"id": "DU/2025/999"}, {"id": "DU/2025/1000"}],
                                "Akty zmieniające": [{"id": "DU/2026/2000"}]}}
     assert consolidated_targets(document) == ["DU/2025/1000", "DU/2025/999"]
+
+
+def _worker_state():
+    import os
+    from supagraf.law import fulltext
+    with fulltext.OCR_LOCK:
+        result = fulltext.preserve_html(b"<p>Complete independent statutory source text.</p>", Extraction())
+        return os.getpid(), fulltext._EXISTING_DOCUMENTS, result.document_text
+
+
+def test_spawned_parser_preserves_resume_snapshot_and_shared_ocr_lock():
+    import os
+    context = multiprocessing.get_context("spawn")
+    existing = {("DU/2026/1", "DU/2026/1"): "immutable-metadata-hash"}
+    with ProcessPoolExecutor(max_workers=2, mp_context=context, initializer=initialize_worker,
+                             initargs=(existing, context.Lock())) as pool:
+        results = [future.result(timeout=30) for future in [pool.submit(_worker_state) for _ in range(4)]]
+    assert all(pid != os.getpid() and snapshot == existing and "statutory source text" in text
+               for pid, snapshot, text in results)

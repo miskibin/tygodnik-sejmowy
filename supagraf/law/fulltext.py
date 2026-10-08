@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import json
 import os
+import multiprocessing
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
@@ -20,6 +21,18 @@ from supagraf.sync.runlog import RunLedger
 
 FULLTEXT_PARSER = PARSER_VERSION + "+fulltext-v1"
 OCR_LOCK = threading.Lock()
+_EXISTING_DOCUMENTS: dict[tuple[str, str], str] = {}
+
+
+def initialize_worker(existing: dict, ocr_lock) -> None:
+    """Spawned workers own HTTP clients; transfer the resume snapshot once per process."""
+    global _EXISTING_DOCUMENTS, OCR_LOCK
+    _EXISTING_DOCUMENTS = existing
+    OCR_LOCK = ocr_lock
+
+
+def import_worker(act: dict, *, output: Path, ocr: bool) -> dict:
+    return import_statute(act, output=output, existing=_EXISTING_DOCUMENTS, ocr=ocr)
 
 
 def write_json(path: Path, value: dict) -> None:
@@ -215,8 +228,14 @@ def import_all_statutes(*, output: Path, workers: int = 3, ocr: bool = True, ref
             step.counts = {"catalog_total": catalog["total"], "selected": len(acts), "sha256": catalog["metadata_sha256"]}
         with ledger.step("full_text_documents", fatal=True) as step:
             existing = existing_documents(sb)
-            with (output / "results.jsonl").open("a", encoding="utf-8") as receipt, ThreadPoolExecutor(max_workers=workers) as pool:
-                futures = {pool.submit(import_statute, act, output=output, existing=existing, ocr=ocr): act["ELI"] for act in acts}
+            # Parsing historical HTML is CPU-bound. Spawn avoids sharing a live
+            # Supabase client across processes and also works on Windows.
+            context = multiprocessing.get_context("spawn")
+            with (output / "results.jsonl").open("a", encoding="utf-8") as receipt, ProcessPoolExecutor(
+                max_workers=workers, mp_context=context, initializer=initialize_worker,
+                initargs=(existing, context.Lock()),
+            ) as pool:
+                futures = {pool.submit(import_worker, act, output=output, ocr=ocr): act["ELI"] for act in acts}
                 for future in as_completed(futures):
                     root = futures[future]
                     try:
