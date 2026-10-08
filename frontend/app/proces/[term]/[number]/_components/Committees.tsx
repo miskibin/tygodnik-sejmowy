@@ -1,4 +1,5 @@
 import { stageLabel } from "@/lib/stages";
+import { warsawDay } from "@/lib/process-evidence";
 import type { LinkedCommitteeSitting, ProcessStage } from "@/lib/db/prints";
 
 function SectionHead({ title, subtitle }: { title: string; subtitle?: string | null }) {
@@ -17,7 +18,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
 
 function shortDate(iso: string | null): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return new Date(iso).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 /** Nagłówek sekcji: „5 posiedzeń”, „2 posiedzenia”, „1 posiedzenie”. */
@@ -54,7 +55,7 @@ function rowsFromRealSittings(sittings: LinkedCommitteeSitting[]): KomisjaRowDat
     const status = committeeStatusLabel(s.status);
     const details = [
       `nr ${s.sittingNum}`,
-      s.room ? `sala ${s.room}` : null,
+      s.room ? (/^sala\b/i.test(s.room) ? s.room : `sala ${s.room}`) : null,
       status,
     ].filter(Boolean);
     return {
@@ -69,6 +70,7 @@ function rowsFromRealSittings(sittings: LinkedCommitteeSitting[]): KomisjaRowDat
 }
 
 function rowsFromProcessStages(stages: ProcessStage[]): KomisjaRowData[] {
+  const today = warsawDay();
   return stages
     .filter((s) => COMMITTEE_STAGE_TYPES.has(s.stageType))
     .map((s) => {
@@ -77,8 +79,8 @@ function rowsFromProcessStages(stages: ProcessStage[]): KomisjaRowData[] {
         date: s.stageDate,
         title: label,
         subtitle: s.stageName && s.stageName !== label ? s.stageName : null,
-        stageTag: s.depth > 0 ? `etap ${s.depth}` : null,
-        sourceTag: null,
+        stageTag: null,
+        sourceTag: s.stageDate && s.stageDate.slice(0, 10) > today ? "Zaplanowany etap" : null,
         videoPlayerLink: null,
       };
     });
@@ -99,15 +101,14 @@ export function Committees({
 
   return (
     <section
-      className="py-12 px-3 md:px-4 lg:px-5 border-b border-border"
-      style={{ background: "var(--muted)" }}
+      className="py-8 border-b border-border"
     >
       <div className="max-w-[1280px] mx-auto">
-        <SectionHead title="Posiedzenia komisji" subtitle={committeeSectionSubtitle(rows.length)} />
+        <SectionHead title={committeeSittings.length > 0 ? "Posiedzenia komisji" : "Etapy prac w komisjach"} subtitle={committeeSittings.length > 0 ? committeeSectionSubtitle(rows.length) : null} />
 
         <ol className="list-none p-0 m-0 mt-1 md:mt-2 relative">
-          <div
-            className="absolute top-2 bottom-3 w-px"
+          <li aria-hidden="true"
+            className="absolute top-2 bottom-3 w-px list-none"
             style={{ left: 96, background: "var(--border)" }}
           />
           {rows.map((k, i) => (
@@ -136,7 +137,7 @@ function KomisjaRow({ row }: { row: KomisjaRowData }) {
           className="font-mono font-medium"
           style={{ fontSize: 13, color: pending ? "var(--muted-foreground)" : "var(--foreground)" }}
         >
-          {pending ? "oczekuje" : shortDate(row.date)}
+          {pending ? "brak daty" : shortDate(row.date)}
         </div>
         <div
           className="absolute rounded-full"

@@ -22,7 +22,7 @@ export function VoteSummary({ vote, notParticipating, decision = false }: {
 
   return <section className={styles.voteCard} aria-label={`Głosowanie nr ${vote.voting_number}`}>
     <div className={styles.cardMeta}>
-      <span>{decision ? `Rozstrzygnięcie · ${new Date(vote.date).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}` : "Wynik głosowania"}</span>
+      <span>{decision ? `Ostatnie głosowanie · ${new Date(vote.date).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw", day: "numeric", month: "long", year: "numeric" })}` : "Wynik głosowania"}</span>
       {!decision && <span>Nr {vote.voting_number}</span>}
     </div>
     {decision && <h2 className={styles.decision}>{meaning.label}</h2>}
@@ -39,7 +39,7 @@ export function VoteSummary({ vote, notParticipating, decision = false }: {
         {threshold && <i className={styles.threshold} style={{ left: decision ? "100%" : `${threshold / total * 100}%` }} />}
       </div>}
       {total > 0 && <div className={styles.scale} aria-hidden><span>{decision && threshold ? "Za ponownym uchwaleniem" : "0"}</span><span>{decision && threshold ? "Próg" : `${total} ${notParticipating == null ? "głosów oddanych" : "posłów"}`}</span></div>}
-      {!decision && <p className={styles.question}>{meaning.question}</p>}
+      <p className={styles.question}>{meaning.question}</p>
       {threshold && <p className={styles.thresholdNote}>Do odrzucenia weta potrzeba było <strong>{threshold} głosów za</strong>.{vote.yes < threshold ? ` Zabrakło ${threshold - vote.yes}.` : " Próg został osiągnięty."}</p>}
     </>}
     <Link className={styles.cardLink} href={vote.sourceUrl || `/glosowanie/${vote.id}`}>

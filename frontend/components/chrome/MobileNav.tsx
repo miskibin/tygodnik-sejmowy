@@ -7,8 +7,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 import { ThemeToggle } from "./ThemeToggle";
-import { SIDEBAR_MAIN_NAV, SECONDARY_NAV, isActive } from "./nav-items";
-export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
+import { SIDEBAR_MAIN_NAV, SECONDARY_GROUPS, isActive } from "./nav-items";
+export function MobileNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -69,48 +69,16 @@ export function MobileNav({ alertsCount = 0 }: { alertsCount?: number }) {
             );
           })}
 
-          <div className="text-[11px] text-muted-foreground px-3 pt-5 pb-2 font-medium">
-            Działy
-          </div>
-          {SECONDARY_NAV.filter((s) => s.href !== "/atlas" && s.href !== "/sondaze").map((s) => {
-            const on = isActive(pathname, s.href);
-            return (
-              <Link
-                key={s.href}
-                href={s.href}
-                onClick={close}
-                className="flex items-baseline justify-between gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-muted"
-                style={{
-                  color: on ? "var(--destructive)" : "var(--secondary-foreground)",
-                  background: on ? "var(--muted)" : "transparent",
-                  fontWeight: on ? 500 : 400,
-                }}
-              >
-                <span className="font-sans text-[14px]">{s.label}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">{s.hint}</span>
-              </Link>
-            );
-          })}
+          {SECONDARY_GROUPS.map(group => <div key={group.label} className="pt-4">
+            <p className="px-3 py-2 text-xs text-muted-foreground">{group.label}</p>
+            {group.items.map(item => <Link key={item.href} href={item.href} onClick={close}
+              aria-current={isActive(pathname, item.href) ? "page" : undefined}
+              className="block rounded-md px-3 py-3 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-semibold">{item.label}</Link>)}
+          </div>)}
         </nav>
 
         <div className="px-3 py-4 border-t border-rule flex items-center gap-2">
           <ThemeToggle variant="mobile" />
-          <Link
-            href="/alerty"
-            onClick={close}
-            className="relative flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 border border-border rounded-full text-secondary-foreground text-[13px]"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg>
-            Alerty
-            {alertsCount > 0 && (
-              <span className="ml-1 min-w-[18px] h-[18px] px-1.5 bg-destructive text-background font-mono text-[10px] font-semibold rounded-full inline-flex items-center justify-center">
-                {alertsCount}
-              </span>
-            )}
-          </Link>
           <PatroniteTrackedLink
             placement="mobile_nav"
             onClick={close}

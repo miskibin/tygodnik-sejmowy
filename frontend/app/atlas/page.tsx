@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/atlas" },
 };
 
-import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { PageHeader } from "@/components/chrome/PageHeader";
 import {
   getDistrictMap,
   getKlubFlow,
@@ -48,12 +48,9 @@ export default async function AtlasPage() {
   ]);
 
   return (
-    <main className="bg-background text-foreground px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-20 sm:pb-28 min-w-0 w-full">
+    <main className="bg-background text-foreground px-5 md:px-8 pt-8 md:pt-10 pb-20 sm:pb-28 min-w-0 w-full">
       <div className="max-w-[1280px] mx-auto min-w-0 w-full">
-        <PageBreadcrumb
-          items={[{ label: "Atlas" }]}
-          subtitle={`Aktualizacja: ${formatDataUpdate(lastUpdate)} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: Sejm RP`}
-        />
+        <PageHeader title="Atlas">{`Aktualizacja: ${formatDataUpdate(lastUpdate)} · n = ${heatmap.totalVotings.toLocaleString("pl-PL")} głosowań · Źródło: Sejm RP`}</PageHeader>
 
         <Link href="/powiazania" className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 p-5 hover:bg-muted">
           <span><span className="text-xs uppercase tracking-wider text-muted-foreground">Eksperyment</span><span className="mt-1 block text-xl font-medium">Powiązania posłów</span></span>

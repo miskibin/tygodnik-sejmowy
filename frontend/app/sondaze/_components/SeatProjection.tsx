@@ -169,9 +169,9 @@ export function SeatProjection({ rows, compact = false }: { rows: PollAverageRow
 
       {!compact && (
         <div className="grid gap-3 mt-5 md:grid-cols-3">
-          <Block label="Koalicja rządząca (15. kadencja)" seats={govSeats} threshold={MAJORITY} hint="KO + PSL + Polska2050 + Lewica + Razem" />
-          <Block label="Opozycja" seats={oppSeats} threshold={MAJORITY} hint="PiS + Konfederacja + KKP + PJJ" />
-          <Block label="Pozostali" seats={otherSeats} threshold={MAJORITY} hint="Niezrzeszeni · BS · inne kluby" />
+          <Block label="KO + PSL + Polska 2050 + Lewica" seats={govSeats} threshold={MAJORITY} hint="Scenariusz arytmetyczny" />
+          <Block label="PiS + Konfederacja + KKP + PJJ" seats={oppSeats} threshold={MAJORITY} hint="Scenariusz arytmetyczny" />
+          <Block label="Pozostali" seats={otherSeats} threshold={MAJORITY} hint="Pozostałe listy uwzględnione w modelu" />
         </div>
       )}
 

@@ -7,7 +7,6 @@ import {
   PROCES_GROUP_BLURB,
   PROCES_GROUP_HEADING,
   SPONSOR_LABEL,
-  classifyInFlight,
   type ProcesGroupKey,
 } from "@/lib/proces-classify";
 import { SearchHero } from "@/components/lists/SearchHero";
@@ -27,11 +26,11 @@ const SORT_OPTIONS: { id: SortKey; label: string; tip?: string }[] = [
   { id: "druk", label: "druk" },
 ];
 
-const GROUP_ORDER: ProcesGroupKey[] = ["sejm", "senat", "prezydent", "uchwalone"];
+const GROUP_ORDER: ProcesGroupKey[] = ["sejm", "senat", "prezydent", "uchwalone", "zakonczone"];
 
 function shortDate(iso: string | null): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "2-digit" });
+  return new Date(iso).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit", year: "2-digit" });
 }
 
 function daysBetween(iso: string | null, now = Date.now()): number | null {
@@ -67,6 +66,7 @@ export function ProcesDirectoryClient({ items }: { items: ProcesListItem[] }) {
       senat: 0,
       prezydent: 0,
       uchwalone: 0,
+      zakonczone: 0,
     };
     for (const it of items) counts[it.groupKey] += 1;
     return counts;

@@ -45,9 +45,9 @@ type Scenario = {
 const SCENARIOS: Scenario[] = [
   {
     id: "current",
-    name: "Obecna koalicja",
-    members: ["KO", "PSL", "TD", "Polska2050", "Lewica", "Razem"],
-    description: "Układ z 15. kadencji: KO, Trzecia Droga, Lewica.",
+    name: "KO + PSL + Polska 2050 + Lewica",
+    members: ["KO", "PSL", "TD", "Polska2050", "Lewica"],
+    description: "Suma mandatów tych list w modelu.",
   },
   {
     id: "right",
@@ -103,9 +103,8 @@ export function KoalicjeStub({
   return (
     <section className="min-w-0">
       <div className="text-secondary-foreground text-[15px] sm:text-[16px] leading-[1.55] max-w-[720px] mb-6 text-pretty">
-        Suma prognozowanych mandatów dla wstępnie zdefiniowanych bloków. Większość bezwzględna:{" "}
-        <strong className="text-foreground tabular-nums">{MAJORITY}</strong> z {SEJM_SEATS}. Czy
-        którykolwiek z tych układów byłby politycznie realny — to oddzielna rozmowa.
+        Scenariusze arytmetyczne, nie deklaracje partii. Większość ustawowej liczby posłów to{" "}
+        <strong className="text-foreground tabular-nums">{MAJORITY}</strong> z {SEJM_SEATS} mandatów.
       </div>
 
       <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
