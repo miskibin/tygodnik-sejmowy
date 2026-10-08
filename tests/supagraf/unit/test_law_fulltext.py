@@ -83,6 +83,27 @@ def test_scanned_annex_is_a_gap_until_ocr_is_enabled(monkeypatch):
         preserve_pdf(b"scan", Extraction(), ocr=False)
 
 
+def test_blank_page_review_binds_exact_source_bytes_and_retains_page_number(monkeypatch):
+    from supagraf.law import source_reviews
+    from supagraf.law.extract import sha256
+    class Page:
+        def __init__(self, text): self.text = text
+        def get_text(self, *args, **kwargs): return self.text
+        def get_images(self): return ["scan"]
+    class Document:
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def __iter__(self): return iter([Page("Complete statutory text on the first source page."), Page("")])
+    monkeypatch.setattr(pymupdf, "open", lambda **kwargs: Document())
+    monkeypatch.setattr(source_reviews, "VISUALLY_INSPECTED_BLANK_PAGES", {sha256(b"reviewed"): frozenset({2})})
+    result = preserve_pdf(b"reviewed", Extraction(), ocr=False)
+    assert "[Strona 2]" in result.document_text and len(result.units) == 1
+    assert result.units[0]["anchor"] == "source-page-1" and result.quality == "needs_review"
+    assert any("blank source pages: [2]" in warning for warning in result.warnings)
+    with pytest.raises(ValueError, match="requires OCR"):
+        preserve_pdf(b"changed bytes", Extraction(), ocr=False)
+
+
 def test_resume_reads_beyond_the_postgrest_response_limit_and_binds_metadata():
     rows = [{"root_eli_id": f"DU/2026/{i}", "document_eli_id": f"DU/2026/{i}", "metadata": act(i)} for i in range(1250)]
     class Query:

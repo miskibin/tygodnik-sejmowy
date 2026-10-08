@@ -66,10 +66,15 @@ def preserve_html(raw: bytes, extraction: Extraction) -> Extraction:
 
 def preserve_pdf(raw: bytes, extraction: Extraction, *, ocr: bool) -> Extraction:
     import pymupdf
+    from supagraf.law.source_reviews import VISUALLY_INSPECTED_BLANK_PAGES
 
     pages, scanned = [], []
+    blank_pages = VISUALLY_INSPECTED_BLANK_PAGES.get(sha256(raw), frozenset())
     with pymupdf.open(stream=raw, filetype="pdf") as document:
         for index, page in enumerate(document, 1):
+            if index in blank_pages:
+                pages.append("")
+                continue
             text = page.get_text("text", sort=True).strip()
             # Empty pages with images can hold historical scans or annexes.
             if len(text) < 30 and page.get_images():
@@ -90,6 +95,8 @@ def preserve_pdf(raw: bytes, extraction: Extraction, *, ocr: bool) -> Extraction
     if len("".join(pages)) < 30:
         raise ValueError("Official PDF contains no usable full text")
     extraction.document_text = "\n\n".join(f"[Strona {i}]\n{text}" for i, text in enumerate(pages, 1))
+    if blank_pages:
+        extraction.warnings.append(f"Visually inspected blank source pages: {sorted(blank_pages)}; bound to SHA256 {sha256(raw)}")
     if scanned or not extraction.units:
         # Do not combine partial machine-recognized articles with missing OCR pages.
         extraction.units = [page_unit(text, i, ocr=i in scanned) for i, text in enumerate(pages, 1) if text]
