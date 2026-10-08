@@ -29,7 +29,7 @@ export async function generateMetadata({
   const desc =
     p.impactPunch?.trim() ||
     p.summaryPlain?.trim()?.slice(0, 240) ||
-    `Pełny przebieg projektu ustawy ${term}/${number}: etapy procesu, głosowania, opinie, dopasowane obietnice wyborcze.`;
+    `Dokument ${term}/${number}: dostępne etapy postępowania, głosowania i źródła.`;
   const path = `/proces/${term}/${number}`;
   return {
     title,
@@ -54,7 +54,7 @@ export default async function DrukPage({
 }) {
   const { term: rawTerm, number } = await params;
   const term = Number(rawTerm);
-  if (!Number.isFinite(term)) notFound();
+  if (!Number.isSafeInteger(term) || term <= 0) notFound();
 
   const data = await getPrint(term, number);
   if (!data) notFound();

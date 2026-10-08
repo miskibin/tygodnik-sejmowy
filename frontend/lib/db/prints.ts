@@ -1,4 +1,5 @@
 import "server-only";
+import { chronologicalVotings, latestProcessVoting } from "@/lib/process-evidence";
 
 import { normalizeActSourceUrl } from "@/lib/isap";
 import { supabase } from "@/lib/supabase";
@@ -531,29 +532,17 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
     videoPlayerLink: (r.video_player_link as string | null) ?? null,
   }));
 
-  // Canonical voting from voting_print_links FK (mig 0047). Role priority:
-  // main > sprawozdanie > autopoprawka > poprawka > joint > other; tiebreak
-  // by voting_number desc. Replaces the prior "sort stage JSON by votingNumber"
-  // heuristic that broke on multi-print votings + autopoprawki.
-  const ROLE_RANK: Record<string, number> = {
-    main: 0, sprawozdanie: 1, autopoprawka: 2, poprawka: 3, joint: 4, other: 5,
-  };
+  // Links establish relevance; source dates establish chronology.
   let mainVoting: LinkedVoting | null = null;
   let relatedVotings: LinkedVoting[] = [];
   if (linkedRows && linkedRows.length > 0) {
-    const ranked = (linkedRows as Array<{ role: string; votings: Record<string, unknown> | Record<string, unknown>[] | null }>)
+    const linkedVotings = (linkedRows as Array<{ role: string; votings: Record<string, unknown> | Record<string, unknown>[] | null }>)
       .map((r) => {
         const v = Array.isArray(r.votings) ? r.votings[0] : r.votings;
         return v ? { role: r.role, v } : null;
       })
-      .filter((x): x is { role: string; v: Record<string, unknown> } => !!x)
-      .sort((a, b) => {
-        const ra = ROLE_RANK[a.role] ?? 9;
-        const rb = ROLE_RANK[b.role] ?? 9;
-        if (ra !== rb) return ra - rb;
-        return ((b.v.voting_number as number) ?? 0) - ((a.v.voting_number as number) ?? 0);
-      });
-    relatedVotings = ranked.map(({ role, v }) => ({
+      .filter((x): x is { role: string; v: Record<string, unknown> } => !!x);
+    relatedVotings = linkedVotings.map(({ role, v }) => ({
       votingId: v.id as number,
       role: role as LinkedVoting["role"],
       votingNumber: (v.voting_number as number) ?? 0,
@@ -571,7 +560,8 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
       topic: (v.topic as string) ?? null,
       kind: (v.kind as string) ?? undefined,
     }));
-    if (relatedVotings.length > 0) mainVoting = relatedVotings[0];
+    relatedVotings = chronologicalVotings(relatedVotings);
+    mainVoting = latestProcessVoting(relatedVotings);
   }
 
   // Per-club tally for the canonical voting (view voting_by_club from mig 0047).
@@ -591,6 +581,8 @@ export async function getPrint(term: number, number: string): Promise<PrintWithS
         .select("mp_id, club_ref, vote")
         .eq("voting_id", mainVoting.votingId),
     ]);
+    if (clubsRes.error) throw clubsRes.error;
+    if (seatsRes.error) throw seatsRes.error;
     votingByClub = (clubsRes.data ?? []).map((r) => ({
       clubShort: (r.club_short as string) ?? "",
       clubName: (r.club_name as string) ?? "",

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { supabase } from "@/lib/supabase";
-import { isSourceQuote } from "@/lib/source-quote";
+import { isSourceQuote, sourceSnippet } from "@/lib/source-quote";
 
 const DEFAULT_TERM = 10;
 
@@ -673,10 +673,8 @@ export async function getStatementsOverview(term = DEFAULT_TERM): Promise<Statem
   return { totalStatements: stmts.count ?? 0, totalProceedings: procs.count ?? 0 };
 }
 
-// Top-N viral quotes across the whole term, joined with the speaker's current
-// club. Powers the landing-page typewriter + carousel and the /mowa "Najgłośniej
-// w Sejmie" feed. We don't filter by date — viral_score already biases toward
-// memorable + recent. Keep payload tiny (no body_text, no preamble parsing).
+// Selected excerpts across the term, verified against each named speaker's
+// transcript passage. Club membership is current, not historical.
 export type ViralStatementCard = {
   id: number;
   speakerName: string | null;
@@ -691,32 +689,6 @@ export type ViralStatementCard = {
   viralScore: number | null;
 };
 
-// Pull the most-quotable single sentence out of a transcript body. Sejm
-// transcripts often open with a procedural preamble (kadencja/posiedzenie)
-// which we already strip on the detail page; for landing snippets we just
-// want a clean middle sentence between 60 and 220 chars.
-function snippetFromBody(body: string | null): string | null {
-  if (!body) return null;
-  const stripped = body
-    .replace(/^\s*\d+\.\s*kadencja[^.]*\./i, "")
-    .replace(/punkt porządku dziennego:[^.]*\./i, "")
-    .replace(/\(druki?\s+nr[^)]*\)/gi, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  const sentences = stripped.split(/(?<=[.!?])\s+/);
-  for (const s of sentences) {
-    const t = s.trim();
-    if (t.length >= 60 && t.length <= 220 && /[a-ząęółśżźćń]/i.test(t[0])) {
-      return t;
-    }
-  }
-  // Loose fallback: first 180 chars cut to nearest space.
-  if (stripped.length < 60) return null;
-  const slice = stripped.slice(0, 200);
-  const lastSpace = slice.lastIndexOf(" ");
-  return (lastSpace > 80 ? slice.slice(0, lastSpace) : slice) + "…";
-}
-
 export async function getTopViralStatements(
   limit = 12,
   term = DEFAULT_TERM,
@@ -725,7 +697,7 @@ export async function getTopViralStatements(
   const { data, error } = await sb
     .from("proceeding_statements")
     .select(
-      "id, mp_id, speaker_name, function, viral_quote, viral_reason, viral_score, tone, topic_tags, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
+      "id, mp_id, speaker_name, function, body_text, viral_quote, viral_reason, viral_score, tone, topic_tags, start_datetime, proceeding_day:proceeding_days!inner(date, proceeding:proceedings!inner(number))",
     )
     .eq("term", term)
     .not("viral_quote", "is", null)
@@ -745,6 +717,7 @@ export async function getTopViralStatements(
     mp_id: number | null;
     speaker_name: string | null;
     function: string | null;
+    body_text: string | null;
     viral_quote: string | null;
     viral_reason: string | null;
     viral_score: number | string | null;
@@ -753,7 +726,10 @@ export async function getTopViralStatements(
     start_datetime: string | null;
     proceeding_day: { date: string | null; proceeding: { number: number | null } | null } | null;
   };
-  const rows = (data ?? []) as unknown as Row[];
+  const rows = ((data ?? []) as unknown as Row[]).filter(r =>
+    isSourceQuote(r.body_text, r.speaker_name, r.viral_quote),
+  );
+  if (rows.length === 0) return getRecentStatementSnippets(limit, term);
 
   const mpIds = Array.from(new Set(rows.map((r) => r.mp_id).filter((x): x is number => x != null)));
   const clubMap = await resolveMpClubs(mpIds, term);
@@ -813,7 +789,7 @@ async function getRecentStatementSnippets(
 
   const picked: { row: Row; snippet: string }[] = [];
   for (const r of rows) {
-    const snip = snippetFromBody(r.body_text);
+    const snip = sourceSnippet(r.body_text, r.speaker_name);
     if (snip) picked.push({ row: r, snippet: snip });
     if (picked.length >= limit) break;
   }

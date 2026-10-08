@@ -133,10 +133,18 @@ export function voteMeaning(v: StoryVote): VoteMeaning {
   const passed = v.majority_votes != null ? v.yes >= v.majority_votes : v.yes > v.no;
   const question = (v.topic || v.description || v.title).replace(/\.$/, "");
   if (v.kind === "ON_LIST") {
-    const elected = v.majority_votes != null ? v.options?.filter(o => o.votes >= v.majority_votes!) : null;
-    return { label: elected?.length ? `Wybrano: ${elected.map(o => o.name).join(", ")}` : v.options?.length && v.majority_votes != null ? "Żadna kandydatura nie uzyskała wymaganej większości" : "Głosowanie nad kandydaturami", question, tone: "neutral" };
+    const elected = v.majority_votes != null && v.majority_votes > 0 ? v.options?.filter(o => o.votes >= v.majority_votes!) : null;
+    return { label: elected?.length ? `Wybrano: ${elected.map(o => o.name).join(", ")}` : v.options?.length && v.majority_votes != null && v.majority_votes > 0 ? "Żadna kandydatura nie uzyskała wymaganej większości" : "Głosowanie nad kandydaturami", question, tone: "neutral" };
   }
-  if (/wniosk.*Prezydenta.*ponowne rozpatrzenie/i.test(v.title)) {
+  const specialMajority = /wnios(?:ek|k).*Prezydenta.*ponowne rozpatrzenie|uchwale Senatu/i.test(v.title);
+  if (v.yes + v.no + v.abstain === 0 || (v.majority_votes != null && v.majority_votes <= 0) || (specialMajority && v.majority_votes == null)) {
+    return { label: "Wynik nierozstrzygnięty w dostępnych danych", question, tone: "neutral" };
+  }
+  // Explicit source wording takes precedence over an enrichment classification.
+  if (/^(?:(?:głosowanie nad|wniosek o|wnioskiem o)\s+)*(?:skróceni|skierowani|przerw|odroczeni|zmian[ęą] porządku|odesłani)/i.test(question)) {
+    return { label: passed ? "Wniosek przyjęty" : "Wniosek odrzucony", question, tone: "neutral" };
+  }
+  if (/wnios(?:ek|k).*Prezydenta.*ponowne rozpatrzenie/i.test(v.title)) {
     return { label: passed ? "Sejm odrzucił weto prezydenta" : "Weto prezydenta pozostaje w mocy", question: "Głosowanie nad ponownym uchwaleniem ustawy", tone: "neutral" };
   }
   if (/poprawk/i.test(question) && !/całoś(?:cią|ć) projektu/i.test(question)) {
@@ -152,8 +160,13 @@ export function voteMeaning(v: StoryVote): VoteMeaning {
     return { label: passed ? "Sejm odrzucił projekt" : "Wniosek o odrzucenie projektu upadł", question, tone: passed ? "negative" : "neutral" };
   }
   if (v.motion_polarity === "pass" || /całoś(?:cią|ć) projektu/i.test(question)) {
-    const resolution = /projekt(?:u)? uchwały/i.test(`${v.description ?? ""} ${v.title} ${question}`);
-    return { label: resolution ? (passed ? "Sejm przyjął uchwałę" : "Sejm odrzucił projekt uchwały") : (passed ? "Sejm uchwalił ustawę" : "Sejm odrzucił projekt ustawy"), question, tone: passed ? "positive" : "negative" };
+    const context = `${v.description ?? ""} ${v.title} ${question}`;
+    const resolution = /projekt(?:u)? uchwały/i.test(context);
+    const bill = /projekt(?:u)? ustaw|całoś(?:cią|ć) ustaw/i.test(context);
+    const subject = resolution ? "uchwałę" : bill ? "ustawę" : "projekt";
+    const label = passed ? (bill && !resolution ? "Sejm uchwalił ustawę" : `Sejm przyjął ${subject}`)
+      : resolution ? "Sejm odrzucił projekt uchwały" : bill ? "Sejm odrzucił projekt ustawy" : "Sejm odrzucił projekt";
+    return { label, question, tone: passed ? "positive" : "negative" };
   }
   return { label: passed ? "Wniosek przyjęty" : "Wniosek odrzucony", question, tone: "neutral" };
 }
@@ -161,7 +174,7 @@ export function voteMeaning(v: StoryVote): VoteMeaning {
 export function principalVote(votes: StoryVote[]): StoryVote | null {
   const ordered = [...votes].sort((a,b) => a.voting_number - b.voting_number);
   return ordered.filter(v => v.motion_polarity === "pass").at(-1)
-    ?? ordered.filter(v => /wniosk.*Prezydenta.*ponowne rozpatrzenie/i.test(v.title)).at(-1)
+    ?? ordered.filter(v => /wnios(?:ek|k).*Prezydenta.*ponowne rozpatrzenie/i.test(v.title)).at(-1)
     ?? ordered.filter(v => v.motion_polarity === "reject").at(-1)
     ?? ordered.at(-1) ?? null;
 }
@@ -200,7 +213,7 @@ export function buildWeeklyStories(term: number, statements: StoryStatement[], v
     const projects = related.filter(p => !p.is_meta_document && ["projekt_ustawy", "projekt_uchwaly"].includes(p.document_category ?? ""));
     const primary = projects[0] ?? related.find(p => p.summary_plain || p.impact_punch);
     const vote = principalVote(ballots);
-    const isVeto = /wniosk.*Prezydenta.*ponowne rozpatrzenie/i.test(context.title);
+    const isVeto = /wnios(?:ek|k).*Prezydenta.*ponowne rozpatrzenie/i.test(context.title);
     const senate = /uchwale Senatu/i.test(context.title);
     const title = projects.length > 1
       ? `${projects[0].short_title || projects[0].title} — wspólna debata`

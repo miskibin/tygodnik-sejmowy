@@ -1,7 +1,7 @@
 import { getAllActiveMps } from "@/lib/db/mps";
 import { getAllMpCardStats } from "@/lib/db/mp-card-stats";
 import { PoselDirectoryClient } from "./_components/PoselDirectoryClient";
-import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { PageHeader } from "@/components/chrome/PageHeader";
 
 export const metadata = {
   title: "Posłowie — Tygodnik Sejmowy",
@@ -9,18 +9,10 @@ export const metadata = {
     "Wszyscy posłowie X kadencji. Filtruj po klubie, okręgu, sortuj po aktywności. Każde dossier zawiera głosowania, interpelacje, wystąpienia.",
 };
 
-async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
-  try {
-    return await p;
-  } catch {
-    return fallback;
-  }
-}
-
 export default async function PoselIndexPage() {
   const [mps, statsMap] = await Promise.all([
-    safe(getAllActiveMps(), []),
-    safe(getAllMpCardStats(), new Map()),
+    getAllActiveMps(),
+    getAllMpCardStats(),
   ]);
 
   // Merge stats into the directory rows; never drop an MP if stats are missing.
@@ -37,10 +29,8 @@ export default async function PoselIndexPage() {
 
   return (
     <main className="bg-background text-foreground pb-12 sm:pb-16 min-w-0">
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 min-w-0">
-        <PageBreadcrumb
-          items={[{ label: "Posłowie" }]}
-        />
+      <div className="max-w-[1280px] mx-auto px-5 md:px-8 pt-8 md:pt-10 min-w-0">
+        <PageHeader title="Posłowie" />
 
         <PoselDirectoryClient mps={rows} />
       </div>

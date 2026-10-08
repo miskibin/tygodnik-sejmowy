@@ -5,7 +5,7 @@ import {
   isHubSort,
 } from "@/lib/db/promises";
 import { ObietniceClient } from "./_components/ObietniceClient";
-import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { PageHeader } from "@/components/chrome/PageHeader";
 
 export const revalidate = 300;
 
@@ -48,11 +48,8 @@ export default async function ObietnicePage({
 
   return (
     <div className="bg-background text-foreground pb-20">
-      <div className="max-w-[1240px] mx-auto px-4 md:px-8 lg:px-14 pt-6 md:pt-8">
-        <PageBreadcrumb
-          items={[{ label: "Obietnice" }]}
-          subtitle={`${total} obietnic z kampanii 2023.`}
-        />
+      <div className="max-w-[1280px] mx-auto px-5 md:px-8 pt-8 md:pt-10">
+        <PageHeader title="Obietnice">{`${total} obietnic z kampanii 2023.`}</PageHeader>
         <ObietniceClient rows={rows} counts={counts} total={total} />
       </div>
     </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/chrome/PageHeader";
 import { getLawRoots, searchLaw } from "@/lib/db/law";
 import { validDate, validEli } from "@/lib/law-types";
 
@@ -19,11 +20,11 @@ export default async function LawPage({ searchParams }: { searchParams: Promise<
     if (title) values.set("title", title);
     return `/prawo?${values}`;
   }
-  return <main className="mx-auto w-full max-w-4xl px-5 py-10">
-    <h1 className="mb-8 font-serif text-4xl">Prawo</h1>
+  return <main className="mx-auto w-full max-w-[1280px] px-5 md:px-8 py-8 md:py-10">
+    <PageHeader title="Prawo" />
     <form action="/prawo" className="grid gap-3 border-b border-border pb-8 sm:grid-cols-2">
       <label className="sm:col-span-2">Szukaj przepisu<input name="q" defaultValue={query} placeholder="np. odstąpienie od umowy" minLength={2} maxLength={400} className="mt-2 w-full rounded-md border border-input bg-background p-3" /></label>
-      <label>Identyfikator aktu ELI<input name="eli" defaultValue={root ?? ""} placeholder="np. DU/1974/141; puste: wszystkie ustawy" maxLength={24} className="mt-2 w-full rounded-md border border-input bg-background p-3" /></label>
+      <label>Identyfikator aktu ELI (opcjonalnie)<input name="eli" defaultValue={root ?? ""} placeholder="np. DU/1974/141" maxLength={24} className="mt-2 w-full rounded-md border border-input bg-background p-3" /></label>
       <label>Artykuł<input name="article" defaultValue={article} placeholder="np. 27" maxLength={20} className="mt-2 w-full rounded-md border border-input bg-background p-3" /></label>
       <button className="w-fit rounded-md bg-foreground px-5 py-3 text-background">Szukaj</button>
     </form>

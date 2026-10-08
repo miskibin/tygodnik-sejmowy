@@ -1,35 +1,30 @@
-// Three-pillar primary nav matches the manifesto ("3 do 7 rzeczy" — keep
-// top-level lean). Sondaże/Atlas/Mowa are exploration tools, not core
-// product, so they live under "Więcej". Global /szukaj is reachable from
-// the search button + Ctrl+K palette in the masthead, plus a SECONDARY_NAV
-// entry below for discoverability.
 export const PRIMARY_NAV = [
-  { href: "/tygodnik",  label: "Tygodnik" },
-  { href: "/prawo",     label: "Prawo" },
-  { href: "/posel",     label: "Posłowie" },
-  { href: "/obietnice", label: "Obietnice" },
+  { href: "/tygodnik", label: "Tygodnik" },
+  { href: "/proces", label: "Procesy" },
+  { href: "/prawo", label: "Prawo" },
+  { href: "/posel", label: "Posłowie" },
 ] as const;
-
-// Sidebar "Główne" gets two extra high-traffic explorer routes while desktop
-// top nav stays lean (PRIMARY_NAV + Więcej).
-export const SIDEBAR_MAIN_NAV = [
-  ...PRIMARY_NAV,
-  { href: "/atlas",   label: "Atlas" },
-  { href: "/sondaze", label: "Sondaże" },
+export const SIDEBAR_MAIN_NAV = PRIMARY_NAV;
+export const SECONDARY_GROUPS = [
+  { label: "Prace Sejmu", items: [
+    { href: "/posiedzenie", label: "Posiedzenia" },
+    { href: "/komisja", label: "Komisje" },
+    { href: "/mowa", label: "Wypowiedzi" },
+    { href: "/glosowanie", label: "Głosowania" },
+  ] },
+  { label: "Analizy", items: [
+    { href: "/obietnice", label: "Obietnice" },
+    { href: "/sondaze", label: "Sondaże" },
+    { href: "/atlas", label: "Atlas" },
+    { href: "/powiazania", label: "Powiązania" },
+  ] },
+  { label: "Serwis", items: [
+    { href: "/o-projekcie", label: "O projekcie" },
+    { href: "/preferencje", label: "Preferencje" },
+    { href: "/alerty", label: "Alerty" },
+  ] },
 ] as const;
-
-export const SECONDARY_NAV = [
-  { href: "/szukaj",       label: "Szukaj",      hint: "wyszukiwarka" },
-  { href: "/atlas",        label: "Atlas",       hint: "wykresy" },
-  { href: "/powiazania",   label: "Powiązania",  hint: "eksperyment" },
-  { href: "/sondaze",      label: "Sondaże",     hint: "poparcie partii" },
-  { href: "/proces",       label: "Procesy",     hint: "ścieżka ustaw" },
-  { href: "/mowa",         label: "Mowa",        hint: "transkrypcje" },
-  { href: "/komisja",      label: "Komisja",     hint: "posiedzenia" },
-  { href: "/o-projekcie",  label: "O projekcie", hint: "warsztat" },
-  { href: "/alerty",       label: "Alerty",      hint: "subskrypcje" },
-  { href: "/preferencje",  label: "Preferencje", hint: "wybór tematów" },
-] as const;
+export const SECONDARY_NAV = SECONDARY_GROUPS.flatMap(group => [...group.items]);
 
 export function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";

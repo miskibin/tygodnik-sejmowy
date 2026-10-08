@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PRIMARY_NAV, SECONDARY_NAV } from "./nav-items";
 import { Heart, Bug, Rss, Globe } from "lucide-react";
 import { PatroniteTrackedLink } from "./PatroniteTrackedLink";
 import { GithubIcon, YoutubeIcon, XIcon } from "./BrandIcons";
@@ -31,18 +32,8 @@ function relativeLabel(d: Date): string {
 // only when they carry page-specific CTAs.
 
 const SITEMAP = [
-  { href: "/tygodnik", label: "Tygodnik" },
-  { href: "/posel", label: "Posłowie" },
-  { href: "/obietnice", label: "Obietnice" },
-  { href: "/atlas", label: "Atlas" },
-  { href: "/mowa", label: "Mowa" },
-  { href: "/komisja", label: "Komisje" },
-  { href: "/proces", label: "Procesy" },
-  { href: "/szukaj", label: "Szukaj" },
-  { href: "/alerty", label: "Alerty" },
-  { href: "/preferencje", label: "Preferencje" },
-  { href: "/manifest", label: "Manifest" },
-  { href: "/o-projekcie", label: "O projekcie" },
+  ...PRIMARY_NAV,
+  ...SECONDARY_NAV,
   { href: "/jak-powstaje-ustawa", label: "Jak powstaje ustawa" },
 ] as const;
 
@@ -53,7 +44,7 @@ export async function SiteFooter() {
       role="contentinfo"
       className="border-t border-rule bg-muted mt-12"
     >
-      <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-14 py-12 grid gap-10 md:gap-8 grid-cols-1 md:grid-cols-3">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-8 py-12 grid gap-10 md:gap-8 grid-cols-1 md:grid-cols-3">
         {/* Wordmark + tagline */}
         <div>
           <Link href="/" className="inline-flex items-baseline gap-2">

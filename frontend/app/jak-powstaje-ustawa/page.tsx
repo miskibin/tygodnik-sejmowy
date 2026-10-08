@@ -862,7 +862,7 @@ const GLOSSARY: Term[] = [
   },
   {
     term: "Kworum",
-    def: <>Minimalna liczba posłów obecnych na sali wymagana do podjęcia decyzji. W Sejmie: 230 z 460. Bez kworum każde głosowanie jest nieważne.</>,
+    def: <>Minimalna liczba posłów obecnych na sali wymagana do podjęcia decyzji. Przy uchwalaniu zwykłej ustawy: co najmniej 230 z 460 posłów (art. 120 Konstytucji).</>,
   },
   {
     term: "Monitor Polski (M.P.)",
@@ -1248,12 +1248,6 @@ export default function JakPowstajeUstawaPage() {
               the inline SVG infographic on the right. */}
           <div className="grid gap-6 md:gap-8 items-center mb-8 md:mb-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
             <div>
-              <span
-                className="text-muted-foreground font-medium"
-                style={{ fontSize: 11, fontWeight: 600 }}
-              >
-                Przewodnik
-              </span>
               <h1
                 className="font-medium m-0 mt-3 mb-4 md:mb-5"
                 style={{ fontSize: "clamp(28px, 6vw, 56px)", letterSpacing: "-0.025em", lineHeight: 1.05 }}
@@ -1265,26 +1259,12 @@ export default function JakPowstajeUstawaPage() {
                 className="text-secondary-foreground m-0 mb-4 md:mb-5"
                 style={{ fontSize: "clamp(15px, 4vw, 18px)", lineHeight: 1.55 }}
               >
-                Ten przewodnik dzieli typowy proces uchwalania ustawy na{" "}
-                <strong>11 części</strong> — od wniesienia
+                Od wniesienia
                 projektu przez uprawniony podmiot, przez prace komisji i
                 głosowania w Sejmie i Senacie, aż po podpis Prezydenta i
                 publikację w Dzienniku Ustaw.
               </p>
-              {/* Secondary lead — desktop only. On mobile the first paragraph
-                  carries enough; meta-commentary about citations would push
-                  the user-facing stats too far down. */}
-              <p
-                className="hidden md:block font-sans text-muted-foreground m-0"
-                style={{ fontSize: 14, lineHeight: 1.55 }}
-              >
-                Ten przewodnik tłumaczy każdy etap{" "}
-                <strong className="text-foreground">prostym językiem</strong>{" "}
-                i wskazuje{" "}
-                <strong className="text-foreground">podstawę prawną</strong>{" "}
-                w Konstytucji RP albo Regulaminie Sejmu, żeby każde
-                stwierdzenie można było zweryfikować.
-              </p>
+
             </div>
             <div className="hidden md:block">
               <HeroInfographic />
@@ -1308,9 +1288,7 @@ export default function JakPowstajeUstawaPage() {
             <div className="text-[14px] leading-relaxed pt-1">
               <strong className="font-medium">Proces nie zawsze idzie do przodu.</strong>{" "}
               Projekt może wrócić do komisji po poprawkach, Senat może zawrócić
-              ustawę, Sejm może odrzucić prezydenckie weto. Każde
-              &quot;cofnięcie&quot; to szansa na dopracowanie albo zatrzymanie
-              ustawy — a nie porażka.
+              ustawę, Sejm może odrzucić prezydenckie weto. Dalszy przebieg zależy od podjętych decyzji.
             </div>
           </div>
 
@@ -1409,12 +1387,6 @@ export default function JakPowstajeUstawaPage() {
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                       <PhasePill phase={stage.phase} />
-                      <span
-                        className="hidden md:inline text-muted-foreground font-medium"
-                        style={{ fontSize: 9.5 }}
-                      >
-                        pasek: {stage.bucket}
-                      </span>
                     </div>
                     <p
                       className="font-sans text-muted-foreground italic m-0 mt-2"

@@ -6,42 +6,29 @@ import type { ProcessSummary } from "@/lib/db/threads";
 // `uchwalone` is set externally by the loader for passed rows (closure_date
 // known, no live stage). Single source of truth — both the server fetch
 // merge and the client filter chip row consume this.
-export type ProcesGroupKey = "sejm" | "senat" | "prezydent" | "uchwalone";
+export type ProcesGroupKey = "sejm" | "senat" | "prezydent" | "zakonczone" | "uchwalone";
 
 export const PROCES_GROUP_HEADING: Record<ProcesGroupKey, string> = {
+  zakonczone: "Zakończone bez przyjęcia",
   sejm: "W Sejmie",
-  senat: "W Senacie",
-  prezydent: "U Prezydenta",
-  uchwalone: "Ostatnio uchwalone",
+  senat: "Stanowisko Senatu",
+  prezydent: "Etap prezydencki",
+  uchwalone: "Przyjęte",
 };
 
 export const PROCES_GROUP_BLURB: Record<ProcesGroupKey, string> = {
-  sejm: "Projekty po wpłynięciu, w komisjach albo w czytaniach plenarnych.",
-  senat: "Sejm zakończył pracę, Senat ma 30 dni na decyzję (20 — budżet, 14 — pilna).",
-  prezydent:
-    "Po głosowaniach w obu izbach. Prezydent ma 21 dni (7 — pilna/budżet) na podpis, weto lub TK.",
-  uchwalone: "Uchwalone w ciągu ostatnich 90 dni — opublikowane lub czekające na Dz.U.",
+  sejm: "Etapy sejmowe, w tym rozpatrywanie stanowiska Senatu i weta prezydenta.",
+  senat: "Stanowisko Senatu odnotowane w historii. Nie przesądza o zakończeniu prac nad ustawą.",
+  prezydent: "Odnotowano przekazanie ustawy prezydentowi, podpis lub skierowanie do TK.",
+  zakonczone: "Odrzucone, wycofane lub zakończone bez potwierdzenia przyjęcia.",
+  uchwalone: "Przyjęcie dokumentu nie oznacza wejścia przepisów w życie.",
 };
-
-const SENATE_STAGE_TYPES = new Set([
-  "SenatePosition",
-  "SenatePositionConsideration",
-  "SenateAmendments",
-]);
-
-const PRESIDENT_STAGE_TYPES = new Set([
-  "ToPresident",
-  "PresidentSignature",
-  "PresidentVeto",
-  "Veto",
-  "PresidentMotionConsideration",
-  "ConstitutionalTribunal",
-]);
 
 export function classifyInFlight(p: ProcessSummary): Exclude<ProcesGroupKey, "uchwalone"> {
   const t = p.lastStageType ?? "";
-  if (SENATE_STAGE_TYPES.has(t)) return "senat";
-  if (PRESIDENT_STAGE_TYPES.has(t)) return "prezydent";
+  if (["End", "Rejected", "Withdrawn"].includes(t)) return "zakonczone";
+  if (t === "SenatePosition") return "senat";
+  if (["ToPresident", "PresidentSignature", "ConstitutionalTribunal"].includes(t)) return "prezydent";
   return "sejm";
 }
 

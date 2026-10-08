@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 // Global error boundary (Next.js convention). Replaces the default red
-// dev-style stack trace with a branded "Coś poszło nie tak" page in
+// dev-style stack trace with a branded "Nie udało się wczytać strony" page in
 // production. Client component (required by Next).
 
 export default function GlobalError({
@@ -26,17 +26,6 @@ export default function GlobalError({
       className="bg-background text-foreground px-4 sm:px-8 md:px-14 pt-10 sm:pt-14 pb-24 sm:pb-28"
     >
       <div className="max-w-[760px] mx-auto">
-        <div
-          aria-hidden="true"
-          className="italic font-medium leading-none tracking-[-0.04em] mb-6"
-          style={{
-            color: "var(--destructive)",
-            fontSize: "clamp(4rem, 14vw, 8rem)",
-          }}
-        >
-          ✶✶✶
-        </div>
-
         <h1
           className="font-medium m-0"
           style={{
@@ -45,7 +34,7 @@ export default function GlobalError({
             letterSpacing: "-0.02em",
           }}
         >
-          Coś poszło nie tak
+          Nie udało się wczytać strony
         </h1>
 
         {error.digest && (
@@ -58,8 +47,7 @@ export default function GlobalError({
           className="text-secondary-foreground max-w-[640px] mt-6 mb-10"
           style={{ fontSize: 18, lineHeight: 1.55 }}
         >
-          Strony nie udało się zrenderować. To pewnie nasza wina —
-          spróbuj odświeżyć, a jeśli to nie pomoże, wróć do Tygodnika.
+          Spróbuj ponownie lub wróć do Tygodnika.
         </p>
 
         <div className="flex items-center gap-5 flex-wrap">

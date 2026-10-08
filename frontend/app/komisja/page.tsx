@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import {
   getCommitteeList,
   getCommitteeActivityStats,
-  activityTier,
   type CommitteeListItem,
   type CommitteeActivity,
 } from "@/lib/db/committees";
-import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { PageHeader } from "@/components/chrome/PageHeader";
 import { CommitteeRow } from "@/components/komisja/CommitteeRow";
 
 export const metadata: Metadata = {
@@ -25,8 +24,8 @@ const GROUP_HEADING: Record<GroupKey, string> = {
 const GROUP_BLURB: Record<GroupKey, string> = {
   STANDING: "Stałe komisje przedmiotowe (zdrowie, edukacja, finanse…). Pracują przez całą kadencję.",
   EXTRAORDINARY: "Powołane ad hoc do konkretnego tematu lub projektu ustawy.",
-  INVESTIGATIVE: "Sejmowe komisje badające konkretne sprawy publiczne. Funkcja zbliżona do procesu sądowego.",
-  OTHER: "Komisje pozostałe — np. regulaminowa, etyki, sprawozdawcza.",
+  INVESTIGATIVE: "Powołane przez Sejm do zbadania określonej sprawy.",
+  OTHER: "Komisje bez przypisania do powyższych kategorii w danych źródłowych.",
 };
 
 function sortByActivity(
@@ -73,35 +72,22 @@ export default async function KomisjaIndexPage() {
     const a = activity.get(c.id);
     return (a?.last30dCount ?? 0) > 0;
   }).length;
-  const hotCount = committees.filter((c) => {
-    const a = activity.get(c.id);
-    return a ? activityTier(a) === "hot" : false;
-  }).length;
 
   const order: GroupKey[] = ["STANDING", "EXTRAORDINARY", "INVESTIGATIVE", "OTHER"];
 
   return (
     <main className="bg-background text-foreground pb-20">
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8">
-        <PageBreadcrumb
-          items={[{ label: "Komisje" }]}
-          subtitle={
+      <div className="max-w-[1280px] mx-auto px-5 md:px-8 pt-8">
+        <PageHeader title="Komisje">{
             <>
               {committees.length} komisji w X kadencji ·{" "}
-              <span className="text-foreground">{activeCount}</span> aktywnych w ostatnim miesiącu
-              {hotCount > 0 && (
-                <>
-                  {" · "}
-                  <span className="text-destructive">{hotCount}</span> bardzo aktywnych
-                </>
-              )}
+              <span className="text-foreground">{activeCount}</span> z posiedzeniem w ostatnich 30 dniach
               . Sortowane wg częstości posiedzeń.
             </>
-          }
-        />
+          }</PageHeader>
       </div>
 
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-2 md:pt-4 space-y-12">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-8 pt-2 md:pt-4 space-y-12">
         {/* Legend bar */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-sans text-muted-foreground border-b border-border pb-3">
           <span className="font-sans text-[11px] font-medium">Aktywność:</span>

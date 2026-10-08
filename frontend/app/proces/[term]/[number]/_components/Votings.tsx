@@ -20,7 +20,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
 
 function shortDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return new Date(iso).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 function votingChip(polarity: LinkedVoting["motionPolarity"], role: LinkedVoting["role"]): string {

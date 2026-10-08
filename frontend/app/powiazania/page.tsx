@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, Network } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { getNetworkPageData } from "@/lib/db/network";
+import { PageHeader } from "@/components/chrome/PageHeader";
 import { NetworkExplorer } from "./NetworkExplorer";
 
 export const metadata: Metadata = {
@@ -14,21 +15,11 @@ export const dynamic = "force-dynamic";
 export default async function NetworkPage() {
   const { snapshot, unavailable, stale } = await getNetworkPageData();
   return (
-    <main className="mx-auto max-w-[1440px] px-4 py-5 sm:px-8 sm:py-12">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 sm:mb-8">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Network size={16} aria-hidden="true" /> Atlas / Powiązania
-          <span className="rounded-full bg-highlight px-2.5 py-1 text-xs text-foreground">Eksperyment</span>
-        </div>
-        <Link href="/atlas" className="inline-flex min-h-11 items-center gap-1 text-sm hover:underline"><span className="sm:hidden">Atlas</span><span className="hidden sm:inline">Wróć do Atlasu</span><ArrowUpRight size={14} /></Link>
-      </div>
-      <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">Powiązania posłów</h1>
-      <p className="mt-3 mb-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:mt-4 sm:mb-8 sm:text-lg">
-        Wybierz osobę i sprawdź podobieństwo głosowań oraz działania stojące za każdą relacją.
-      </p>
+    <main className="mx-auto max-w-[1280px] px-5 py-8 md:px-8 md:py-10">
+      <PageHeader title="Powiązania posłów">Podobieństwo głosowań i wspólne działania. Powiązanie nie oznacza relacji osobistej.</PageHeader>
       {snapshot ? <NetworkExplorer data={snapshot} stale={stale} /> : (
-        <section className="rounded-2xl border border-border bg-muted/40 p-8 sm:p-12" role="status">
-          <h2 className="text-xl font-medium">{unavailable ? "Nie udało się pobrać mapy" : "Pierwsza mapa jest jeszcze przed nami"}</h2>
+        <section className="rounded-md border border-border bg-muted/40 p-8 sm:p-12" role="status">
+          <h2 className="text-xl font-medium">{unavailable ? "Nie udało się pobrać mapy" : "Brak danych o powiązaniach"}</h2>
           <p className="mt-3 max-w-xl text-muted-foreground">{unavailable
             ? "Dane są chwilowo niedostępne. Spróbuj odświeżyć stronę za chwilę."
             : "Powiązania pojawią się po zakończeniu pierwszej analizy danych. Przy każdej relacji znajdziesz dokumenty, daty i opis sposobu obliczenia."}</p>

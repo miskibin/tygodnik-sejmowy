@@ -22,7 +22,7 @@ function SectionHead({ title, subtitle }: { title: string; subtitle?: string | n
 
 function formatDate(iso: string | null): string | null {
   if (!iso) return null;
-  return new Date(iso).toLocaleDateString("pl-PL", {
+  return new Date(iso).toLocaleDateString("pl-PL", { timeZone: "Europe/Warsaw",
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -34,7 +34,7 @@ export function Citations({ items }: { items: ProcessCitation[] }) {
   const sittingNum = items[0].proceedingNumber;
 
   return (
-    <section className="py-12 border-b border-border">
+    <section className="py-8 border-b border-border">
       <div className="max-w-[1280px] mx-auto">
         <SectionHead
           title="Cytaty z sali plenarnej"
@@ -45,15 +45,14 @@ export function Citations({ items }: { items: ProcessCitation[] }) {
           }
         />
 
-        <div className="grid gap-6 md:gap-8 grid-cols-1 md:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1">
           {items.map((c) => (
             <CitationCard key={c.id} c={c} />
           ))}
         </div>
 
         <div className="mt-5 font-sans text-[11px] text-muted-foreground italic">
-          Próbka spośród najbardziej cytowalnych wypowiedzi — odśwież stronę, by
-          zobaczyć inne.
+          Wybrane fragmenty wypowiedzi, nie pełny zapis debaty.
         </div>
       </div>
     </section>

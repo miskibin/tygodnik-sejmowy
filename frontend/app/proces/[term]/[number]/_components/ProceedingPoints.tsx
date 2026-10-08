@@ -32,18 +32,10 @@ function pluralWypowiedzi(n: number): string {
 }
 
 function formatSittingDates(dates: string[]): string {
-  if (dates.length === 0) return "—";
-  const fmt = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" });
-  if (dates.length === 1) return fmt.format(new Date(dates[0]));
-  const first = new Date(dates[0]);
-  const last = new Date(dates[dates.length - 1]);
-  const sameYear = first.getFullYear() === last.getFullYear();
-  const sameMonth = sameYear && first.getMonth() === last.getMonth();
-  if (sameMonth) {
-    const monthYear = new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric" }).format(first);
-    return `${first.getDate()}–${last.getDate()} ${monthYear}`;
-  }
-  return `${fmt.format(first)} – ${fmt.format(last)}`;
+  const ordered = [...dates].sort();
+  if (ordered.length === 0) return "—";
+  const fmt = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Warsaw" });
+  return fmt.formatRange(new Date(ordered[0]), new Date(ordered[ordered.length - 1]));
 }
 
 // Collapse a stage row to a short badge string. stage_name carries the
@@ -98,7 +90,7 @@ export function ProceedingPoints({ points }: { points: ProceedingPoint[] }) {
   const groups = groupBySitting(points);
 
   return (
-    <section className="py-12 px-3 md:px-4 lg:px-5 border-b border-border">
+    <section className="py-8 border-b border-border">
       <div className="max-w-[1280px] mx-auto">
         <SectionHead
           title="Punkty obrad plenarnych"
@@ -212,7 +204,7 @@ function SittingGroupRow({ group }: { group: SittingGroup }) {
             className="text-muted-foreground"
             style={{ fontSize: 13, paddingLeft: 4 }}
           >
-            Procedowany bez wpisu w porządku obrad — etapy procesu poniżej.
+            Brak powiązanego punktu porządku obrad w dostępnych danych.
           </li>
         )}
       </ul>

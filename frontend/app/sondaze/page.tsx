@@ -16,7 +16,7 @@ import { SondazeHero } from "./_components/SondazeHero";
 import { SondazeTabsClient } from "./_components/SondazeTabsClient";
 import { KoalicjeStub } from "./_components/KoalicjeStub";
 import { ViewMethodologyFooter } from "@/components/chrome/ViewMethodologyFooter";
-import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { PageHeader } from "@/components/chrome/PageHeader";
 
 const TREND_INCLUSION_PCT = 3;
 
@@ -60,13 +60,13 @@ export default async function SondazePage() {
     { id: "teraz", label: "Średnia teraz", count: mainCount },
     { id: "trend", label: "Trend kwartalny", count: trendCount },
     { id: "koalicje", label: "Możliwe koalicje" },
-    { id: "lista", label: "Wszystkie sondaże", count: recent.length },
+    { id: "lista", label: "Ostatnie sondaże", count: recent.length },
   ];
 
   return (
-    <main className="bg-background text-foreground px-3 sm:px-8 md:px-14 pt-8 sm:pt-12 pb-12 sm:pb-16 min-w-0">
+    <main className="bg-background text-foreground px-5 md:px-8 pt-8 md:pt-10 pb-12 sm:pb-16 min-w-0">
       <div className="max-w-[1280px] mx-auto min-w-0">
-        <PageBreadcrumb items={[{ label: "Sondaże" }]} />
+        <PageHeader title="Sondaże" />
         <SondazeHero rows={averages} lastUpdateLabel={formatDataUpdate(lastUpdate)} />
 
         <div className="mt-8 sm:mt-12">
@@ -96,7 +96,7 @@ export default async function SondazePage() {
             {
               kicker: "Mandaty",
               children:
-                "Largest-remainder · próg 5% dla partii, 8% dla koalicji. Przybliżenie, nie prognoza wyborów (bez geografii D'Hondta).",
+                "Metoda największej reszty, jeden okręg, próg 5% dla każdej listy. Model nie uwzględnia koalicyjnego progu 8%, wyjątków dla mniejszości ani okręgowej metody D’Hondta.",
             },
             {
               kicker: "Źródła sondaży",

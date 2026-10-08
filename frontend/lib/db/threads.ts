@@ -2,6 +2,7 @@ import "server-only";
 
 import { normalizeActSourceUrl } from "@/lib/isap";
 import { supabase } from "@/lib/supabase";
+import { warsawDay } from "@/lib/process-evidence";
 import type { SponsorAuthority } from "@/lib/db/prints";
 
 export type { SponsorAuthority } from "@/lib/db/prints";
@@ -89,7 +90,9 @@ export async function getThreadsInFlight(limit = 30, cutoffDays = 90): Promise<P
     .select("process_id, stage_type, stage_name, stage_date")
     .eq("depth", 0)
     .gte("stage_date", cutoffDate)
+    .lte("stage_date", warsawDay())
     .order("stage_date", { ascending: false })
+    .order("ord", { ascending: false })
     .limit(2000);
   if (se) throw se;
 
@@ -200,6 +203,7 @@ export async function getPassedProcesses(limit = 30, cutoffDays = 90): Promise<P
     .select("id, term, number, title, last_refreshed_at, closure_date")
     .eq("passed", true)
     .gte("closure_date", cutoffDate)
+    .lte("closure_date", warsawDay())
     .order("closure_date", { ascending: false })
     .limit(limit);
   if (pe) throw pe;
@@ -246,8 +250,8 @@ export async function getPassedProcesses(limit = 30, cutoffDays = 90): Promise<P
       number: r.number,
       title: r.title ?? "",
       shortTitle: shortByKey.get(key) ?? null,
-      lastStageType: "Promulgation",
-      lastStageName: "Uchwalono",
+      lastStageType: null,
+      lastStageName: "Postępowanie zakończone",
       lastStageDate: r.closure_date,
       lastRefreshedAt: r.last_refreshed_at ?? null,
       firstStageDate: firstStageByProc.get(r.id) ?? null,
@@ -270,7 +274,7 @@ async function fetchFirstStageDates(
     .select("process_id, stage_date")
     .eq("depth", 0)
     .in("process_id", procIds)
-    .not("stage_date", "is", null)
+    .lte("stage_date", warsawDay())
     .order("stage_date", { ascending: true })
     .limit(5000);
   for (const r of (data ?? []) as Array<{ process_id: number; stage_date: string | null }>) {
@@ -298,18 +302,16 @@ export async function getLatestThread(): Promise<ProcessSummary | null> {
     .from("process_stages")
     .select("process_id, stage_type, stage_name, stage_date")
     .eq("depth", 0)
-    .not("stage_date", "is", null)
+    .lte("stage_date", warsawDay())
     .or(midPipelineMatch)
     .order("stage_date", { ascending: false })
+    .order("ord", { ascending: false })
     .limit(1);
   const mid = (midStages ?? [])[0] as
     | { process_id: number; stage_type: string | null; stage_name: string | null; stage_date: string | null }
     | undefined;
 
   let procId: number | null = mid?.process_id ?? null;
-  let latest: { stage_type: string | null; stage_name: string | null; stage_date: string | null } | null = mid
-    ? { stage_type: mid.stage_type, stage_name: mid.stage_name, stage_date: mid.stage_date }
-    : null;
 
   if (procId == null) {
     // Fallback: any most-recently-refreshed process.
@@ -323,16 +325,23 @@ export async function getLatestThread(): Promise<ProcessSummary | null> {
       | undefined;
     if (!p) return null;
     procId = p.id;
-    const { data: stageRows } = await sb
-      .from("process_stages")
-      .select("stage_type, stage_name, stage_date")
-      .eq("process_id", p.id)
-      .eq("depth", 0)
-      .not("stage_date", "is", null)
-      .order("stage_date", { ascending: false })
-      .limit(1);
-    latest = ((stageRows ?? [])[0] as typeof latest) ?? null;
   }
+
+  // The candidate stage picks the process, not its current status. Always read
+  // the actual latest recorded stage, including later closure/signature events.
+  const { data: stageRows, error: stageError } = await sb
+    .from("process_stages")
+    .select("stage_type, stage_name, stage_date")
+    .eq("process_id", procId)
+    .eq("depth", 0)
+    .lte("stage_date", warsawDay())
+    .order("stage_date", { ascending: false })
+    .order("ord", { ascending: false })
+    .limit(1);
+  if (stageError) throw stageError;
+  const latest = (stageRows ?? [])[0] as
+    | { stage_type: string | null; stage_name: string | null; stage_date: string | null }
+    | undefined;
 
   // Hydrate process header.
   const { data: procRows, error: pe } = await sb

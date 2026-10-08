@@ -32,7 +32,7 @@ export function allocateLargestRemainder(cap: number, weights: number[]): number
 // Project Sejm seats for every main party (residual codes excluded). Parties
 // below SEJM_THRESHOLD_PCT keep their `pct` but get 0 seats.
 export function projectSeats(rows: PollAverageRow[]): SeatRow[] {
-  const main = rows.filter((r) => !RESIDUAL_CODES.has(r.party_code));
+  const main = dedupeCoalitionRows(rows).filter((r) => !RESIDUAL_CODES.has(r.party_code));
   const qualified = main.filter((r) => r.percentage_avg >= SEJM_THRESHOLD_PCT);
   const sizes = qualified.map((r) => r.percentage_avg);
   const seats = allocateLargestRemainder(SEJM_SEATS, sizes);
@@ -50,16 +50,8 @@ export function projectSeatsMap(rows: PollAverageRow[]): Map<string, SeatRow> {
   return new Map(projectSeats(rows).map((r) => [r.party_code, r]));
 }
 
-// Editorial blocs — single source of truth so /sondaze headline and seat
-// breakdown stay consistent. Razem is in `gov` because the 15th-term
-// coalition relies on it for confidence votes.
-//
-// Double-count risk: a pollster may report `TD` as a single line OR split
-// it into `PSL` + `Polska2050`. Both `TD` and its components are in this
-// set; if a single `rows` array contains all three, bloc sums will
-// double-count. In practice every Polish pollster picks one convention per
-// poll, but the consumer should `dedupeCoalitionRows` to be safe.
-export const COALITION_GOV = new Set(["KO", "PSL", "TD", "Polska2050", "Lewica", "Razem"]);
+// Explicit arithmetic scenarios, not claims about membership of the current government.
+export const COALITION_GOV = new Set(["KO", "PSL", "TD", "Polska2050", "Lewica"]);
 export const COALITION_OPP = new Set(["PiS", "Konfederacja", "KKP", "PJJ"]);
 
 // If a poll has TD *and* one of its components, drop the components so we

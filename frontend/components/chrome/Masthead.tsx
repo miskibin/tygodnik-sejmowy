@@ -9,7 +9,7 @@ import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
 import { TygodnikLogoMark } from "./TygodnikLogoMark";
 import { GlobalSearchDialog } from "./GlobalSearchDialog";
-import { PRIMARY_NAV, SECONDARY_NAV, isActive } from "./nav-items";
+import { PRIMARY_NAV, SECONDARY_NAV, SECONDARY_GROUPS, isActive } from "./nav-items";
 
 // Tablet (768–1023) inherits the mobile burger nav. At iPad widths the primary
 // pills + Więcej + support action need more room than the middle column offers,
@@ -75,7 +75,7 @@ export function Masthead() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative flex items-center min-h-20 whitespace-nowrap hover:text-foreground"
+                className="relative flex items-center min-h-16 whitespace-nowrap hover:text-foreground"
                 aria-current={on ? "page" : undefined}
                 style={{
                   color: on ? "var(--foreground)" : "var(--muted-foreground)",
@@ -94,8 +94,8 @@ export function Masthead() {
             <button
               onClick={() => setMoreOpen((o) => !o)}
               aria-expanded={moreOpen}
-              aria-haspopup="menu"
-              className="min-h-20 flex items-center gap-1.5 whitespace-nowrap hover:text-foreground cursor-pointer"
+              aria-controls="more-navigation"
+              className="min-h-16 flex items-center gap-1.5 whitespace-nowrap hover:text-foreground cursor-pointer"
               style={{
                 color: secondaryActive ? "var(--foreground)" : "var(--muted-foreground)",
                 borderBottom: secondaryActive ? "2px solid var(--destructive)" : "2px solid transparent",
@@ -110,38 +110,22 @@ export function Masthead() {
             </button>
             {moreOpen && (
               <div
-                role="menu"
+                id="more-navigation"
                 className="absolute right-0 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto bg-background border border-rule rounded-md p-1.5 z-20"
                 style={{
                   top: "calc(100% + 8px)",
-                  minWidth: 200,
+                  minWidth: 230,
+                  maxHeight: "calc(100dvh - 100px)",
+                  overflowY: "auto",
                   boxShadow: "0 8px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)",
                 }}
               >
-                <div className="text-[11px] text-muted-foreground px-3 pt-2 pb-1.5 font-medium">
-                  Działy
-                </div>
-                {SECONDARY_NAV.map((s) => {
-                  const on = isActive(pathname, s.href);
-                  return (
-                    <Link
-                      key={s.href}
-                      href={s.href}
-                      onClick={() => setMoreOpen(false)}
-                      className="block w-full px-3 py-2 rounded transition-colors hover:bg-muted"
-                      style={{
-                        color: on ? "var(--destructive)" : "var(--secondary-foreground)",
-                        background: on ? "var(--muted)" : "transparent",
-                        fontWeight: on ? 500 : 400,
-                      }}
-                    >
-                      <div className="flex justify-between items-baseline gap-3 font-sans text-[13px]">
-                        <span>{s.label}</span>
-                        <span className="font-mono text-[10px] text-muted-foreground">{s.hint}</span>
-                      </div>
-                    </Link>
-                  );
-                })}
+                {SECONDARY_GROUPS.map(group => <div key={group.label} className="py-2 first:pt-0 border-b border-border last:border-0">
+                  <p className="px-3 py-2 text-xs text-muted-foreground">{group.label}</p>
+                  {group.items.map(item => <Link key={item.href} href={item.href} onClick={() => setMoreOpen(false)}
+                    aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                    className="block rounded px-3 py-2 text-sm hover:bg-muted aria-[current=page]:font-semibold">{item.label}</Link>)}
+                </div>)}
               </div>
             )}
           </div>

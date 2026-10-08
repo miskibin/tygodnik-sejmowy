@@ -1,9 +1,8 @@
 import {
   getThreadsInFlight,
   getPassedProcesses,
-  type ProcessSummary,
 } from "@/lib/db/threads";
-import { PageBreadcrumb } from "@/components/chrome/PageBreadcrumb";
+import { PageHeader } from "@/components/chrome/PageHeader";
 import { classifyInFlight } from "@/lib/proces-classify";
 import {
   ProcesDirectoryClient,
@@ -13,22 +12,13 @@ import {
 export const metadata = {
   title: "Procesy legislacyjne — Tygodnik Sejmowy",
   description:
-    "Wszystkie projekty ustaw w 10. kadencji Sejmu — z filtrami po fazie procesu, wyszukiwarką i sortowaniem.",
+    "Procesy z aktywnością w ostatnich 90 dniach: etapy prac, głosowania i dokumenty.",
 };
-
-async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
-  try {
-    return await p;
-  } catch (err) {
-    console.error("[/proces] data fetch failed", err);
-    return fallback;
-  }
-}
 
 export default async function ProcesIndexPage() {
   const [inFlight, passed] = await Promise.all([
-    safe(getThreadsInFlight(120, 90), [] as ProcessSummary[]),
-    safe(getPassedProcesses(50, 90), [] as ProcessSummary[]),
+    getThreadsInFlight(120, 90),
+    getPassedProcesses(50, 90),
   ]);
 
   const items: ProcesListItem[] = [
@@ -38,11 +28,8 @@ export default async function ProcesIndexPage() {
 
   return (
     <main className="bg-background text-foreground pb-20">
-      <div className="max-w-[1100px] mx-auto px-4 md:px-8 lg:px-14 pt-8 md:pt-10">
-        <PageBreadcrumb
-          items={[{ label: "Procesy" }]}
-          subtitle={`${items.length} projektów w 10. kadencji · aktywność z ostatnich 90 dni.`}
-        />
+      <div className="max-w-[1280px] mx-auto px-5 md:px-8 pt-8 md:pt-10">
+        <PageHeader title="Procesy">{`${items.length} procesów z aktywnością w ostatnich 90 dniach · do 120 nieprzyjętych i 50 przyjętych.`}</PageHeader>
 
         <ProcesDirectoryClient items={items} />
       </div>
