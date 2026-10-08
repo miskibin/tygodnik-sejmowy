@@ -79,7 +79,7 @@ def _build_index(*, model: str, limit: int, activate: bool) -> dict:
             sb.table("law_embedding_indexes").insert({"id": index_id, "model": model, "model_digest": metadata["digest"],
                 "dimension": MODEL_DIMS[model], "query_prefix": prefix, "document_prefix": "", "encoder_options": options, "active": False}).execute()
         counts = {"index_id": index_id, "model_digest": metadata["digest"], "model": model, "ok": 0, "reused": 0, "skipped": 0, "errors": []}
-        versions = sb.table("law_versions").select("id,root_eli_id,document_date").order("document_date", desc=True).execute().data or []
+        versions = sb.table("law_versions").select("id,root_eli_id,document_date,captured_at").order("document_date", desc=True, nullsfirst=False).order("captured_at", desc=True).order("id").execute().data or []
         selected = {}
         for version in versions:
             selected.setdefault(version["root_eli_id"], version["id"])

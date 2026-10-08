@@ -34,6 +34,55 @@ def test_unknown_html_structure_and_duplicate_anchors_are_not_verified():
     duplicate = document().replace(b'id="art-2"', b'id="art-1"')
     parsed = html_units(duplicate)
     assert parsed.quality == "needs_review" and parsed.warnings
+    assert len(parsed.units) == 2 and parsed.units[0]["anchor"] != parsed.units[1]["anchor"]
+
+
+def test_official_empty_heading_uses_sibling_titles_and_nested_amendments_stay_inside_parent():
+    source = '''<div class="unit unit_chpt"><h3></h3><p>Rozdział 1</p><p>Przepisy ogólne</p>
+    <div class="unit-inner"><div class="unit unit_arti" id="a1"><h3>Art. 1.</h3><div>Zmiana:
+    <div class="unit unit_arti" id="quoted-a2"><h3>Art. 2.</h3><div>Przytoczone brzmienie.</div></div>
+    </div></div></div></div>'''.encode()
+    result = html_units(source)
+    assert len(result.units) == 1
+    assert result.units[0]["context"] == ["Rozdział 1 — Przepisy ogólne"]
+    assert "Przytoczone brzmienie." in result.units[0]["body"]
+
+
+def test_pdf_notice_superscripts_chapters_notes_and_annexes_are_distinct(monkeypatch):
+    import pymupdf
+    from types import SimpleNamespace
+    from supagraf.law.extract import pdf_units
+
+    def line(text, *, size=9.96, centered=False, spans=None):
+        return {"bbox": [250 if centered else 72, 100, 345 if centered else 540, 112],
+                "spans": spans or [{"text": text, "size": size, "flags": 4, "bbox": [72, 100, 540, 112]}]}
+
+    records = [line("Art. 31. Cytat z innej ustawy."), line("Załącznik do obwieszczenia"), line("USTAWA"),
+               line("DZIAŁ I", centered=True),
+               {"bbox": [51, 100, 544, 112], "spans": [{"text": "Szeroki tytuł rozdziału", "size": 9.96, "flags": 20, "bbox": [51, 100, 544, 112]}]},
+               line("Przepisy ogólne", centered=True), line("Art. 1. Reguła."),
+               line("1) Przypis źródłowy.", size=9), line("", spans=[
+                   {"text": "Art. 3", "size": 9.96, "flags": 20, "bbox": [72, 100, 98, 112]},
+                   {"text": "[1]", "size": 6.48, "flags": 21, "bbox": [98, 97, 103, 109]},
+                   {"text": ". § 1. Dalsza reguła.", "size": 9.96, "flags": 4, "bbox": [103, 100, 540, 112]},
+               ]), line("Załącznik nr 1"), line("Formularz do zachowania.")]
+    class Page:
+        rect = SimpleNamespace(width=595)
+        def get_text(self, *args, **kwargs):
+            return {"blocks": [{"lines": records}]}
+    class Document:
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def __iter__(self): return iter([Page()])
+    monkeypatch.setattr(pymupdf, "open", lambda **kwargs: Document())
+    result = pdf_units(b"source")
+    assert [u["article_number"] for u in result.units] == ["1", "3¹"]
+    assert result.units[0]["context"] == ["DZIAŁ I — Szeroki tytuł rozdziału Przepisy ogólne"]
+    assert "Przypis" not in result.units[0]["body"] and "Formularz" not in result.units[-1]["body"]
+    assert "Cytat z innej ustawy" in result.preamble
+    assert result.footnotes[0]["text"] == "1) Przypis źródłowy."
+    assert "Formularz do zachowania" in result.attachments[0]["text"]
+    assert result.quality == "needs_review"
 
 
 def test_body_is_not_truncated_to_search_preview_length():

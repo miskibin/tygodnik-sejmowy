@@ -1,6 +1,7 @@
 import "server-only";
 import { supabase } from "@/lib/supabase";
 import { isLegalBasis, lawUnitUrl, packUnits, validDate, type LawUnit } from "@/lib/law-types";
+import { mentionedActs, type LawLinks } from "@/lib/law-reader";
 
 export type LawSearchOptions = { query: string; date: string; root?: string; article?: string; version?: string; limit?: number; semantic?: boolean };
 
@@ -94,6 +95,37 @@ export async function getLawDocument(root: string, version?: string) {
   const { data: processes, error: processError } = await sb.rpc("law_process_links", { p_root: root });
   if (processError) throw processError;
   return { root, title: acts.title as string, versions: versions ?? [], selected, units, processes: processes ?? [] };
+}
+
+export async function getLawLinks(units: LawUnit[]): Promise<LawLinks> {
+  const sb = supabase();
+  const { data: versions, error } = await sb.from("law_versions").select("id,root_eli_id,document_eli_id,document_date,captured_at")
+    .order("document_date", { ascending: false, nullsFirst: false }).order("captured_at", { ascending: false });
+  if (error) throw error;
+  const latest = new Map<string, NonNullable<typeof versions>[number]>();
+  for (const version of versions ?? []) if (!latest.has(version.root_eli_id)) latest.set(version.root_eli_id, version);
+  // Same-act references keep the selected document, including historical views.
+  const selected = units[0];
+  if (selected) latest.set(selected.root_eli_id, { id: selected.version_id, root_eli_id: selected.root_eli_id,
+    document_eli_id: selected.document_eli_id, document_date: selected.document_date, captured_at: selected.captured_at });
+  const acts = await Promise.all([...latest.values()].map(async version => {
+    const articles: Record<string, string> = {};
+    for (let offset = 0; ; offset += 500) {
+      const { data, error } = await sb.from("law_units").select("article_number,anchor").eq("version_id", version.id).order("ordinal").range(offset, offset + 499);
+      if (error) throw error;
+      for (const unit of data ?? []) if (unit.article_number && !articles[unit.article_number]) articles[unit.article_number] = unit.anchor;
+      if ((data?.length ?? 0) < 500) break;
+    }
+    return { root: version.root_eli_id, version: version.id, documents: [version.document_eli_id], articles };
+  }));
+  const mentions = [...new Set(units.flatMap(u => mentionedActs(u.body)))];
+  const metadata: string[] = [];
+  for (let offset = 0; offset < mentions.length; offset += 100) {
+    const { data, error } = await sb.from("acts").select("eli_id").in("eli_id", mentions.slice(offset, offset + 100));
+    if (error) throw error;
+    metadata.push(...(data ?? []).map(a => a.eli_id));
+  }
+  return { acts, metadata };
 }
 
 export async function searchLaw(options: LawSearchOptions) {

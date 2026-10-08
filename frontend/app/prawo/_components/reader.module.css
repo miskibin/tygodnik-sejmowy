@@ -1,0 +1,83 @@
+.reader { max-width:1240px; width:100%; margin:0 auto; padding:36px 32px 64px; color:var(--foreground); }
+.breadcrumb { font-size:13px; color:var(--muted-foreground); text-decoration:underline; text-underline-offset:4px; }
+.header { max-width:840px; margin:24px 0 32px; }
+.header h1 { font-family:var(--font-source-serif),Georgia,serif; font-size:clamp(28px,3vw,40px); font-weight:400; line-height:1.25; letter-spacing:-.025em; text-wrap:pretty; }
+.versionInfo { border-bottom:1px solid var(--border); margin-top:24px; padding-bottom:20px; font-size:12px; line-height:1.75; color:var(--muted-foreground); }
+.status { font-size:13px; color:var(--foreground); margin-bottom:5px; }
+.versionInfo a, .versionInfo summary { text-decoration:underline; text-underline-offset:4px; cursor:pointer; }
+.provenance { margin-top:10px; }
+.provenance p { overflow-wrap:anywhere; margin-top:8px; }
+.versions { display:flex; flex-wrap:wrap; align-items:end; gap:12px 20px; margin-top:20px; font-size:12px; }
+.versions label { display:grid; gap:6px; max-width:100%; min-width:0; }
+.versions select { max-width:100%; width:290px; padding:10px 12px; border:1px solid var(--border); border-radius:4px; background:var(--background); color:var(--foreground); font-size:12px; }
+.versions button { padding:11px 16px; border:1px solid var(--border); border-radius:4px; cursor:pointer; }
+.compareNote { font-size:12px; line-height:1.7; margin-top:16px; color:var(--muted-foreground); }
+.layout { display:grid; grid-template-columns:minmax(0,800px) 260px; gap:64px; align-items:start; }
+.document { min-width:0; }
+.chapter { padding:32px 0 16px; border-top:1px solid var(--border); scroll-margin-top:110px; }
+.chapter p { font-size:11px; color:var(--muted-foreground); line-height:1.7; margin-bottom:8px; }
+.chapter h2 { font-family:var(--font-source-serif),Georgia,serif; font-size:24px; font-weight:400; line-height:1.35; text-wrap:pretty; }
+.article { padding:26px 0 30px; border-bottom:1px solid var(--border); scroll-margin-top:110px; }
+.article h3 { font-size:17px; font-weight:600; margin-bottom:18px; }
+.article h3 a:hover { text-decoration:underline; text-underline-offset:4px; }
+.article h3 sup { font-size:10px; font-weight:400; margin-left:4px; color:var(--muted-foreground); }
+.legalText { font-family:var(--font-source-serif),Georgia,serif; font-size:19px; line-height:1.8; overflow-wrap:break-word; }
+.legalText p { margin:0 0 12px; scroll-margin-top:110px; }
+.legalText p:last-child { margin-bottom:0; }
+.paragraph,.point,.letter,.dash { display:flex; gap:12px; align-items:baseline; }
+.paragraph > span,.point > span,.letter > span,.dash > span { min-width:0; flex:1; }
+.point { padding-left:24px; }
+.letter { padding-left:48px; }
+.dash { padding-left:64px; }
+.marker { flex-shrink:0; min-width:1.5em; font-variant-numeric:tabular-nums; }
+.paragraph .marker { min-width:2.25em; }
+.marker:hover { text-decoration:underline; }
+.reference { text-decoration:underline; text-decoration-color:color-mix(in srgb,var(--foreground) 25%,transparent); text-underline-offset:4px; }
+.reference:hover { text-decoration-color:var(--foreground); }
+.articleActions { display:flex; flex-wrap:wrap; gap:8px 20px; margin-top:22px; font-size:11px; color:var(--muted-foreground); }
+.articleActions a { text-decoration:underline; text-underline-offset:4px; }
+.variantNote { font-size:12px; color:var(--muted-foreground); line-height:1.6; margin-bottom:16px; }
+.comparison { margin-top:18px; }
+.comparison summary { cursor:pointer; font-size:12px; }
+.comparison .legalText { font-size:17px; margin-top:16px; }
+.contents { position:sticky; top:104px; min-width:0; max-height:calc(100dvh - 128px); }
+.contentsTitle { font-size:13px; font-weight:600; padding-bottom:16px; }
+.contentsSearch { display:block; margin-bottom:12px; }
+.contentsSearch input { width:100%; background:var(--background); color:var(--foreground); font-size:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+.contentsSearch input::placeholder { color:var(--muted-foreground); }
+.contentsList { overflow-y:auto; max-height:calc(100dvh - 220px); overscroll-behavior:contain; scrollbar-width:thin; padding-right:12px; }
+.contentsGroup { border-bottom:1px solid var(--border); padding:10px 0; }
+.contentsGroup summary { cursor:pointer; font-size:12px; line-height:1.6; color:var(--muted-foreground); }
+.contentsGroup summary:hover { color:var(--foreground); }
+.contentsGroup ol { list-style:none; margin-top:8px; }
+.contentsGroup a { display:block; padding:7px 12px; border-left:2px solid transparent; font-size:12px; color:var(--muted-foreground); }
+.contentsGroup a:hover { color:var(--foreground); background:var(--muted); }
+.contentsGroup a[aria-current=location] { color:var(--foreground); border-color:var(--foreground); font-weight:600; }
+.mobileSummary { display:none; }
+.noMatch { font-size:12px; line-height:1.7; color:var(--muted-foreground); padding:16px 0; }
+.extras { margin-top:32px; border-top:1px solid var(--border); padding:20px 0; scroll-margin-top:125px; }
+.extras > summary { cursor:pointer; font-size:13px; font-weight:500; }
+.extras p,.extras a { font-size:13px; line-height:1.75; margin-top:12px; }
+.extras pre { white-space:pre-wrap; font-family:inherit; font-size:13px; line-height:1.8; margin-top:16px; overflow-wrap:anywhere; }
+.extras a { text-decoration:underline; text-underline-offset:4px; }
+.reader :is(a,summary,button,select,input):focus-visible { outline:2px solid var(--foreground); outline-offset:4px; }
+@media(max-width:1023px) {
+  .reader { padding:28px 20px 48px; }
+  .layout { display:flex; flex-direction:column; gap:0; }
+  .document { width:100%; order:1; }
+  .contents { width:100%; order:0; position:sticky; top:60px; z-index:10; background:var(--background); max-height:none; border-bottom:1px solid var(--border); margin-bottom:24px; }
+  .contentsTitle { display:none; }
+  .mobileSummary { display:flex; justify-content:space-between; align-items:center; padding:14px 0; cursor:pointer; font-size:13px; }
+  .mobileSummary span { color:var(--muted-foreground); font-size:11px; }
+  .contentsList { max-height:45dvh; padding-bottom:12px; }
+  .chapter { padding-top:24px; }
+  .legalText { font-size:18px; line-height:1.75; }
+  .point { padding-left:12px; }
+  .letter { padding-left:24px; }
+  .dash { padding-left:36px; }
+  .versions label,.versions select { width:100%; }
+  .header { margin-top:20px; margin-bottom:24px; }
+  .article { scroll-margin-top:125px; }
+  .legalText p { scroll-margin-top:125px; }
+}
+@media(prefers-reduced-motion:no-preference) { .reader { scroll-behavior:smooth; } }

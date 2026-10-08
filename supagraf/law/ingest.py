@@ -121,7 +121,7 @@ def capture(api: Eli, sb, root: str, document: dict, dependency_hash: str, unres
                "source_sha256": source_hash, "source_type": source_type, "captured_at": datetime.now(timezone.utc).isoformat(),
                "document_date": document.get("promulgation"), "metadata": document, "parser_version": PARSER_VERSION,
                "extraction_method": extraction.method, "extraction_quality": extraction.quality,
-               "warnings": extraction.warnings, "notes": ""}
+               "warnings": extraction.warnings, "notes": json.dumps({"preamble": extraction.preamble, "footnotes": extraction.footnotes, "attachments": extraction.attachments}, ensure_ascii=False)}
     units = [{**{k: v for k, v in u.items() if k != "references"}, "id": sha256(version_id + "|" + u["anchor"]),
               "version_id": version_id, "references_json": u["references"]} for u in extraction.units]
     check = {"dependency_sha256": dependency_hash, "unresolved_changes": unresolved,
