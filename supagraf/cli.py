@@ -525,6 +525,24 @@ def cmd_images_pipeline(
         raise typer.Exit(3)
 
 
+@enrich_app.command("illustrations")
+def cmd_enrich_illustrations(
+    term: int = typer.Option(10, "--term", "-t"),
+    sitting: int | None = typer.Option(None, "--sitting", "-s", help="default: newest sitting with votings"),
+    limit: int | None = typer.Option(None, "--limit", "-n", help="default: SUPAGRAF_ILLUSTRATION_MAX (12)"),
+):
+    """The daily's `enrich:illustrations` step: plan, generate on SFGPU, review and
+    publish approved images to `print_images`. Exit 3 on infrastructure failures."""
+    import json
+    from supagraf.db import load_dotenv
+    load_dotenv()
+    from supagraf.enrich.illustrations.daily import run_illustrations
+    stats = run_illustrations(term=term, sitting=sitting, limit=limit)
+    print(json.dumps(stats, ensure_ascii=False, indent=2, default=str))
+    if stats["failed"]:
+        raise typer.Exit(3)
+
+
 @enrich_app.command("prints")
 def cmd_enrich_prints(
     kind: str = typer.Option("unified", "--kind", "-k", help="unified | embed"),

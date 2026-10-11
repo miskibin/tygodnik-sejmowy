@@ -32,6 +32,8 @@ select id, status, started_at, finished_at, steps from etl_runs order by id desc
 | `load` | `load_*` SQL for **dirty resources only**, FK-ordered (`supagraf/sync/loaders.py`) | nothing dirty, `--skip-load` |
 | `load:relink_agenda_refs`, `backfill:*` | cheap relinks that depend on what changed | inputs not dirty |
 | `enrich:prints` | unified LLM pass on prints without `impact_punch`, `SUPAGRAF_ENRICH_WORKERS` at a time | `--skip-enrich` |
+| `enrich:images` | zero-cost Commons catalog match for the newest sitting's prints | `--skip-enrich` |
+| `enrich:illustrations` | prints still without an image: DeepSeek plan → Qwen-Image-2.1-Turbo on SFGPU → DeepSeek vision review → approved image to Storage + `print_images` (see below) | `--skip-enrich`, unless `SUPAGRAF_ENABLE_ILLUSTRATIONS=1` |
 | `enrich:statements` | flash pass on the newest sitting that has un-enriched statements | `--skip-enrich` |
 | `enrich:voting_short_title` | last 30 days | `--skip-enrich` |
 | `embed:*` | qwen3 embeddings (Ollama) for prints / statements / promises | `--skip-embed`, `SUPAGRAF_DAILY_SKIP_EMBED=1` |
@@ -150,8 +152,11 @@ bodies the DB already has.
   schema first, document last — and hits are logged from
   `prompt_cache_hit_tokens`.
 * **Pricing windows**: peak is Mon–Fri 01:00–04:00 and 06:00–10:00 UTC,
-  off-peak is half price. Schedule the cron outside those windows (e.g.
-  22:00 UTC); the daily logs a warning when it starts inside one.
+  off-peak is half price. The mixvm cron runs at 00:15 UTC. With
+  `SUPAGRAF_ENRICH_OFFPEAK_ONLY=1` (set in the mixvm compose) every LLM step
+  that would *start* inside a peak window is skipped (`skipped` in the
+  ledger) and its work stays pending for the next run — a manual daily at
+  09:00 on a weekday syncs and loads but spends no tokens.
 
 Prints that failed 3 times in 14 days are left alone until the window
 slides (`SUPAGRAF_ENRICH_FAILURE_BACKOFF_*`); after 8 attachment-fetch
@@ -190,7 +195,48 @@ PGRST205). Or via psql on mixvm as documented in CLAUDE.md.
 
 ## mixvm
 
-`deploy/mixvm/docker-compose.yml` runs `python -m supagraf daily --term 10`
+Scheduled by the `sejm` crontab on mixvm (VM clock is UTC):
+
+```
+15 0 * * * /home/sejm/sejmograf/daily.sh
+```
+
+`deploy/mixvm/daily.sh` (installed as `~/sejmograf/daily.sh`, refreshed from
+each release) takes the newest `v*.*.*` tag, exports it once to
+`~/sejmograf/releases/<tag>`, builds `sejmograf/supagraf:local` from it and
+runs the release's own `deploy/mixvm/docker-compose.yml` one-shot. Shipping
+ETL code = pushing a tag (the same tag also builds the frontend image). Logs:
+`~/sejmograf/logs/daily-YYYYMMDD.log`; status: `/admin/etl`.
+
+### Illustrations on SFGPU
+
+`enrich:illustrations` (`supagraf/enrich/illustrations/daily.py`) handles the
+newest sitting's prints that the Commons catalog left without a picture, at
+most `SUPAGRAF_ILLUSTRATION_MAX` (12) per run:
+
+1. DeepSeek flash plans a scene (`illustration_plan` v2) or abstains;
+   named institutions need an authentic Commons photo instead.
+2. SFGPU (`sf-ai-gpu`, RTX PRO 6000 96 GB) generates two candidates with
+   **Qwen-Image-2.1-Turbo** (8 steps, 2528×1696 → 1536×1024 JPEG, ~16 s
+   each) in a `--network none` container from a read-only model cache.
+3. DeepSeek vision reviews full frame + four crops (`illustration_review` v5);
+   the first approved candidate is uploaded to the public Storage bucket
+   `illustrations/term-N/<sha256>.jpg` and written to `print_images`.
+4. Abstentions/rejections are written as `no_match` under the same
+   `illustration:` policy hash, so a print is never re-planned until its
+   title or the policy (model, prompt versions) changes. GPU/LLM outages
+   write nothing and are retried the next night.
+
+The container reaches SFGPU as `michal@sf-ai-gpu.bison-fort.ts.net` with
+`~/sejmograf/sfgpu/id_ed25519`, whose `authorized_keys` entry is pinned to
+`scripts/illustrations/gate.sh` (`command=...,restrict`): it can only ask for
+GPU status or run one generation. Runtime setup / model bump:
+`scripts/illustrations/prepare-runtime.ps1` (from a workstation with the
+`sfgpu` SSH alias). Qwen-Image-2.1 is under the Qwen Research License
+(non-commercial). Disable with `SUPAGRAF_ENABLE_ILLUSTRATIONS=0` in
+`~/sejmograf/.env`.
+
+The compose file runs `python -m supagraf daily --term 10`
 one-shot. Keep `SUPAGRAF_LOAD_DIRECT_DSN` set there — `load_votes`,
 `load_proceedings` and the matview refreshes exceed Kong's 60 s upstream
 timeout when they run through PostgREST. The `fixtures/` bind mount is no

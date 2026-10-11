@@ -32,6 +32,7 @@ PaddleOCR and the GPU OCR experiments were removed in Sept 2026 (deadlocks, mult
 
 ## Updater (daily)
 
+- Scheduled: mixvm `sejm` crontab `15 0 * * * ~/sejmograf/daily.sh` (UTC) → newest `v*` tag. Ship ETL code by pushing a tag. `SUPAGRAF_ENRICH_OFFPEAK_ONLY=1` skips LLM steps that would start in DeepSeek's peak window. Daily illustrations: `enrich:illustrations` → Qwen-Image-2.1-Turbo on SFGPU via the SSH gate `scripts/illustrations/gate.sh`, auto-published to Storage bucket `illustrations` (see `docs/updater.md`).
 - `python -m supagraf daily` = `supagraf/sync/` (Sept 2026 rewrite). Incremental: per-resource change detection (server-side `modifiedSince`/`since` where the API has it, `changeDate`/payload diffs against `_stage_*` otherwise), loaders only for dirty resources, `etl_runs` ledger, non-zero exit on any failed step. Full description in `docs/updater.md`.
 - Needs migrations **0105** (`etl_runs`, `etl_cursors`, `proceeding_day_gaps`), **0106** (`vote_choice` += `VOTE_VALID`), **0107** (`load_votings` topic fallback), **0108** (per-sitting `load_proceeding` / `load_votings_sitting` / `load_votes_sitting`); refuses to run without 0105. Applied to prod 2026-09-07.
 - Heavy whole-term loaders (`load_proceedings`, `load_votes`, matview refreshes) exceed Cloudflare's 100 s limit through PostgREST (504, no commit). The daily avoids them via the per-sitting variants; `--full` / `--skip-fetch` still need `SUPAGRAF_LOAD_DIRECT_DSN` (mixvm).

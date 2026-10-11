@@ -102,3 +102,17 @@ def test_idempotence_and_dry_run(monkeypatch):
     monkeypatch.setattr(images, 'fetch_image', fail)
     assert run_images(sitting=64, client=client, force=True)['failed'] == 1
     assert client.saved == old
+
+
+def test_illustration_pipeline_rows_are_not_overwritten(monkeypatch):
+    import hashlib
+    import supagraf.enrich.scoped_prints as scoped
+    import supagraf.enrich.story_images as images
+    monkeypatch.setattr(scoped, 'build_plan', lambda **_: SimpleNamespace(rows=[{'id': 1}]))
+    monkeypatch.setattr(images, 'fetch_image', lambda *args: pytest.fail('Commons queried'))
+    client = Client()
+    client.saved = [{'print_id': 1, 'status': 'no_match', 'catalog_hash': 'illustration:v1:test',
+                     'subject_hash': hashlib.sha256('Jakość wody w kąpieliskach'.encode()).hexdigest(),
+                     'checked_at': '2020-01-01T00:00:00+00:00', 'image': None}]
+    assert run_images(sitting=64, client=client)['skipped'] == 1
+    assert client.saved[0]['catalog_hash'] == 'illustration:v1:test'

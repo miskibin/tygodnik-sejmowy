@@ -194,3 +194,24 @@ def test_failed_load_is_retried_next_run_when_upstream_is_unchanged(monkeypatch,
     assert load_attempts == [({"prints"}, {}), ({"prints"}, {})]
     assert second.exit_code == 0
     assert stubs["pending"].dirty == set()
+
+
+def test_offpeak_only_defers_llm_steps_but_keeps_free_ones(monkeypatch):
+    import supagraf.enrich.jobs as jobs
+    import supagraf.enrich.llm as llm
+    import supagraf.enrich.story_images as story_images
+    from types import SimpleNamespace
+    from supagraf.sync.runlog import RunLedger
+
+    ran = []
+    monkeypatch.setenv("SUPAGRAF_ENRICH_OFFPEAK_ONLY", "1")
+    monkeypatch.setattr(llm, "is_deepseek_peak_hour", lambda now=None: True)
+    monkeypatch.setattr(jobs, "enrich_pending_prints", lambda **_: pytest.fail("LLM in peak"))
+    monkeypatch.setattr(jobs, "enrich_pending_statements", lambda **_: pytest.fail("LLM in peak"))
+    monkeypatch.setattr(story_images, "run_images", lambda **_: ran.append("images") or {})
+    ledger = RunLedger(kind="daily", term=10, persist=False, args={})
+    daily._enrich_phase(SimpleNamespace(term=10), ledger, 1)
+    status = {s.name: s.status for s in ledger.steps}
+    assert ran == ["images"] and status["enrich:images"] == "ok"
+    assert status["enrich:prints"] == status["enrich:statements"] == status["enrich:voting_short_title"] == "skipped"
+    assert ledger.exit_code == 0

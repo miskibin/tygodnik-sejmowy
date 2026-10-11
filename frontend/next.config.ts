@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
   images: { formats: ["image/avif", "image/webp"], remotePatterns: [
     { protocol: "https", hostname: "upload.wikimedia.org", pathname: "/wikipedia/commons/**" },
+    // Daily illustrations (supagraf/enrich/illustrations/daily.py), immutable sha256 paths.
+    { protocol: "https", hostname: "db.msulawiak.pl", pathname: "/storage/v1/object/public/illustrations/**" },
   ] },
   experimental: {
     optimizePackageImports: [

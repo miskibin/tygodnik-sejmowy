@@ -1,6 +1,6 @@
 # Pipeline ilustracji artykułów
 
-Pipeline działa z repozytorium przez `supagraf enrich images-pipeline`. Przygotowuje gotowe pliki, wybór i galerię do oceny. Nie zmienia `print_images`, ETL harmonogramu ani fotografii na stronie produkcyjnej; dotychczasowa komenda `enrich images` zachowuje swoje działanie.
+Pipeline działa codziennie w ETL jako krok `enrich:illustrations` (`supagraf enrich illustrations`): obrazy zatwierdzone przez automatyczną kontrolę są publikowane bez ręcznego kroku — opis w `docs/updater.md` (sekcja *Illustrations on SFGPU*). Komenda `supagraf enrich images-pipeline` pozostaje trybem podglądu: przygotowuje pliki, wybór i galerię do oceny i nie zmienia `print_images`.
 
 ## Uruchomienie
 
@@ -26,7 +26,7 @@ Plik wejściowy to lista 1–20 obiektów:
 
 1. **DeepSeek Flash — plan.** Krótki, wersjonowany prompt daje strukturę: temat, uzasadnienie, trasa, prompt lub maksymalnie dwa zapytania. Sceny ogólne mogą być generowane. Nazwana instytucja, konkretne miejsce, osoba lub wydarzenie wymagają rzeczywistego źródła. Brak odpowiedniej ilustracji może zakończyć się bez obrazu.
 2. **Wybór źródła.** Dla ETPC rejestr `sourcing.AUTHENTIC_SOURCES` wskazuje wcześniej potwierdzone zdjęcie budynku w Strasburgu. Inne tematy korzystają z wyszukiwania Commons lub Pixabay. Autor, licencja i opis pochodzą z odpowiedzi źródła, nigdy z promptu. Filtr `photo` Pixabay nie dowodzi, że zdjęcie nie jest generowane.
-3. **SFGPU.** FLUX.2 klein 4B, snapshot `e7b7dc27f91deacad38e78976d1f2b499d76a294`, cztery kroki, 1536×1024, deterministyczne seedy, maksymalnie dwa obrazy na artykuł. Odrębny kontener bez sieci; model z własnego cache. Kontrola wolnej pamięci przed startem. Pipeline nie przerywa cudzych procesów. UID/GID 1000 oraz alias `sfgpu` opisują obecne środowisko.
+3. **SFGPU.** Qwen-Image-2.1-Turbo (od 11 października 2026; wcześniej FLUX.2 klein 4B), snapshot `d65dbc9a7e8f6b5479e33dee6030eaab2a906509`, 8 kroków, generacja 2528×1696 zapisana jako JPEG 1536×1024, deterministyczne seedy, maksymalnie dwa obrazy na artykuł. Odrębny kontener bez sieci; model z własnego cache. Kontrola wolnej pamięci przed startem. Pipeline nie przerywa cudzych procesów. UID/GID 1000 oraz alias `sfgpu` opisują obecne środowisko.
 4. **DeepSeek vision — kontrola pełnego kadru i czterech ćwiartek.** Wymagana jest kompletna, płaska odpowiedź JSON. Ocena dotyczy zgodności tematu, geometrii, ludzi/twarzy, napisów/logo oraz widocznych artefaktów. Dla konkretnej instytucji wymagane są zgodne metadane źródłowe. Samo pochodzenie AI nie dyskwalifikuje wygenerowanej ilustracji. Niepewność nie jest akceptacją.
 5. **Wybór.** Pierwszy kandydat, który przeszedł wszystkie wymagane kontrole, trafia do `selected.json`. Jeśli żaden nie przejdzie, pipeline nie wymyśla zastępczego zdjęcia. Zapisana decyzja nie uruchamia publikacji.
 

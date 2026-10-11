@@ -126,18 +126,32 @@ def _enrich_phase(ctx: SyncContext, ledger: RunLedger, workers: int | None) -> N
     from supagraf.enrich.llm import is_deepseek_peak_hour
     from supagraf.enrich.voting_short_title import enrich_votings
 
+    offpeak_only = os.environ.get("SUPAGRAF_ENRICH_OFFPEAK_ONLY") == "1"
+
+    def llm_step(name: str, fn: Callable[[], dict[str, Any] | None]) -> None:
+        # Checked per step: a long run can cross into the peak window. Whatever
+        # is skipped stays pending for the next (off-peak) run.
+        if offpeak_only and is_deepseek_peak_hour():
+            ledger.skip(name, "DeepSeek peak pricing window; deferred to the next off-peak run")
+            return
+        _run(ledger, name, fn)
+
     if is_deepseek_peak_hour():
-        logger.warning("DeepSeek peak pricing window (weekdays 01-04 & 06-10 UTC) — enrichment costs 2x")
+        logger.warning("DeepSeek peak pricing window (weekdays 01-04 & 06-10 UTC) — enrichment costs 2x"
+                       + (", LLM steps deferred" if offpeak_only else ""))
     w, term = workers or DEFAULT_WORKERS, ctx.term
-    _run(ledger, "enrich:prints", lambda: enrich_pending_prints(term=term, workers=w).to_dict())
+    llm_step("enrich:prints", lambda: enrich_pending_prints(term=term, workers=w).to_dict())
     from supagraf.enrich.story_images import run_images
     _run(ledger, "enrich:images", lambda: run_images(term=term))
-    _run(ledger, "enrich:statements", lambda: enrich_pending_statements(term=term, workers=w).to_dict())
-    _run(ledger, "enrich:voting_short_title",
-         lambda: dict(zip(("fast", "llm", "failed"), enrich_votings(term=term, days=30))))
+    if os.environ.get("SUPAGRAF_ENABLE_ILLUSTRATIONS") == "1":
+        from supagraf.enrich.illustrations.daily import run_illustrations
+        llm_step("enrich:illustrations", lambda: run_illustrations(term=term))
+    llm_step("enrich:statements", lambda: enrich_pending_statements(term=term, workers=w).to_dict())
+    llm_step("enrich:voting_short_title",
+             lambda: dict(zip(("fast", "llm", "failed"), enrich_votings(term=term, days=30))))
     if os.environ.get("SUPAGRAF_ENABLE_ACT_SHORT_TITLE") == "1":
         from supagraf.enrich.act_short_title import enrich_acts
-        _run(ledger, "enrich:act_short_title", lambda: dict(zip(("llm", "failed"), enrich_acts(days=30))))
+        llm_step("enrich:act_short_title", lambda: dict(zip(("llm", "failed"), enrich_acts(days=30))))
 
 
 def _embed_phase(ctx: SyncContext, ledger: RunLedger) -> None:

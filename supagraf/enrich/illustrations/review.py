@@ -17,7 +17,7 @@ from .models import Article, Candidate, Plan, Review, VisionReview
 
 REVIEW_MODEL = LLM_MODELS["vision"]
 REVIEW_PROMPT = "illustration_review"
-REVIEW_PROMPT_VERSION = 4
+REVIEW_PROMPT_VERSION = 5
 FEEDBACK_POLICY_VERSION = "2026-09-12-courtroom-rejection-v1"
 # Human editorial feedback: exact rejected trial bytes are permanently excluded.
 REJECTED_SHA256 = {
@@ -31,6 +31,8 @@ REJECTED_SHA256 = {
     "2a40c5f8dd443c21636913e5dfdbebb80d31f5bd1ad5309cb0f305596e73640e",
     "85b20b0a8ab4b250e3b688c11b2d46795baccfcd6dc7d5274a6d0ffc2051d3e6",
     "c1b7540537d956c71663ebec5826c0a440f70bc6de25f9df95c936347fa8df79",
+    # Visual QA of the first daily run, 2026-10-11: walking cane with a handle at both ends.
+    "82f47c5396477a71efe3bf9c0fb19495968dd3c9ae35a01ee24672b421797467",
 }
 
 

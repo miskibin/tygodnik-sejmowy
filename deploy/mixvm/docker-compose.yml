@@ -2,10 +2,14 @@
 #
 # - `ollama`: long-running embeddings server. Persistent model cache at
 #   `./ollama_data`. Bound to internal compose network only.
-# - `supagraf-daily`: one-shot run. Triggered via `docker compose run --rm
-#   daily` (cron-friendly). Schedule it OUTSIDE DeepSeek's peak windows
-#   (Mon-Fri 01-04 & 06-10 UTC) — off-peak is half price; e.g. `0 22 * * *`.
-#   Exit code is non-zero when any step failed (see `etl_runs`).
+# - `daily`: one-shot run, started by `deploy/mixvm/daily.sh` from cron
+#   (`15 0 * * *` UTC, before DeepSeek's weekday peak at 01 UTC). daily.sh
+#   exports the newest v* tag to ./releases/<tag> and points
+#   SUPAGRAF_RELEASE_DIR at it. Exit code is non-zero when any step failed
+#   (see `etl_runs`).
+# - Illustrations are generated on SFGPU over SSH with a key pinned to
+#   scripts/illustrations/gate.sh (forced command); ./sfgpu holds that key
+#   and the host key (see docs/updater.md).
 #
 # All upstream services (Supabase REST at db.*.pl, Sejm API,
 # DeepSeek API) are reached over public HTTPS — no extra network plumbing.
@@ -29,8 +33,8 @@ services:
 
   daily:
     build:
-      context: ./repo
-      dockerfile: Dockerfile.supagraf
+      context: ${SUPAGRAF_RELEASE_DIR:-./repo}
+      dockerfile: deploy/mixvm/Dockerfile.supagraf
     image: sejmograf/supagraf:local
     container_name: sejmograf-daily
     depends_on:
@@ -40,6 +44,7 @@ services:
       - ./.env
     environment:
       OLLAMA_HOST: "http://ollama:11434"
+      OLLAMA_BASE_URL: "http://ollama:11434"
       SUPAGRAF_LLM_TIMEOUT_S: "300"
       # Bypass Cloudflare edge timeout — talk straight to Kong on the
       # supabase_default network joined below. Kong routes /rest/v1/* to
@@ -47,6 +52,15 @@ services:
       SUPABASE_URL: "http://supabase-kong:8000"
       SUPAGRAF_LAW_SCOPE: ${SUPAGRAF_LAW_SCOPE:-scoped}
       SUPAGRAF_LAW_OUTPUT: /app/law-fulltext
+      # LLM steps that would start inside DeepSeek's 2x window are deferred
+      # to the next run instead of paying peak price.
+      SUPAGRAF_ENRICH_OFFPEAK_ONLY: "1"
+      SUPAGRAF_ENABLE_ILLUSTRATIONS: ${SUPAGRAF_ENABLE_ILLUSTRATIONS:-1}
+      SUPAGRAF_ILLUSTRATION_DIR: /app/illustrations
+      SUPAGRAF_PUBLIC_SUPABASE_URL: https://db.msulawiak.pl
+      SUPAGRAF_SFGPU_SSH: michal@sf-ai-gpu.bison-fort.ts.net
+      SUPAGRAF_SFGPU_SSH_KEY: /run/sfgpu/id_ed25519
+      SUPAGRAF_SFGPU_KNOWN_HOSTS: /run/sfgpu/known_hosts
     networks:
       - default
       - supabase
@@ -58,6 +72,8 @@ services:
       - ./fixtures:/app/fixtures
       - ./logs:/app/logs
       - ./law-fulltext:/app/law-fulltext
+      - ./illustrations:/app/illustrations
+      - ./sfgpu:/run/sfgpu:ro
     profiles: ["jobs"]   # one-shot: never auto-up, only via `compose run`
     command: ["uv", "run", "python", "-m", "supagraf", "daily", "--term", "10"]
 

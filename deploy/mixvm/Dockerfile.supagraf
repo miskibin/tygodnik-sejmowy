@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir --upgrade pip uv
 # those prints with TesseractNotFoundError. Polish traineddata is ~5MB.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-        git ca-certificates \
+        git ca-certificates openssh-client \
         tesseract-ocr tesseract-ocr-pol \
  && rm -rf /var/lib/apt/lists/*
 

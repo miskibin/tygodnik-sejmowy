@@ -70,8 +70,12 @@ def _reuse_candidates(entry: dict | None, expires_s: int = 0) -> list[Candidate]
 def run_pipeline(articles: list[Article], output_dir: Path, generate: bool = False, *,
                  planner: Planner = plan_article, reviewer: Reviewer = review_candidate,
                  authentic_search: CandidateFinder | None = None, generator: CandidateFinder | None = None,
-                 generator_fingerprint: str = "", authentic_fingerprint: str = "") -> dict:
-    """Write preview-only report/assets. Approval never publishes an image."""
+                 generator_fingerprint: str = "", authentic_fingerprint: str = "",
+                 stop_at_first_approved: bool = False) -> dict:
+    """Write preview-only report/assets. Approval never publishes an image.
+
+    `stop_at_first_approved` skips reviewing later candidates once one passed
+    (the daily publishes only the first; the preview gallery reviews all)."""
     output_dir.mkdir(parents=True, exist_ok=True)
     assets = output_dir / "assets"; assets.mkdir(exist_ok=True)
     plans_path, candidates_path, reviews_path = (output_dir / "plan-cache.json", output_dir / "candidate-cache.json", output_dir / "review-cache.json")
@@ -113,6 +117,8 @@ def run_pipeline(articles: list[Article], output_dir: Path, generate: bool = Fal
                 candidate_error = f"{type(exc).__name__}: provider unavailable"; candidates = []
         reviewed = []
         for candidate in candidates:
+            if stop_at_first_approved and any(item["review"]["status"] == "approved" for item in reviewed):
+                break
             image_sha = _file_sha(candidate.local_path)
             review_key = _digest({"plan": plan_hash, "candidate": candidate.model_dump(exclude={"local_path"}), "image_sha256": image_sha,
                                   "model": REVIEW_MODEL, "prompt": _prompt_sha("illustration_review", REVIEW_PROMPT_VERSION), "feedback": {"version": FEEDBACK_POLICY_VERSION, "hashes": sorted(__import__("supagraf.enrich.illustrations.review", fromlist=["REJECTED_SHA256"]).REJECTED_SHA256)}})

@@ -15,7 +15,7 @@ AUTHENTIC_SOURCES = {
     },
 }
 
-def find_authentic(plan: Plan, directory: Path) -> list[Candidate]:
+def find_authentic(plan: Plan, directory: Path, *, pixabay: bool = True) -> list[Candidate]:
     identity = plan.required_identity.casefold()
     for entry in AUTHENTIC_SOURCES.values():
         if any(re.search(r'(?<!\w)' + re.escape(alias) + r'(?!\w)', identity) for alias in entry['aliases']):
@@ -29,7 +29,7 @@ def find_authentic(plan: Plan, directory: Path) -> list[Candidate]:
         if plan.required_identity:
             found = search_commons(query, directory, limit=2)
         else:
-            found = search_pixabay(query, directory, limit=2)
+            found = search_pixabay(query, directory, limit=2) if pixabay else []
             if not found:
                 found = search_commons(query, directory, limit=2)
         if found:
