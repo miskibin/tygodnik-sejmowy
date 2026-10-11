@@ -37,6 +37,7 @@ RELEASE="releases/$TAG"
 if [ ! -d "$RELEASE" ]; then
   mkdir -p "$RELEASE.tmp"
   git -C repo archive "refs/tags/$TAG" | tar -x -C "$RELEASE.tmp"
+  touch "$RELEASE.tmp/.daily-release"  # only these are ever pruned below
   mv "$RELEASE.tmp" "$RELEASE"
 fi
 echo "release: $TAG ($(git -C repo rev-parse --short "refs/tags/$TAG^{commit}"))"
@@ -54,7 +55,11 @@ rc=0
 "${compose[@]}" run --rm daily || rc=$?
 
 install -m 755 "$RELEASE/deploy/mixvm/daily.sh" "$HOME_DIR/daily.sh.next" && mv "$HOME_DIR/daily.sh.next" "$HOME_DIR/daily.sh"
-find logs -name 'daily-2*.log' -mtime +30 -delete
-ls -1d releases/v* 2>/dev/null | sort -V | head -n -3 | xargs -r rm -rf
+# Housekeeping never changes the exit code. Other directories in releases/
+# (manual deploy snapshots, rollback files) are not ours and stay.
+find logs -name 'daily-2*.log' -mtime +30 -delete || true
+for old in $(ls -1d releases/v*/.daily-release 2>/dev/null | xargs -r -n1 dirname | sort -V | head -n -3); do
+  rm -rf "$old" || true
+done
 echo "=== $(ts) daily end rc=$rc (tag=$TAG) ==="
 exit "$rc"
