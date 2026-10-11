@@ -32,6 +32,7 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
   const acceptedAmendments = amendments.filter(v => voteMeaning(v).label === "Poprawka przyjęta").length;
   const senateResult = acceptedAmendments === amendments.length ? "Sejm przyjął wszystkie głosowane poprawki Senatu" : acceptedAmendments === 0 ? "Sejm odrzucił wszystkie głosowane poprawki Senatu" : "Sejm przyjął część poprawek Senatu";
   const hasProjects = story.prints.some(p => p.isProject);
+  const otherVotes = main && !amendmentsOnly ? story.votes.filter(v => v.id !== main.id) : story.votes;
 
   return <article className={styles.story} id={`sprawa-${story.id}`} aria-labelledby={`tytul-${story.id}`}>
     <div className={styles.storyContent}>
@@ -63,9 +64,9 @@ function Story({ story, term }: { story: WeeklyStory; term: number }) {
           {href && <Link className={styles.primaryLink} href={href}>{story.prints.length ? "Przebieg sprawy" : main ? "Wynik głosowania" : "Pełna wypowiedź"}<ArrowRight size={17} aria-hidden /></Link>}
         </div>
         <div className={styles.disclosures}>
-          {story.votes.length > 0 && <details className={styles.voteDetails}>
-            <summary>Głosowania <span>{story.votes.length}</span></summary>
-            <ol>{story.votes.map(v => <li key={v.id}>
+          {otherVotes.length > 0 && <details className={styles.voteDetails}>
+            <summary>{main && !amendmentsOnly ? "Pozostałe głosowania" : "Głosowania"} <span>{otherVotes.length}</span></summary>
+            <ol>{otherVotes.map(v => <li key={v.id}>
               <Link href={v.sourceUrl || `/glosowanie/${v.id}`}><span>Nr {v.voting_number} · {voteMeaning(v).question}</span><strong>{voteMeaning(v).label}</strong></Link>
               <VoteBreakdown vote={v} compact />
             </li>)}</ol>
